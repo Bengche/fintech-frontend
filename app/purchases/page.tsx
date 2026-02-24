@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import Navbar from "@/app/components/Navbar";
 import SiteFooter from "@/app/components/SiteFooter";
 import { useAuth } from "@/context/UserContext";
+import { useTranslations } from "next-intl";
 
 const API = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
 
@@ -15,7 +16,13 @@ type Purchase = {
   invoicename: string;
   amount: number;
   currency: string;
-  status: "pending" | "paid" | "delivered" | "expired" | "disputed";
+  status:
+    | "pending"
+    | "paid"
+    | "delivered"
+    | "expired"
+    | "disputed"
+    | "completed";
   createdat: string;
   paid_at: string | null;
   delivered_at: string | null;
@@ -33,6 +40,7 @@ const statusConfig: Record<
   pending: { label: "Pending", bg: "#fef9c3", color: "#854d0e" },
   paid: { label: "Paid", bg: "#dcfce7", color: "#166534" },
   delivered: { label: "Delivered", bg: "#dbeafe", color: "#1e40af" },
+  completed: { label: "Completed", bg: "#f0fdf4", color: "#15803d" },
   expired: { label: "Expired", bg: "#f3f4f6", color: "#6b7280" },
   disputed: { label: "Disputed", bg: "#fee2e2", color: "#991b1b" },
 };
@@ -51,14 +59,28 @@ function fmtDate(d: string | null) {
 }
 
 export default function PurchasesPage() {
-  const { user_id } = useAuth() ?? {};
+  const { user_id, authLoading } = useAuth() ?? {};
   const router = useRouter();
+  const t = useTranslations("Purchases");
+
+  const getStatusLabel = (s: string) => {
+    const map: Record<string, string> = {
+      pending: t("statusPending"),
+      paid: t("statusPaid"),
+      delivered: t("statusDelivered"),
+      completed: t("statusCompleted"),
+      expired: t("statusExpired"),
+      disputed: t("statusDisputed"),
+    };
+    return map[s] ?? s;
+  };
 
   const [purchases, setPurchases] = useState<Purchase[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
+    if (authLoading) return; // wait for session to be restored
     if (!user_id) {
       router.replace("/login");
       return;
@@ -71,16 +93,13 @@ export default function PurchasesPage() {
         setPurchases(res.data.purchases ?? []);
       } catch (err: unknown) {
         const e = err as { response?: { data?: { message?: string } } };
-        setError(
-          e.response?.data?.message ??
-            "Failed to load your purchases. Please try again.",
-        );
+        setError(e.response?.data?.message ?? t("error"));
       } finally {
         setLoading(false);
       }
     };
     load();
-  }, [user_id, router]);
+  }, [user_id, authLoading, router]);
 
   const totalSpent = purchases
     .filter((p) => p.status === "paid" || p.status === "delivered")
@@ -107,7 +126,7 @@ export default function PurchasesPage() {
               margin: 0,
             }}
           >
-            My Purchases
+            {t("title")}
           </h1>
           <p
             style={{
@@ -116,7 +135,7 @@ export default function PurchasesPage() {
               fontSize: "0.95rem",
             }}
           >
-            All invoices you have paid through Fonlok.
+            {t("subtitle")}
           </p>
         </div>
 
@@ -142,7 +161,7 @@ export default function PurchasesPage() {
                   letterSpacing: "0.06em",
                 }}
               >
-                Total Purchases
+                {t("summaryTotalPurchases")}
               </div>
               <div
                 style={{
@@ -164,7 +183,7 @@ export default function PurchasesPage() {
                   letterSpacing: "0.06em",
                 }}
               >
-                Total Spent
+                {t("summaryTotalSpent")}
               </div>
               <div
                 style={{
@@ -186,7 +205,7 @@ export default function PurchasesPage() {
                   letterSpacing: "0.06em",
                 }}
               >
-                Delivered
+                {t("summaryDelivered")}
               </div>
               <div
                 style={{
@@ -210,7 +229,7 @@ export default function PurchasesPage() {
               color: "var(--color-slate)",
             }}
           >
-            Loading your purchases…
+            {t("loading")}
           </div>
         )}
 
@@ -231,11 +250,10 @@ export default function PurchasesPage() {
                 marginBottom: "0.5rem",
               }}
             >
-              No purchases yet
+              {t("noPurchasesTitle")}
             </h2>
             <p style={{ color: "var(--color-slate)", fontSize: "0.95rem" }}>
-              When you pay an invoice through Fonlok it will appear here along
-              with the delivery status and receipt.
+              {t("noPurchasesBody")}
             </p>
           </div>
         )}
@@ -248,7 +266,9 @@ export default function PurchasesPage() {
             {purchases.map((p) => {
               const status = statusConfig[p.status] ?? statusConfig.pending;
               const canDownloadReceipt =
-                p.status === "paid" || p.status === "delivered";
+                p.status === "paid" ||
+                p.status === "delivered" ||
+                p.status === "completed";
 
               return (
                 <div
@@ -279,7 +299,7 @@ export default function PurchasesPage() {
                           color: "var(--color-navy)",
                         }}
                       >
-                        {p.invoicename || "Untitled Invoice"}
+                        {p.invoicename || t("untitledInvoice")}
                       </div>
                       <div
                         style={{
@@ -303,7 +323,7 @@ export default function PurchasesPage() {
                         whiteSpace: "nowrap",
                       }}
                     >
-                      {status.label}
+                      {getStatusLabel(p.status)}
                     </span>
                   </div>
 
@@ -391,9 +411,10 @@ export default function PurchasesPage() {
                         }}
                       >
                         {p.payment_type === "installment"
-                          ? "Installment"
-                          : "One-time"}
-                        {" · "}Paid {fmtDate(p.paid_at)}
+                          ? t("installment")
+                          : t("oneTime")}
+                        {" · "}
+                        {t("paidOn")} {fmtDate(p.paid_at)}
                       </div>
                     </div>
                   </div>
@@ -428,7 +449,7 @@ export default function PurchasesPage() {
                       className="btn-ghost"
                       style={{ fontSize: "0.85rem", padding: "0.45rem 1rem" }}
                     >
-                      View Invoice
+                      {t("viewInvoice")}
                     </Link>
 
                     {canDownloadReceipt && (
@@ -439,7 +460,7 @@ export default function PurchasesPage() {
                         className="btn-primary"
                         style={{ fontSize: "0.85rem", padding: "0.45rem 1rem" }}
                       >
-                        Download Receipt
+                        {t("downloadReceipt")}
                       </a>
                     )}
                   </div>

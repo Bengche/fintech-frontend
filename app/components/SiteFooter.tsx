@@ -1,5 +1,5 @@
-/**
- * SiteFooter — the shared footer for all public-facing pages.
+﻿/**
+ * SiteFooter â€” the shared footer for all public-facing pages.
  *
  * Shows a "Go to Dashboard" link when the user is logged in,
  * or sign-up/sign-in links when they are not.
@@ -8,11 +8,13 @@
 import Link from "next/link";
 import { useAuth } from "@/context/UserContext";
 import FonlokLogo from "./FonlokLogo";
+import { useTranslations } from "next-intl";
 
 const currentYear = new Date().getFullYear();
 
 export default function SiteFooter() {
   const { user_id } = useAuth();
+  const t = useTranslations("SiteFooter");
 
   return (
     <footer
@@ -23,7 +25,7 @@ export default function SiteFooter() {
         marginTop: "auto",
       }}
     >
-      {/* ── Main footer grid ─────────────────────────────────────── */}
+      {/* â”€â”€ Main footer grid â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <div
         className="page-wrapper"
         style={{
@@ -56,7 +58,7 @@ export default function SiteFooter() {
               maxWidth: "220px",
             }}
           >
-            Secure escrow payments for Cameroon. Pay and get paid safely.
+            {t("tagline")}
           </p>
         </div>
 
@@ -72,16 +74,16 @@ export default function SiteFooter() {
               margin: "0 0 1rem",
             }}
           >
-            Product
+            {t("columns.product")}
           </p>
           <FooterLinks
             links={[
-              { href: "/how-it-works", label: "How it works" },
-              { href: "/pricing", label: "Pricing" },
-              { href: "/faq", label: "FAQ" },
+              { href: "/how-it-works", label: t("links.howItWorks") },
+              { href: "/pricing", label: t("links.pricing") },
+              { href: "/faq", label: t("links.faq") },
               ...(user_id
-                ? [{ href: "/dashboard", label: "Dashboard" }]
-                : [{ href: "/register", label: "Create account" }]),
+                ? [{ href: "/dashboard", label: t("links.dashboard") }]
+                : [{ href: "/register", label: t("links.createAccount") }]),
             ]}
           />
         </div>
@@ -98,15 +100,15 @@ export default function SiteFooter() {
               margin: "0 0 1rem",
             }}
           >
-            Support
+            {t("columns.support")}
           </p>
           <FooterLinks
             links={[
-              { href: "/contact", label: "Contact us" },
-              { href: "/faq", label: "Help centre" },
+              { href: "/contact", label: t("links.contactUs") },
+              { href: "/faq", label: t("links.helpCentre") },
               ...(user_id
-                ? [{ href: "/settings", label: "Account settings" }]
-                : [{ href: "/login", label: "Sign in" }]),
+                ? [{ href: "/settings", label: t("links.accountSettings") }]
+                : [{ href: "/login", label: t("links.signIn") }]),
             ]}
           />
         </div>
@@ -123,12 +125,12 @@ export default function SiteFooter() {
               margin: "0 0 1rem",
             }}
           >
-            Legal
+            {t("columns.legal")}
           </p>
           <FooterLinks
             links={[
-              { href: "/terms", label: "Terms of service" },
-              { href: "/privacy", label: "Privacy policy" },
+              { href: "/terms", label: t("links.terms") },
+              { href: "/privacy", label: t("links.privacy") },
             ]}
           />
         </div>
@@ -145,7 +147,7 @@ export default function SiteFooter() {
               margin: "0 0 1rem",
             }}
           >
-            Contact
+            {t("columns.contact")}
           </p>
           <div
             style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}
@@ -176,7 +178,7 @@ export default function SiteFooter() {
         </div>
       </div>
 
-      {/* ── Bottom bar ───────────────────────────────────────────── */}
+      {/* â”€â”€ Bottom bar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <div
         className="page-wrapper"
         style={{
@@ -197,10 +199,10 @@ export default function SiteFooter() {
             color: "rgba(255,255,255,0.4)",
           }}
         >
-          © {currentYear} Fonlok. All rights reserved. Made in Cameroon.
+          {t("copyright", { year: currentYear })}
         </p>
         <p>
-          Built with ❤ by{" "}
+          {t("builtBy")}{" "}
           <Link
             href="https://brancodex.com/"
             style={{
@@ -221,7 +223,7 @@ export default function SiteFooter() {
               textDecoration: "none",
             }}
           >
-            Terms
+            {t("links.termsShort")}
           </Link>
           <Link
             href="/privacy"
@@ -231,7 +233,7 @@ export default function SiteFooter() {
               textDecoration: "none",
             }}
           >
-            Privacy
+            {t("links.privacyShort")}
           </Link>
         </div>
       </div>

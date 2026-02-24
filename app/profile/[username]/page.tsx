@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import { useAuth } from "@/context/UserContext";
 import Navbar from "@/app/components/Navbar";
 import SiteFooter from "@/app/components/SiteFooter";
+import { useTranslations } from "next-intl";
 
 const API = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
 
@@ -34,6 +35,7 @@ type CompletedInvoice = {
 export default function SellerProfilePage() {
   const { username } = useParams<{ username: string }>();
   const { user_id } = useAuth();
+  const t = useTranslations("Profile");
   const [seller, setSeller] = useState<Seller | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [completedInvoices, setCompletedInvoices] = useState<
@@ -65,11 +67,7 @@ export default function SellerProfilePage() {
         setAverageRating(response.data.averageRating);
         setCompletedCount(response.data.completedCount);
       } catch (err: any) {
-        setError(
-          err.response?.status === 404
-            ? "This seller profile does not exist."
-            : "Failed to load seller profile. Please try again.",
-        );
+        setError(err.response?.status === 404 ? t("notFound") : t("loadError"));
       } finally {
         setLoading(false);
       }
@@ -92,16 +90,13 @@ export default function SellerProfilePage() {
         },
         { withCredentials: true },
       );
-      setReviewSuccess("Your review has been submitted. Thank you!");
+      setReviewSuccess(t("reviewSuccess"));
       setShowReviewForm(false);
       const updated = await Axios.get(`${API}/profile/${username}`);
       setReviews(updated.data.reviews);
       setAverageRating(updated.data.averageRating);
     } catch (err: any) {
-      setReviewError(
-        err.response?.data?.message ||
-          "Failed to submit review. Please try again.",
-      );
+      setReviewError(err.response?.data?.message || t("reviewError"));
     }
   };
 
@@ -139,10 +134,8 @@ export default function SellerProfilePage() {
             color: "var(--color-text-muted)",
           }}
         >
-          Loading seller profile�
+          {t("loading")}
         </div>
-
-        <SiteFooter />
       </div>
     );
 
@@ -256,7 +249,7 @@ export default function SellerProfilePage() {
                   color: "var(--color-text-muted)",
                 }}
               >
-                Member since {formatDate(seller.createdat)}
+                {t("memberSince")} {formatDate(seller.createdat)}
               </p>
 
               {/* MoMo phone number */}
@@ -278,7 +271,7 @@ export default function SellerProfilePage() {
                           color: "var(--color-text-body)",
                         }}
                       >
-                        📱{" "}
+                        {" "}
                         {seller.phone ? (
                           `+${seller.phone}`
                         ) : (
@@ -288,7 +281,7 @@ export default function SellerProfilePage() {
                               fontStyle: "italic",
                             }}
                           >
-                            No MoMo number set
+                            {t("noMoMo")}
                           </span>
                         )}
                       </p>
@@ -311,7 +304,7 @@ export default function SellerProfilePage() {
                             textDecoration: "underline",
                           }}
                         >
-                          ✏️ Edit
+                          📝 {t("editPhone")}
                         </button>
                       )}
                     </div>
@@ -331,7 +324,7 @@ export default function SellerProfilePage() {
                           color: "var(--color-text-muted)",
                         }}
                       >
-                        MoMo Phone Number
+                        {t("phoneLabel")}
                       </label>
                       <div
                         style={{
@@ -407,19 +400,18 @@ export default function SellerProfilePage() {
                                   ? { ...prev, phone: res.data.phone }
                                   : prev,
                               );
-                              setPhoneSuccess("Phone number updated!");
+                              setPhoneSuccess(t("phoneSuccess"));
                               setEditingPhone(false);
                             } catch (err: any) {
                               setPhoneError(
-                                err.response?.data?.message ||
-                                  "Failed to update phone.",
+                                err.response?.data?.message || t("phoneError"),
                               );
                             } finally {
                               setPhoneSaving(false);
                             }
                           }}
                         >
-                          {phoneSaving ? "Saving…" : "Save"}
+                          {phoneSaving ? t("savingPhone") : t("savePhone")}
                         </button>
                         <button
                           onClick={() => {
@@ -434,7 +426,7 @@ export default function SellerProfilePage() {
                             color: "var(--color-text-muted)",
                           }}
                         >
-                          Cancel
+                          {t("cancelPhone")}
                         </button>
                       </div>
                       <p
@@ -444,8 +436,7 @@ export default function SellerProfilePage() {
                           margin: 0,
                         }}
                       >
-                        Must start a with 6... e.g. 677298709 (9 digits after
-                        the fixed +237)
+                        {t("phoneHint")}
                       </p>
                       {phoneError && (
                         <p
@@ -489,17 +480,17 @@ export default function SellerProfilePage() {
           >
             <StatBox
               value={completedCount}
-              label="Completed Orders"
+              label={t("completedOrders")}
               color="var(--color-success)"
             />
             <StatBox
               value={averageRating}
-              label="Avg. Rating"
+              label={t("averageRating")}
               color="var(--color-accent)"
             />
             <StatBox
               value={reviews.length}
-              label="Reviews"
+              label={t("reviewsTitle")}
               color="var(--color-primary)"
             />
           </div>
@@ -514,13 +505,13 @@ export default function SellerProfilePage() {
             margin: "0 0 1rem",
           }}
         >
-          Completed Orders
+          {t("completedOrders")}
         </h2>
         {completedInvoices.length === 0 ? (
           <p
             style={{ color: "var(--color-text-muted)", marginBottom: "1.5rem" }}
           >
-            No completed orders yet.
+            {t("noCompleted")}
           </p>
         ) : (
           <div
@@ -557,8 +548,8 @@ export default function SellerProfilePage() {
                     color: "var(--color-text-muted)",
                   }}
                 >
-                  {inv.amount.toLocaleString()} {inv.currency} � Delivered{" "}
-                  {formatDate(inv.delivered_at)}
+                  {inv.amount.toLocaleString()} {inv.currency} —{" "}
+                  {t("deliveredOn")} {formatDate(inv.delivered_at)}
                 </p>
               </div>
             ))}
@@ -584,7 +575,7 @@ export default function SellerProfilePage() {
               margin: 0,
             }}
           >
-            Reviews
+            {t("reviewsTitle")}
           </h2>
           {user_id && (
             <button
@@ -592,7 +583,7 @@ export default function SellerProfilePage() {
               className={showReviewForm ? "btn-ghost" : "btn-primary"}
               style={{ fontSize: "0.875rem", padding: "0.5rem 1rem" }}
             >
-              {showReviewForm ? "Cancel" : "Leave a Review"}
+              {showReviewForm ? t("cancelReview") : t("leaveReview")}
             </button>
           )}
         </div>
@@ -614,8 +605,21 @@ export default function SellerProfilePage() {
                 color: "var(--color-text-heading)",
               }}
             >
-              Write a review
+              {t("writeReview")}
             </h3>
+            <p
+              style={{
+                fontSize: "0.8125rem",
+                color: "var(--color-text-muted)",
+                margin: "0 0 0.75rem",
+                background: "var(--color-cloud)",
+                borderLeft: "3px solid var(--color-accent)",
+                padding: "0.5rem 0.75rem",
+                borderRadius: "0 4px 4px 0",
+              }}
+            >
+              {t("reviewNote")}
+            </p>
             <form
               onSubmit={submitReview}
               style={{
@@ -625,20 +629,18 @@ export default function SellerProfilePage() {
               }}
             >
               <div>
-                <label className="label">
-                  Invoice number (from your payment)
-                </label>
+                <label className="label">{t("reviewInvoiceLabel")}</label>
                 <input
                   className="input"
                   type="text"
-                  placeholder="e.g. INV-000123"
+                  placeholder={t("reviewInvoicePlaceholder")}
                   value={reviewInvoiceNumber}
                   onChange={(e) => setReviewInvoiceNumber(e.target.value)}
                   required
                 />
               </div>
               <div>
-                <label className="label">Rating (1�5 stars)</label>
+                <label className="label">{t("reviewRatingLabel")}</label>
                 <select
                   className="input"
                   value={reviewRating}
@@ -646,16 +648,16 @@ export default function SellerProfilePage() {
                 >
                   {[5, 4, 3, 2, 1].map((r) => (
                     <option key={r} value={r}>
-                      {r} star{r > 1 ? "s" : ""}
+                      {r} {r > 1 ? t("stars") : t("star")}
                     </option>
                   ))}
                 </select>
               </div>
               <div>
-                <label className="label">Your comment</label>
+                <label className="label">{t("reviewCommentLabel")}</label>
                 <textarea
                   className="input"
-                  placeholder="Share your experience with this seller�"
+                  placeholder={t("reviewCommentPlaceholder")}
                   value={reviewComment}
                   onChange={(e) => setReviewComment(e.target.value)}
                   required
@@ -670,7 +672,7 @@ export default function SellerProfilePage() {
                 className="btn-accent"
                 style={{ alignSelf: "flex-start" }}
               >
-                Submit review
+                {t("submitReview")}
               </button>
             </form>
           </div>
@@ -679,7 +681,7 @@ export default function SellerProfilePage() {
         {/* Reviews list */}
         {reviews.length === 0 ? (
           <p style={{ color: "var(--color-text-muted)" }}>
-            No reviews yet. Be the first to review this seller.
+            {t("noReviewsFull")}
           </p>
         ) : (
           <div

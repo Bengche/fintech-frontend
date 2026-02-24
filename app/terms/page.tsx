@@ -1,15 +1,19 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import SiteHeader from "../components/SiteHeader";
 import SiteFooter from "../components/SiteFooter";
 
-export const metadata: Metadata = {
-  title: "Terms of Service | Fonlok",
-  description:
-    "Read Fonlok's terms of service. By using Fonlok you agree to these terms governing the use of our escrow payment platform in Cameroon.",
-  alternates: { canonical: "https://fonlok.com/terms" },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("Terms.meta");
+  return {
+    title: t("title"),
+    description: t("description"),
+    alternates: { canonical: "https://fonlok.com/terms" },
+  };
+}
 
-export default function TermsPage() {
+export default async function TermsPage() {
+  const t = await getTranslations("Terms.hero");
   const lastUpdated = "1 January 2025";
 
   return (
@@ -32,12 +36,12 @@ export default function TermsPage() {
                 marginBottom: "0.5rem",
               }}
             >
-              Terms of Service
+              {t("h1")}
             </h1>
             <p
               style={{ fontSize: "0.875rem", color: "rgba(255,255,255,0.55)" }}
             >
-              Last updated: {lastUpdated}
+              {t("lastUpdated")} {lastUpdated}
             </p>
           </div>
         </section>

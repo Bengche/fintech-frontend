@@ -38,16 +38,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         (response) => response,
         (error) => {
           if (error?.response?.status === 401) {
-            const authPaths = [
+            // Pages that are publicly accessible — a 401 here just means
+            // "not logged in", which is fine. Do NOT redirect to /login.
+            const publicPaths = [
               "/login",
               "/forgot-password",
               "/reset-password",
               "/register",
+              "/invoice/",
+              "/chat/",
             ];
-            const onAuthPage = authPaths.some((p) =>
+            const onPublicPage = publicPaths.some((p) =>
               window.location.pathname.startsWith(p),
             );
-            if (!onAuthPage) {
+            if (!onPublicPage) {
               setUser_id(null);
               setUsername(null);
               Cookies.remove("authToken");

@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import Axios from "axios";
+import { useTranslations } from "next-intl";
 
 const API = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
 
@@ -10,6 +11,7 @@ type myEditProps = {
 };
 
 export default function EditInvoice({ invoice_number, onEdit }: myEditProps) {
+  const t = useTranslations("Invoice");
   const [showEdit, setShowEdit] = useState(false);
   const [editSuccess, setEditSuccess] = useState("");
   const [editError, setEditError] = useState("");
@@ -37,15 +39,13 @@ export default function EditInvoice({ invoice_number, onEdit }: myEditProps) {
       await Axios.patch(`${API}/invoice/edit/${invoice_number}`, newFormData, {
         headers: { "Content-Type": "application/json" },
       });
-      setEditSuccess("Invoice updated successfully.");
+      setEditSuccess(t("edit.success"));
       setShowEdit(false);
       onEdit();
       setTimeout(() => setEditSuccess(""), 5000);
     } catch (error: unknown) {
       const err = error as { response?: { data?: { message?: string } } };
-      const message =
-        err.response?.data?.message ||
-        "Failed to update invoice. Please try again.";
+      const message = err.response?.data?.message || t("edit.errorDefault");
       setEditError(message);
       setTimeout(() => setEditError(""), 5000);
     } finally {
@@ -95,7 +95,7 @@ export default function EditInvoice({ invoice_number, onEdit }: myEditProps) {
         style={{ fontSize: "0.8125rem" }}
         onClick={() => setShowEdit(!showEdit)}
       >
-        {showEdit ? "Cancel" : "Edit"}
+        {showEdit ? t("edit.cancel") : t("edit.trigger")}
       </button>
 
       {/* Edit form */}
@@ -109,7 +109,7 @@ export default function EditInvoice({ invoice_number, onEdit }: myEditProps) {
               margin: "0 0 1rem",
             }}
           >
-            Edit Invoice
+            {t("edit.title")}
           </h4>
           <form onSubmit={handleEdit}>
             <div style={{ display: "grid", gap: "0.75rem" }}>
@@ -118,11 +118,14 @@ export default function EditInvoice({ invoice_number, onEdit }: myEditProps) {
                   className="label"
                   htmlFor={`invoicename-${invoice_number}`}
                 >
-                  Invoice Name
+                  {t("edit.invoiceName")}
                 </label>
                 <input
                   className="input"
-                  placeholder="e.g. Logo Design Package"
+                  placeholder={
+                    t("edit.invoiceNamePlaceholder") ??
+                    "e.g. Logo Design Package"
+                  }
                   id={`invoicename-${invoice_number}`}
                   name="invoicename"
                   type="text"
@@ -142,7 +145,7 @@ export default function EditInvoice({ invoice_number, onEdit }: myEditProps) {
                     className="label"
                     htmlFor={`currency-${invoice_number}`}
                   >
-                    Currency
+                    {t("edit.currency")}
                   </label>
                   <select
                     className="input"
@@ -156,7 +159,7 @@ export default function EditInvoice({ invoice_number, onEdit }: myEditProps) {
                 </div>
                 <div>
                   <label className="label" htmlFor={`amount-${invoice_number}`}>
-                    Amount (FCFA)
+                    {t("edit.amount")}
                   </label>
                   <input
                     className="input"
@@ -174,7 +177,7 @@ export default function EditInvoice({ invoice_number, onEdit }: myEditProps) {
                 className="btn-primary"
                 disabled={isSubmitting}
               >
-                {isSubmitting ? "Saving\u2026" : "Save Changes"}
+                {isSubmitting ? t("edit.saving") : t("edit.saveChanges")}
               </button>
             </div>
           </form>

@@ -3,26 +3,29 @@ import Link from "next/link";
 import SiteHeader from "../components/SiteHeader";
 import SiteFooter from "../components/SiteFooter";
 import FAQAccordion from "./FAQAccordion";
+import { getTranslations } from "next-intl/server";
 
-export const metadata: Metadata = {
-  title: "FAQ — Frequently Asked Questions | Fonlok",
-  description:
-    "Answers to common questions about Fonlok — how escrow works, fees, payments, disputes, security, and more.",
-  keywords: [
-    "Fonlok FAQ",
-    "escrow questions Cameroon",
-    "how does escrow work",
-    "Fonlok questions",
-  ],
-  openGraph: {
-    title: "FAQ — Frequently Asked Questions | Fonlok",
-    description: "Everything you need to know about using Fonlok safely.",
-    url: "https://fonlok.com/faq",
-    siteName: "Fonlok",
-    type: "website",
-  },
-  alternates: { canonical: "https://fonlok.com/faq" },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("FAQ.meta");
+  return {
+    title: t("title"),
+    description: t("description"),
+    keywords: [
+      "Fonlok FAQ",
+      "escrow questions Cameroon",
+      "how does escrow work",
+      "Fonlok questions",
+    ],
+    openGraph: {
+      title: t("title"),
+      description: t("description"),
+      url: "https://fonlok.com/faq",
+      siteName: "Fonlok",
+      type: "website",
+    },
+    alternates: { canonical: "https://fonlok.com/faq" },
+  };
+}
 
 const faqSchema = {
   "@context": "https://schema.org",
@@ -95,7 +98,91 @@ const faqSchema = {
   ],
 };
 
-export default function FAQPage() {
+export default async function FAQPage() {
+  const t = await getTranslations("FAQ");
+
+  const FAQ_SECTIONS = [
+    {
+      heading: t("sections.basics.heading"),
+      items: [
+        {
+          q: t("sections.basics.items.0.q"),
+          a: t("sections.basics.items.0.a"),
+        },
+        {
+          q: t("sections.basics.items.1.q"),
+          a: t("sections.basics.items.1.a"),
+        },
+        {
+          q: t("sections.basics.items.2.q"),
+          a: t("sections.basics.items.2.a"),
+        },
+        {
+          q: t("sections.basics.items.3.q"),
+          a: t("sections.basics.items.3.a"),
+        },
+      ],
+    },
+    {
+      heading: t("sections.payments.heading"),
+      items: [
+        {
+          q: t("sections.payments.items.0.q"),
+          a: t("sections.payments.items.0.a"),
+        },
+        {
+          q: t("sections.payments.items.1.q"),
+          a: t("sections.payments.items.1.a"),
+        },
+        {
+          q: t("sections.payments.items.2.q"),
+          a: t("sections.payments.items.2.a"),
+        },
+        {
+          q: t("sections.payments.items.3.q"),
+          a: t("sections.payments.items.3.a"),
+        },
+      ],
+    },
+    {
+      heading: t("sections.disputes.heading"),
+      items: [
+        {
+          q: t("sections.disputes.items.0.q"),
+          a: t("sections.disputes.items.0.a"),
+        },
+        {
+          q: t("sections.disputes.items.1.q"),
+          a: t("sections.disputes.items.1.a"),
+        },
+        {
+          q: t("sections.disputes.items.2.q"),
+          a: t("sections.disputes.items.2.a"),
+        },
+        {
+          q: t("sections.disputes.items.3.q"),
+          a: t("sections.disputes.items.3.a"),
+        },
+      ],
+    },
+    {
+      heading: t("sections.accounts.heading"),
+      items: [
+        {
+          q: t("sections.accounts.items.0.q"),
+          a: t("sections.accounts.items.0.a"),
+        },
+        {
+          q: t("sections.accounts.items.1.q"),
+          a: t("sections.accounts.items.1.a"),
+        },
+        {
+          q: t("sections.accounts.items.2.q"),
+          a: t("sections.accounts.items.2.a"),
+        },
+      ],
+    },
+  ];
   return (
     <>
       <script
@@ -122,7 +209,7 @@ export default function FAQPage() {
                 marginBottom: "1rem",
               }}
             >
-              Frequently asked questions
+              {t("hero.h1")}
             </h1>
             <p
               style={{
@@ -131,7 +218,7 @@ export default function FAQPage() {
                 lineHeight: 1.75,
               }}
             >
-              Have a question not listed here?{" "}
+              {t("hero.description")}{" "}
               <Link
                 href="/contact"
                 style={{
@@ -140,7 +227,7 @@ export default function FAQPage() {
                   fontWeight: 600,
                 }}
               >
-                Contact us
+                {t("hero.contactLink")}
               </Link>
               .
             </p>
@@ -192,7 +279,7 @@ export default function FAQPage() {
                 marginBottom: "1rem",
               }}
             >
-              Still have questions?
+              {t("bottomCta.heading")}
             </h2>
             <p
               style={{
@@ -201,7 +288,7 @@ export default function FAQPage() {
                 marginBottom: "2rem",
               }}
             >
-              Our team is available to help.
+              {t("bottomCta.description")}
             </p>
             <div
               style={{
@@ -212,7 +299,7 @@ export default function FAQPage() {
               }}
             >
               <Link href="/contact" className="btn-accent">
-                Get in touch
+                {t("bottomCta.ctaPrimary")}
               </Link>
               <Link
                 href="/register"
@@ -222,7 +309,7 @@ export default function FAQPage() {
                   borderColor: "rgba(255,255,255,0.3)",
                 }}
               >
-                Create a free account
+                {t("bottomCta.ctaSecondary")}
               </Link>
             </div>
           </div>
@@ -233,88 +320,3 @@ export default function FAQPage() {
     </>
   );
 }
-
-// ── Data ────────────────────────────────────────────────────────
-
-const FAQ_SECTIONS = [
-  {
-    heading: "The basics",
-    items: [
-      {
-        q: "What is escrow?",
-        a: "Escrow is a system where a trusted third party holds money until both sides of a deal are satisfied. The buyer pays in, and the money is only released to the seller once the buyer confirms they received what they paid for.",
-      },
-      {
-        q: "How does Fonlok work?",
-        a: "The seller creates an invoice on Fonlok and shares a payment link with the buyer. The buyer pays using Mobile Money. Fonlok holds the funds. Once the buyer confirms delivery, Fonlok pays the seller. If there's a problem, Fonlok investigates.",
-      },
-      {
-        q: "Is Fonlok a bank?",
-        a: "No. Fonlok is an escrow platform — we hold funds temporarily as a neutral party during a transaction. We are not a bank and do not offer interest or savings products.",
-      },
-      {
-        q: "Can I use Fonlok from my phone?",
-        a: "Yes. Fonlok works on any device with a web browser — smartphones, tablets, and computers.",
-      },
-    ],
-  },
-  {
-    heading: "Payments & fees",
-    items: [
-      {
-        q: "Which payment methods are accepted?",
-        a: "Buyers can pay with MTN Mobile Money and Orange Money. Credit/debit cards are not currently supported.",
-      },
-      {
-        q: "Who pays the Fonlok fee — buyer or seller?",
-        a: "The seller pays a 3% fee on each transaction. Buyers pay the exact invoice amount with no additional charges from Fonlok.",
-      },
-      {
-        q: "Are there monthly fees or subscription plans?",
-        a: "No. Fonlok is completely free to sign up for and free to use. The only cost is the 3% fee when a transaction is completed.",
-      },
-      {
-        q: "How long does it take to receive my money after delivery is confirmed?",
-        a: "Fonlok initiates the payout immediately after the buyer confirms delivery. Depending on your mobile network, funds typically arrive within a few minutes to a few hours.",
-      },
-    ],
-  },
-  {
-    heading: "Disputes & safety",
-    items: [
-      {
-        q: "What if the buyer does not confirm delivery?",
-        a: "If the buyer does not respond within the expected window, Fonlok will contact both parties to resolve the situation. We review all available evidence before making a final decision.",
-      },
-      {
-        q: "What happens if there is a dispute?",
-        a: "Either party can open a dispute from their Fonlok dashboard. We freeze the funds and request evidence from both sides — photos, messages, delivery confirmations, etc. Our team reviews everything and decides whether to release or refund the money.",
-      },
-      {
-        q: "What if the seller does not deliver?",
-        a: "The buyer can open a dispute. If the seller cannot prove delivery, Fonlok refunds the buyer in full.",
-      },
-      {
-        q: "Is Fonlok secure?",
-        a: "Yes. All transactions are encrypted and funds held in escrow are ring-fenced. We use secure payment processors and never store sensitive payment credentials on our servers.",
-      },
-    ],
-  },
-  {
-    heading: "Accounts",
-    items: [
-      {
-        q: "Is creating an account free?",
-        a: "Yes. Creating an account on Fonlok is free and takes less than two minutes.",
-      },
-      {
-        q: "Do I need an account to pay as a buyer?",
-        a: "You can make a payment via the invoice link without an account. However, creating a free account gives you access to payment history, dispute management, and order tracking.",
-      },
-      {
-        q: "How do I change my password or phone number?",
-        a: "Log in to your account and go to Settings. From there you can update your phone number and change your password.",
-      },
-    ],
-  },
-];

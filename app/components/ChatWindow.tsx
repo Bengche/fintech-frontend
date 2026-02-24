@@ -1,7 +1,8 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import Axios from "axios";
-import { Send, Paperclip, X } from "lucide-react";
+import { Send, Paperclip, X, MessageSquare } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 const API = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
 
@@ -19,13 +20,17 @@ type ChatWindowProps = {
 };
 
 export default function ChatWindow({ invoice_number }: ChatWindowProps) {
+  const t = useTranslations("Chat");
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [errorMessage, setErrorMessage] = useState("");
   const [isSending, setIsSending] = useState(false);
+  const [buyerMsgCount, setBuyerMsgCount] = useState(0);
+  const [chatExists, setChatExists] = useState<boolean | null>(null);
   const bottomOfChat = useRef<HTMLDivElement>(null);
+  const prevMsgCount = useRef(0);
 
   const fetchMessages = async () => {
     try {
@@ -33,16 +38,32 @@ export default function ChatWindow({ invoice_number }: ChatWindowProps) {
         `${API}/chat/messages/${invoice_number}`,
         { withCredentials: true },
       );
-      setMessages(response.data.messages);
-    } catch {
-      console.log("Could not load messages");
+      const msgs: Message[] = response.data.messages ?? [];
+      setMessages(msgs);
+      setChatExists(true);
+      // Count buyer messages so we can show a badge on the button
+      setBuyerMsgCount(msgs.filter((m) => m.sender_type === "buyer").length);
+    } catch (err: any) {
+      if (err.response?.status === 404) {
+        setChatExists(false);
+      } else {
+        console.log("Could not load messages");
+      }
     }
   };
 
+  // Fetch message count once on mount so the badge shows without opening the chat
   useEffect(() => {
-    if (bottomOfChat.current) {
-      bottomOfChat.current.scrollIntoView({ behavior: "smooth" });
+    fetchMessages();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Only scroll to bottom when the message count actually increases
+  useEffect(() => {
+    if (messages.length > prevMsgCount.current) {
+      bottomOfChat.current?.scrollIntoView({ behavior: "smooth" });
     }
+    prevMsgCount.current = messages.length;
   }, [messages]);
 
   useEffect(() => {
@@ -65,7 +86,7 @@ export default function ChatWindow({ invoice_number }: ChatWindowProps) {
       setNewMessage("");
       fetchMessages();
     } catch {
-      setErrorMessage("Failed to send message. Please try again.");
+      setErrorMessage(t("errorSend"));
       setTimeout(() => setErrorMessage(""), 4000);
     } finally {
       setIsSending(false);
@@ -85,7 +106,7 @@ export default function ChatWindow({ invoice_number }: ChatWindowProps) {
       setSelectedFile(null);
       fetchMessages();
     } catch {
-      setErrorMessage("Failed to upload file. Please try again.");
+      setErrorMessage(t("errorUpload"));
       setTimeout(() => setErrorMessage(""), 4000);
     }
   };
@@ -94,10 +115,33 @@ export default function ChatWindow({ invoice_number }: ChatWindowProps) {
     <div>
       <button
         onClick={() => setIsChatOpen(!isChatOpen)}
-        className="btn-ghost"
-        style={{ fontSize: "0.8125rem" }}
+        className={isChatOpen ? "btn-secondary" : "btn-primary"}
+        style={{
+          fontSize: "0.8125rem",
+          display: "inline-flex",
+          alignItems: "center",
+          gap: "0.375rem",
+        }}
       >
-        {isChatOpen ? "Close Chat" : "Chat with Buyer"}
+        <MessageSquare size={14} />
+        {isChatOpen ? t("closeBtn") : t("openBtn")}
+        {!isChatOpen && buyerMsgCount > 0 && (
+          <span
+            style={{
+              backgroundColor: "#ef4444",
+              color: "#fff",
+              borderRadius: "999px",
+              fontSize: "0.625rem",
+              fontWeight: 700,
+              padding: "0 0.35rem",
+              lineHeight: "1.4",
+              minWidth: "1.1rem",
+              textAlign: "center",
+            }}
+          >
+            {buyerMsgCount}
+          </span>
+        )}
       </button>
 
       {isChatOpen && (
@@ -123,7 +167,8 @@ export default function ChatWindow({ invoice_number }: ChatWindowProps) {
             }}
           >
             <span style={{ fontWeight: 700, fontSize: "0.875rem" }}>
-              Chat &mdash; Invoice #{invoice_number}
+              {t("headerPrefix")}
+              {invoice_number}
             </span>
             <button
               onClick={() => setIsChatOpen(false)}
@@ -151,7 +196,7 @@ export default function ChatWindow({ invoice_number }: ChatWindowProps) {
               backgroundColor: "var(--color-cloud)",
             }}
           >
-            {messages.length === 0 && (
+            {chatExists === false ? (
               <p
                 style={{
                   textAlign: "center",
@@ -160,9 +205,20 @@ export default function ChatWindow({ invoice_number }: ChatWindowProps) {
                   marginTop: "2rem",
                 }}
               >
-                No messages yet. Start the conversation!
+                Chat opens once the buyer completes payment.
               </p>
-            )}
+            ) : messages.length === 0 ? (
+              <p
+                style={{
+                  textAlign: "center",
+                  color: "var(--color-text-muted)",
+                  fontSize: "0.8125rem",
+                  marginTop: "2rem",
+                }}
+              >
+                {t("empty")}
+              </p>
+            ) : null}
 
             {messages.map((msg) => {
               const isSeller = msg.sender_type === "seller";
@@ -203,7 +259,7 @@ export default function ChatWindow({ invoice_number }: ChatWindowProps) {
                       }}
                     >
                       {isSeller
-                        ? "You (Seller)"
+                        ? t("youSeller")
                         : `Buyer (${msg.sender_email})`}
                     </p>
                     {msg.message && <p style={{ margin: 0 }}>{msg.message}</p>}
@@ -220,7 +276,7 @@ export default function ChatWindow({ invoice_number }: ChatWindowProps) {
                           textDecoration: "underline",
                         }}
                       >
-                        View Uploaded File
+                        {t("viewFile")}
                       </a>
                     )}
                   </div>
@@ -257,81 +313,92 @@ export default function ChatWindow({ invoice_number }: ChatWindowProps) {
             </div>
           )}
 
-          {/* File upload area */}
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "0.5rem",
-              padding: "0.5rem 0.75rem",
-              borderTop: "1px solid var(--color-border)",
-              backgroundColor: "var(--color-mist)",
-            }}
-          >
-            <label
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "0.25rem",
-                fontSize: "0.8125rem",
-                color: "var(--color-text-muted)",
-                cursor: "pointer",
-              }}
-            >
-              <Paperclip size={14} />
-              <input
-                type="file"
-                onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
-                style={{ display: "none" }}
-              />
-              {selectedFile ? selectedFile.name : "Attach file"}
-            </label>
-            {selectedFile && (
-              <button
-                onClick={uploadFile}
-                className="btn-primary"
-                style={{ fontSize: "0.75rem", padding: "0.25rem 0.625rem" }}
+          {/* File upload + message input — hidden until chat room exists */}
+          {chatExists !== false && (
+            <>
+              {/* File upload area */}
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.5rem",
+                  padding: "0.5rem 0.75rem",
+                  borderTop: "1px solid var(--color-border)",
+                  backgroundColor: "var(--color-mist)",
+                }}
               >
-                Upload
-              </button>
-            )}
-          </div>
+                <label
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.25rem",
+                    fontSize: "0.8125rem",
+                    color: "var(--color-text-muted)",
+                    cursor: "pointer",
+                  }}
+                >
+                  <Paperclip size={14} />
+                  <input
+                    type="file"
+                    onChange={(e) =>
+                      setSelectedFile(e.target.files?.[0] || null)
+                    }
+                    style={{ display: "none" }}
+                  />
+                  {selectedFile ? selectedFile.name : t("attachFile")}
+                </label>
+                {selectedFile && (
+                  <button
+                    onClick={uploadFile}
+                    className="btn-primary"
+                    style={{ fontSize: "0.75rem", padding: "0.25rem 0.625rem" }}
+                  >
+                    {t("upload")}
+                  </button>
+                )}
+              </div>
 
-          {/* Message input */}
-          <div
-            style={{
-              display: "flex",
-              gap: "0.5rem",
-              padding: "0.625rem 0.75rem",
-              borderTop: "1px solid var(--color-border)",
-            }}
-          >
-            <input
-              type="text"
-              placeholder="Type a message\u2026"
-              value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
-              onKeyDown={(e) =>
-                e.key === "Enter" && !isSending && sendMessage()
-              }
-              className="input"
-              style={{ flex: 1, paddingTop: "0.5rem", paddingBottom: "0.5rem" }}
-            />
-            <button
-              onClick={sendMessage}
-              disabled={isSending}
-              className="btn-primary"
-              style={{
-                padding: "0.5rem 0.875rem",
-                display: "flex",
-                alignItems: "center",
-                gap: "0.25rem",
-              }}
-            >
-              <Send size={14} />
-              {isSending ? "" : "Send"}
-            </button>
-          </div>
+              {/* Message input */}
+              <div
+                style={{
+                  display: "flex",
+                  gap: "0.5rem",
+                  padding: "0.625rem 0.75rem",
+                  borderTop: "1px solid var(--color-border)",
+                }}
+              >
+                <input
+                  type="text"
+                  placeholder={t("messagePlaceholder")}
+                  value={newMessage}
+                  onChange={(e) => setNewMessage(e.target.value)}
+                  onKeyDown={(e) =>
+                    e.key === "Enter" && !isSending && sendMessage()
+                  }
+                  className="input"
+                  style={{
+                    flex: 1,
+                    paddingTop: "0.5rem",
+                    paddingBottom: "0.5rem",
+                  }}
+                />
+                <button
+                  onClick={sendMessage}
+                  disabled={isSending}
+                  className="btn-primary"
+                  style={{
+                    padding: "0.5rem 0.875rem",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.25rem",
+                  }}
+                >
+                  <Send size={14} />
+                  {isSending ? "" : t("send")}
+                </button>
+              </div>
+            </>
+          )}
         </div>
       )}
     </div>

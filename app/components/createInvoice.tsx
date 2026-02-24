@@ -1,11 +1,15 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Axios from "axios";
 import InvoiceTemplates from "./InvoiceTemplates";
+import { useTranslations } from "next-intl";
 
 const API = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
 
-export default function CreateInvoice() {
+export default function CreateInvoice({
+  onCreated,
+}: { onCreated?: () => void } = {}) {
+  const t = useTranslations("Invoice");
   const [openModal, setOpenModal] = useState(false);
   const [invoiceSuccess, setInvoiceSuccess] = useState("");
   const [invoiceError, setInvoiceError] = useState("");
@@ -22,6 +26,21 @@ export default function CreateInvoice() {
   const [showSaveTemplate, setShowSaveTemplate] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSavingTemplate, setIsSavingTemplate] = useState(false);
+
+  // --- Email ownership check ---
+  const [myEmail, setMyEmail] = useState<string | null>(null);
+  const emailMismatch =
+    myEmail !== null &&
+    formData.email.trim() !== "" &&
+    formData.email.trim().toLowerCase() !== myEmail.toLowerCase();
+
+  // Fetch authenticated user's email when the modal opens
+  useEffect(() => {
+    if (!openModal) return;
+    Axios.get(`${API}/user/me`, { withCredentials: true })
+      .then((res) => setMyEmail(res.data.email ?? null))
+      .catch(() => setMyEmail(null));
+  }, [openModal]);
 
   // --- Installment payment state ---
   const [paymentType, setPaymentType] = useState<"full" | "installment">(
@@ -74,6 +93,7 @@ export default function CreateInvoice() {
     setOpenModal(false);
     setInvoiceError("");
     setSaveTemplateSuccess("");
+    setMyEmail(null);
     setShowSaveTemplate(false);
     setTemplateName("");
   };
@@ -119,10 +139,11 @@ export default function CreateInvoice() {
         headers: { "Content-Type": "application/json" },
       });
       console.log(response.data);
-      setInvoiceSuccess("Invoice created! Share the link with your client.");
+      setInvoiceSuccess(t("create.successToast"));
       resetForm();
       closeModal();
       setTimeout(() => setInvoiceSuccess(""), 7000);
+      onCreated?.();
     } catch (error: unknown) {
       const err = error as {
         message?: string;
@@ -207,7 +228,7 @@ export default function CreateInvoice() {
         onClick={() => setOpenModal(true)}
         style={{ fontSize: "0.9375rem", padding: "0.625rem 1.5rem" }}
       >
-        + Create Invoice
+        {t("create.trigger")}
       </button>
 
       {/* Toast: success (outside modal so it persists after close) */}
@@ -275,7 +296,7 @@ export default function CreateInvoice() {
                     color: "var(--color-text-heading)",
                   }}
                 >
-                  Create New Invoice
+                  {t("create.modalTitle")}
                 </h2>
                 <p
                   style={{
@@ -284,7 +305,7 @@ export default function CreateInvoice() {
                     color: "var(--color-text-muted)",
                   }}
                 >
-                  Fill in the details below to generate a payment link.
+                  {t("create.modalSubtitle")}
                 </p>
               </div>
               <button
@@ -340,9 +361,7 @@ export default function CreateInvoice() {
                     lineHeight: 1.5,
                   }}
                 >
-                  ⚠️ The email below must match the email you used when creating
-                  your Fonlok account. This links the invoice to your seller
-                  profile.
+                  ⚠️ {t("create.identityNotice")}
                 </div>
 
                 {/* Invoice name + email (two columns on wider screens) */}
@@ -357,11 +376,11 @@ export default function CreateInvoice() {
                 >
                   <div>
                     <label className="label" htmlFor="invoicename">
-                      Invoice name
+                      {t("create.invoiceName")}
                     </label>
                     <input
                       className="input"
-                      placeholder="e.g. Logo Design Package"
+                      placeholder={t("create.invoiceNamePlaceholder")}
                       id="invoicename"
                       name="invoicename"
                       type="text"
@@ -372,7 +391,7 @@ export default function CreateInvoice() {
                   </div>
                   <div>
                     <label className="label" htmlFor="email">
-                      Your account email
+                      {t("create.accountEmail")}
                     </label>
                     <input
                       className="input"
@@ -383,7 +402,50 @@ export default function CreateInvoice() {
                       required
                       onChange={handleChange}
                       value={formData.email}
+                      style={
+                        emailMismatch ? { borderColor: "#dc2626" } : undefined
+                      }
                     />
+                    {emailMismatch && (
+                      <div
+                        style={{
+                          marginTop: "0.5rem",
+                          padding: "0.75rem 1rem",
+                          backgroundColor: "#fef2f2",
+                          border: "1px solid #fca5a5",
+                          borderRadius: "var(--radius-sm, 6px)",
+                          color: "#991b1b",
+                          fontSize: "0.8125rem",
+                          lineHeight: 1.55,
+                        }}
+                      >
+                        <div
+                          style={{
+                            fontWeight: 700,
+                            marginBottom: "0.3rem",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "0.375rem",
+                          }}
+                        >
+                          🚫 {t("create.wrongEmailTitle")}
+                        </div>
+                        <p style={{ margin: 0 }}>
+                          {t("create.wrongEmailBody")}
+                        </p>
+                        {myEmail && (
+                          <p
+                            style={{
+                              margin: "0.4rem 0 0",
+                              fontStyle: "italic",
+                              color: "#b91c1c",
+                            }}
+                          >
+                            {t("create.wrongEmailHint")}
+                          </p>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -398,7 +460,7 @@ export default function CreateInvoice() {
                 >
                   <div>
                     <label className="label" htmlFor="currency">
-                      Currency
+                      {t("create.currency")}
                     </label>
                     <select
                       className="input"
@@ -413,7 +475,7 @@ export default function CreateInvoice() {
                   </div>
                   <div>
                     <label className="label" htmlFor="amount">
-                      Amount
+                      {t("create.amount")}
                     </label>
                     <input
                       className="input"
@@ -431,7 +493,7 @@ export default function CreateInvoice() {
                 {/* Description */}
                 <div style={{ marginBottom: "1rem" }}>
                   <label className="label" htmlFor="description">
-                    Description
+                    {t("create.description")}
                   </label>
                   <p
                     style={{
@@ -441,12 +503,11 @@ export default function CreateInvoice() {
                       lineHeight: 1.5,
                     }}
                   >
-                    Be specific — list all deliverables, specs, and conditions.
-                    Clear descriptions reduce disputes.
+                    {t("create.descriptionHint")}
                   </p>
                   <textarea
                     className="input"
-                    placeholder="Describe exactly what you are delivering…"
+                    placeholder={t("create.descriptionPlaceholder")}
                     name="description"
                     id="description"
                     value={formData.description}
@@ -459,14 +520,14 @@ export default function CreateInvoice() {
                 {/* Expiry date */}
                 <div style={{ marginBottom: "1.25rem" }}>
                   <label className="label" htmlFor="expires_at">
-                    Expiry date{" "}
+                    {t("create.expiryDate")}{" "}
                     <span
                       style={{
                         fontWeight: 400,
                         color: "var(--color-text-muted)",
                       }}
                     >
-                      (optional)
+                      ({t("create.expiryOptional")})
                     </span>
                   </label>
                   <p
@@ -476,7 +537,7 @@ export default function CreateInvoice() {
                       margin: "0 0 0.375rem",
                     }}
                   >
-                    After this date the buyer will no longer be able to pay.
+                    {t("create.expiryHint")}
                   </p>
                   <input
                     className="input"
@@ -502,7 +563,7 @@ export default function CreateInvoice() {
                     className="label"
                     style={{ display: "block", marginBottom: "0.625rem" }}
                   >
-                    Payment type
+                    {t("create.paymentType")}
                   </label>
                   <div
                     style={{
@@ -534,8 +595,8 @@ export default function CreateInvoice() {
                         }}
                       >
                         {type === "full"
-                          ? "Full payment"
-                          : "Installments / milestones"}
+                          ? t("create.fullPayment")
+                          : t("create.installments")}
                       </button>
                     ))}
                   </div>
@@ -548,9 +609,7 @@ export default function CreateInvoice() {
                         marginBottom: 0,
                       }}
                     >
-                      The buyer pays the full amount upfront. You receive each
-                      portion after marking a milestone complete and the buyer
-                      confirms it.
+                      {t("create.installmentHint")}
                     </p>
                   )}
                 </div>
@@ -575,7 +634,7 @@ export default function CreateInvoice() {
                       }}
                     >
                       <label className="label" style={{ margin: 0 }}>
-                        Milestones
+                        {t("create.milestones")}
                       </label>
                       <span
                         style={{
@@ -588,7 +647,7 @@ export default function CreateInvoice() {
                       >
                         {invoiceTotal > 0
                           ? `${milestonesTotal.toLocaleString()} / ${invoiceTotal.toLocaleString()} XAF`
-                          : "Enter invoice amount first"}
+                          : t("create.enterAmountFirst")}
                       </span>
                     </div>
 
@@ -669,7 +728,7 @@ export default function CreateInvoice() {
                         padding: 0,
                       }}
                     >
-                      + Add milestone
+                      {t("create.addMilestone")}
                     </button>
 
                     {invoiceTotal > 0 && !milestonesBalanced && (
@@ -705,11 +764,9 @@ export default function CreateInvoice() {
                   }}
                 >
                   <strong style={{ color: "var(--color-text-body)" }}>
-                    Escrow fee:
+                    {t("create.escrowFeeTitle")}
                   </strong>{" "}
-                  Fonlok charges a flat <strong>2% fee</strong> per transaction.
-                  This is deducted from your payout after the buyer confirms
-                  delivery. Buyers are never charged a Fonlok fee.
+                  {t("create.escrowFeeDesc")}
                 </div>
 
                 {/* Save as template toggle */}
@@ -729,8 +786,8 @@ export default function CreateInvoice() {
                     }}
                   >
                     {showSaveTemplate
-                      ? "Cancel"
-                      : "Save this invoice as a template"}
+                      ? t("create.cancelTemplate")
+                      : t("create.saveAsTemplate")}
                   </button>
 
                   {showSaveTemplate && (
@@ -745,7 +802,7 @@ export default function CreateInvoice() {
                       <input
                         className="input"
                         type="text"
-                        placeholder="Template name (e.g. Logo Design Package)"
+                        placeholder={t("create.templateNamePlaceholder")}
                         value={templateName}
                         onChange={(e) => setTemplateName(e.target.value)}
                         style={{ flex: 1, minWidth: "200px" }}
@@ -765,7 +822,9 @@ export default function CreateInvoice() {
                               : "pointer",
                         }}
                       >
-                        {isSavingTemplate ? "Saving…" : "Save Template"}
+                        {isSavingTemplate
+                          ? t("create.saving")
+                          : t("create.saveTemplate")}
                       </button>
                     </div>
                   )}
@@ -800,19 +859,22 @@ export default function CreateInvoice() {
                     onClick={closeModal}
                     style={{ fontSize: "0.9375rem" }}
                   >
-                    Cancel
+                    {t("create.cancel")}
                   </button>
                   <button
                     type="submit"
                     className="btn-primary"
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || emailMismatch}
                     style={{
                       fontSize: "0.9375rem",
-                      cursor: isSubmitting ? "not-allowed" : "pointer",
-                      opacity: isSubmitting ? 0.65 : 1,
+                      cursor:
+                        isSubmitting || emailMismatch
+                          ? "not-allowed"
+                          : "pointer",
+                      opacity: isSubmitting || emailMismatch ? 0.65 : 1,
                     }}
                   >
-                    {isSubmitting ? "Creating…" : "Create Invoice"}
+                    {isSubmitting ? t("create.submitting") : t("create.submit")}
                   </button>
                 </div>
               </form>

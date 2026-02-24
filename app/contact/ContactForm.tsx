@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 
 export default function ContactForm() {
+  const t = useTranslations("Contact.form");
   const [form, setForm] = useState({ name: "", email: "", message: "" });
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
@@ -44,11 +46,7 @@ export default function ContactForm() {
   };
 
   if (sent) {
-    return (
-      <div className="alert alert-success">
-        Your message has been sent. We will get back to you as soon as possible.
-      </div>
-    );
+    return <div className="alert alert-success">{t("success")}</div>;
   }
 
   return (
@@ -60,7 +58,7 @@ export default function ContactForm() {
 
       <div>
         <label className="label" htmlFor="contact-name">
-          Your name
+          {t("name")}
         </label>
         <input
           id="contact-name"
@@ -75,7 +73,7 @@ export default function ContactForm() {
 
       <div>
         <label className="label" htmlFor="contact-email">
-          Email address
+          {t("email")}
         </label>
         <input
           id="contact-email"
@@ -90,7 +88,7 @@ export default function ContactForm() {
 
       <div>
         <label className="label" htmlFor="contact-message">
-          Message
+          {t("message")}
         </label>
         <textarea
           id="contact-message"
@@ -110,7 +108,7 @@ export default function ContactForm() {
         disabled={loading}
         style={{ alignSelf: "flex-start" }}
       >
-        {loading ? "Sending…" : "Send message"}
+        {loading ? t("sending") : t("submit")}
       </button>
     </form>
   );

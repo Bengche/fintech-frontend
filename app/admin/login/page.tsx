@@ -2,11 +2,13 @@
 import { useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
 
 export default function AdminLoginPage() {
   const router = useRouter();
+  const t = useTranslations("Admin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -27,7 +29,7 @@ export default function AdminLoginPage() {
       const message =
         axios.isAxiosError(err) && err.response?.data?.message
           ? err.response.data.message
-          : "Login failed. Please check your credentials.";
+          : t("login.error");
       setError(message);
     } finally {
       setLoading(false);
@@ -83,10 +85,10 @@ export default function AdminLoginPage() {
               margin: "0 0 0.25rem",
             }}
           >
-            Admin Portal
+            {t("login.title")}
           </h1>
           <p style={{ fontSize: "0.875rem", color: "#94a3b8", margin: 0 }}>
-            Sign in to access the dashboard
+            {t("login.subtitle")}
           </p>
         </div>
 
@@ -114,7 +116,7 @@ export default function AdminLoginPage() {
                   marginBottom: "0.375rem",
                 }}
               >
-                Email Address
+                {t("login.emailLabel")}
               </label>
               <input
                 id="admin-email"
@@ -150,7 +152,7 @@ export default function AdminLoginPage() {
                   marginBottom: "0.375rem",
                 }}
               >
-                Password
+                {t("login.passwordLabel")}
               </label>
               <input
                 id="admin-password"
@@ -207,7 +209,7 @@ export default function AdminLoginPage() {
                 transition: "background 0.15s",
               }}
             >
-              {loading ? "Signing in\u2026" : "Sign In"}
+              {loading ? t("login.submitting") : t("login.submit")}
             </button>
           </form>
         </div>
@@ -220,7 +222,7 @@ export default function AdminLoginPage() {
             marginTop: "1.25rem",
           }}
         >
-          Restricted area &mdash; authorised personnel only
+          {t("login.restricted")}
         </p>
       </div>
     </div>

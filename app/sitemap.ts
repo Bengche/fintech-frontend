@@ -2,7 +2,8 @@ import type { MetadataRoute } from "next";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
-  return [
+
+  const pages: MetadataRoute.Sitemap = [
     {
       url: "https://fonlok.com",
       lastModified: now,
@@ -58,4 +59,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.3,
     },
   ];
+
+  // Add French locale variants for all pages
+  const frPages: MetadataRoute.Sitemap = pages.map((page) => ({
+    ...page,
+    url: page.url.replace("https://fonlok.com", "https://fonlok.com/fr"),
+  }));
+
+  return [...pages, ...frPages];
 }

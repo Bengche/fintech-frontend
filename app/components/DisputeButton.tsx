@@ -2,6 +2,7 @@
 import { useState } from "react";
 import Axios from "axios";
 import { AlertTriangle } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 const API = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
 
@@ -18,6 +19,7 @@ export default function DisputeButton({
   buyer_token,
   autoOpen = false,
 }: DisputeButtonProps) {
+  const t = useTranslations("Dispute");
   const [showModal, setShowModal] = useState(autoOpen);
   const [reason, setReason] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
@@ -26,7 +28,7 @@ export default function DisputeButton({
 
   const submitDispute = async () => {
     if (!reason.trim()) {
-      setErrorMessage("Please describe the reason for the dispute.");
+      setErrorMessage(t("emptyReason"));
       return;
     }
     setIsSubmitting(true);
@@ -41,15 +43,11 @@ export default function DisputeButton({
       await Axios.post(`${API}/dispute/open/${invoice_number}`, body);
       setShowModal(false);
       setReason("");
-      setSuccessMessage(
-        "Dispute submitted. Our admin has been notified and will review your case shortly.",
-      );
+      setSuccessMessage(t("successMsg"));
       setTimeout(() => setSuccessMessage(""), 8000);
     } catch (error: unknown) {
       const err = error as { response?: { data?: { message?: string } } };
-      const msg =
-        err.response?.data?.message ||
-        "Failed to open dispute. Please try again.";
+      const msg = err.response?.data?.message || t("errorDefault");
       setErrorMessage(msg);
       setTimeout(() => setErrorMessage(""), 8000);
     } finally {
@@ -99,7 +97,7 @@ export default function DisputeButton({
         }}
       >
         <AlertTriangle size={13} />
-        Open a Dispute
+        {t("trigger")}
       </button>
 
       {/* Dispute modal */}
@@ -144,7 +142,7 @@ export default function DisputeButton({
                   margin: 0,
                 }}
               >
-                Open a Dispute
+                {t("title")}
               </h3>
             </div>
 
@@ -155,19 +153,17 @@ export default function DisputeButton({
                 marginBottom: "1rem",
               }}
             >
-              A dispute will notify our admin, who will review the chat history
-              and all messages before making a fair decision. Please only open a
-              dispute if you have a genuine issue.
+              {t("body")}
             </p>
 
             <label className="label" htmlFor="dispute-reason">
-              Describe your issue{" "}
+              {t("issueLabel")}{" "}
               <span style={{ color: "var(--color-danger)" }}>*</span>
             </label>
             <textarea
               id="dispute-reason"
               rows={4}
-              placeholder="Explain clearly what went wrong. For example: I paid but did not receive the product, or the product was different from described."
+              placeholder={t("issuePlaceholder")}
               value={reason}
               onChange={(e) => setReason(e.target.value)}
               className="input"
@@ -178,9 +174,7 @@ export default function DisputeButton({
               className="alert alert-warning"
               style={{ fontSize: "0.8125rem", marginBottom: "1rem" }}
             >
-              <strong>Note:</strong> Our admin will read all chat messages
-              between you and the other party before deciding. Make sure your
-              communication clearly reflects the situation.
+              <strong>{t("noteTitle")}</strong> {t("noteBody")}
             </div>
 
             {errorMessage && (
@@ -209,7 +203,7 @@ export default function DisputeButton({
                   opacity: isSubmitting ? 0.7 : 1,
                 }}
               >
-                {isSubmitting ? "Submitting\u2026" : "Submit Dispute"}
+                {isSubmitting ? t("submitting") : t("submit")}
               </button>
               <button
                 onClick={() => {
@@ -220,7 +214,7 @@ export default function DisputeButton({
                 className="btn-ghost"
                 style={{ flex: 1 }}
               >
-                Cancel
+                {t("cancel")}
               </button>
             </div>
           </div>

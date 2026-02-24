@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import Axios from "axios";
 import { useAuth } from "@/context/UserContext";
+import { useTranslations } from "next-intl";
 
 const API = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
 
@@ -16,6 +17,7 @@ interface FilteredInvoice {
 
 export default function FilterInvoice() {
   const { user_id } = useAuth();
+  const t = useTranslations("Invoice");
   const [formData, setFormData] = useState({ amount: 0, currency: "XAF" });
   const [invoices, setInvoices] = useState<FilteredInvoice[]>([]);
   const [showForm, setShowForm] = useState(false);
@@ -39,7 +41,7 @@ export default function FilterInvoice() {
       setInvoices(response.data.invoice || []);
     } catch (err: unknown) {
       const e = err as { response?: { data?: { message?: string } } };
-      setError(e.response?.data?.message || "Failed to filter invoices.");
+      setError(e.response?.data?.message || t("filter.errorDefault"));
     } finally {
       setLoading(false);
     }
@@ -53,7 +55,7 @@ export default function FilterInvoice() {
         style={{ fontSize: "0.875rem" }}
         onClick={() => setShowForm(!showForm)}
       >
-        {showForm ? "Hide Filter" : "Filter Invoices"}
+        {showForm ? t("filter.hide") : t("filter.show")}
       </button>
 
       {/* Filter form */}
@@ -67,7 +69,7 @@ export default function FilterInvoice() {
               margin: "0 0 1rem",
             }}
           >
-            Filter Invoices
+            {t("filter.title")}
           </h4>
 
           <form onSubmit={handleFilter}>
@@ -81,7 +83,7 @@ export default function FilterInvoice() {
             >
               <div>
                 <label className="label" htmlFor="filter-amount">
-                  Amount (FCFA)
+                  {t("filter.amountLabel")}
                 </label>
                 <input
                   className="input"
@@ -95,7 +97,7 @@ export default function FilterInvoice() {
               </div>
               <div>
                 <label className="label" htmlFor="filter-currency">
-                  Currency
+                  {t("filter.currencyLabel")}
                 </label>
                 <select
                   className="input"
@@ -119,7 +121,7 @@ export default function FilterInvoice() {
             )}
 
             <button type="submit" className="btn-primary" disabled={loading}>
-              {loading ? "Filtering\u2026" : "Apply Filter"}
+              {loading ? t("filter.filtering") : t("filter.applyFilter")}
             </button>
           </form>
 
@@ -134,8 +136,8 @@ export default function FilterInvoice() {
                   marginBottom: "0.5rem",
                 }}
               >
-                {invoices.length} invoice{invoices.length !== 1 ? "s" : ""}{" "}
-                found
+                {invoices.length}{" "}
+                {t("filter.noResults", { count: invoices.length })}
               </p>
               {invoices.map((inv) => (
                 <div
@@ -182,7 +184,7 @@ export default function FilterInvoice() {
                 color: "var(--color-text-muted)",
               }}
             >
-              No invoices match that filter.
+              {t("filter.noResults")}
             </p>
           )}
         </div>

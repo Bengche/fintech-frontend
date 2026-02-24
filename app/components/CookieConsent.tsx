@@ -15,6 +15,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 
 const STORAGE_KEY = "fonlok_cookie_consent"; // "accepted" | "essential"
 
@@ -54,6 +55,7 @@ function CookieIcon() {
 export type ConsentValue = "accepted" | "essential" | null;
 
 export default function CookieConsent() {
+  const t = useTranslations("CookieConsent");
   const [visible, setVisible] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [leaving, setLeaving] = useState(false); // triggers exit animation
@@ -189,7 +191,7 @@ export default function CookieConsent() {
                 letterSpacing: "-0.01em",
               }}
             >
-              We value your privacy
+              {t("title")}
             </p>
             <p
               style={{
@@ -200,9 +202,7 @@ export default function CookieConsent() {
                 maxWidth: "56ch",
               }}
             >
-              Fonlok uses cookies to keep your session secure, remember
-              preferences, and understand how you use the platform so we can
-              improve it.{" "}
+              {t("body")}{" "}
               {/* "Show more" toggle — only relevant on very small screens */}
               <button
                 onClick={() => setExpanded((x) => !x)}
@@ -219,7 +219,7 @@ export default function CookieConsent() {
                   lineHeight: "inherit",
                 }}
               >
-                {expanded ? "Show less" : "Learn more"}
+                {expanded ? t("showLess") : t("showMore")}
               </button>
             </p>
           </div>
@@ -240,7 +240,7 @@ export default function CookieConsent() {
             }}
           >
             <p style={{ margin: "0 0 0.5rem", fontWeight: 600, color: "#fff" }}>
-              What we use cookies for
+              {t("detailTitle")}
             </p>
             <ul
               style={{
@@ -253,22 +253,21 @@ export default function CookieConsent() {
             >
               <li>
                 <strong style={{ color: "rgba(255,255,255,0.9)" }}>
-                  Essential
+                  {t("essential")}
                 </strong>{" "}
-                — required for login, sessions, and security. Always active.
+                — {t("essentialDesc")}
               </li>
               <li>
                 <strong style={{ color: "rgba(255,255,255,0.9)" }}>
-                  Functional
+                  {t("functional")}
                 </strong>{" "}
-                — remember your language and display preferences.
+                — {t("functionalDesc")}
               </li>
               <li>
                 <strong style={{ color: "rgba(255,255,255,0.9)" }}>
-                  Analytics
+                  {t("analytics")}
                 </strong>{" "}
-                — anonymised usage data that helps us fix bugs and improve
-                features. No personal data is sold.
+                — {t("analyticsDesc")}
               </li>
             </ul>
           </div>
@@ -298,7 +297,7 @@ export default function CookieConsent() {
               whiteSpace: "nowrap",
             }}
           >
-            Privacy Policy
+            {t("privacyPolicy")}
           </Link>
 
           {/* Reject all */}
@@ -319,7 +318,7 @@ export default function CookieConsent() {
               letterSpacing: "-0.01em",
             }}
           >
-            Reject all
+            {t("rejectAll")}
           </button>
 
           {/* Essential Only */}
@@ -340,7 +339,7 @@ export default function CookieConsent() {
               letterSpacing: "-0.01em",
             }}
           >
-            Essential only
+            {t("essentialOnly")}
           </button>
 
           {/* Accept All */}
@@ -362,7 +361,7 @@ export default function CookieConsent() {
               boxShadow: "0 2px 12px rgba(245,158,11,0.35)",
             }}
           >
-            Accept all
+            {t("acceptAll")}
           </button>
         </div>
       </div>

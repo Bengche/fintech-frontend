@@ -1,0 +1,1313 @@
+{
+  "SiteHeader": {
+    "logoAlt": "Fonlok accueil",
+    "nav": {
+      "howItWorks": "Comment ça marche",
+      "pricing": "Tarifs",
+      "faq": "FAQ",
+      "contact": "Contact"
+    },
+    "auth": {
+      "signIn": "Se connecter",
+      "getStarted": "Commencer",
+      "getStartedFree": "Commencer — c'est gratuit",
+      "dashboard": "Tableau de bord",
+      "logOut": "Se déconnecter"
+    },
+    "mobile": {
+      "openMenu": "Ouvrir le menu",
+      "closeMenu": "Fermer le menu"
+    },
+    "language": {
+      "toggle": "EN",
+      "label": "Passer en anglais"
+    }
+  },
+  "SiteFooter": {
+    "tagline": "Paiements sécurisés par séquestre au Cameroun. Payez et soyez payé en toute sécurité.",
+    "columns": {
+      "product": "Produit",
+      "support": "Support",
+      "legal": "Légal",
+      "contact": "Contact"
+    },
+    "links": {
+      "howItWorks": "Comment ça marche",
+      "pricing": "Tarifs",
+      "faq": "FAQ",
+      "createAccount": "Créer un compte",
+      "dashboard": "Tableau de bord",
+      "contactUs": "Nous contacter",
+      "helpCentre": "Centre d'aide",
+      "accountSettings": "Paramètres du compte",
+      "signIn": "Se connecter",
+      "terms": "Conditions d'utilisation",
+      "privacy": "Politique de confidentialité",
+      "termsShort": "Conditions",
+      "privacyShort": "Confidentialité"
+    },
+    "copyright": "© {year} Fonlok. Tous droits réservés. Fabriqué au Cameroun.",
+    "builtBy": "Conçu avec ❤ par"
+  },
+  "Landing": {
+    "meta": {
+      "title": "Fonlok — Paiements Sécurisés par Séquestre au Cameroun",
+      "description": "Fonlok conserve votre argent jusqu'à ce que l'acheteur et le vendeur soient satisfaits. Payez et encaissez en toute sécurité avec MTN Mobile Money et Orange Money. Fini les arnaques."
+    },
+    "hero": {
+      "badge": "Service de paiement sécurisé du Cameroun",
+      "h1Part1": "Payez en sécurité.",
+      "h1Part2": "Encaissez intégralement.",
+      "description": "Fonlok conserve l'argent jusqu'à ce que l'acheteur et le vendeur soient satisfaits. Arrêtez de perdre de l'argent à cause des arnaques en ligne. Concluez chaque deal avec confiance.",
+      "ctaPrimary": "Créer un compte gratuit",
+      "ctaSecondary": "Voir comment ça marche →",
+      "stats": {
+        "free": { "value": "Gratuit", "label": "pour créer un compte" },
+        "fee": { "value": "3%", "label": "frais vendeur par transaction" },
+        "momo": { "value": "MTN + Orange", "label": "Mobile Money acceptés" }
+      }
+    },
+    "howItWorks": {
+      "heading": "Simple. Sûr. Direct.",
+      "subheading": "Trois étapes suffisent pour conclure un deal sécurisé sur Fonlok.",
+      "steps": {
+        "1": {
+          "title": "Le vendeur crée une facture",
+          "desc": "2 minutes suffisent. Connectez-vous, entrez votre email, le montant et une description de ce que vous vendez. Fonlok génère instantanément un lien de paiement unique."
+        },
+        "2": {
+          "title": "L'acheteur paie en toute sécurité",
+          "desc": "Partagez le lien de paiement avec votre client. Il l'ouvre et paie via MTN Mobile Money ou Orange Money. Fonlok conserve les fonds en séquestre."
+        },
+        "3": {
+          "title": "Les deux parties confirment",
+          "desc": "Livrez ce qui a été convenu. L'acheteur confirme la réception et Fonlok libère l'argent directement au vendeur. Tout le monde est gagnant."
+        }
+      },
+      "readGuide": "Lire le guide complet →"
+    },
+    "benefits": {
+      "heading": "Pourquoi choisir Fonlok",
+      "subheading": "Conçu spécifiquement pour la façon dont les gens paient et vendent au Cameroun.",
+      "items": {
+        "buyerProtection": {
+          "title": "Protection de l'acheteur",
+          "desc": "Votre argent est conservé jusqu'à ce que vous confirmiez avoir reçu exactement ce pour quoi vous avez payé. Vous n'êtes jamais exposé à un risque."
+        },
+        "sellerGuarantee": {
+          "title": "Garantie vendeur",
+          "desc": "Une fois que vous livrez, vous êtes payé. Plus besoin de courir après les factures impayées. Plus de promesses non tenues."
+        },
+        "disputeResolution": {
+          "title": "Résolution des litiges",
+          "desc": "En cas de problème, notre équipe examine les preuves et tranche équitablement. Aucune partie ne peut disparaître."
+        },
+        "mobileMoney": {
+          "title": "Paiements Mobile Money",
+          "desc": "Les acheteurs paient avec MTN ou Orange Money. Aucun compte bancaire ni carte n'est requis."
+        },
+        "noHiddenCharges": {
+          "title": "Aucun frais caché",
+          "desc": "3% par transaction pour les vendeurs. Les acheteurs ne paient rien. Pas d'abonnement. Pas de frais d'inscription."
+        },
+        "fullyOnline": {
+          "title": "100% en ligne",
+          "desc": "Créez des factures, suivez les paiements et gérez les litiges — tout depuis votre téléphone."
+        }
+      }
+    },
+    "pricing": {
+      "heading": "Un seul frais simple",
+      "subheading": "Pas d'abonnement. Pas de frais d'inscription. Seulement 3% quand vous l'utilisez.",
+      "feeLabel": "par transaction en séquestre",
+      "features": {
+        "freeBuyers": "Gratuit pour les acheteurs — Fonlok facture 0% aux acheteurs",
+        "freeAccount": "Création de compte gratuite",
+        "noMonthlyFee": "Pas de frais mensuels",
+        "momo": "MTN & Orange Money",
+        "dispute": "Résolution des litiges incluse"
+      },
+      "fullDetails": "Voir tous les tarifs →",
+      "networkNote": "Les frais de réseau MTN et Orange Mobile Money (généralement 2%) sont appliqués par l'opérateur mobile au moment du paiement et ne sont pas perçus par Fonlok."
+    },
+    "referral": {
+      "badge": "Programme de Parrainage",
+      "heading": "Gagnez",
+      "headingHighlight": "0,5% de commission",
+      "headingEnd": "sur chaque deal — pour toujours.",
+      "description": "Partagez votre lien de parrainage unique. Chaque fois qu'une personne que vous parrainez effectue une transaction sur Fonlok, vous gagnez",
+      "descriptionHighlight": "0,5% de la valeur de la transaction",
+      "descriptionEnd": "— automatiquement, sans limite de temps.",
+      "cards": {
+        "0": {
+          "title": "Un lien, des revenus infinis",
+          "desc": "Partagez votre lien de parrainage une fois. Chaque personne qui s'inscrit via ce lien vous rapporte de l'argent — sur chaque transaction qu'elle effectue, à vie."
+        },
+        "1": {
+          "title": "Pas d'expiration. Jamais.",
+          "desc": "Votre commission n'expire pas. Plus vos filleuls développent leur activité sur Fonlok, plus vos revenus passifs augmentent avec eux."
+        },
+        "2": {
+          "title": "Versé instantanément dans votre portefeuille",
+          "desc": "Les gains de parrainage sont crédités automatiquement sur votre portefeuille Fonlok au moment où chaque transaction est finalisée."
+        }
+      },
+      "exampleLabel": "Exemple",
+      "example": "Votre ami parraine 10 personnes. Chacune d'elles réalise 100 000 XAF de transactions par mois. C'est",
+      "exampleHighlight": "5 000 XAF dans votre poche chaque mois",
+      "exampleEnd": "— qui augmentent au fur et à mesure que leurs activités grandissent, sans aucun effort supplémentaire de votre part.",
+      "cta": "Obtenir votre lien de parrainage →",
+      "ctaNote": "Inscription gratuite. Paiement minimum : 2 000 XAF."
+    },
+    "finalCta": {
+      "heading": "Prêt à faire des affaires en toute sécurité ?",
+      "description": "Rejoignez les Camerounais qui utilisent Fonlok pour protéger leur argent et conclure des deals avec confiance.",
+      "ctaPrimary": "Créer votre compte gratuit",
+      "ctaSecondary": "Découvrir comment ça marche →"
+    }
+  },
+  "HowItWorks": {
+    "meta": {
+      "title": "Comment Fonlok Fonctionne — Séquestre Sécurisé Étape par Étape",
+      "description": "Découvrez comment Fonlok protège acheteurs et vendeurs au Cameroun. Un guide étape par étape pour créer des factures, payer en toute sécurité et libérer les fonds."
+    },
+    "hero": {
+      "h1": "Comment fonctionne Fonlok",
+      "description": "Un processus simple en cinq étapes qui protège à la fois l'acheteur et le vendeur — de la première facture jusqu'au paiement final."
+    },
+    "steps": {
+      "1": {
+        "who": "Vendeur",
+        "title": "Créer une facture",
+        "desc": "Connectez-vous à Fonlok, entrez votre adresse email, le montant convenu en XAF et une courte description de ce que vous vendez. La facture et un lien de paiement unique sont créés instantanément."
+      },
+      "2": {
+        "who": "Vendeur",
+        "title": "Partager le lien de paiement",
+        "desc": "Copiez le lien de paiement unique généré par Fonlok pour votre facture et envoyez-le à votre acheteur par WhatsApp, SMS ou toute application de messagerie. Il n'a pas besoin de compte de son côté."
+      },
+      "3": {
+        "who": "Acheteur",
+        "title": "Payer avec Mobile Money",
+        "desc": "L'acheteur ouvre le lien et paie via MTN Mobile Money ou Orange Money. L'argent va sur le compte séquestre sécurisé de Fonlok — pas directement au vendeur pour l'instant."
+      },
+      "4": {
+        "who": "Vendeur",
+        "title": "Livrer le bien ou le service",
+        "desc": "Une fois que Fonlok confirme le paiement, vous êtes notifié. Vous livrez ensuite ce qui a été convenu — biens physiques, service, fichiers numériques ou tout autre chose."
+      },
+      "5": {
+        "who": "Les deux parties",
+        "title": "Confirmer et recevoir le paiement",
+        "desc": "L'acheteur marque la commande comme reçue. Fonlok libère immédiatement l'argent sur le compte du vendeur, déduction faite des 3% de frais de service. C'est fait."
+      }
+    },
+    "edgeCases": {
+      "heading": "Que se passe-t-il dans les cas limites ?",
+      "items": {
+        "0": {
+          "q": "Et si l'acheteur ne confirme jamais la livraison ?",
+          "a": "Si l'acheteur ne confirme pas dans le délai convenu, Fonlok envoie un rappel. En l'absence de réponse, notre équipe examine les preuves et intervient pour résoudre la situation équitablement."
+        },
+        "1": {
+          "q": "Que se passe-t-il en cas de litige ?",
+          "a": "L'une ou l'autre partie peut ouvrir un litige depuis son tableau de bord. Fonlok gèle les fonds et demande des preuves aux deux côtés. Notre équipe examine tout et prend une décision finale — les fonds sont soit libérés au vendeur, soit remboursés à l'acheteur."
+        },
+        "2": {
+          "q": "Et si le vendeur ne livre pas ?",
+          "a": "L'acheteur peut ouvrir un litige. Si le vendeur ne peut pas fournir de preuve de livraison, Fonlok rembourse l'acheteur, mais dans ce cas, l'acheteur paie les frais de service de 3% sur le montant remboursé."
+        },
+        "3": {
+          "q": "L'argent est-il en sécurité pendant qu'il est en séquestre ?",
+          "a": "Oui. Les fonds détenus par Fonlok sont sanctuarisés et ne peuvent pas être accessibles par le vendeur tant que la livraison n'est pas confirmée. Ils ne peuvent pas non plus être utilisés par Fonlok à d'autres fins."
+        }
+      }
+    },
+    "cta": {
+      "heading": "Prêt à essayer ?",
+      "description": "La création d'un compte est gratuite et prend moins de deux minutes.",
+      "ctaPrimary": "Créer un compte gratuit",
+      "ctaSecondary": "Lire la FAQ"
+    }
+  },
+  "FAQ": {
+    "meta": {
+      "title": "FAQ — Foire Aux Questions | Fonlok",
+      "description": "Réponses aux questions fréquentes sur Fonlok — comment fonctionne le séquestre, les frais, les paiements, les litiges, la sécurité et plus encore."
+    },
+    "hero": {
+      "h1": "Foire aux questions",
+      "description": "Vous avez une question qui n'est pas listée ici ?",
+      "contactLink": "Contactez-nous"
+    },
+    "sections": {
+      "basics": {
+        "heading": "Les bases",
+        "items": {
+          "0": {
+            "q": "Qu'est-ce que le séquestre ?",
+            "a": "Le séquestre est un système où un tiers de confiance conserve l'argent jusqu'à ce que les deux parties d'un accord soient satisfaites. L'acheteur paie, et l'argent n'est libéré au vendeur que lorsque l'acheteur confirme avoir reçu ce pour quoi il a payé."
+          },
+          "1": {
+            "q": "Comment fonctionne Fonlok ?",
+            "a": "Le vendeur crée une facture sur Fonlok et partage un lien de paiement avec l'acheteur. L'acheteur paie via Mobile Money. Fonlok conserve les fonds. Une fois que l'acheteur confirme la livraison, Fonlok paie le vendeur. En cas de problème, Fonlok enquête."
+          },
+          "2": {
+            "q": "Fonlok est-il une banque ?",
+            "a": "Non. Fonlok est une plateforme de séquestre — nous conservons temporairement les fonds en tant que partie neutre lors d'une transaction. Nous ne sommes pas une banque et n'offrons pas de produits d'épargne ou d'intérêts."
+          },
+          "3": {
+            "q": "Puis-je utiliser Fonlok depuis mon téléphone ?",
+            "a": "Oui. Fonlok fonctionne sur n'importe quel appareil avec un navigateur web — smartphones, tablettes et ordinateurs."
+          }
+        }
+      },
+      "payments": {
+        "heading": "Paiements & frais",
+        "items": {
+          "0": {
+            "q": "Quels modes de paiement sont acceptés ?",
+            "a": "Les acheteurs peuvent payer avec MTN Mobile Money et Orange Money. Les cartes de crédit/débit ne sont pas encore prises en charge."
+          },
+          "1": {
+            "q": "Qui paie les frais Fonlok — l'acheteur ou le vendeur ?",
+            "a": "Le vendeur paie des frais de 3% sur chaque transaction. Les acheteurs paient exactement le montant de la facture sans frais supplémentaires de la part de Fonlok."
+          },
+          "2": {
+            "q": "Y a-t-il des frais mensuels ou des abonnements ?",
+            "a": "Non. L'inscription à Fonlok est entièrement gratuite. Le seul coût est de 3% lors de la finalisation d'une transaction."
+          },
+          "3": {
+            "q": "Combien de temps faut-il pour recevoir mon argent après confirmation de la livraison ?",
+            "a": "Fonlok lance le paiement immédiatement après que l'acheteur confirme la livraison. Selon votre réseau mobile, les fonds arrivent généralement en quelques minutes à quelques heures."
+          }
+        }
+      },
+      "disputes": {
+        "heading": "Litiges & sécurité",
+        "items": {
+          "0": {
+            "q": "Et si l'acheteur ne confirme pas la livraison ?",
+            "a": "Si l'acheteur ne répond pas dans le délai prévu, Fonlok contactera les deux parties pour résoudre la situation. Nous examinons toutes les preuves disponibles avant de prendre une décision finale."
+          },
+          "1": {
+            "q": "Que se passe-t-il en cas de litige ?",
+            "a": "L'une ou l'autre partie peut ouvrir un litige depuis son tableau de bord Fonlok. Nous gelons les fonds et demandons des preuves des deux côtés — photos, messages, confirmations de livraison, etc. Notre équipe examine tout et décide de libérer ou rembourser l'argent."
+          },
+          "2": {
+            "q": "Et si le vendeur ne livre pas ?",
+            "a": "L'acheteur peut ouvrir un litige. Si le vendeur ne peut pas prouver la livraison, Fonlok rembourse l'acheteur intégralement."
+          },
+          "3": {
+            "q": "Fonlok est-il sécurisé ?",
+            "a": "Oui. Toutes les transactions sont chiffrées et les fonds détenus en séquestre sont sanctuarisés. Nous utilisons des processeurs de paiement sécurisés et ne stockons jamais d'informations de paiement sensibles sur nos serveurs."
+          }
+        }
+      },
+      "accounts": {
+        "heading": "Comptes",
+        "items": {
+          "0": {
+            "q": "La création d'un compte est-elle gratuite ?",
+            "a": "Oui. La création d'un compte sur Fonlok est gratuite et prend moins de deux minutes."
+          },
+          "1": {
+            "q": "Ai-je besoin d'un compte pour payer en tant qu'acheteur ?",
+            "a": "Vous pouvez effectuer un paiement via le lien de facture sans compte. Cependant, créer un compte gratuit vous donne accès à l'historique des paiements, à la gestion des litiges et au suivi des commandes."
+          },
+          "2": {
+            "q": "Comment modifier mon mot de passe ou mon numéro de téléphone ?",
+            "a": "Connectez-vous à votre compte et allez dans Paramètres. Vous pouvez y mettre à jour votre numéro de téléphone et changer votre mot de passe."
+          }
+        }
+      }
+    },
+    "bottomCta": {
+      "heading": "Vous avez encore des questions ?",
+      "description": "Notre équipe est disponible pour vous aider.",
+      "ctaPrimary": "Nous contacter",
+      "ctaSecondary": "Créer un compte gratuit"
+    }
+  },
+  "Contact": {
+    "meta": {
+      "title": "Contactez-Nous | Fonlok",
+      "description": "Contactez l'équipe Fonlok. Nous sommes disponibles via WhatsApp et email pour répondre à toutes vos questions sur notre plateforme de paiement sécurisé au Cameroun."
+    },
+    "hero": {
+      "h1": "Nous contacter",
+      "description": "Nous sommes là pour vous aider. Contactez-nous via WhatsApp, email ou le formulaire ci-dessous."
+    },
+    "channels": {
+      "heading": "Canaux de contact",
+      "whatsapp": {
+        "label": "WhatsApp (le plus rapide)",
+        "description": "Envoyez-nous un message sur WhatsApp pour une réponse rapide. Nous répondons généralement en quelques heures."
+      },
+      "email": {
+        "label": "Email",
+        "description": "Pour des questions détaillées ou si vous préférez l'email. Nous répondons dans les 24 heures les jours ouvrables."
+      },
+      "hours": {
+        "label": "Heures de support :",
+        "value": "Lundi – Samedi, 8h – 20h (WAT)"
+      }
+    },
+    "form": {
+      "heading": "Envoyer un message",
+      "name": "Nom complet",
+      "email": "Adresse email",
+      "subject": "Sujet",
+      "message": "Message",
+      "submit": "Envoyer le message",
+      "sending": "Envoi en cours…",
+      "success": "Message envoyé ! Nous vous répondrons bientôt.",
+      "error": "Une erreur s'est produite. Veuillez réessayer ou nous contacter directement."
+    }
+  },
+  "Pricing": {
+    "meta": {
+      "title": "Tarifs — Simples & Transparents | Fonlok",
+      "description": "Un seul frais, aucune surprise. Fonlok prélève 3% par transaction aux vendeurs. Les acheteurs ne paient rien. Pas d'abonnement, pas de frais d'inscription."
+    },
+    "hero": {
+      "h1": "Tarifs simples et transparents",
+      "description": "Pas d'abonnement. Pas de frais cachés. Pas de frais d'inscription. Vous ne payez que lorsqu'une transaction est finalisée."
+    },
+    "cards": {
+      "seller": {
+        "who": "Vendeur",
+        "fee": "3%",
+        "feeLabel": "par transaction finalisée",
+        "description": "Prélevé lorsque l'acheteur confirme la réception. Si une transaction est remboursée, vous ne payez pas.",
+        "features": {
+          "0": "Création de facture — gratuit",
+          "1": "Partage du lien de paiement — gratuit",
+          "2": "Accès aux litiges — gratuit",
+          "3": "3% uniquement sur les deals réussis"
+        }
+      },
+      "buyer": {
+        "who": "Acheteur",
+        "fee": "0%",
+        "feeLabel": "de la part de Fonlok",
+        "description": "Les acheteurs paient exactement le montant de la facture. Fonlok ne facture rien aux acheteurs.",
+        "features": {
+          "0": "Payer via MTN ou Orange Money",
+          "1": "Aucun compte requis pour payer",
+          "2": "Protection complète en cas de litige",
+          "3": "Zéro frais Fonlok"
+        }
+      }
+    },
+    "networkNote": {
+      "heading": "À propos des frais de réseau Mobile Money",
+      "body": "MTN et Orange appliquent leurs propres frais de transaction sur les paiements Mobile Money (généralement entre 1 et 2%). Ces frais sont perçus par l'opérateur de réseau mobile au moment du paiement et sont totalement indépendants des 3% de Fonlok. Fonlok ne reçoit pas et ne contrôle pas ces frais."
+    },
+    "referral": {
+      "heading": "Récupérez vos frais — et plus encore",
+      "description": "Rejoignez le programme de parrainage Fonlok et gagnez 0,5% de commission sur chaque transaction effectuée par les personnes que vous parrainez. Parrainez suffisamment de personnes et vos gains de parrainage couvriront largement vos propres frais de transaction.",
+      "cta": "En savoir plus sur le programme de parrainage →"
+    },
+    "cta": {
+      "heading": "Prêt à commencer ?",
+      "description": "La création d'un compte est gratuite. Vous ne payez que quand un deal est conclu.",
+      "ctaPrimary": "Créer un compte gratuit",
+      "ctaSecondary": "Voir comment ça marche"
+    },
+    "seller": {
+      "feeLabel": "du montant de chaque transaction — facturé au vendeur uniquement",
+      "body": "Ces 3% couvrent tout ce que Fonlok fait pour vous : conserver les fonds, traiter le virement, gérer les litiges et envoyer les reçus. Votre acheteur ne paie aucuns frais Fonlok — ce qui vous facilite la tâche pour le convaincre d'utiliser la plateforme.",
+      "included": {
+        "0": "Création et gestion des factures",
+        "1": "Paiements MTN et Orange Money",
+        "2": "Conservation des fonds en séquestre",
+        "3": "Virement au vendeur à la confirmation",
+        "4": "Résolution des litiges",
+        "5": "Notifications par email",
+        "6": "Accès au tableau de bord",
+        "7": "Gratuit pour les acheteurs — toujours"
+      },
+      "cta": "Créer un compte gratuit"
+    },
+    "buyer": {
+      "feeLabel": "Fonlok ne facture rien aux acheteurs",
+      "badge": "Gratuit pour les acheteurs",
+      "body": "Lorsque vous payez via un lien de facture Fonlok, vous payez exactement le montant indiqué. Fonlok n'ajoute aucune majoration ni frais de service pour les acheteurs.",
+      "note": "Note",
+      "noteBody": "Les frais de réseau Mobile Money standard (généralement 2%) appliqués par MTN ou Orange au moment du paiement sont fixés par les réseaux mobiles et leur sont versés — Fonlok ne les perçoit pas."
+    },
+    "valueSection": {
+      "heading": "Qu'obtiennent les vendeurs pour 3% ?",
+      "description": "Ces frais ne sont pas une simple charge — c'est l'intégralité du service. Voici exactement ce qu'ils couvrent.",
+      "items": {
+        "0": {
+          "title": "Paiement garanti avant la livraison",
+          "desc": "L'argent de l'acheteur est bloqué en séquestre avant même que vous ne commenciez. Vous ne livrez que quand les fonds sont confirmés."
+        },
+        "1": {
+          "title": "Fonds conservés en sécurité",
+          "desc": "Fonlok détient l'argent en tant que tiers neutre. Ni l'une ni l'autre des parties ne peut y accéder tant que le deal n'est pas finalisé."
+        },
+        "2": {
+          "title": "Virement automatique à la confirmation",
+          "desc": "Dès que l'acheteur confirme la livraison, Fonlok libère votre argent immédiatement. Pas de relance, pas d'attente."
+        },
+        "3": {
+          "title": "Reçus de paiement par email",
+          "desc": "L'acheteur et le vendeur reçoivent automatiquement des reçus par email. Une trace écrite claire pour chaque transaction."
+        },
+        "4": {
+          "title": "Résolution des litiges incluse",
+          "desc": "En cas de problème, Fonlok enquête et rend une décision équitable. Vous ne serez jamais laissé seul à vous défendre."
+        },
+        "5": {
+          "title": "Les acheteurs ne paient aucuns frais Fonlok",
+          "desc": "Vos acheteurs ne sont pas facturés par Fonlok. Cela lève leurs réticences et vous facilite la conclusion de deals."
+        }
+      }
+    },
+    "examples": {
+      "heading": "À quoi ressemblent 3% en pratique ?",
+      "description": "Le vendeur paie les frais. Les acheteurs paient toujours exactement ce que la facture indique.",
+      "col0": "Montant de la facture",
+      "col1": "Frais (3%)",
+      "col2": "Le vendeur reçoit"
+    },
+    "faq": {
+      "heading": "Questions fréquentes sur les frais",
+      "items": {
+        "0": {
+          "q": "Qu'en est-il des frais de réseau Mobile Money que les acheteurs voient sur leur téléphone ?",
+          "a": "Quand un acheteur paie avec MTN ou Orange Money, le réseau mobile déduit ses propres frais de transaction (généralement environ 2%) directement au moment du paiement. Il s'agit d'un frais standard appliqué à toutes les transactions MoMo, que Fonlok ne contrôle pas et ne perçoit pas. Fonlok ne collecte rien auprès des acheteurs."
+        },
+        "1": {
+          "q": "Qui paie les 3% — l'acheteur ou le vendeur ?",
+          "a": "Le vendeur paie les frais. Ils sont déduits du montant versé au vendeur à la confirmation du deal. Les acheteurs paient toujours exactement le montant de la facture."
+        },
+        "2": {
+          "q": "Y a-t-il des frais mensuels ou d'abonnement ?",
+          "a": "Non. Vous ne payez que lorsque vous utilisez Fonlok. La création d'un compte, la création de factures et la consultation de votre tableau de bord sont entièrement gratuits."
+        },
+        "3": {
+          "q": "Y a-t-il des frais d'inscription ?",
+          "a": "Non. Commencer est entièrement gratuit."
+        },
+        "4": {
+          "q": "Que se passe-t-il si un deal est annulé ou remboursé ?",
+          "a": "Si aucune livraison n'a eu lieu et que les fonds de l'acheteur sont remboursés, c'est l'acheteur qui paie les 3% de frais de service."
+        }
+      },
+      "allFaq": "Voir toutes les questions fréquentes →"
+    }
+  },
+  "Login": {
+    "meta": {
+      "title": "Connexion | Fonlok",
+      "description": "Connectez-vous à votre compte Fonlok pour gérer vos factures, suivre vos paiements et plus encore."
+    },
+    "heading": "Bon retour",
+    "subheading": "Connectez-vous à votre compte",
+    "email": "Email ou nom d'utilisateur",
+    "password": "Mot de passe",
+    "forgotPassword": "Mot de passe oublié ?",
+    "submit": "Se connecter",
+    "submitting": "Connexion en cours…",
+    "noAccount": "Pas encore de compte ?",
+    "register": "Créez-en un",
+    "protected": "Vos paiements sont protégés par Fonlok Escrow",
+    "errors": {
+      "invalidCredentials": "Email ou mot de passe invalide.",
+      "generic": "Une erreur s'est produite. Veuillez réessayer."
+    }
+  },
+  "Register": {
+    "meta": {
+      "title": "Créer Votre Compte Gratuit | Fonlok",
+      "description": "Inscrivez-vous sur Fonlok en moins de 2 minutes. Protégez votre prochain deal avec des paiements sécurisés par séquestre au Cameroun."
+    },
+    "heading": "Créer votre compte gratuit",
+    "subheading": "Réalisez votre premier deal sécurisé en quelques minutes",
+    "name": "Nom complet",
+    "username": "Nom d'utilisateur",
+    "email": "Adresse email",
+    "emailWarning": "Utilisez une adresse email que vous consultez régulièrement. Tous les reçus de transaction, confirmations de virement, notifications de litige et alertes de sécurité seront envoyés à cette adresse. Vous ne pourrez pas récupérer votre compte sans accès à cet email.",
+    "phone": "Numéro de téléphone",
+    "phoneWarning": "Il doit s'agir de votre numéro MTN Mobile Money ou Orange Money actif. Tous les virements vendeur sont envoyés directement à ce numéro. Si vous entrez le mauvais numéro, les fonds qui y seront envoyés ne pourront pas être récupérés.",
+    "password": "Mot de passe",
+    "confirmPassword": "Confirmer le mot de passe",
+    "dob": "Date de naissance",
+    "country": "Pays",
+    "profilePicture": "Photo de profil (facultatif)",
+    "referralCode": "Code de parrainage",
+    "referralCodeOptional": "(facultatif)",
+    "referralCodeHint": "Si quelqu'un vous a parrainé, entrez son code pour associer votre compte.",
+    "submit": "Créer le compte",
+    "submitting": "Création du compte…",
+    "success": "Compte créé avec succès ! Vous pouvez maintenant vous connecter.",
+    "haveAccount": "Vous avez déjà un compte ?",
+    "signIn": "Se connecter",
+    "terms": "En créant un compte, vous acceptez nos",
+    "termsLink": "Conditions d'utilisation",
+    "and": "et notre",
+    "privacyLink": "Politique de confidentialité",
+    "errors": {
+      "passwordMismatch": "Les mots de passe ne correspondent pas.",
+      "emailTaken": "Cet email est déjà enregistré.",
+      "generic": "Une erreur s'est produite. Veuillez réessayer."
+    }
+  },
+  "ForgotPassword": {
+    "meta": {
+      "title": "Réinitialisation du Mot de Passe | Fonlok"
+    },
+    "heading": "Mot de passe oublié ?",
+    "subheading": "Réinitialiser votre mot de passe",
+    "description": "Entrez l'adresse email associée à votre compte et nous vous enverrons un lien sécurisé pour réinitialiser votre mot de passe.",
+    "email": "Adresse email",
+    "submit": "Envoyer le lien",
+    "submitting": "Envoi du lien…",
+    "checkInbox": "Vérifiez votre boîte de réception",
+    "checkInboxBody": "Un lien de réinitialisation a été envoyé. Le lien expire dans {hours} heure. Si vous ne voyez pas l'email, vérifiez votre dossier spam.",
+    "expiry": "1 heure",
+    "backToLogin": "← Retour à la connexion",
+    "rememberPassword": "Vous vous souvenez de votre mot de passe ?",
+    "signIn": "Se connecter",
+    "protected": "Vos paiements sont protégés par Fonlok Escrow",
+    "errors": {
+      "notFound": "Aucun compte trouvé avec cette adresse email.",
+      "generic": "Une erreur s'est produite. Veuillez réessayer."
+    }
+  },
+  "ResetPassword": {
+    "meta": {
+      "title": "Définir un Nouveau Mot de Passe | Fonlok"
+    },
+    "heading": "Créer un nouveau mot de passe",
+    "subheading": "Définir un nouveau mot de passe",
+    "description": "Entrez votre nouveau mot de passe ci-dessous.",
+    "password": "Nouveau mot de passe",
+    "passwordPlaceholder": "Au moins 8 caractères",
+    "confirmPassword": "Confirmer le nouveau mot de passe",
+    "confirmPasswordPlaceholder": "Saisissez à nouveau votre nouveau mot de passe",
+    "passwordsMismatch": "Les mots de passe ne correspondent pas.",
+    "submit": "Mettre à jour le mot de passe",
+    "submitting": "Mise à jour en cours…",
+    "successHeading": "Mot de passe mis à jour",
+    "successBody": "Vous allez être redirigé vers la page de connexion automatiquement.",
+    "signInNow": "Se connecter maintenant",
+    "backToLogin": "← Retour à la connexion",
+    "noToken": "Ce lien de réinitialisation ne contient pas de jeton. Veuillez",
+    "requestNewLink": "demander un nouveau lien",
+    "requestNew": "Demander un nouveau lien",
+    "protected": "Vos paiements sont protégés par Fonlok Escrow",
+    "errors": {
+      "passwordMismatch": "Les mots de passe ne correspondent pas.",
+      "tokenExpired": "Ce lien de réinitialisation a expiré. Veuillez en demander un nouveau.",
+      "noToken": "Aucun jeton de réinitialisation trouvé. Veuillez demander un nouveau lien.",
+      "generic": "Une erreur s'est produite. Veuillez réessayer ou demander un nouveau lien."
+    }
+  },
+  "Terms": {
+    "meta": {
+      "title": "Conditions d'Utilisation | Fonlok",
+      "description": "Lisez les conditions d'utilisation de Fonlok. En utilisant Fonlok, vous acceptez ces conditions régissant l'utilisation de notre plateforme de paiement par séquestre au Cameroun."
+    },
+    "hero": {
+      "h1": "Conditions d'Utilisation",
+      "lastUpdated": "Dernière mise à jour :"
+    }
+  },
+  "Privacy": {
+    "meta": {
+      "title": "Politique de Confidentialité | Fonlok",
+      "description": "La politique de confidentialité de Fonlok explique les données que nous collectons, comment nous les utilisons et vos droits en tant qu'utilisateur de notre plateforme au Cameroun."
+    },
+    "hero": {
+      "h1": "Politique de Confidentialité",
+      "lastUpdated": "Dernière mise à jour :"
+    }
+  },
+  "Common": {
+    "loading": "Chargement…",
+    "error": "Une erreur s'est produite.",
+    "retry": "Réessayer",
+    "save": "Enregistrer",
+    "saving": "Enregistrement…",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "confirm": "Confirmer",
+    "back": "Retour",
+    "next": "Suivant",
+    "close": "Fermer",
+    "search": "Rechercher",
+    "noResults": "Aucun résultat trouvé.",
+    "copyLink": "Copier le lien",
+    "copied": "Copié !",
+    "status": {
+      "paid": "Payé",
+      "pending": "En attente",
+      "delivered": "Livré",
+      "expired": "Expiré",
+      "disputed": "En litige",
+      "refunded": "Remboursé",
+      "released": "Libéré"
+    },
+    "currency": "XAF"
+  },
+  "Navbar": {
+    "dashboard": "Tableau de bord",
+    "transactions": "Transactions",
+    "myPurchases": "Mes achats",
+    "referral": "Parrainage",
+    "profile": "Profil",
+    "settings": "Paramètres",
+    "logOut": "Se déconnecter",
+    "signIn": "Se connecter",
+    "getStarted": "Commencer"
+  },
+  "CookieConsent": {
+    "title": "Nous respectons votre vie privée",
+    "body": "Fonlok utilise des cookies pour sécuriser votre session, mémoriser vos préférences et comprendre comment vous utilisez la plateforme afin de l'améliorer.",
+    "showMore": "En savoir plus",
+    "showLess": "Réduire",
+    "detailTitle": "À quoi servent les cookies",
+    "essential": "Essentiels",
+    "essentialDesc": "nécessaires pour la connexion, les sessions et la sécurité. Toujours actifs.",
+    "functional": "Fonctionnels",
+    "functionalDesc": "mémorisent vos préférences de langue et d'affichage.",
+    "analytics": "Analytiques",
+    "analyticsDesc": "données d'utilisation anonymisées pour corriger les bugs et améliorer les fonctionnalités. Aucune donnée personnelle n'est vendue.",
+    "privacyPolicy": "Politique de confidentialité",
+    "rejectAll": "Tout refuser",
+    "essentialOnly": "Essentiels seulement",
+    "acceptAll": "Tout accepter"
+  },
+  "Notifications": {
+    "title": "Notifications",
+    "markAllRead": "Tout marquer comme lu",
+    "empty": "Vous êtes à jour !",
+    "justNow": "à l'instant",
+    "minutesAgo": "il y a {mins}min",
+    "hoursAgo": "il y a {hrs}h",
+    "daysAgo": "il y a {days}j"
+  },
+  "RevenueStats": {
+    "title": "Revenus & Statistiques",
+    "subtitle": "Aperçu de votre activité de facturation",
+    "loading": "Chargement…",
+    "refresh": "Actualiser",
+    "viewStats": "Voir les statistiques",
+    "errorLoad": "Impossible de charger les statistiques. Veuillez réessayer.",
+    "invoiceOverview": "Aperçu des factures",
+    "totalInvoices": "Total des factures",
+    "pending": "En attente",
+    "inEscrow": "En séquestre",
+    "delivered": "Livré",
+    "revenueSpending": "Revenus & Dépenses",
+    "totalEarned": "Total gagné (en tant que vendeur)",
+    "fromPayouts": "Des versements effectués",
+    "totalSpent": "Total dépensé (en tant qu'acheteur)",
+    "fromPurchases": "De vos achats"
+  },
+  "Invoice": {
+    "create": {
+      "trigger": "+ Créer une facture",
+      "modalTitle": "Créer une nouvelle facture",
+      "modalSubtitle": "Remplissez les informations ci-dessous pour générer un lien de paiement.",
+      "identityNotice": "⚠️ L'e-mail ci-dessous doit correspondre à celui utilisé lors de la création de votre compte Fonlok. Cela lie la facture à votre profil vendeur.",
+      "invoiceName": "Nom de la facture",
+      "invoiceNamePlaceholder": "ex. Logo Design Package",
+      "accountEmail": "Votre e-mail de compte",
+      "currency": "Devise",
+      "amount": "Montant",
+      "description": "Description",
+      "descriptionHint": "Soyez précis — listez tous les livrables, spécifications et conditions. Des descriptions claires réduisent les litiges.",
+      "descriptionPlaceholder": "Décrivez exactement ce que vous livrez…",
+      "expiryDate": "Date d'expiration",
+      "expiryOptional": "(facultatif)",
+      "expiryHint": "Après cette date, l'acheteur ne pourra plus payer.",
+      "paymentType": "Type de paiement",
+      "fullPayment": "Paiement intégral",
+      "installments": "Versements / jalons",
+      "installmentHint": "L'acheteur paie le montant total à l'avance. Vous recevez chaque portion après avoir marqué un jalon comme terminé et la confirmation de l'acheteur.",
+      "milestones": "Jalons",
+      "enterAmountFirst": "Saisissez d'abord le montant de la facture",
+      "addMilestone": "+ Ajouter un jalon",
+      "milestoneMustAddUp": "Les montants doivent totaliser {total} XAF. Différence : {diff} XAF.",
+      "milestoneLabel": "Libellé du jalon {n}",
+      "escrowFeeTitle": "Frais de séquestre :",
+      "escrowFeeDesc": "Fonlok prélève des frais fixes de 2% par transaction. Ceux-ci sont déduits de votre versement après confirmation de livraison par l'acheteur. Les acheteurs ne sont jamais facturés de frais Fonlok.",
+      "saveAsTemplate": "Enregistrer comme modèle",
+      "cancelTemplate": "Annuler",
+      "templateNamePlaceholder": "Nom du modèle (ex. Logo Design Package)",
+      "saveTemplate": "Enregistrer le modèle",
+      "saving": "Enregistrement…",
+      "cancel": "Annuler",
+      "submit": "Créer la facture",
+      "submitting": "Création…",
+      "successToast": "Facture créée ! Partagez le lien avec votre client.",
+      "milestoneMismatch": "Les montants des jalons doivent totaliser {total} XAF. Total actuel : {current} XAF.",
+      "milestoneRequireLabel": "Chaque jalon doit avoir un libellé et un montant.",
+      "wrongEmailTitle": "Adresse e-mail incorrecte",
+      "wrongEmailBody": "L'adresse e-mail saisie ne correspond pas à votre compte Fonlok. Vous ne pouvez créer des factures qu'avec votre propre compte. Veuillez saisir l'adresse e-mail utilisée lors de votre inscription.",
+      "wrongEmailHint": "Votre adresse e-mail de compte est celle avec laquelle vous vous êtes inscrit."
+    },
+    "edit": {
+      "trigger": "Modifier",
+      "cancel": "Annuler",
+      "title": "Modifier la facture",
+      "invoiceName": "Nom de la facture",
+      "currency": "Devise",
+      "amount": "Montant (FCFA)",
+      "saveChanges": "Enregistrer",
+      "saving": "Enregistrement…",
+      "success": "Facture mise à jour avec succès.",
+      "errorDefault": "Échec de la mise à jour. Veuillez réessayer."
+    },
+    "delete": {
+      "trigger": "Supprimer",
+      "title": "Supprimer la facture",
+      "confirm": "Êtes-vous sûr de vouloir supprimer cette facture ? Cette action est irréversible.",
+      "confirmBtn": "Oui, supprimer",
+      "deleting": "Suppression…",
+      "cancel": "Annuler",
+      "success": "Facture supprimée avec succès.",
+      "errorDefault": "Échec de la suppression de la facture.",
+      "locked": "Suppression impossible",
+      "reasonPaid": "L'acheteur a déjà effectué le paiement. Les fonds sont sécurisés en séquestre et ne peuvent pas être libérés en supprimant la facture.",
+      "reasonDelivered": "La livraison a été confirmée. La facture est en attente de validation par l'acheteur pour libérer les fonds.",
+      "reasonCompleted": "Le virement pour cette facture a déjà été effectué et la transaction est terminée.",
+      "reasonPendingPayment": "Un paiement pour cette facture est actuellement en cours de traitement.",
+      "eligibleHint": "Cette facture peut être supprimée car aucun paiement n'a encore été effectué."
+    },
+    "filter": {
+      "show": "Filtrer les factures",
+      "hide": "Masquer le filtre",
+      "title": "Filtrer les factures",
+      "amountLabel": "Montant (FCFA)",
+      "currencyLabel": "Devise",
+      "applyFilter": "Appliquer le filtre",
+      "filtering": "Filtrage…",
+      "resultsFound": "{count} facture trouvée",
+      "resultsFoundPlural": "{count} factures trouvées",
+      "noResults": "Aucune facture ne correspond à ce filtre.",
+      "errorDefault": "Échec du filtrage des factures."
+    },
+    "list": {
+      "title": "Vos factures",
+      "refresh": "Actualiser les factures",
+      "loading": "Chargement…",
+      "empty": "Aucune facture. Cliquez sur « Actualiser les factures » pour charger ou créez votre première facture ci-dessus.",
+      "noMatch": "Aucune facture ne correspond à ce filtre.",
+      "statusAll": "Toutes",
+      "statusPending": "En attente",
+      "statusPaid": "Payé",
+      "statusDelivered": "Livré",
+      "statusExpired": "Expiré",
+      "copyLink": "Copier le lien",
+      "copied": "Copié",
+      "whatsapp": "WhatsApp",
+      "showQR": "Afficher QR",
+      "hideQR": "Masquer QR",
+      "qrHint": "L'acheteur scanne ce code pour ouvrir la page de paiement.",
+      "fieldAmount": "Montant",
+      "fieldCreated": "Créée",
+      "fieldExpires": "Expire"
+    }
+  },
+  "Dispute": {
+    "trigger": "Ouvrir un litige",
+    "title": "Ouvrir un litige",
+    "body": "Un litige notifiera notre administrateur, qui examinera l'historique du chat et tous les messages avant de rendre une décision équitable. N'ouvrez un litige qu'en cas de problème réel.",
+    "issueLabel": "Décrivez votre problème",
+    "issuePlaceholder": "Expliquez clairement ce qui s'est passé. Par exemple : j'ai payé mais n'ai pas reçu le produit, ou le produit était différent de la description.",
+    "noteTitle": "Remarque :",
+    "noteBody": "Notre administrateur lira tous les messages de chat entre vous et l'autre partie avant de décider. Assurez-vous que votre communication reflète clairement la situation.",
+    "emptyReason": "Veuillez décrire la raison du litige.",
+    "submit": "Soumettre le litige",
+    "submitting": "Envoi…",
+    "cancel": "Annuler",
+    "successMsg": "Litige soumis. Notre administrateur a été notifié et examinera votre dossier.",
+    "errorDefault": "Échec de l'ouverture du litige. Veuillez réessayer."
+  },
+  "MarkDelivered": {
+    "trigger": "Marquer comme livré",
+    "title": "Confirmer la livraison",
+    "body": "Vous êtes sur le point de marquer cette facture comme livrée. Ne le faites que si vous avez entièrement terminé le travail ou livré la commande.",
+    "warning": "L'acheteur recevra un e-mail lui demandant de confirmer la réception avant que les fonds ne vous soient versés.",
+    "confirm": "Oui, j'ai livré",
+    "confirming": "Confirmation…",
+    "cancel": "Annuler",
+    "successMsg": "Facture marquée comme livrée. L'acheteur a été notifié.",
+    "errorDefault": "Échec du marquage comme livré. Veuillez réessayer."
+  },
+  "Chat": {
+    "openBtn": "Discuter avec l'acheteur",
+    "closeBtn": "Fermer le chat",
+    "headerPrefix": "Chat — Facture n°",
+    "empty": "Aucun message pour l'instant. Démarrez la conversation !",
+    "youSeller": "Vous (Vendeur)",
+    "viewFile": "Voir le fichier",
+    "attachFile": "Joindre un fichier",
+    "upload": "Envoyer",
+    "messagePlaceholder": "Tapez un message…",
+    "send": "Envoyer",
+    "errorSend": "Échec de l'envoi du message. Veuillez réessayer.",
+    "errorUpload": "Échec du téléversement du fichier. Veuillez réessayer."
+  },
+  "BuyerChat": {
+    "accessDeniedTitle": "Accès refusé",
+    "accessDeniedBody": "Ce lien de chat est invalide ou a expiré. Veuillez vérifier votre e-mail pour obtenir le bon lien.",
+    "title": "Discuter avec le vendeur",
+    "invoiceLabel": "Facture :",
+    "empty": "Aucun message pour l'instant. N'hésitez pas à poser une question au vendeur !",
+    "youBuyer": "Vous (Acheteur)",
+    "seller": "Vendeur",
+    "viewFile": "Voir le fichier",
+    "errorSend": "Échec de l'envoi du message. Veuillez réessayer.",
+    "errorUpload": "Échec du téléversement du fichier. Veuillez réessayer.",
+    "uploadBtn": "Télécharger",
+    "messagePlaceholder": "Tapez un message...",
+    "send": "Envoyer",
+    "haveAProblem": "Un problème avec votre commande ?"
+  },
+  "Dashboard": {
+    "title": "Tableau de bord",
+    "subtitle": "Gérez vos factures et suivez vos gains",
+    "transactions": "Transactions",
+    "myProfile": "Mon profil",
+    "referrals": "Parrainages",
+    "tabs": {
+      "invoices": "Mes factures",
+      "filter": "Recherche & Filtre",
+      "payment": "Demander un versement",
+      "stats": "Revenus & Stats"
+    },
+    "invoicesTab": {
+      "title": "Vos factures",
+      "subtitle": "Toutes les factures que vous avez créées",
+      "refresh": "Actualiser les factures"
+    },
+    "statsTab": {
+      "title": "Revenus & Stats",
+      "subtitle": "Un aperçu de vos gains et de votre activité"
+    },
+    "payoutTab": {
+      "title": "Facture déjà terminée ?",
+      "body": "Une fois que l'acheteur confirme la livraison, il reçoit un code unique. Saisissez-le ci-dessous avec le numéro de facture pour libérer vos fonds instantanément.",
+      "invoiceNumberLabel": "Numéro de facture",
+      "invoiceNumberPlaceholder": "ex. INV-00001",
+      "codeLabel": "Code de confirmation de l'acheteur",
+      "codePlaceholder": "Saisir le code",
+      "submit": "Demander le versement",
+      "processing": "Traitement…",
+      "successDefault": "Fonds libérés avec succès !",
+      "errorDefault": "Échec de la libération des fonds. Vérifiez votre code et numéro de facture."
+    }
+  },
+  "Transactions": {
+    "title": "Historique des transactions",
+    "subtitle": "Tous vos paiements et versements en un seul endroit",
+    "backToDashboard": "← Tableau de bord",
+    "tabReceived": "Argent reçu",
+    "tabSpent": "Argent dépensé",
+    "emptyReceived": "Aucun paiement reçu pour l'instant. Créez une facture pour commencer.",
+    "emptySpent": "Aucune transaction en tant qu'acheteur.",
+    "errorLoad": "Échec du chargement de l'historique. Veuillez réessayer.",
+    "downloadReceipt": "Télécharger le reçu"
+  },
+  "Purchases": {
+    "title": "Mes achats",
+    "subtitle": "Toutes les factures que vous avez payées via Fonlok.",
+    "loading": "Chargement de vos achats…",
+    "error": "Échec du chargement de vos achats. Veuillez réessayer.",
+    "noPurchasesTitle": "Aucun achat pour l'instant",
+    "noPurchasesBody": "Lorsque vous payez une facture via Fonlok, elle apparaîtra ici avec le statut de livraison et le reçu.",
+    "summaryTotalPurchases": "Total des achats",
+    "summaryTotalSpent": "Total dépensé",
+    "summaryDelivered": "Livré",
+    "untitledInvoice": "Facture sans titre",
+    "oneTime": "Paiement unique",
+    "installment": "Versement",
+    "paidOn": "Payé le",
+    "viewInvoice": "Voir la facture",
+    "downloadReceipt": "Télécharger le reçu",
+    "statusPending": "En attente",
+    "statusPaid": "Payé",
+    "statusDelivered": "Livré",
+    "statusCompleted": "Terminé",
+    "statusExpired": "Expiré",
+    "statusDisputed": "Litié"
+  },
+  "Referral": {
+    "loading": "Chargement de votre tableau de bord de parrainage…",
+    "errorTitle": "Une erreur s'est produite",
+    "title": "Programme de parrainage",
+    "subtitle": "Gagnez des revenus passifs en invitant d'autres vendeurs sur la plateforme.",
+    "howItWorksTitle": "Comment ça marche",
+    "step1Title": "Partagez votre lien",
+    "step1Body": "Copiez votre lien de parrainage unique et partagez-le avec vos amis ou sur les réseaux sociaux.",
+    "step2Title": "Ils s'inscrivent et vendent",
+    "step2Body": "Lorsque quelqu'un s'inscrit via votre lien et crée sa première facture payée, vous gagnez une commission.",
+    "step3Title": "Gagnez une commission",
+    "step3Body": "Vous recevez un pourcentage des frais de séquestre sur chaque facture qu'ils complètent. Versé directement sur votre MoMo.",
+    "yourLinkTitle": "Votre lien de parrainage",
+    "copy": "Copier",
+    "copied": "Copié !",
+    "balanceTitle": "Solde disponible",
+    "minWithdrawal": "Retrait minimum :",
+    "withdrawTitle": "Retirer vos gains",
+    "withdrawAmountLabel": "Montant (XAF)",
+    "withdrawAmountPlaceholder": "Saisir le montant",
+    "momoLabel": "Numéro MoMo",
+    "momoPlaceholder": "ex. 677000000",
+    "withdrawBtn": "Retirer",
+    "withdrawing": "Traitement…",
+    "earningsTitle": "Historique des gains",
+    "noEarnings": "Aucun gain pour l'instant. Commencez à partager votre lien !",
+    "referredTitle": "Personnes que vous avez parrainées",
+    "noReferred": "Aucun parrainage pour l'instant.",
+    "withdrawalsTitle": "Historique des retraits",
+    "noWithdrawals": "Aucun retrait pour l'instant.",
+    "amountExceedsBalance": "Le montant dépasse votre solde disponible.",
+    "invalidAmount": "Veuillez saisir un montant valide.",
+    "minWithdrawalError": "Le retrait minimum est de {min}.",
+    "withdrawFailed": "Échec du retrait. Veuillez réessayer.",
+    "loadError": "Impossible de charger le tableau de bord des parrainages. Veuillez actualiser.",
+    "importantTitle": "Détails importants",
+    "bullet1": "Les commissions sont créditées instantanément après chaque paiement réussi.",
+    "bullet2": "Vous pouvez retirer sur n'importe quel numéro MTN ou Orange MoMo.",
+    "bullet3": "Retrait minimum : {min}.",
+    "bullet4": "Pas de maximum — retirez autant que vous avez gagné.",
+    "bullet5": "Retraits traités en quelques minutes via Campay.",
+    "codeTitle": "Votre code de parrainage",
+    "codeLabel": "Code",
+    "shareLinkLabel": "Lien de partage",
+    "currentBalance": "Solde actuel",
+    "minToWithdraw": "Retrait min. : {min}",
+    "needAtLeast": "Vous avez besoin d'au moins {min} pour retirer.",
+    "colInvoice": "Facture",
+    "colSeller": "Vendeur",
+    "colInvoiceAmount": "Montant facture",
+    "colEarned": "Vous avez gagné",
+    "colDate": "Date",
+    "totalEarned": "Total gagné",
+    "withdrawColAmount": "Montant",
+    "withdrawColMomo": "Numéro MoMo",
+    "withdrawColStatus": "Statut"
+  },
+  "Settings": {
+    "title": "Paramètres du compte",
+    "subtitle": "Gérez les informations de votre compte Fonlok.",
+    "loadError": "Échec du chargement des informations du compte.",
+    "name": {
+      "sectionTitle": "Nom d'affichage",
+      "label": "Nom complet",
+      "save": "Enregistrer le nom",
+      "saving": "Enregistrement…",
+      "success": "Nom mis à jour avec succès.",
+      "error": "Échec de la mise à jour du nom."
+    },
+    "email": {
+      "sectionTitle": "Adresse e-mail",
+      "label": "E-mail",
+      "save": "Enregistrer l'e-mail",
+      "saving": "Enregistrement…",
+      "success": "E-mail mis à jour avec succès.",
+      "error": "Échec de la mise à jour de l'e-mail."
+    },
+    "picture": {
+      "sectionTitle": "Photo de profil",
+      "sectionSubtitle": "JPEG, PNG ou WebP · max 5 Mo",
+      "chooseImage": "Choisir une image",
+      "save": "Enregistrer la photo",
+      "uploading": "Téléversement…",
+      "success": "Photo de profil mise à jour.",
+      "error": "Échec de la mise à jour de la photo de profil.",
+      "sizeError": "L'image doit faire 5 Mo maximum."
+    },
+    "phone": {
+      "sectionTitle": "Numéro MoMo",
+      "sectionSubtitle": "C'est le numéro que les acheteurs voient sur votre profil. Les versements sont envoyés à ce numéro.",
+      "label": "Numéro de téléphone",
+      "hint": "Doit commencer par 6... ex. 677298709 (9 chiffres après le +237)",
+      "save": "Enregistrer le numéro",
+      "saving": "Enregistrement…",
+      "inputPlaceholder": "6XXXXXXXX (9 chiffres)",
+      "success": "Numéro MoMo mis à jour avec succès.",
+      "error": "Échec de la mise à jour du numéro."
+    },
+    "password": {
+      "sectionTitle": "Changer le mot de passe",
+      "currentLabel": "Mot de passe actuel",
+      "currentPlaceholder": "Votre mot de passe actuel",
+      "newLabel": "Nouveau mot de passe",
+      "newPlaceholder": "Au moins 8 caractères",
+      "confirmLabel": "Confirmer le nouveau mot de passe",
+      "confirmPlaceholder": "Répéter le nouveau mot de passe",
+      "save": "Changer le mot de passe",
+      "saving": "Enregistrement…",
+      "success": "Mot de passe changé avec succès.",
+      "mismatch": "Les nouveaux mots de passe ne correspondent pas.",
+      "tooShort": "Le nouveau mot de passe doit comporter au moins 8 caractères.",
+      "error": "Échec du changement de mot de passe."
+    },
+    "delete": {
+      "sectionTitle": "Supprimer le compte",
+      "sectionBody": "Supprimez définitivement votre compte et toutes les données associées. Cette action est irréversible. Les comptes avec des transactions de séquestre actives ne peuvent pas être supprimés.",
+      "trigger": "Supprimer mon compte",
+      "modalTitle": "Êtes-vous absolument sûr ?",
+      "modalBody": "Cela supprimera définitivement votre compte, profil, factures et toutes les données. Cette action est irréversible.",
+      "modalBodyConfirm": "Saisissez votre mot de passe pour confirmer.",
+      "passwordLabel": "Votre mot de passe",
+      "passwordPlaceholder": "Saisir votre mot de passe pour confirmer",
+      "confirm": "Oui, supprimer mon compte",
+      "deleting": "Suppression…",
+      "cancel": "Annuler",
+      "error": "Impossible de supprimer le compte."
+    }
+  },
+  "Profile": {
+    "loading": "Chargement du profil du vendeur…",
+    "notFound": "Ce profil vendeur n'existe pas.",
+    "loadError": "Échec du chargement du profil. Veuillez réessayer.",
+    "memberSince": "Membre depuis",
+    "noMoMo": "Aucun numéro MoMo défini",
+    "editPhone": "Modifier",
+    "savePhone": "Enregistrer",
+    "savingPhone": "Enregistrement…",
+    "cancelPhone": "Annuler",
+    "phoneError": "Échec de la mise à jour du numéro.",
+    "completedJobs": "Travaux effectués",
+    "averageRating": "Note moyenne",
+    "reviewsTitle": "Avis",
+    "noReviews": "Aucun avis pour l'instant.",
+    "writeReview": "Écrire un avis",
+    "cancelReview": "Annuler",
+    "reviewInvoiceLabel": "Numéro de facture",
+    "reviewInvoicePlaceholder": "ex. INV-00001",
+    "reviewRatingLabel": "Note",
+    "reviewCommentLabel": "Commentaire",
+    "reviewCommentPlaceholder": "Partagez votre expérience…",
+    "submitReview": "Envoyer l'avis",
+    "reviewSuccess": "Votre avis a été soumis. Merci !",
+    "reviewError": "Échec de la soumission de l'avis. Veuillez réessayer.",
+    "completedInvoicesTitle": "Factures complétées",
+    "noCompleted": "Aucune facture complétée pour l'instant.",
+    "phoneLabel": "Numéro MoMo",
+    "phoneHint": "Doit commencer par 6... ex. 677298709 (9 chiffres après le +237)",
+    "phoneSuccess": "Numéro de téléphone mis à jour !",
+    "completedOrders": "Commandes terminées",
+    "deliveredOn": "Livré",
+    "leaveReview": "Laisser un avis",
+    "star": "étoile",
+    "stars": "étoiles",
+    "noReviewsFull": "Aucun avis pour l'instant. Soyez le premier à noter ce vendeur.",
+    "reviewNote": "Remarque : seuls les acheteurs connectés à leur compte Fonlok au moment du paiement peuvent laisser un avis."
+  },
+  "InvoicePage": {
+    "back": "← Retour",
+    "invoiceLabel": "Facture",
+    "loading": "Chargement…",
+    "fieldAmount": "Montant",
+    "fieldInvoiceNumber": "Facture n°",
+    "fieldClientEmail": "E-mail du client",
+    "fieldExpires": "Expire",
+    "fieldDescription": "Description",
+    "milestoneTitle": "Progression des jalons",
+    "milestonesReleased": "{done} sur {total} jalons libérés",
+    "due": "Échéance",
+    "markComplete": "Marquer comme terminé",
+    "checkEmailRelease": "Vérifiez votre e-mail pour le lien de libération",
+    "expired": "Cette facture a expiré et ne peut plus être payée.",
+    "alreadyPaid": "Cette facture a déjà été payée. Merci !",
+    "payTitle": "Payer cette facture",
+    "momoLabel": "Numéro Mobile Money",
+    "momoHint": "💳 Saisissez votre numéro MTN Mobile Money ou Orange Money. La demande de paiement sera envoyée à ce numéro. Assurez-vous qu'il est correct — un numéro incorrect peut entraîner un échec ou un paiement mal dirigé.",
+    "emailLabel": "Votre adresse e-mail",
+    "emailHint": "✉️ Utilisez une adresse e-mail valide à laquelle vous avez accès. Une fois votre paiement confirmé, un lien unique de libération des fonds vous sera envoyé. Vous en aurez besoin pour libérer le paiement du vendeur après réception de votre commande.",
+    "feeNotice": "Des frais de traitement de 2% seront appliqués à cette transaction. Le vendeur reçoit le montant moins 2%.",
+    "termsNotice": "En cliquant sur Payer maintenant, vous confirmez avoir examiné la description du vendeur et accepter nos Conditions d'utilisation et notre Politique de confidentialité.",
+    "payNow": "Payer maintenant",
+    "paySuccess": "Paiement initié ! Veuillez approuver la demande sur votre téléphone.",
+    "payError": "Échec du paiement. Veuillez réessayer.",
+    "receiptTitle": "Reçu de paiement",
+    "receiptBody": "Téléchargez un reçu PDF officiel pour cette transaction. L'acheteur et le vendeur peuvent le conserver.",
+    "downloadPdf": "Télécharger le reçu (PDF)",
+    "generatingPdf": "Génération…",
+    "resendTitle": "L'acheteur n'a pas répondu ?",
+    "resendBodyInstallment": "Renvoyer le lien de libération du jalon à l'e-mail de l'acheteur au cas où il l'aurait manqué.",
+    "resendBodyDelivered": "Renvoyer la notification de livraison à l'e-mail de l'acheteur au cas où il l'aurait manqué.",
+    "resendBtn": "✉ Renvoyer l'e-mail de confirmation",
+    "resending": "Envoi…",
+    "resendError": "Échec du renvoi de l'e-mail. Veuillez réessayer.",
+    "milestoneMarkedComplete": "Étape marquée comme terminée ! L'acheteur a été notifié par e-mail.",
+    "milestoneMarkError": "Impossible de marquer l'étape comme terminée.",
+    "receiptFailedGenerate": "Impossible de générer le reçu.",
+    "receiptFailedDownload": "Impossible de télécharger le reçu. Veuillez réessayer."
+  },
+  "Admin": {
+    "login": {
+      "title": "Portail Administrateur",
+      "subtitle": "Connectez-vous pour accéder au tableau de bord",
+      "emailLabel": "Adresse e-mail",
+      "passwordLabel": "Mot de passe",
+      "submit": "Se connecter",
+      "submitting": "Connexion…",
+      "restricted": "Zone réservée — personnel autorisé uniquement",
+      "error": "Connexion échouée. Vérifiez vos identifiants."
+    },
+    "dispute": {
+      "loading": "Chargement du litige…",
+      "accessDeniedTitle": "Accès refusé",
+      "headerTitle": "Examen du litige",
+      "headerSubtitle": "Vue Modérateur Admin — Fonlok",
+      "resolvedBanner": "Litige résolu. Statut actuel :",
+      "detailsTitle": "Détails de la facture & du litige",
+      "releaseToSeller": "Libérer les fonds au vendeur ? Cette action est irréversible.",
+      "refundBuyer": "Rembourser l'acheteur ? Cette action est irréversible.",
+      "releasedSeller": "Les fonds ont été libérés au vendeur. Les deux parties ont été notifiées.",
+      "refundedBuyer": "Remboursement approuvé pour l'acheteur. Les deux parties ont été notifiées.",
+      "errorDefault": "Échec de la résolution du litige.",
+      "errorLoad": "Impossible de charger le litige. Lien invalide.",
+      "sendError": "Impossible d'envoyer le message.",
+      "resolvedTitle": "Litige résolu.",
+      "currentStatus": "Statut actuel :",
+      "detailsInvoiceNum": "Facture n°",
+      "detailsInvoiceName": "Nom de la facture",
+      "detailsAmount": "Montant",
+      "detailsInvoiceStatus": "Statut de la facture",
+      "detailsOpenedBy": "Ouvert par",
+      "detailsOpenedAt": "Ouvert le",
+      "detailsReason": "Motif du litige",
+      "noReason": "Aucun motif fourni.",
+      "buyerLabel": "Acheteur",
+      "sellerLabel": "Vendeur",
+      "unknownName": "Inconnu",
+      "chatTitle": "Historique du chat",
+      "noMessages": "Aucun message pour l'instant.",
+      "adminModerator": "Modérateur admin",
+      "systemLabel": "Système",
+      "messagePlaceholder": "Envoyer un message en tant que modérateur\u2026",
+      "sendBtn": "Envoyer",
+      "makeDecision": "Prendre une décision",
+      "makeDecisionBody": "Examinez attentivement tous les messages avant de décider. Les deux parties seront notifiées par e-mail.",
+      "releaseFunds": "Libérer les fonds au vendeur",
+      "refundBtn": "Rembourser l'acheteur",
+      "viewFile": "Voir le fichier joint"
+    },
+    "dashboard": {
+      "verifyingSession": "V\u00e9rification de la session\u2026",
+      "headerTitle": "Fonlok Admin",
+      "headerSubtitle": "Gestion de la plateforme",
+      "signOut": "Se d\u00e9connecter",
+      "overviewTitle": "Vue d'ensemble de la plateforme",
+      "loadingStats": "Chargement des statistiques\u2026",
+      "noStats": "Impossible de charger les statistiques.",
+      "loadError": "\u00c9chec du chargement des donn\u00e9es.",
+      "tabOverview": "Vue d'ensemble",
+      "tabUsers": "Utilisateurs",
+      "tabInvoices": "Factures",
+      "tabPayments": "Paiements",
+      "tabPayouts": "Versements",
+      "tabStuck": "Fonds en attente",
+      "tabDisputes": "Litiges",
+      "tabReferrals": "Parrainages",
+      "tabMessages": "Messages",
+      "statTotalUsers": "Total utilisateurs",
+      "statTotalInvoices": "Total factures",
+      "statPayments": "Paiements trait\u00e9s",
+      "statPayouts": "Versements effectu\u00e9s",
+      "statVolume": "Volume total trait\u00e9",
+      "statRevenue": "Revenus plateforme (frais 2%)",
+      "statReferrals": "Commissions de parrainage pay\u00e9es",
+      "statOpenDisputes": "Litiges ouverts",
+      "statResolvedDisputes": "Litiges r\u00e9solus",
+      "statReferrers": "Parrains actifs",
+      "usersTitle": "Utilisateurs inscrits",
+      "usersEmpty": "Aucun utilisateur trouv\u00e9.",
+      "colName": "Nom",
+      "colUsername": "Nom d'utilisateur",
+      "colEmail": "Email",
+      "colPhone": "T\u00e9l\u00e9phone",
+      "colCountry": "Pays",
+      "colInvoiceCount": "Factures",
+      "colReferralCode": "Code de parrainage",
+      "colJoined": "Inscrit le",
+      "invoicesTitle": "Toutes les factures",
+      "invoicesEmpty": "Aucune facture trouv\u00e9e.",
+      "colInvoiceNum": "Facture n\u00b0",
+      "colInvoiceName": "Nom",
+      "colSeller": "Vendeur",
+      "colBuyerEmail": "Email acheteur",
+      "colAmount": "Montant",
+      "colStatus": "Statut",
+      "colCreated": "Cr\u00e9\u00e9e le",
+      "colExpires": "Expire le",
+      "paymentsTitle": "Paiements acheteurs",
+      "paymentsEmpty": "Aucun paiement trouv\u00e9.",
+      "colInvoiceRef": "Facture",
+      "colInvoiceNameRef": "Nom de la facture",
+      "colMethod": "M\u00e9thode",
+      "colDate": "Date",
+      "payoutsTitle": "Versements vendeurs",
+      "payoutsEmpty": "Aucun versement trouv\u00e9.",
+      "colNum": "N\u00b0",
+      "stuckTitle": "Fonds en attente",
+      "stuckEmpty": "Aucune facture en attente \u2014 tous les fonds ont \u00e9t\u00e9 lib\u00e9r\u00e9s.",
+      "colPaidAt": "Pay\u00e9 le",
+      "colDeliveredAt": "Livr\u00e9 le",
+      "disputesTitle": "Litiges",
+      "disputesEmpty": "Aucun litige trouv\u00e9.",
+      "colOpenedBy": "Ouvert par",
+      "colReason": "Raison",
+      "colAction": "Action",
+      "moderate": "Mod\u00e9rer",
+      "referralsTitle": "Parrains actifs",
+      "referralsEmpty": "Aucun utilisateur n'a encore fait de parrainage.",
+      "colPeopleReferred": "Personnes parrain\u00e9es",
+      "colTotalEarned": "Total gagn\u00e9",
+      "colCurrentBalance": "Solde actuel",
+      "personSingular": "personne",
+      "personPlural": "personnes",
+      "msgSendTitle": "Envoyer un message",
+      "msgRecipientsLabel": "Destinataires",
+      "msgBroadcastAll": "Diffuser \u00e0 tous les utilisateurs",
+      "msgSendSpecific": "Envoyer \u00e0 un utilisateur sp\u00e9cifique",
+      "msgRecipientLabel": "Destinataire",
+      "msgSearchPlaceholder": "Rechercher par nom, identifiant ou email\u2026",
+      "msgSearching": "Recherche\u2026",
+      "msgNoUsers": "Aucun utilisateur trouv\u00e9.",
+      "msgRemove": "Supprimer",
+      "msgSubjectLabel": "Objet",
+      "msgSubjectPlaceholder": "Objet de l'email\u2026",
+      "msgBodyLabel": "Message",
+      "msgBodyPlaceholder": "R\u00e9digez votre message ici. Chaque nouvelle ligne devient un nouveau paragraphe dans l'email.",
+      "msgSendingBtn": "Envoi\u2026",
+      "msgBroadcastBtn": "\uD83D\uDCE2 Diffuser \u00e0 tous les utilisateurs",
+      "msgDirectBtn": "\uD83D\uDCE9 Envoyer le message",
+      "msgBroadcastNote": "Un email sera envoy\u00e9 \u00e0 chaque utilisateur inscrit.",
+      "msgHistoryTitle": "Historique des messages",
+      "msgHistoryEmpty": "Aucun message envoy\u00e9 pour l'instant.",
+      "colType": "Type",
+      "colRecipient": "Destinataire",
+      "colSubject": "Objet",
+      "colDeliveredTo": "Livr\u00e9 \u00e0",
+      "colSent": "Envoy\u00e9",
+      "typeBroadcast": "Diffusion",
+      "typeDirect": "Direct",
+      "recipientAllUsers": "Tous les utilisateurs",
+      "usersCountLabel": "{count} utilisateurs",
+      "oneUserLabel": "1 utilisateur",
+      "recordsShowing": "{count, plural, one {Affichage de # enregistrement} other {Affichage de # enregistrements}}",
+      "tabLoading": "Chargement\u2026",
+      "loadMore": "Charger plus",
+      "subjectRequired": "L'objet est requis.",
+      "bodyRequired": "Le corps du message est requis.",
+      "recipientRequired": "Veuillez rechercher et s\u00e9lectionner un destinataire.",
+      "msgSendError": "\u00c9chec de l'envoi du message. Veuillez r\u00e9essayer."
+    }
+  }
+}

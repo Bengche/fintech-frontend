@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import Axios from "axios";
+import { useTranslations } from "next-intl";
 
 const API = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
 
@@ -13,6 +14,7 @@ export default function MarkDelivered({
   invoice_id,
   onDelivered,
 }: MarkDeliveredProps) {
+  const t = useTranslations("MarkDelivered");
   const [showModal, setShowModal] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
@@ -23,17 +25,13 @@ export default function MarkDelivered({
     try {
       await Axios.patch(`${API}/invoice/mark-delivered/${invoice_id}`);
       setShowModal(false);
-      setSuccessMessage(
-        "Invoice marked as delivered. The buyer has been notified.",
-      );
+      setSuccessMessage(t("successMsg"));
       onDelivered();
       setTimeout(() => setSuccessMessage(""), 6000);
     } catch (error: unknown) {
       setShowModal(false);
       const err = error as { response?: { data?: { message?: string } } };
-      const msg =
-        err.response?.data?.message ||
-        "Failed to mark as delivered. Please try again.";
+      const msg = err.response?.data?.message || t("errorDefault");
       setErrorMessage(msg);
       setTimeout(() => setErrorMessage(""), 6000);
     } finally {
@@ -83,7 +81,7 @@ export default function MarkDelivered({
         style={{ fontSize: "0.8125rem" }}
         onClick={() => setShowModal(true)}
       >
-        Mark as Delivered
+        {t("trigger")}
       </button>
 
       {/* Confirmation modal */}
@@ -116,7 +114,7 @@ export default function MarkDelivered({
                 margin: "0 0 0.5rem",
               }}
             >
-              Confirm Delivery
+              {t("title")}
             </h3>
 
             <p
@@ -126,17 +124,14 @@ export default function MarkDelivered({
                 marginBottom: "0.75rem",
               }}
             >
-              You are about to mark this invoice as <strong>delivered</strong>.
-              Only do this if you have fully completed the job or delivered the
-              order.
+              {t("body")}
             </p>
 
             <div
               className="alert alert-warning"
               style={{ marginBottom: "1rem", fontSize: "0.8125rem" }}
             >
-              The buyer will receive an email asking them to confirm receipt
-              before funds are released to you.
+              {t("warning")}
             </div>
 
             <div style={{ display: "flex", gap: "0.75rem" }}>
@@ -146,14 +141,14 @@ export default function MarkDelivered({
                 className="btn-primary"
                 style={{ flex: 1 }}
               >
-                {isSubmitting ? "Confirming\u2026" : "Yes, I Have Delivered"}
+                {isSubmitting ? t("confirming") : t("confirm")}
               </button>
               <button
                 onClick={() => setShowModal(false)}
                 className="btn-ghost"
                 style={{ flex: 1 }}
               >
-                Cancel
+                {t("cancel")}
               </button>
             </div>
           </div>

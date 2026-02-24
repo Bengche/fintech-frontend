@@ -1,0 +1,1313 @@
+{
+  "SiteHeader": {
+    "logoAlt": "Fonlok home",
+    "nav": {
+      "howItWorks": "How it works",
+      "pricing": "Pricing",
+      "faq": "FAQ",
+      "contact": "Contact"
+    },
+    "auth": {
+      "signIn": "Sign in",
+      "getStarted": "Get started",
+      "getStartedFree": "Get started — it's free",
+      "dashboard": "Dashboard",
+      "logOut": "Log out"
+    },
+    "mobile": {
+      "openMenu": "Open menu",
+      "closeMenu": "Close menu"
+    },
+    "language": {
+      "toggle": "FR",
+      "label": "Switch to French"
+    }
+  },
+  "SiteFooter": {
+    "tagline": "Secure escrow payments for Cameroon. Pay and get paid safely.",
+    "columns": {
+      "product": "Product",
+      "support": "Support",
+      "legal": "Legal",
+      "contact": "Contact"
+    },
+    "links": {
+      "howItWorks": "How it works",
+      "pricing": "Pricing",
+      "faq": "FAQ",
+      "createAccount": "Create account",
+      "dashboard": "Dashboard",
+      "contactUs": "Contact us",
+      "helpCentre": "Help centre",
+      "accountSettings": "Account settings",
+      "signIn": "Sign in",
+      "terms": "Terms of service",
+      "privacy": "Privacy policy",
+      "termsShort": "Terms",
+      "privacyShort": "Privacy"
+    },
+    "copyright": "© {year} Fonlok. All rights reserved. Made in Cameroon.",
+    "builtBy": "Built with ❤ by"
+  },
+  "Landing": {
+    "meta": {
+      "title": "Fonlok — Secure Escrow Payments for Cameroon",
+      "description": "Fonlok holds your money until both buyer and seller are satisfied. Pay and get paid safely with MTN Mobile Money and Orange Money. No more scams."
+    },
+    "hero": {
+      "badge": "Cameroon's escrow payment service",
+      "h1Part1": "Pay safely.",
+      "h1Part2": "Get paid fully.",
+      "description": "Fonlok holds the money until both buyer and seller are satisfied. Stop losing money to online scams. Start every deal with confidence.",
+      "ctaPrimary": "Create a free account",
+      "ctaSecondary": "See how it works →",
+      "stats": {
+        "free": { "value": "Free", "label": "to create an account" },
+        "fee": { "value": "3%", "label": "seller fee per transaction" },
+        "momo": { "value": "MTN + Orange", "label": "Mobile Money supported" }
+      }
+    },
+    "howItWorks": {
+      "heading": "Simple. Safe. Straightforward.",
+      "subheading": "Three steps is all it takes to do a safe deal on Fonlok.",
+      "steps": {
+        "1": {
+          "title": "Seller creates an invoice",
+          "desc": "Takes 2 minutes. Log in, enter your email, the amount, and a description of what you are selling. Fonlok generates a unique payment link instantly."
+        },
+        "2": {
+          "title": "Buyer pays securely",
+          "desc": "Share the payment link with your client. They open it and pay using MTN Mobile Money or Orange Money. Fonlok holds the funds safely in escrow."
+        },
+        "3": {
+          "title": "Both sides confirm",
+          "desc": "Deliver what was agreed. The buyer confirms receipt and Fonlok releases the money straight to the seller. Everyone wins."
+        }
+      },
+      "readGuide": "Read the full guide →"
+    },
+    "benefits": {
+      "heading": "Why people choose Fonlok",
+      "subheading": "Built specifically for the way people pay and sell in Cameroon.",
+      "items": {
+        "buyerProtection": {
+          "title": "Buyer protection",
+          "desc": "Your money is held until you confirm you received exactly what you paid for. You are never at risk."
+        },
+        "sellerGuarantee": {
+          "title": "Seller guarantee",
+          "desc": "Once you deliver, you get paid. No more chasing unpaid invoices. No more broken promises."
+        },
+        "disputeResolution": {
+          "title": "Dispute resolution",
+          "desc": "If there is a problem, our team reviews the evidence and resolves it fairly. Neither side can run."
+        },
+        "mobileMoney": {
+          "title": "Mobile Money payments",
+          "desc": "Buyers pay with MTN or Orange Money. No bank account or card required."
+        },
+        "noHiddenCharges": {
+          "title": "No hidden charges",
+          "desc": "3% per transaction for sellers. Buyers pay nothing. No monthly fee. No setup cost."
+        },
+        "fullyOnline": {
+          "title": "Fully online",
+          "desc": "Create invoices, track payments, and manage disputes — all from your phone."
+        }
+      }
+    },
+    "pricing": {
+      "heading": "One simple fee",
+      "subheading": "No monthly plans. No setup cost. Just 3% when you use it.",
+      "feeLabel": "per escrow transaction",
+      "features": {
+        "freeBuyers": "Free for buyers — Fonlok charges buyers 0%",
+        "freeAccount": "Free account creation",
+        "noMonthlyFee": "No monthly fee",
+        "momo": "MTN & Orange Money",
+        "dispute": "Dispute resolution included"
+      },
+      "fullDetails": "Full pricing details →",
+      "networkNote": "MTN and Orange Mobile Money network charges (typically 2%) are applied by the mobile network at the point of payment and are not collected by Fonlok."
+    },
+    "referral": {
+      "badge": "Referral Programme",
+      "heading": "Earn",
+      "headingHighlight": "0.5% commission",
+      "headingEnd": "on every deal — forever.",
+      "description": "Share your unique referral link. Every time someone you refer completes a transaction on Fonlok, you earn",
+      "descriptionHighlight": "0.5% of the transaction value",
+      "descriptionEnd": "— automatically, with no time limit.",
+      "cards": {
+        "0": {
+          "title": "One link, infinite earning",
+          "desc": "Share your referral link once. Every person who signs up through it earns you money — on every single transaction they make, for life."
+        },
+        "1": {
+          "title": "No expiry. Ever.",
+          "desc": "Your commission does not expire. As your referrals grow their businesses on Fonlok, your passive income grows with them."
+        },
+        "2": {
+          "title": "Paid instantly to your wallet",
+          "desc": "Referral earnings are credited to your Fonlok wallet automatically at the moment each transaction settles."
+        }
+      },
+      "exampleLabel": "Example",
+      "example": "Your friend refers 10 people. Each of those people does 100,000 XAF in transactions every month. That's",
+      "exampleHighlight": "5,000 XAF in your pocket every month",
+      "exampleEnd": "— growing as their businesses grow, with zero extra effort from you.",
+      "cta": "Get your referral link →",
+      "ctaNote": "Free to join. Minimum payout: 2,000 XAF."
+    },
+    "finalCta": {
+      "heading": "Ready to do business safely?",
+      "description": "Join Cameroonians who use Fonlok to protect their money and complete deals with confidence.",
+      "ctaPrimary": "Create your free account",
+      "ctaSecondary": "Learn how it works →"
+    }
+  },
+  "HowItWorks": {
+    "meta": {
+      "title": "How Fonlok Works — Secure Escrow Step by Step",
+      "description": "Learn how Fonlok protects both buyers and sellers in Cameroon. A step-by-step guide to creating invoices, paying safely, and releasing funds."
+    },
+    "hero": {
+      "h1": "How Fonlok works",
+      "description": "A simple, five-step process that protects both the buyer and the seller — from the first invoice to the final payout."
+    },
+    "steps": {
+      "1": {
+        "who": "Seller",
+        "title": "Create an invoice",
+        "desc": "Log in to Fonlok, enter your email address, the agreed amount in XAF, and a short description of what you are selling. The invoice and a unique payment link are created instantly."
+      },
+      "2": {
+        "who": "Seller",
+        "title": "Share the payment link",
+        "desc": "Copy the unique payment link Fonlok generated for your invoice and send it to your buyer by WhatsApp, SMS, or any messaging app. No account needed on their end."
+      },
+      "3": {
+        "who": "Buyer",
+        "title": "Pay with Mobile Money",
+        "desc": "The buyer opens the link and pays using MTN Mobile Money or Orange Money. The money goes into Fonlok's secure escrow account — not directly to the seller yet."
+      },
+      "4": {
+        "who": "Seller",
+        "title": "Deliver the goods or service",
+        "desc": "Once Fonlok confirms the payment, you are notified. You then deliver whatever you agreed to — physical goods, a service, digital files, or anything else."
+      },
+      "5": {
+        "who": "Both sides",
+        "title": "Confirm and receive payment",
+        "desc": "The buyer marks the order as received. Fonlok immediately releases the money to the seller's account, minus the 3% service fee. Done."
+      }
+    },
+    "edgeCases": {
+      "heading": "What happens in edge cases?",
+      "items": {
+        "0": {
+          "q": "What if the buyer never confirms delivery?",
+          "a": "If the buyer does not confirm within the agreed window, Fonlok sends a reminder. If there is still no response, our team reviews the evidence and steps in to resolve it fairly."
+        },
+        "1": {
+          "q": "What if there is a dispute?",
+          "a": "Either party can open a dispute from their dashboard. Fonlok freezes the funds and asks both sides for evidence. Our team reviews and makes a final decision — funds are either released to the seller or refunded to the buyer."
+        },
+        "2": {
+          "q": "What if the seller does not deliver?",
+          "a": "The buyer can open a dispute. If the seller cannot provide proof of delivery, Fonlok refunds the buyer, but in this case, the buyer pays the service fee of 3% from the refunded amount."
+        },
+        "3": {
+          "q": "Is the money safe while it is in escrow?",
+          "a": "Yes. Funds held by Fonlok are ring-fenced and cannot be accessed by the seller until delivery is confirmed. They also cannot be accessed by Fonlok for any other purpose."
+        }
+      }
+    },
+    "cta": {
+      "heading": "Ready to try it?",
+      "description": "Creating an account is free and takes less than two minutes.",
+      "ctaPrimary": "Create a free account",
+      "ctaSecondary": "Read the FAQ"
+    }
+  },
+  "FAQ": {
+    "meta": {
+      "title": "FAQ — Frequently Asked Questions | Fonlok",
+      "description": "Answers to common questions about Fonlok — how escrow works, fees, payments, disputes, security, and more."
+    },
+    "hero": {
+      "h1": "Frequently asked questions",
+      "description": "Have a question not listed here?",
+      "contactLink": "Contact us"
+    },
+    "sections": {
+      "basics": {
+        "heading": "The basics",
+        "items": {
+          "0": {
+            "q": "What is escrow?",
+            "a": "Escrow is a system where a trusted third party holds money until both sides of a deal are satisfied. The buyer pays in, and the money is only released to the seller once the buyer confirms they received what they paid for."
+          },
+          "1": {
+            "q": "How does Fonlok work?",
+            "a": "The seller creates an invoice on Fonlok and shares a payment link with the buyer. The buyer pays using Mobile Money. Fonlok holds the funds. Once the buyer confirms delivery, Fonlok pays the seller. If there's a problem, Fonlok investigates."
+          },
+          "2": {
+            "q": "Is Fonlok a bank?",
+            "a": "No. Fonlok is an escrow platform — we hold funds temporarily as a neutral party during a transaction. We are not a bank and do not offer interest or savings products."
+          },
+          "3": {
+            "q": "Can I use Fonlok from my phone?",
+            "a": "Yes. Fonlok works on any device with a web browser — smartphones, tablets, and computers."
+          }
+        }
+      },
+      "payments": {
+        "heading": "Payments & fees",
+        "items": {
+          "0": {
+            "q": "Which payment methods are accepted?",
+            "a": "Buyers can pay with MTN Mobile Money and Orange Money. Credit/debit cards are not currently supported."
+          },
+          "1": {
+            "q": "Who pays the Fonlok fee — buyer or seller?",
+            "a": "The seller pays a 3% fee on each transaction. Buyers pay the exact invoice amount with no additional charges from Fonlok."
+          },
+          "2": {
+            "q": "Are there monthly fees or subscription plans?",
+            "a": "No. Fonlok is completely free to sign up for and free to use. The only cost is the 3% fee when a transaction is completed."
+          },
+          "3": {
+            "q": "How long does it take to receive my money after delivery is confirmed?",
+            "a": "Fonlok initiates the payout immediately after the buyer confirms delivery. Depending on your mobile network, funds typically arrive within a few minutes to a few hours."
+          }
+        }
+      },
+      "disputes": {
+        "heading": "Disputes & safety",
+        "items": {
+          "0": {
+            "q": "What if the buyer does not confirm delivery?",
+            "a": "If the buyer does not respond within the expected window, Fonlok will contact both parties to resolve the situation. We review all available evidence before making a final decision."
+          },
+          "1": {
+            "q": "What happens if there is a dispute?",
+            "a": "Either party can open a dispute from their Fonlok dashboard. We freeze the funds and request evidence from both sides — photos, messages, delivery confirmations, etc. Our team reviews everything and decides whether to release or refund the money."
+          },
+          "2": {
+            "q": "What if the seller does not deliver?",
+            "a": "The buyer can open a dispute. If the seller cannot prove delivery, Fonlok refunds the buyer in full."
+          },
+          "3": {
+            "q": "Is Fonlok secure?",
+            "a": "Yes. All transactions are encrypted and funds held in escrow are ring-fenced. We use secure payment processors and never store sensitive payment credentials on our servers."
+          }
+        }
+      },
+      "accounts": {
+        "heading": "Accounts",
+        "items": {
+          "0": {
+            "q": "Is creating an account free?",
+            "a": "Yes. Creating an account on Fonlok is free and takes less than two minutes."
+          },
+          "1": {
+            "q": "Do I need an account to pay as a buyer?",
+            "a": "You can make a payment via the invoice link without an account. However, creating a free account gives you access to payment history, dispute management, and order tracking."
+          },
+          "2": {
+            "q": "How do I change my password or phone number?",
+            "a": "Log in to your account and go to Settings. From there you can update your phone number and change your password."
+          }
+        }
+      }
+    },
+    "bottomCta": {
+      "heading": "Still have questions?",
+      "description": "Our team is available to help.",
+      "ctaPrimary": "Get in touch",
+      "ctaSecondary": "Create a free account"
+    }
+  },
+  "Contact": {
+    "meta": {
+      "title": "Contact Us | Fonlok",
+      "description": "Get in touch with the Fonlok team. We're available via WhatsApp and email to help with any questions about our escrow payment platform in Cameroon."
+    },
+    "hero": {
+      "h1": "Get in touch",
+      "description": "We're here to help. Reach us via WhatsApp, email, or the form below."
+    },
+    "channels": {
+      "heading": "Contact channels",
+      "whatsapp": {
+        "label": "WhatsApp (fastest)",
+        "description": "Message us on WhatsApp for the quickest response. We typically reply within a few hours."
+      },
+      "email": {
+        "label": "Email",
+        "description": "For detailed questions or if you prefer email. We respond within 24 hours on business days."
+      },
+      "hours": {
+        "label": "Support hours:",
+        "value": "Monday – Saturday, 8 AM – 8 PM (WAT)"
+      }
+    },
+    "form": {
+      "heading": "Send a message",
+      "name": "Full name",
+      "email": "Email address",
+      "subject": "Subject",
+      "message": "Message",
+      "submit": "Send message",
+      "sending": "Sending…",
+      "success": "Message sent! We'll get back to you soon.",
+      "error": "Something went wrong. Please try again or contact us directly."
+    }
+  },
+  "Pricing": {
+    "meta": {
+      "title": "Pricing — Simple & Transparent | Fonlok",
+      "description": "One fee, no surprises. Fonlok charges sellers 3% per transaction. Buyers pay nothing. No monthly fees, no setup costs."
+    },
+    "hero": {
+      "h1": "Simple, transparent pricing",
+      "description": "No monthly plans. No hidden fees. No setup costs. You only pay when you complete a transaction."
+    },
+    "cards": {
+      "seller": {
+        "who": "Seller",
+        "fee": "3%",
+        "feeLabel": "per completed transaction",
+        "description": "Paid when the buyer confirms receipt. If a transaction is refunded, you do not pay.",
+        "features": {
+          "0": "Invoice creation — free",
+          "1": "Payment link sharing — free",
+          "2": "Dispute access — free",
+          "3": "3% only on successful deals"
+        }
+      },
+      "buyer": {
+        "who": "Buyer",
+        "fee": "0%",
+        "feeLabel": "from Fonlok",
+        "description": "Buyers pay exactly the invoice amount. Fonlok does not charge buyers anything.",
+        "features": {
+          "0": "Pay via MTN or Orange Money",
+          "1": "No account required to pay",
+          "2": "Full dispute protection",
+          "3": "Zero Fonlok fee"
+        }
+      }
+    },
+    "networkNote": {
+      "heading": "About Mobile Money network charges",
+      "body": "MTN and Orange apply their own transaction fees on Mobile Money payments (typically around 1–2%). These charges are collected by the mobile network operator at the moment of payment and are completely separate from Fonlok's 3% fee. Fonlok does not receive or control these charges."
+    },
+    "referral": {
+      "heading": "Earn back your fee — and more",
+      "description": "Join the Fonlok referral programme and earn 0.5% commission on every transaction made by the people you refer. Refer enough people and your referral earnings will more than cover your own transaction fees.",
+      "cta": "Learn about the referral programme →"
+    },
+    "cta": {
+      "heading": "Ready to start?",
+      "description": "Creating an account is free. You only pay when a deal is done.",
+      "ctaPrimary": "Create a free account",
+      "ctaSecondary": "See how it works"
+    },
+    "seller": {
+      "feeLabel": "of each transaction amount — charged to the seller only",
+      "body": "That 3% covers everything Fonlok does for you: holding the funds, processing the payout, handling disputes, and sending receipts. Your buyer pays zero Fonlok fees — which makes it easier for you to convince them to use the platform.",
+      "included": {
+        "0": "Invoice creation and management",
+        "1": "MTN & Orange Money payments",
+        "2": "Escrow fund holding",
+        "3": "Payout to seller on confirmation",
+        "4": "Dispute resolution",
+        "5": "Email notifications",
+        "6": "Dashboard access",
+        "7": "Free for buyers — always"
+      },
+      "cta": "Create a free account"
+    },
+    "buyer": {
+      "feeLabel": "Fonlok charges buyers nothing",
+      "badge": "Free for buyers",
+      "body": "When you pay through a Fonlok invoice link, you pay exactly the amount shown. Fonlok adds no markup or service charge for buyers.",
+      "note": "Note",
+      "noteBody": "Standard Mobile Money network charges (typically 2%) applied by MTN or Orange at the point of payment are set by and paid to the mobile network — not collected by Fonlok."
+    },
+    "valueSection": {
+      "heading": "What do sellers get for 3%?",
+      "description": "The fee is not just a charge — it is the entire service. Here is exactly what it covers.",
+      "items": {
+        "0": {
+          "title": "Guaranteed payment before you deliver",
+          "desc": "The buyer's money is locked in escrow before you lift a finger. You only deliver when the funds are confirmed."
+        },
+        "1": {
+          "title": "Funds held securely",
+          "desc": "Fonlok holds the money as a neutral party. Neither side can access it until the deal is completed."
+        },
+        "2": {
+          "title": "Automatic payout on confirmation",
+          "desc": "Once the buyer confirms delivery, Fonlok releases your money immediately. No chasing, no waiting."
+        },
+        "3": {
+          "title": "Payment receipts by email",
+          "desc": "Both buyer and seller receive email receipts automatically. A clear paper trail for every deal."
+        },
+        "4": {
+          "title": "Dispute resolution included",
+          "desc": "If something goes wrong, Fonlok investigates and makes a fair decision. You are never left to fight alone."
+        },
+        "5": {
+          "title": "Buyers pay zero Fonlok fees",
+          "desc": "Your buyers are not charged anything by Fonlok. That removes their hesitation and makes it easier for you to close deals."
+        }
+      }
+    },
+    "examples": {
+      "heading": "What does 3% look like in practice?",
+      "description": "The seller pays the fee. Buyers always pay exactly what the invoice says.",
+      "col0": "Invoice amount",
+      "col1": "Fee (3%)",
+      "col2": "Seller receives"
+    },
+    "faq": {
+      "heading": "Common questions about fees",
+      "items": {
+        "0": {
+          "q": "What about the Mobile Money network charge buyers see on their phone?",
+          "a": "When a buyer pays with MTN or Orange Money, the mobile network deducts their own transaction fee (typically around 2%) directly at the point of payment. This is a standard charge applied to all MoMo transactions, not something Fonlok controls or receives. Fonlok collects nothing from buyers."
+        },
+        "1": {
+          "q": "Who pays the 3% fee — buyer or seller?",
+          "a": "The seller pays the fee. It is deducted from the amount released to the seller when the deal is confirmed. Buyers always pay the exact invoice amount."
+        },
+        "2": {
+          "q": "Are there any monthly or subscription fees?",
+          "a": "No. You only pay when you use Fonlok. Creating an account, creating invoices, and browsing your dashboard are all completely free."
+        },
+        "3": {
+          "q": "Is there a setup fee?",
+          "a": "No. Getting started is completely free."
+        },
+        "4": {
+          "q": "What if a deal is cancelled or refunded?",
+          "a": "If no delivery has taken place and the buyer's funds are refunded, the buyer pays for the 3% service fee."
+        }
+      },
+      "allFaq": "See all frequently asked questions →"
+    }
+  },
+  "Login": {
+    "meta": {
+      "title": "Sign In | Fonlok",
+      "description": "Sign in to your Fonlok account to manage invoices, track payments, and more."
+    },
+    "heading": "Welcome back",
+    "subheading": "Sign in to your account",
+    "email": "Email or Username",
+    "password": "Password",
+    "forgotPassword": "Forgot your password?",
+    "submit": "Sign in",
+    "submitting": "Signing in…",
+    "noAccount": "Don't have an account?",
+    "register": "Create one",
+    "protected": "Your payments are protected by Fonlok Escrow",
+    "errors": {
+      "invalidCredentials": "Invalid email or password.",
+      "generic": "Something went wrong. Please try again."
+    }
+  },
+  "Register": {
+    "meta": {
+      "title": "Create Your Free Account | Fonlok",
+      "description": "Sign up for Fonlok in under 2 minutes. Protect your next deal with secure escrow payments in Cameroon."
+    },
+    "heading": "Create your free account",
+    "subheading": "Start your first safe deal in minutes",
+    "name": "Full name",
+    "username": "Username",
+    "email": "Email address",
+    "emailWarning": "Use an email address you actively check. All transaction receipts, payout confirmations, dispute notifications, and account security alerts will be sent to this address. You will not be able to recover your account without access to this email.",
+    "phone": "Phone number",
+    "phoneWarning": "This must be your active MTN Mobile Money or Orange Money number. All seller payouts are sent directly to this number. If you enter the wrong number, funds sent to it cannot be recovered.",
+    "password": "Password",
+    "confirmPassword": "Confirm password",
+    "dob": "Date of birth",
+    "country": "Country",
+    "profilePicture": "Profile picture (optional)",
+    "referralCode": "Referral code",
+    "referralCodeOptional": "(optional)",
+    "referralCodeHint": "If someone referred you, enter their code to link your account.",
+    "submit": "Create account",
+    "submitting": "Creating account…",
+    "success": "Account created successfully! You can now sign in.",
+    "haveAccount": "Already have an account?",
+    "signIn": "Sign in",
+    "terms": "By creating an account you agree to our",
+    "termsLink": "Terms of Service",
+    "and": "and",
+    "privacyLink": "Privacy Policy",
+    "errors": {
+      "passwordMismatch": "Passwords do not match.",
+      "emailTaken": "This email is already registered.",
+      "generic": "Something went wrong. Please try again."
+    }
+  },
+  "ForgotPassword": {
+    "meta": {
+      "title": "Reset Password | Fonlok"
+    },
+    "heading": "Forgot your password?",
+    "subheading": "Reset your password",
+    "description": "Enter the email address associated with your account and we will send you a secure link to reset your password.",
+    "email": "Email address",
+    "submit": "Send reset link",
+    "submitting": "Sending reset link…",
+    "checkInbox": "Check your inbox",
+    "checkInboxBody": "A password reset link has been sent. The link expires in {hours} hour. If you do not see the email, please check your spam folder.",
+    "expiry": "1 hour",
+    "backToLogin": "← Back to sign in",
+    "rememberPassword": "Remembered your password?",
+    "signIn": "Sign in",
+    "protected": "Your payments are protected by Fonlok Escrow",
+    "errors": {
+      "notFound": "No account found with this email address.",
+      "generic": "Something went wrong. Please try again."
+    }
+  },
+  "ResetPassword": {
+    "meta": {
+      "title": "Set New Password | Fonlok"
+    },
+    "heading": "Create a new password",
+    "subheading": "Set a new password",
+    "description": "Enter your new password below.",
+    "password": "New password",
+    "passwordPlaceholder": "At least 8 characters",
+    "confirmPassword": "Confirm new password",
+    "confirmPasswordPlaceholder": "Re-enter your new password",
+    "passwordsMismatch": "Passwords do not match.",
+    "submit": "Update password",
+    "submitting": "Updating password…",
+    "successHeading": "Password updated",
+    "successBody": "You will be redirected to the sign-in page automatically.",
+    "signInNow": "Sign in now",
+    "backToLogin": "← Back to sign in",
+    "noToken": "This reset link is missing a token. Please",
+    "requestNewLink": "request a new reset link",
+    "requestNew": "Request a new link",
+    "protected": "Your payments are protected by Fonlok Escrow",
+    "errors": {
+      "passwordMismatch": "Passwords do not match.",
+      "tokenExpired": "This reset link has expired. Please request a new one.",
+      "noToken": "No reset token found. Please request a new password reset link.",
+      "generic": "Something went wrong. Please try again or request a new reset link."
+    }
+  },
+  "Terms": {
+    "meta": {
+      "title": "Terms of Service | Fonlok",
+      "description": "Read Fonlok's terms of service. By using Fonlok you agree to these terms governing the use of our escrow payment platform in Cameroon."
+    },
+    "hero": {
+      "h1": "Terms of Service",
+      "lastUpdated": "Last updated:"
+    }
+  },
+  "Privacy": {
+    "meta": {
+      "title": "Privacy Policy | Fonlok",
+      "description": "Fonlok's privacy policy explains what data we collect, how we use it, and your rights as a user of our escrow payment platform in Cameroon."
+    },
+    "hero": {
+      "h1": "Privacy Policy",
+      "lastUpdated": "Last updated:"
+    }
+  },
+  "Common": {
+    "loading": "Loading…",
+    "error": "Something went wrong.",
+    "retry": "Try again",
+    "save": "Save",
+    "saving": "Saving…",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
+    "close": "Close",
+    "search": "Search",
+    "noResults": "No results found.",
+    "copyLink": "Copy link",
+    "copied": "Copied!",
+    "status": {
+      "paid": "Paid",
+      "pending": "Pending",
+      "delivered": "Delivered",
+      "expired": "Expired",
+      "disputed": "Disputed",
+      "refunded": "Refunded",
+      "released": "Released"
+    },
+    "currency": "XAF"
+  },
+  "Navbar": {
+    "dashboard": "Dashboard",
+    "transactions": "Transactions",
+    "myPurchases": "My Purchases",
+    "referral": "Referral",
+    "profile": "Profile",
+    "settings": "Settings",
+    "logOut": "Log out",
+    "signIn": "Sign in",
+    "getStarted": "Get started"
+  },
+  "CookieConsent": {
+    "title": "We value your privacy",
+    "body": "Fonlok uses cookies to keep your session secure, remember preferences, and understand how you use the platform so we can improve it.",
+    "showMore": "Learn more",
+    "showLess": "Show less",
+    "detailTitle": "What we use cookies for",
+    "essential": "Essential",
+    "essentialDesc": "required for login, sessions, and security. Always active.",
+    "functional": "Functional",
+    "functionalDesc": "remember your language and display preferences.",
+    "analytics": "Analytics",
+    "analyticsDesc": "anonymised usage data that helps us fix bugs and improve features. No personal data is sold.",
+    "privacyPolicy": "Privacy Policy",
+    "rejectAll": "Reject all",
+    "essentialOnly": "Essential only",
+    "acceptAll": "Accept all"
+  },
+  "Notifications": {
+    "title": "Notifications",
+    "markAllRead": "Mark all read",
+    "empty": "You're all caught up!",
+    "justNow": "just now",
+    "minutesAgo": "{mins}m ago",
+    "hoursAgo": "{hrs}h ago",
+    "daysAgo": "{days}d ago"
+  },
+  "RevenueStats": {
+    "title": "Revenue & Stats",
+    "subtitle": "Overview of your invoice activity",
+    "loading": "Loading…",
+    "refresh": "Refresh",
+    "viewStats": "View Stats",
+    "errorLoad": "Could not load stats. Please try again.",
+    "invoiceOverview": "Invoice Overview",
+    "totalInvoices": "Total Invoices",
+    "pending": "Pending",
+    "inEscrow": "In Escrow",
+    "delivered": "Delivered",
+    "revenueSpending": "Revenue & Spending",
+    "totalEarned": "Total Earned (as Seller)",
+    "fromPayouts": "From completed payouts",
+    "totalSpent": "Total Spent (as Buyer)",
+    "fromPurchases": "From your purchases"
+  },
+  "Invoice": {
+    "create": {
+      "trigger": "+ Create Invoice",
+      "modalTitle": "Create New Invoice",
+      "modalSubtitle": "Fill in the details below to generate a payment link.",
+      "identityNotice": "⚠️ The email below must match the email you used when creating your Fonlok account. This links the invoice to your seller profile.",
+      "invoiceName": "Invoice name",
+      "invoiceNamePlaceholder": "e.g. Logo Design Package",
+      "accountEmail": "Your account email",
+      "currency": "Currency",
+      "amount": "Amount",
+      "description": "Description",
+      "descriptionHint": "Be specific — list all deliverables, specs, and conditions. Clear descriptions reduce disputes.",
+      "descriptionPlaceholder": "Describe exactly what you are delivering…",
+      "expiryDate": "Expiry date",
+      "expiryOptional": "(optional)",
+      "expiryHint": "After this date the buyer will no longer be able to pay.",
+      "paymentType": "Payment type",
+      "fullPayment": "Full payment",
+      "installments": "Installments / milestones",
+      "installmentHint": "The buyer pays the full amount upfront. You receive each portion after marking a milestone complete and the buyer confirms it.",
+      "milestones": "Milestones",
+      "enterAmountFirst": "Enter invoice amount first",
+      "addMilestone": "+ Add milestone",
+      "milestoneMustAddUp": "Amounts must add up to {total} XAF. Difference: {diff} XAF.",
+      "milestoneLabel": "Milestone {n} label",
+      "escrowFeeTitle": "Escrow fee:",
+      "escrowFeeDesc": "Fonlok charges a flat 2% fee per transaction. This is deducted from your payout after the buyer confirms delivery. Buyers are never charged a Fonlok fee.",
+      "saveAsTemplate": "Save this invoice as a template",
+      "cancelTemplate": "Cancel",
+      "templateNamePlaceholder": "Template name (e.g. Logo Design Package)",
+      "saveTemplate": "Save Template",
+      "saving": "Saving…",
+      "cancel": "Cancel",
+      "submit": "Create Invoice",
+      "submitting": "Creating…",
+      "successToast": "Invoice created! Share the link with your client.",
+      "milestoneMismatch": "Milestone amounts must add up to {total} XAF. Current total: {current} XAF.",
+      "milestoneRequireLabel": "Each milestone must have a label and an amount.",
+      "wrongEmailTitle": "Email address mismatch",
+      "wrongEmailBody": "The email you entered does not match your Fonlok account email. You can only create invoices from your own account. Please enter the email address you used to register.",
+      "wrongEmailHint": "Your account email is the one you registered with."
+    },
+    "edit": {
+      "trigger": "Edit",
+      "cancel": "Cancel",
+      "title": "Edit Invoice",
+      "invoiceName": "Invoice Name",
+      "currency": "Currency",
+      "amount": "Amount (FCFA)",
+      "saveChanges": "Save Changes",
+      "saving": "Saving…",
+      "success": "Invoice updated successfully.",
+      "errorDefault": "Failed to update invoice. Please try again."
+    },
+    "delete": {
+      "trigger": "Delete",
+      "title": "Delete Invoice",
+      "confirm": "Are you sure you want to delete this invoice? This action cannot be undone.",
+      "confirmBtn": "Yes, Delete",
+      "deleting": "Deleting…",
+      "cancel": "Cancel",
+      "success": "Invoice deleted successfully.",
+      "errorDefault": "Failed to delete invoice.",
+      "locked": "Cannot be deleted",
+      "reasonPaid": "The buyer has already paid. Funds are securely held in escrow and cannot be released by deleting the invoice.",
+      "reasonDelivered": "Delivery has been marked. The invoice is awaiting buyer confirmation to release escrow funds.",
+      "reasonCompleted": "The payout for this invoice has already been processed and the transaction is complete.",
+      "reasonPendingPayment": "A payment for this invoice is currently being processed.",
+      "eligibleHint": "This invoice can be deleted as no payment has been made."
+    },
+    "filter": {
+      "show": "Filter Invoices",
+      "hide": "Hide Filter",
+      "title": "Filter Invoices",
+      "amountLabel": "Amount (FCFA)",
+      "currencyLabel": "Currency",
+      "applyFilter": "Apply Filter",
+      "filtering": "Filtering…",
+      "resultsFound": "{count} invoice found",
+      "resultsFoundPlural": "{count} invoices found",
+      "noResults": "No invoices match that filter.",
+      "errorDefault": "Failed to filter invoices."
+    },
+    "list": {
+      "title": "Your Invoices",
+      "refresh": "Refresh Invoices",
+      "loading": "Loading…",
+      "empty": "No invoices yet. Click \"Refresh Invoices\" to load or create your first one above.",
+      "noMatch": "No invoices match this filter.",
+      "statusAll": "All",
+      "statusPending": "Pending",
+      "statusPaid": "Paid",
+      "statusDelivered": "Delivered",
+      "statusExpired": "Expired",
+      "copyLink": "Copy Link",
+      "copied": "Copied",
+      "whatsapp": "WhatsApp",
+      "showQR": "Show QR",
+      "hideQR": "Hide QR",
+      "qrHint": "Buyer scans this to open the payment page.",
+      "fieldAmount": "Amount",
+      "fieldCreated": "Created",
+      "fieldExpires": "Expires"
+    }
+  },
+  "Dispute": {
+    "trigger": "Open a Dispute",
+    "title": "Open a Dispute",
+    "body": "A dispute will notify our admin, who will review the chat history and all messages before making a fair decision. Please only open a dispute if you have a genuine issue.",
+    "issueLabel": "Describe your issue",
+    "issuePlaceholder": "Explain clearly what went wrong. For example: I paid but did not receive the product, or the product was different from described.",
+    "noteTitle": "Note:",
+    "noteBody": "Our admin will read all chat messages between you and the other party before deciding. Make sure your communication clearly reflects the situation.",
+    "emptyReason": "Please describe the reason for the dispute.",
+    "submit": "Submit Dispute",
+    "submitting": "Submitting…",
+    "cancel": "Cancel",
+    "successMsg": "Dispute submitted. Our admin has been notified and will review your case shortly.",
+    "errorDefault": "Failed to open dispute. Please try again."
+  },
+  "MarkDelivered": {
+    "trigger": "Mark as Delivered",
+    "title": "Confirm Delivery",
+    "body": "You are about to mark this invoice as delivered. Only do this if you have fully completed the job or delivered the order.",
+    "warning": "The buyer will receive an email asking them to confirm receipt before funds are released to you.",
+    "confirm": "Yes, I Have Delivered",
+    "confirming": "Confirming…",
+    "cancel": "Cancel",
+    "successMsg": "Invoice marked as delivered. The buyer has been notified.",
+    "errorDefault": "Failed to mark as delivered. Please try again."
+  },
+  "Chat": {
+    "openBtn": "Chat with Buyer",
+    "closeBtn": "Close Chat",
+    "headerPrefix": "Chat — Invoice #",
+    "empty": "No messages yet. Start the conversation!",
+    "youSeller": "You (Seller)",
+    "viewFile": "View Uploaded File",
+    "attachFile": "Attach file",
+    "upload": "Upload",
+    "messagePlaceholder": "Type a message…",
+    "send": "Send",
+    "errorSend": "Failed to send message. Please try again.",
+    "errorUpload": "Failed to upload file. Please try again."
+  },
+  "BuyerChat": {
+    "accessDeniedTitle": "Access Denied",
+    "accessDeniedBody": "This chat link is invalid or has expired. Please check your email for the correct link.",
+    "title": "Chat with the Seller",
+    "invoiceLabel": "Invoice:",
+    "empty": "No messages yet. Feel free to ask the seller a question!",
+    "youBuyer": "You (Buyer)",
+    "seller": "Seller",
+    "viewFile": "View Uploaded File",
+    "errorSend": "Failed to send message. Please try again.",
+    "errorUpload": "Failed to upload file. Please try again.",
+    "uploadBtn": "Upload",
+    "messagePlaceholder": "Type a message...",
+    "send": "Send",
+    "haveAProblem": "Have a problem with your order?"
+  },
+  "Dashboard": {
+    "title": "Dashboard",
+    "subtitle": "Manage your invoices and track your earnings",
+    "transactions": "Transactions",
+    "myProfile": "My Profile",
+    "referrals": "Referrals",
+    "tabs": {
+      "invoices": "My Invoices",
+      "filter": "Search & Filter",
+      "payment": "Request Payout",
+      "stats": "Revenue & Stats"
+    },
+    "invoicesTab": {
+      "title": "Your Invoices",
+      "subtitle": "All invoices you have created",
+      "refresh": "Refresh Invoices"
+    },
+    "statsTab": {
+      "title": "Revenue & Stats",
+      "subtitle": "An overview of your earnings and invoice activity"
+    },
+    "payoutTab": {
+      "title": "Already completed an invoice?",
+      "body": "Once the buyer confirms delivery, they receive a unique code. Enter it below along with your invoice number to release your funds instantly.",
+      "invoiceNumberLabel": "Invoice number",
+      "invoiceNumberPlaceholder": "e.g. INV-00001",
+      "codeLabel": "Buyer's confirmation code",
+      "codePlaceholder": "Enter code",
+      "submit": "Request Payment",
+      "processing": "Processing…",
+      "successDefault": "Funds released successfully!",
+      "errorDefault": "Failed to release funds. Please check your code and invoice number."
+    }
+  },
+  "Transactions": {
+    "title": "Transaction History",
+    "subtitle": "All your payments and payouts in one place",
+    "backToDashboard": "← Dashboard",
+    "tabReceived": "Money Received",
+    "tabSpent": "Money Spent",
+    "emptyReceived": "No payments received yet. Create an invoice to get started.",
+    "emptySpent": "No transactions yet as a buyer.",
+    "errorLoad": "Failed to load transaction history. Please try again.",
+    "downloadReceipt": "Download Receipt"
+  },
+  "Purchases": {
+    "title": "My Purchases",
+    "subtitle": "All invoices you have paid through Fonlok.",
+    "loading": "Loading your purchases…",
+    "error": "Failed to load your purchases. Please try again.",
+    "noPurchasesTitle": "No purchases yet",
+    "noPurchasesBody": "When you pay an invoice through Fonlok it will appear here along with the delivery status and receipt.",
+    "summaryTotalPurchases": "Total Purchases",
+    "summaryTotalSpent": "Total Spent",
+    "summaryDelivered": "Delivered",
+    "untitledInvoice": "Untitled Invoice",
+    "oneTime": "One-time",
+    "installment": "Installment",
+    "paidOn": "Paid",
+    "viewInvoice": "View Invoice",
+    "downloadReceipt": "Download Receipt",
+    "statusPending": "Pending",
+    "statusPaid": "Paid",
+    "statusDelivered": "Delivered",
+    "statusCompleted": "Completed",
+    "statusExpired": "Expired",
+    "statusDisputed": "Disputed"
+  },
+  "Referral": {
+    "loading": "Loading your referral dashboard…",
+    "errorTitle": "Something went wrong",
+    "title": "Referral Programme",
+    "subtitle": "Earn passive income by inviting other sellers to use the platform.",
+    "howItWorksTitle": "How it works",
+    "step1Title": "Share your link",
+    "step1Body": "Copy your unique referral link and share it with friends or post it on social media.",
+    "step2Title": "They sign up & sell",
+    "step2Body": "When someone registers using your link and creates their first paid invoice, you earn a commission.",
+    "step3Title": "Earn commission",
+    "step3Body": "You receive a percentage of the escrow fee on every invoice they complete. Paid directly to your MoMo.",
+    "yourLinkTitle": "Your referral link",
+    "copy": "Copy",
+    "copied": "Copied!",
+    "balanceTitle": "Available balance",
+    "minWithdrawal": "Minimum withdrawal:",
+    "withdrawTitle": "Withdraw earnings",
+    "withdrawAmountLabel": "Amount (XAF)",
+    "withdrawAmountPlaceholder": "Enter amount",
+    "momoLabel": "MoMo phone number",
+    "momoPlaceholder": "e.g. 677000000",
+    "withdrawBtn": "Withdraw",
+    "withdrawing": "Processing…",
+    "earningsTitle": "Earnings history",
+    "noEarnings": "No earnings yet. Start sharing your link!",
+    "referredTitle": "People you've referred",
+    "noReferred": "No referrals yet.",
+    "withdrawalsTitle": "Withdrawal history",
+    "noWithdrawals": "No withdrawals yet.",
+    "amountExceedsBalance": "Amount exceeds your available balance.",
+    "invalidAmount": "Please enter a valid amount.",
+    "minWithdrawalError": "Minimum withdrawal is {min}.",
+    "withdrawFailed": "Withdrawal failed. Please try again.",
+    "loadError": "Failed to load referral dashboard. Please refresh.",
+    "importantTitle": "Important details",
+    "bullet1": "Commissions are credited instantly after each successful payout.",
+    "bullet2": "You can withdraw to any MTN or Orange MoMo number.",
+    "bullet3": "Minimum withdrawal: {min}.",
+    "bullet4": "No maximum — withdraw however much you have earned.",
+    "bullet5": "Withdrawals processed within minutes via Campay.",
+    "codeTitle": "Your referral code",
+    "codeLabel": "Code",
+    "shareLinkLabel": "Shareable link",
+    "currentBalance": "Current balance",
+    "minToWithdraw": "Min. to withdraw: {min}",
+    "needAtLeast": "You need at least {min} to withdraw.",
+    "colInvoice": "Invoice",
+    "colSeller": "Seller",
+    "colInvoiceAmount": "Invoice Amount",
+    "colEarned": "You Earned",
+    "colDate": "Date",
+    "totalEarned": "Total earned",
+    "withdrawColAmount": "Amount",
+    "withdrawColMomo": "MoMo Number",
+    "withdrawColStatus": "Status"
+  },
+  "Settings": {
+    "title": "Account settings",
+    "subtitle": "Manage your Fonlok account information.",
+    "loadError": "Failed to load account information.",
+    "name": {
+      "sectionTitle": "Display name",
+      "label": "Full name",
+      "save": "Save name",
+      "saving": "Saving…",
+      "success": "Name updated successfully.",
+      "error": "Failed to update name."
+    },
+    "email": {
+      "sectionTitle": "Email address",
+      "label": "Email",
+      "save": "Save email",
+      "saving": "Saving…",
+      "success": "Email updated successfully.",
+      "error": "Failed to update email."
+    },
+    "picture": {
+      "sectionTitle": "Profile picture",
+      "sectionSubtitle": "JPEG, PNG or WebP · max 5 MB",
+      "chooseImage": "Choose image",
+      "save": "Save picture",
+      "uploading": "Uploading…",
+      "success": "Profile picture updated.",
+      "error": "Failed to update profile picture.",
+      "sizeError": "Image must be 5 MB or smaller."
+    },
+    "phone": {
+      "sectionTitle": "MoMo phone number",
+      "sectionSubtitle": "This is the number buyers see on your profile. Payouts are sent to this number.",
+      "label": "Phone number",
+      "hint": "Must start with 6... e.g. 677298709 (9 digits after the fixed +237)",
+      "save": "Save phone number",
+      "saving": "Saving…",
+      "inputPlaceholder": "6XXXXXXXX (9 digits)",
+      "success": "MoMo number updated successfully.",
+      "error": "Failed to update phone."
+    },
+    "password": {
+      "sectionTitle": "Change password",
+      "currentLabel": "Current password",
+      "currentPlaceholder": "Your current password",
+      "newLabel": "New password",
+      "newPlaceholder": "At least 8 characters",
+      "confirmLabel": "Confirm new password",
+      "confirmPlaceholder": "Repeat new password",
+      "save": "Change password",
+      "saving": "Saving…",
+      "success": "Password changed successfully.",
+      "mismatch": "New passwords do not match.",
+      "tooShort": "New password must be at least 8 characters.",
+      "error": "Failed to change password."
+    },
+    "delete": {
+      "sectionTitle": "Delete account",
+      "sectionBody": "Permanently delete your account and all associated data. This cannot be undone. Accounts with active escrow transactions cannot be deleted.",
+      "trigger": "Delete my account",
+      "modalTitle": "Are you absolutely sure?",
+      "modalBody": "This will permanently delete your account, profile, invoices, and all data. This cannot be reversed.",
+      "modalBodyConfirm": "Enter your password to confirm.",
+      "passwordLabel": "Your password",
+      "passwordPlaceholder": "Enter your password to confirm",
+      "confirm": "Yes, delete my account",
+      "deleting": "Deleting…",
+      "cancel": "Cancel",
+      "error": "Failed to delete account."
+    }
+  },
+  "Profile": {
+    "loading": "Loading seller profile…",
+    "notFound": "This seller profile does not exist.",
+    "loadError": "Failed to load seller profile. Please try again.",
+    "memberSince": "Member since",
+    "noMoMo": "No MoMo number set",
+    "editPhone": "Edit",
+    "savePhone": "Save",
+    "savingPhone": "Saving…",
+    "cancelPhone": "Cancel",
+    "phoneError": "Failed to update phone.",
+    "completedJobs": "Completed jobs",
+    "averageRating": "Average rating",
+    "reviewsTitle": "Reviews",
+    "noReviews": "No reviews yet.",
+    "writeReview": "Write a Review",
+    "cancelReview": "Cancel",
+    "reviewInvoiceLabel": "Invoice number",
+    "reviewInvoicePlaceholder": "e.g. INV-00001",
+    "reviewRatingLabel": "Rating",
+    "reviewCommentLabel": "Comment",
+    "reviewCommentPlaceholder": "Share your experience…",
+    "submitReview": "Submit Review",
+    "reviewSuccess": "Your review has been submitted. Thank you!",
+    "reviewError": "Failed to submit review. Please try again.",
+    "completedInvoicesTitle": "Completed invoices",
+    "noCompleted": "No completed invoices yet.",
+    "phoneLabel": "MoMo Phone Number",
+    "phoneHint": "Must start with 6... e.g. 677298709 (9 digits after the fixed +237)",
+    "phoneSuccess": "Phone number updated!",
+    "completedOrders": "Completed Orders",
+    "deliveredOn": "Delivered",
+    "leaveReview": "Leave a Review",
+    "star": "star",
+    "stars": "stars",
+    "noReviewsFull": "No reviews yet. Be the first to review this seller.",
+    "reviewNote": "Note: Only buyers who were signed in to their Fonlok account when they paid can leave a review."
+  },
+  "InvoicePage": {
+    "back": "← Back",
+    "invoiceLabel": "Invoice",
+    "loading": "Loading…",
+    "fieldAmount": "Amount",
+    "fieldInvoiceNumber": "Invoice #",
+    "fieldClientEmail": "Client Email",
+    "fieldExpires": "Expires",
+    "fieldDescription": "Description",
+    "milestoneTitle": "Milestone progress",
+    "milestonesReleased": "{done} of {total} milestones released",
+    "due": "Due",
+    "markComplete": "Mark complete",
+    "checkEmailRelease": "Check your email for the release link",
+    "expired": "This invoice has expired and can no longer be paid.",
+    "alreadyPaid": "This invoice has already been paid. Thank you!",
+    "payTitle": "Pay this invoice",
+    "momoLabel": "Mobile Money number",
+    "momoHint": "💳 Enter your MTN Mobile Money or Orange Money number. The payment prompt will be sent to this number. Ensure it is correct — an incorrect number may result in a failed or misdirected payment.",
+    "emailLabel": "Your email address",
+    "emailHint": "✉️ Use a valid email address you have access to. Once your payment is confirmed, a secure one-time fund release link will be sent to this address. You will need it to release the seller's payment after receiving your order.",
+    "feeNotice": "A 2% processing fee will be applied to this transaction. The seller receives the amount minus 2%.",
+    "termsNotice": "By clicking Pay Now, you confirm that you have reviewed the seller description above and agree to our Terms of Service and Privacy Policy.",
+    "payNow": "Pay Now",
+    "paySuccess": "Payment initiated! Please approve the prompt on your phone.",
+    "payError": "Payment failed. Please try again.",
+    "receiptTitle": "Payment Receipt",
+    "receiptBody": "Download an official PDF receipt for this transaction. Both the buyer and seller can keep this for their records.",
+    "downloadPdf": "Download Receipt (PDF)",
+    "generatingPdf": "Generating…",
+    "resendTitle": "Buyer hasn't responded?",
+    "resendBodyInstallment": "Resend the milestone release link to the buyer's email in case they missed or deleted it.",
+    "resendBodyDelivered": "Resend the delivery notification to the buyer's email in case they missed or deleted it.",
+    "resendBtn": "✉ Resend confirmation email",
+    "resending": "Sending…",
+    "resendError": "Failed to resend email. Please try again.",
+    "milestoneMarkedComplete": "Milestone marked complete! The buyer has been notified by email.",
+    "milestoneMarkError": "Failed to mark milestone complete.",
+    "receiptFailedGenerate": "Failed to generate receipt.",
+    "receiptFailedDownload": "Failed to download receipt. Please try again."
+  },
+  "Admin": {
+    "login": {
+      "title": "Admin Portal",
+      "subtitle": "Sign in to access the dashboard",
+      "emailLabel": "Email Address",
+      "passwordLabel": "Password",
+      "submit": "Sign In",
+      "submitting": "Signing in…",
+      "restricted": "Restricted area — authorised personnel only",
+      "error": "Login failed. Please check your credentials."
+    },
+    "dispute": {
+      "loading": "Loading dispute…",
+      "accessDeniedTitle": "Access Denied",
+      "headerTitle": "Dispute Review",
+      "headerSubtitle": "Admin Moderator View — Fonlok",
+      "resolvedBanner": "Dispute resolved. Current status:",
+      "detailsTitle": "Invoice & Dispute Details",
+      "releaseToSeller": "Release funds to the seller? This cannot be undone.",
+      "refundBuyer": "Refund the buyer? This cannot be undone.",
+      "releasedSeller": "Funds have been released to the seller. Both parties have been notified.",
+      "refundedBuyer": "Refund approved for the buyer. Both parties have been notified.",
+      "errorDefault": "Failed to resolve dispute.",
+      "errorLoad": "Could not load dispute. Invalid link.",
+      "sendError": "Failed to send message.",
+      "resolvedTitle": "Dispute resolved.",
+      "currentStatus": "Current status:",
+      "detailsInvoiceNum": "Invoice #",
+      "detailsInvoiceName": "Invoice Name",
+      "detailsAmount": "Amount",
+      "detailsInvoiceStatus": "Invoice Status",
+      "detailsOpenedBy": "Opened By",
+      "detailsOpenedAt": "Opened At",
+      "detailsReason": "Dispute Reason",
+      "noReason": "No reason provided.",
+      "buyerLabel": "Buyer",
+      "sellerLabel": "Seller",
+      "unknownName": "Unknown",
+      "chatTitle": "Chat History",
+      "noMessages": "No messages yet.",
+      "adminModerator": "Admin Moderator",
+      "systemLabel": "System",
+      "messagePlaceholder": "Send a message as moderator\u2026",
+      "sendBtn": "Send",
+      "makeDecision": "Make a Decision",
+      "makeDecisionBody": "Review all chat messages carefully before deciding. Both parties will be notified by email.",
+      "releaseFunds": "Release Funds to Seller",
+      "refundBtn": "Refund the Buyer",
+      "viewFile": "View Uploaded File"
+    },
+    "dashboard": {
+      "verifyingSession": "Verifying session\u2026",
+      "headerTitle": "Fonlok Admin",
+      "headerSubtitle": "Platform management",
+      "signOut": "Sign out",
+      "overviewTitle": "Platform Overview",
+      "loadingStats": "Loading stats\u2026",
+      "noStats": "Could not load stats.",
+      "loadError": "Failed to load data.",
+      "tabOverview": "Overview",
+      "tabUsers": "Users",
+      "tabInvoices": "Invoices",
+      "tabPayments": "Payments",
+      "tabPayouts": "Payouts",
+      "tabStuck": "Pending Releases",
+      "tabDisputes": "Disputes",
+      "tabReferrals": "Referrals",
+      "tabMessages": "Messages",
+      "statTotalUsers": "Total Users",
+      "statTotalInvoices": "Total Invoices",
+      "statPayments": "Payments Processed",
+      "statPayouts": "Payouts Made",
+      "statVolume": "Total Volume Processed",
+      "statRevenue": "Platform Revenue (2% fees)",
+      "statReferrals": "Referral Commissions Paid",
+      "statOpenDisputes": "Open Disputes",
+      "statResolvedDisputes": "Resolved Disputes",
+      "statReferrers": "Active Referrers",
+      "usersTitle": "Registered Users",
+      "usersEmpty": "No users found.",
+      "colName": "Name",
+      "colUsername": "Username",
+      "colEmail": "Email",
+      "colPhone": "Phone",
+      "colCountry": "Country",
+      "colInvoiceCount": "Invoices",
+      "colReferralCode": "Referral Code",
+      "colJoined": "Joined",
+      "invoicesTitle": "All Invoices",
+      "invoicesEmpty": "No invoices found.",
+      "colInvoiceNum": "Invoice #",
+      "colInvoiceName": "Name",
+      "colSeller": "Seller",
+      "colBuyerEmail": "Buyer Email",
+      "colAmount": "Amount",
+      "colStatus": "Status",
+      "colCreated": "Created",
+      "colExpires": "Expires",
+      "paymentsTitle": "Buyer Payments",
+      "paymentsEmpty": "No payments found.",
+      "colInvoiceRef": "Invoice",
+      "colInvoiceNameRef": "Invoice Name",
+      "colMethod": "Method",
+      "colDate": "Date",
+      "payoutsTitle": "Seller Payouts",
+      "payoutsEmpty": "No payouts found.",
+      "colNum": "#",
+      "stuckTitle": "Pending Releases",
+      "stuckEmpty": "No pending invoices \u2014 all funds have been released.",
+      "colPaidAt": "Paid At",
+      "colDeliveredAt": "Delivered At",
+      "disputesTitle": "Disputes",
+      "disputesEmpty": "No disputes found.",
+      "colOpenedBy": "Opened By",
+      "colReason": "Reason",
+      "colAction": "Action",
+      "moderate": "Moderate",
+      "referralsTitle": "Active Referrers",
+      "referralsEmpty": "No users have made referrals yet.",
+      "colPeopleReferred": "People Referred",
+      "colTotalEarned": "Total Earned",
+      "colCurrentBalance": "Current Balance",
+      "personSingular": "person",
+      "personPlural": "people",
+      "msgSendTitle": "Send Message",
+      "msgRecipientsLabel": "Recipients",
+      "msgBroadcastAll": "Broadcast to all users",
+      "msgSendSpecific": "Send to a specific user",
+      "msgRecipientLabel": "Recipient",
+      "msgSearchPlaceholder": "Search by name, username, or email\u2026",
+      "msgSearching": "Searching\u2026",
+      "msgNoUsers": "No users found.",
+      "msgRemove": "Remove",
+      "msgSubjectLabel": "Subject",
+      "msgSubjectPlaceholder": "Email subject line\u2026",
+      "msgBodyLabel": "Message",
+      "msgBodyPlaceholder": "Write your message here. Each new line becomes a new paragraph in the email.",
+      "msgSendingBtn": "Sending\u2026",
+      "msgBroadcastBtn": "\uD83D\uDCE2 Broadcast to all users",
+      "msgDirectBtn": "\uD83D\uDCE9 Send message",
+      "msgBroadcastNote": "This will send an email to every registered user.",
+      "msgHistoryTitle": "Message History",
+      "msgHistoryEmpty": "No messages have been sent yet.",
+      "colType": "Type",
+      "colRecipient": "Recipient",
+      "colSubject": "Subject",
+      "colDeliveredTo": "Delivered to",
+      "colSent": "Sent",
+      "typeBroadcast": "Broadcast",
+      "typeDirect": "Direct",
+      "recipientAllUsers": "All users",
+      "usersCountLabel": "{count} users",
+      "oneUserLabel": "1 user",
+      "recordsShowing": "{count, plural, one {Showing # record} other {Showing # records}}",
+      "tabLoading": "Loading\u2026",
+      "loadMore": "Load more",
+      "subjectRequired": "Subject is required.",
+      "bodyRequired": "Message body is required.",
+      "recipientRequired": "Please search for and select a recipient.",
+      "msgSendError": "Failed to send message. Please try again."
+    }
+  }
+}

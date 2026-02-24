@@ -1,29 +1,42 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import SiteHeader from "../components/SiteHeader";
 import SiteFooter from "../components/SiteFooter";
 
-export const metadata: Metadata = {
-  title: "Pricing — Fonlok Escrow Fees",
-  description:
-    "Fonlok charges a simple 3% fee per transaction. No monthly plans, no setup cost, free for buyers. See exactly what you pay.",
-  keywords: [
-    "Fonlok pricing",
-    "escrow fee Cameroon",
-    "3% escrow fee",
-    "how much does Fonlok cost",
-  ],
-  openGraph: {
-    title: "Pricing — Fonlok Escrow Fees",
-    description: "3% per transaction. Free for buyers. No monthly fee.",
-    url: "https://fonlok.com/pricing",
-    siteName: "Fonlok",
-    type: "website",
-  },
-  alternates: { canonical: "https://fonlok.com/pricing" },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("Pricing.meta");
+  return {
+    title: t("title"),
+    description: t("description"),
+    keywords: [
+      "Fonlok pricing",
+      "escrow fee Cameroon",
+      "3% escrow fee",
+      "how much does Fonlok cost",
+    ],
+    openGraph: {
+      title: t("title"),
+      description: t("description"),
+      url: "https://fonlok.com/pricing",
+      siteName: "Fonlok",
+      type: "website",
+    },
+    alternates: { canonical: "https://fonlok.com/pricing" },
+  };
+}
 
-export default function PricingPage() {
+const FEE_EXAMPLES = [
+  { amount: "5,000 XAF", fee: "150 XAF", receives: "4,850 XAF" },
+  { amount: "10,000 XAF", fee: "300 XAF", receives: "9,700 XAF" },
+  { amount: "25,000 XAF", fee: "750 XAF", receives: "24,250 XAF" },
+  { amount: "50,000 XAF", fee: "1,500 XAF", receives: "48,500 XAF" },
+  { amount: "100,000 XAF", fee: "3,000 XAF", receives: "97,000 XAF" },
+  { amount: "500,000 XAF", fee: "15,000 XAF", receives: "485,000 XAF" },
+];
+
+export default async function PricingPage() {
+  const t = await getTranslations("Pricing");
   return (
     <>
       <SiteHeader />
@@ -46,7 +59,7 @@ export default function PricingPage() {
                 marginBottom: "1rem",
               }}
             >
-              Simple, transparent pricing
+              {t("hero.h1")}
             </h1>
             <p
               style={{
@@ -55,7 +68,7 @@ export default function PricingPage() {
                 lineHeight: 1.75,
               }}
             >
-              One fee. No surprises. Pay only when you use it.
+              {t("hero.description")}
             </p>
           </div>
         </section>
@@ -96,7 +109,7 @@ export default function PricingPage() {
                     marginBottom: "0.75rem",
                   }}
                 >
-                  Seller fee
+                  {t("cards.seller.who")}
                 </p>
                 <p
                   style={{
@@ -116,7 +129,7 @@ export default function PricingPage() {
                     marginBottom: "1rem",
                   }}
                 >
-                  of each transaction amount — charged to the seller only
+                  {t("seller.feeLabel")}
                 </p>
                 <p
                   style={{
@@ -128,10 +141,7 @@ export default function PricingPage() {
                     borderBottom: "1px solid var(--color-border)",
                   }}
                 >
-                  That 3% covers everything Fonlok does for you: holding the
-                  funds, processing the payout, handling disputes, and sending
-                  receipts. Your buyer pays zero Fonlok fees — which makes it
-                  easier for you to convince them to use the platform.
+                  {t("seller.body")}
                 </p>
 
                 <ul
@@ -144,9 +154,9 @@ export default function PricingPage() {
                     gap: "0.75rem",
                   }}
                 >
-                  {WHAT_IS_INCLUDED.map((item) => (
+                  {([0, 1, 2, 3, 4, 5, 6, 7] as const).map((i) => (
                     <li
-                      key={item}
+                      key={i}
                       style={{
                         display: "flex",
                         alignItems: "flex-start",
@@ -164,7 +174,7 @@ export default function PricingPage() {
                       >
                         ✓
                       </span>
-                      {item}
+                      {t(`seller.included.${i}`)}
                     </li>
                   ))}
                 </ul>
@@ -174,7 +184,7 @@ export default function PricingPage() {
                   className="btn-primary"
                   style={{ display: "block", textAlign: "center" }}
                 >
-                  Create a free account
+                  {t("seller.cta")}
                 </Link>
               </div>
 
@@ -193,7 +203,7 @@ export default function PricingPage() {
                     marginBottom: "0.75rem",
                   }}
                 >
-                  Buyer fee
+                  {t("cards.buyer.who")}
                 </p>
                 <p
                   style={{
@@ -213,7 +223,7 @@ export default function PricingPage() {
                     marginBottom: "1rem",
                   }}
                 >
-                  Fonlok charges buyers nothing
+                  {t("buyer.feeLabel")}
                 </p>
                 <span
                   className="badge badge-success"
@@ -223,7 +233,7 @@ export default function PricingPage() {
                     fontSize: "0.8125rem",
                   }}
                 >
-                  Free for buyers
+                  {t("buyer.badge")}
                 </span>
                 <p
                   style={{
@@ -233,9 +243,7 @@ export default function PricingPage() {
                     marginBottom: "1rem",
                   }}
                 >
-                  When you pay through a Fonlok invoice link, you pay exactly
-                  the amount shown. Fonlok adds no markup or service charge for
-                  buyers.
+                  {t("buyer.body")}
                 </p>
                 <p
                   style={{
@@ -247,11 +255,9 @@ export default function PricingPage() {
                   }}
                 >
                   <strong style={{ color: "var(--color-text-heading)" }}>
-                    Note:
+                    {t("buyer.note")}:
                   </strong>{" "}
-                  Standard Mobile Money network charges (typically 2%) applied
-                  by MTN or Orange at the point of payment are set by and paid
-                  to the mobile network — not collected by Fonlok.
+                  {t("buyer.noteBody")}
                 </p>
               </div>
             </div>
@@ -273,7 +279,7 @@ export default function PricingPage() {
                   marginBottom: "0.75rem",
                 }}
               >
-                What do sellers get for 3%?
+                {t("valueSection.heading")}
               </h2>
               <p
                 style={{
@@ -283,8 +289,7 @@ export default function PricingPage() {
                   margin: "0 auto",
                 }}
               >
-                The fee is not just a charge — it is the entire service. Here is
-                exactly what it covers.
+                {t("valueSection.description")}
               </p>
             </div>
 
@@ -295,9 +300,9 @@ export default function PricingPage() {
                 gap: "1.25rem",
               }}
             >
-              {VALUE_ITEMS.map((item) => (
+              {([0, 1, 2, 3, 4, 5] as const).map((i) => (
                 <div
-                  key={item.title}
+                  key={i}
                   style={{
                     padding: "1.5rem",
                     borderRadius: "var(--radius-lg)",
@@ -312,7 +317,7 @@ export default function PricingPage() {
                       marginBottom: "0.4rem",
                     }}
                   >
-                    {item.title}
+                    {t(`valueSection.items.${i}.title`)}
                   </h3>
                   <p
                     style={{
@@ -322,7 +327,7 @@ export default function PricingPage() {
                       lineHeight: 1.7,
                     }}
                   >
-                    {item.desc}
+                    {t(`valueSection.items.${i}.desc`)}
                   </p>
                 </div>
               ))}
@@ -344,7 +349,7 @@ export default function PricingPage() {
                 marginBottom: "0.75rem",
               }}
             >
-              What does 3% look like in practice?
+              {t("examples.heading")}
             </h2>
             <p
               style={{
@@ -353,8 +358,7 @@ export default function PricingPage() {
                 marginBottom: "2rem",
               }}
             >
-              The seller pays the fee. Buyers always pay exactly what the
-              invoice says.
+              {t("examples.description")}
             </p>
 
             <div style={{ overflowX: "auto" }}>
@@ -367,23 +371,21 @@ export default function PricingPage() {
               >
                 <thead>
                   <tr style={{ backgroundColor: "var(--color-mist)" }}>
-                    {["Invoice amount", "Fee (3%)", "Seller receives"].map(
-                      (h) => (
-                        <th
-                          key={h}
-                          style={{
-                            padding: "0.875rem 1rem",
-                            textAlign: "left",
-                            fontWeight: 700,
-                            fontSize: "0.875rem",
-                            color: "var(--color-text-heading)",
-                            borderBottom: "1px solid var(--color-border)",
-                          }}
-                        >
-                          {h}
-                        </th>
-                      ),
-                    )}
+                    {([0, 1, 2] as const).map((i) => (
+                      <th
+                        key={i}
+                        style={{
+                          padding: "0.875rem 1rem",
+                          textAlign: "left",
+                          fontWeight: 700,
+                          fontSize: "0.875rem",
+                          color: "var(--color-text-heading)",
+                          borderBottom: "1px solid var(--color-border)",
+                        }}
+                      >
+                        {t(`examples.col${i}`)}
+                      </th>
+                    ))}
                   </tr>
                 </thead>
                 <tbody>
@@ -448,7 +450,7 @@ export default function PricingPage() {
                 marginBottom: "2.5rem",
               }}
             >
-              Common questions about fees
+              {t("faq.heading")}
             </h2>
 
             <div
@@ -458,8 +460,8 @@ export default function PricingPage() {
                 gap: "1.5rem",
               }}
             >
-              {PRICING_FAQ.map((item) => (
-                <div key={item.q}>
+              {([0, 1, 2, 3, 4] as const).map((i) => (
+                <div key={i}>
                   <h3
                     style={{
                       fontSize: "1rem",
@@ -467,7 +469,7 @@ export default function PricingPage() {
                       marginBottom: "0.4rem",
                     }}
                   >
-                    {item.q}
+                    {t(`faq.items.${i}.q`)}
                   </h3>
                   <p
                     style={{
@@ -477,7 +479,7 @@ export default function PricingPage() {
                       lineHeight: 1.75,
                     }}
                   >
-                    {item.a}
+                    {t(`faq.items.${i}.a`)}
                   </p>
                 </div>
               ))}
@@ -492,7 +494,7 @@ export default function PricingPage() {
                   color: "var(--color-primary)",
                 }}
               >
-                See all frequently asked questions →
+                {t("faq.allFaq")}
               </Link>
             </div>
           </div>
@@ -503,75 +505,3 @@ export default function PricingPage() {
     </>
   );
 }
-
-// ── Data ────────────────────────────────────────────────────────
-
-const VALUE_ITEMS = [
-  {
-    title: "Guaranteed payment before you deliver",
-    desc: "The buyer's money is locked in escrow before you lift a finger. You only deliver when the funds are confirmed.",
-  },
-  {
-    title: "Funds held securely",
-    desc: "Fonlok holds the money as a neutral party. Neither side can access it until the deal is completed.",
-  },
-  {
-    title: "Automatic payout on confirmation",
-    desc: "Once the buyer confirms delivery, Fonlok releases your money immediately. No chasing, no waiting.",
-  },
-  {
-    title: "Payment receipts by email",
-    desc: "Both buyer and seller receive email receipts automatically. A clear paper trail for every deal.",
-  },
-  {
-    title: "Dispute resolution included",
-    desc: "If something goes wrong, Fonlok investigates and makes a fair decision. You are never left to fight alone.",
-  },
-  {
-    title: "Buyers pay zero Fonlok fees",
-    desc: "Your buyers are not charged anything by Fonlok. That removes their hesitation and makes it easier for you to close deals.",
-  },
-];
-
-const WHAT_IS_INCLUDED = [
-  "Invoice creation and management",
-  "MTN & Orange Money payments",
-  "Escrow fund holding",
-  "Payout to seller on confirmation",
-  "Dispute resolution",
-  "Email notifications",
-  "Dashboard access",
-  "Free for buyers — always",
-];
-
-const FEE_EXAMPLES = [
-  { amount: "5,000 XAF", fee: "150 XAF", receives: "4,850 XAF" },
-  { amount: "10,000 XAF", fee: "300 XAF", receives: "9,700 XAF" },
-  { amount: "25,000 XAF", fee: "750 XAF", receives: "24,250 XAF" },
-  { amount: "50,000 XAF", fee: "1,500 XAF", receives: "48,500 XAF" },
-  { amount: "100,000 XAF", fee: "3,000 XAF", receives: "97,000 XAF" },
-  { amount: "500,000 XAF", fee: "15,000 XAF", receives: "485,000 XAF" },
-];
-
-const PRICING_FAQ = [
-  {
-    q: "What about the Mobile Money network charge buyers see on their phone?",
-    a: "When a buyer pays with MTN or Orange Money, the mobile network deducts their own transaction fee (typically around 2%) directly at the point of payment. This is a standard charge applied to all MoMo transactions, not something Fonlok controls or receives. Fonlok collects nothing from buyers.",
-  },
-  {
-    q: "Who pays the 3% fee — buyer or seller?",
-    a: "The seller pays the fee. It is deducted from the amount released to the seller when the deal is confirmed. Buyers always pay the exact invoice amount.",
-  },
-  {
-    q: "Are there any monthly or subscription fees?",
-    a: "No. You only pay when you use Fonlok. Creating an account, creating invoices, and browsing your dashboard are all completely free.",
-  },
-  {
-    q: "Is there a setup fee?",
-    a: "No. Getting started is completely free.",
-  },
-  {
-    q: "What if a deal is cancelled or refunded?",
-    a: "If no delivery has taken place and the buyer's funds are refunded, the buyer pays for the 3% service fee.",
-  },
-];

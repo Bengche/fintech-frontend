@@ -2,15 +2,19 @@ import type { Metadata } from "next";
 import SiteHeader from "../components/SiteHeader";
 import SiteFooter from "../components/SiteFooter";
 import ContactForm from "./ContactForm";
+import { getTranslations } from "next-intl/server";
 
-export const metadata: Metadata = {
-  title: "Contact Us | Fonlok",
-  description:
-    "Get in touch with the Fonlok team. We're available via WhatsApp and email to help with any questions about our escrow payment platform in Cameroon.",
-  alternates: { canonical: "https://fonlok.com/contact" },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("Contact.meta");
+  return {
+    title: t("title"),
+    description: t("description"),
+    alternates: { canonical: "https://fonlok.com/contact" },
+  };
+}
 
-export default function ContactPage() {
+export default async function ContactPage() {
+  const t = await getTranslations("Contact");
   return (
     <>
       <SiteHeader />
@@ -33,7 +37,7 @@ export default function ContactPage() {
                 marginBottom: "1rem",
               }}
             >
-              Get in touch
+              {t("hero.h1")}
             </h1>
             <p
               style={{
@@ -42,8 +46,7 @@ export default function ContactPage() {
                 lineHeight: 1.75,
               }}
             >
-              We&apos;re here to help. Reach us via WhatsApp, email, or the form
-              below.
+              {t("hero.description")}
             </p>
           </div>
         </section>
@@ -73,7 +76,7 @@ export default function ContactPage() {
                   marginBottom: "2rem",
                 }}
               >
-                Contact channels
+                {t("channels.heading")}
               </h2>
 
               <div
@@ -95,7 +98,7 @@ export default function ContactPage() {
                       marginBottom: "0.5rem",
                     }}
                   >
-                    WhatsApp (fastest)
+                    {t("channels.whatsapp.label")}
                   </p>
                   <a
                     href="https://wa.me/237654155218"
@@ -120,8 +123,7 @@ export default function ContactPage() {
                       lineHeight: 1.6,
                     }}
                   >
-                    Message us on WhatsApp for the quickest response. We
-                    typically reply within a few hours.
+                    {t("channels.whatsapp.description")}
                   </p>
                 </div>
 
@@ -137,7 +139,7 @@ export default function ContactPage() {
                       marginBottom: "0.5rem",
                     }}
                   >
-                    Email
+                    {t("channels.email.label")}
                   </p>
                   <a
                     href="mailto:support@fonlok.com"
@@ -160,8 +162,7 @@ export default function ContactPage() {
                       lineHeight: 1.6,
                     }}
                   >
-                    For detailed questions or if you prefer email. We respond
-                    within 24 hours on business days.
+                    {t("channels.email.description")}
                   </p>
                 </div>
 
@@ -183,9 +184,9 @@ export default function ContactPage() {
                     }}
                   >
                     <strong style={{ color: "var(--color-text-heading)" }}>
-                      Support hours:
+                      {t("channels.hours.label")}
                     </strong>{" "}
-                    Monday – Saturday, 8 AM – 8 PM (WAT)
+                    {t("channels.hours.value")}
                   </p>
                 </div>
               </div>
@@ -200,7 +201,7 @@ export default function ContactPage() {
                   marginBottom: "2rem",
                 }}
               >
-                Send a message
+                {t("form.heading")}
               </h2>
               <div className="card" style={{ padding: "2rem" }}>
                 <ContactForm />

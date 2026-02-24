@@ -5,6 +5,7 @@ import { useAuth } from "@/context/UserContext";
 import { useRouter } from "next/navigation";
 import Navbar from "@/app/components/Navbar";
 import SiteFooter from "@/app/components/SiteFooter";
+import { useTranslations } from "next-intl";
 
 const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
 
@@ -66,6 +67,7 @@ const fmtDate = (iso: string) =>
 export default function ReferralPage() {
   const { user_id, authLoading } = useAuth();
   const router = useRouter();
+  const t = useTranslations("Referral");
 
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -104,7 +106,7 @@ export default function ReferralPage() {
         const message =
           axios.isAxiosError(err) && err.response?.data?.error
             ? err.response.data.error
-            : "Failed to load referral dashboard. Please refresh.";
+            : t("loadError");
         setError(message);
       } finally {
         setLoading(false);
@@ -145,14 +147,14 @@ export default function ReferralPage() {
 
     const amt = parseInt(withdrawAmount, 10);
     if (!amt || amt <= 0) {
-      setWithdrawMsg({ type: "error", text: "Please enter a valid amount." });
+      setWithdrawMsg({ type: "error", text: t("invalidAmount") });
       return;
     }
 
     if (!data || amt > data.balance) {
       setWithdrawMsg({
         type: "error",
-        text: "Amount exceeds your available balance.",
+        text: t("amountExceedsBalance"),
       });
       return;
     }
@@ -160,7 +162,9 @@ export default function ReferralPage() {
     if (!data || amt < data.min_withdrawal) {
       setWithdrawMsg({
         type: "error",
-        text: `Minimum withdrawal is ${fmt(data?.min_withdrawal ?? 2000)}.`,
+        text: t("minWithdrawalError", {
+          min: fmt(data?.min_withdrawal ?? 2000),
+        }),
       });
       return;
     }
@@ -169,7 +173,7 @@ export default function ReferralPage() {
     try {
       const res = await axios.post(
         `${API_URL}/referral/withdraw`,
-        { amount: amt, momo_number: momoNumber },
+        { amount: amt, momo_number: `237${momoNumber}` },
         { withCredentials: true },
       );
       setWithdrawMsg({ type: "success", text: res.data.message });
@@ -185,7 +189,7 @@ export default function ReferralPage() {
       const message =
         axios.isAxiosError(err) && err.response?.data?.error
           ? err.response.data.error
-          : "Withdrawal failed. Please try again.";
+          : t("withdrawFailed");
       setWithdrawMsg({ type: "error", text: message });
     } finally {
       setWithdrawing(false);
@@ -209,7 +213,7 @@ export default function ReferralPage() {
           }}
         >
           <p style={{ color: "var(--color-text-muted)", fontSize: "1rem" }}>
-            Loading your referral dashboard…
+            {t("loading")}
           </p>
         </div>
 
@@ -234,7 +238,7 @@ export default function ReferralPage() {
         >
           <div className="alert alert-danger" style={{ maxWidth: "480px" }}>
             <strong style={{ display: "block", marginBottom: "0.25rem" }}>
-              Something went wrong
+              {t("errorTitle")}
             </strong>
             {error}
           </div>
@@ -271,7 +275,7 @@ export default function ReferralPage() {
               margin: 0,
             }}
           >
-            Referral Programme
+            {t("title")}
           </h1>
           <p
             style={{
@@ -280,7 +284,7 @@ export default function ReferralPage() {
               fontSize: "0.9375rem",
             }}
           >
-            Earn passive income by inviting other sellers to use the platform.
+            {t("subtitle")}
           </p>
         </div>
 
@@ -294,7 +298,7 @@ export default function ReferralPage() {
               margin: "0 0 1.25rem",
             }}
           >
-            How it works
+            {t("howItWorksTitle")}
           </h2>
           <div
             style={{
@@ -305,18 +309,18 @@ export default function ReferralPage() {
           >
             <HowItWorksStep
               number="1"
-              title="Share your link"
-              body="Give your unique referral link to other sellers. When they register through your link, you are automatically linked as the referrer."
+              title={t("step1Title")}
+              body={t("step1Body")}
             />
             <HowItWorksStep
               number="2"
-              title="They transact"
-              body="Every time a seller you referred successfully receives a payout through the platform, you earn a commission automatically."
+              title={t("step2Title")}
+              body={t("step2Body")}
             />
             <HowItWorksStep
               number="3"
-              title="Earn 0.5%"
-              body={`You earn 0.5% of every invoice amount settled by your referred users. There is no cap — your earnings grow as your network grows.`}
+              title={t("step3Title")}
+              body={t("step3Body")}
             />
           </div>
           <div
@@ -338,7 +342,7 @@ export default function ReferralPage() {
                 margin: "0 0 0.5rem",
               }}
             >
-              Important details
+              {t("importantTitle")}
             </p>
             <ul
               style={{
@@ -350,15 +354,14 @@ export default function ReferralPage() {
                 color: "var(--color-text-muted)",
               }}
             >
+              <li>{t("bullet1")}</li>
+              <li>{t("bullet2")}</li>
               <li>
-                Commissions are credited instantly after each successful payout.
+                {t("minWithdrawal")} <strong>{fmt(data.min_withdrawal)}</strong>
+                .
               </li>
-              <li>You can withdraw to any MTN or Orange MoMo number.</li>
-              <li>
-                Minimum withdrawal: <strong>{fmt(data.min_withdrawal)}</strong>.
-              </li>
-              <li>No maximum — withdraw however much you have earned.</li>
-              <li>Withdrawals processed within minutes via Campay.</li>
+              <li>{t("bullet4")}</li>
+              <li>{t("bullet5")}</li>
             </ul>
           </div>
         </div>
@@ -373,7 +376,7 @@ export default function ReferralPage() {
               margin: "0 0 1.25rem",
             }}
           >
-            Your referral code
+            {t("codeTitle")}
           </h2>
           <div
             style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
@@ -389,7 +392,7 @@ export default function ReferralPage() {
                   margin: "0 0 0.5rem",
                 }}
               >
-                Code
+                {t("codeLabel")}
               </p>
               <div
                 style={{
@@ -418,7 +421,7 @@ export default function ReferralPage() {
                   margin: "0 0 0.5rem",
                 }}
               >
-                Shareable link
+                {t("shareLinkLabel")}
               </p>
               <div
                 style={{
@@ -453,7 +456,7 @@ export default function ReferralPage() {
                     whiteSpace: "nowrap",
                   }}
                 >
-                  {copied ? "Copied!" : "Copy link"}
+                  {copied ? t("copied") : t("copy")}
                 </button>
               </div>
             </div>
@@ -481,7 +484,7 @@ export default function ReferralPage() {
                 margin: "0 0 0.5rem",
               }}
             >
-              Current balance
+              {t("currentBalance")}
             </p>
             <p
               style={{
@@ -500,7 +503,7 @@ export default function ReferralPage() {
                 margin: 0,
               }}
             >
-              Min. to withdraw: {fmt(data.min_withdrawal)}
+              {t("minToWithdraw", { min: fmt(data.min_withdrawal) })}
             </p>
           </div>
 
@@ -514,7 +517,7 @@ export default function ReferralPage() {
                 color: "var(--color-text-heading)",
               }}
             >
-              Withdraw earnings
+              {t("withdrawTitle")}
             </h3>
             <form
               onSubmit={handleWithdraw}
@@ -525,7 +528,7 @@ export default function ReferralPage() {
               }}
             >
               <div>
-                <label className="label">Amount (XAF)</label>
+                <label className="label">{t("withdrawAmountLabel")}</label>
                 <input
                   type="number"
                   min={data.min_withdrawal}
@@ -538,15 +541,53 @@ export default function ReferralPage() {
                 />
               </div>
               <div>
-                <label className="label">MoMo number</label>
-                <input
-                  type="tel"
-                  value={momoNumber}
-                  onChange={(e) => setMomoNumber(e.target.value)}
-                  placeholder="e.g. 6XXXXXXXX"
-                  className="input"
-                  required
-                />
+                <label className="label">{t("momoLabel")}</label>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    border: "1px solid var(--color-border)",
+                    borderRadius: "var(--radius-sm)",
+                    overflow: "hidden",
+                    background: "var(--color-white)",
+                  }}
+                >
+                  <span
+                    style={{
+                      padding: "0.625rem 0.75rem",
+                      background: "var(--color-cloud)",
+                      color: "var(--color-text-muted)",
+                      fontSize: "0.9rem",
+                      borderRight: "1px solid var(--color-border)",
+                      whiteSpace: "nowrap",
+                      fontWeight: 600,
+                    }}
+                  >
+                    +237
+                  </span>
+                  <input
+                    type="tel"
+                    inputMode="numeric"
+                    maxLength={9}
+                    value={momoNumber}
+                    onChange={(e) =>
+                      setMomoNumber(
+                        e.target.value.replace(/\D/g, "").slice(0, 9),
+                      )
+                    }
+                    placeholder="6XXXXXXXX"
+                    style={{
+                      border: "none",
+                      outline: "none",
+                      padding: "0.625rem 0.75rem",
+                      fontSize: "0.9375rem",
+                      flex: 1,
+                      width: 0,
+                      background: "transparent",
+                    }}
+                    required
+                  />
+                </div>
               </div>
               {withdrawMsg && (
                 <div
@@ -561,7 +602,7 @@ export default function ReferralPage() {
                 disabled={withdrawing || data.balance < data.min_withdrawal}
                 style={{ width: "100%", justifyContent: "center" }}
               >
-                {withdrawing ? "Processing�" : "Withdraw"}
+                {withdrawing ? t("withdrawing") : t("withdrawBtn")}
               </button>
               {data.balance < data.min_withdrawal && (
                 <p
@@ -572,7 +613,7 @@ export default function ReferralPage() {
                     margin: 0,
                   }}
                 >
-                  You need at least {fmt(data.min_withdrawal)} to withdraw.
+                  {t("needAtLeast", { min: fmt(data.min_withdrawal) })}
                 </p>
               )}
             </form>
@@ -589,7 +630,7 @@ export default function ReferralPage() {
               margin: "0 0 1.25rem",
             }}
           >
-            Earnings history
+            {t("earningsTitle")}
             {hasEarnings && (
               <span
                 style={{
@@ -612,7 +653,7 @@ export default function ReferralPage() {
                 padding: "1.5rem 0",
               }}
             >
-              No earnings yet. Share your referral link to start earning.
+              {t("noEarnings")}
             </p>
           ) : (
             <div style={{ overflowX: "auto" }}>
@@ -626,21 +667,18 @@ export default function ReferralPage() {
                 <thead>
                   <tr style={{ borderBottom: "2px solid var(--color-border)" }}>
                     {[
-                      "Invoice",
-                      "Seller",
-                      "Invoice Amount",
-                      "You Earned",
-                      "Date",
+                      { label: t("colInvoice"), right: false },
+                      { label: t("colSeller"), right: false },
+                      { label: t("colInvoiceAmount"), right: true },
+                      { label: t("colEarned"), right: true },
+                      { label: t("colDate"), right: false },
                     ].map((h) => (
                       <th
-                        key={h}
+                        key={h.label}
                         style={{
                           paddingBottom: "0.75rem",
                           paddingRight: "1rem",
-                          textAlign:
-                            h === "Invoice Amount" || h === "You Earned"
-                              ? "right"
-                              : "left",
+                          textAlign: h.right ? "right" : "left",
                           fontSize: "0.75rem",
                           fontWeight: 700,
                           color: "var(--color-text-muted)",
@@ -649,7 +687,7 @@ export default function ReferralPage() {
                           whiteSpace: "nowrap",
                         }}
                       >
-                        {h}
+                        {h.label}
                       </th>
                     ))}
                   </tr>
@@ -729,7 +767,7 @@ export default function ReferralPage() {
                         textTransform: "uppercase",
                       }}
                     >
-                      Total earned
+                      {t("totalEarned")}
                     </td>
                     <td
                       style={{
@@ -762,7 +800,7 @@ export default function ReferralPage() {
               margin: "0 0 1.25rem",
             }}
           >
-            Referred users
+            {t("referredTitle")}
             {hasReferrals && (
               <span
                 style={{
@@ -785,7 +823,7 @@ export default function ReferralPage() {
                 padding: "1.5rem 0",
               }}
             >
-              No referred users yet. Share your link to grow your network.
+              {t("noReferred")}
             </p>
           ) : (
             <div
@@ -863,7 +901,7 @@ export default function ReferralPage() {
               margin: "0 0 1.25rem",
             }}
           >
-            Withdrawal history
+            {t("withdrawalsTitle")}
             {hasWithdrawals && (
               <span
                 style={{
@@ -886,7 +924,7 @@ export default function ReferralPage() {
                 padding: "1.5rem 0",
               }}
             >
-              No withdrawals yet.
+              {t("noWithdrawals")}
             </p>
           ) : (
             <div style={{ overflowX: "auto" }}>
@@ -899,7 +937,12 @@ export default function ReferralPage() {
               >
                 <thead>
                   <tr style={{ borderBottom: "2px solid var(--color-border)" }}>
-                    {["Amount", "MoMo Number", "Status", "Date"].map((h) => (
+                    {[
+                      t("withdrawColAmount"),
+                      t("withdrawColMomo"),
+                      t("withdrawColStatus"),
+                      t("colDate"),
+                    ].map((h) => (
                       <th
                         key={h}
                         style={{

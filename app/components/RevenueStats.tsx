@@ -2,6 +2,7 @@
 import { useState } from "react";
 import Axios from "axios";
 import { useAuth } from "@/context/UserContext";
+import { useTranslations } from "next-intl";
 
 interface StatsData {
   totalInvoices: number;
@@ -79,6 +80,7 @@ function StatCard({
 
 export default function RevenueStats() {
   const { user_id } = useAuth();
+  const t = useTranslations("RevenueStats");
   const [stats, setStats] = useState<StatsData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -92,7 +94,7 @@ export default function RevenueStats() {
       );
       setStats(response.data);
     } catch {
-      setErrorMessage("Could not load stats. Please try again.");
+      setErrorMessage(t("errorLoad"));
     } finally {
       setIsLoading(false);
     }
@@ -119,7 +121,7 @@ export default function RevenueStats() {
               color: "var(--color-text-heading)",
             }}
           >
-            Revenue & Stats
+            {t("title")}
           </h3>
           <p
             style={{
@@ -128,7 +130,7 @@ export default function RevenueStats() {
               color: "var(--color-text-muted)",
             }}
           >
-            Overview of your invoice activity
+            {t("subtitle")}
           </p>
         </div>
         <button
@@ -137,7 +139,7 @@ export default function RevenueStats() {
           style={{ fontSize: "0.875rem", padding: "0.45rem 1rem" }}
           disabled={isLoading}
         >
-          {isLoading ? "Loading…" : stats ? "Refresh" : "View Stats"}
+          {isLoading ? t("loading") : stats ? t("refresh") : t("viewStats")}
         </button>
       </div>
 
@@ -160,7 +162,7 @@ export default function RevenueStats() {
               margin: "0 0 0.75rem",
             }}
           >
-            Invoice Overview
+            {t("invoiceOverview")}
           </p>
           <div
             style={{
@@ -170,20 +172,20 @@ export default function RevenueStats() {
               marginBottom: "1.25rem",
             }}
           >
-            <StatCard value={stats.totalInvoices} label="Total Invoices" />
+            <StatCard value={stats.totalInvoices} label={t("totalInvoices")} />
             <StatCard
               value={stats.pendingInvoices}
-              label="Pending"
+              label={t("pending")}
               highlight="warning"
             />
             <StatCard
               value={stats.paidInvoices}
-              label="In Escrow"
+              label={t("inEscrow")}
               highlight="info"
             />
             <StatCard
               value={stats.deliveredInvoices}
-              label="Delivered"
+              label={t("delivered")}
               highlight="success"
             />
           </div>
@@ -199,7 +201,7 @@ export default function RevenueStats() {
               margin: "0 0 0.75rem",
             }}
           >
-            Revenue & Spending
+            {t("revenueSpending")}
           </p>
           <div
             style={{
@@ -223,7 +225,7 @@ export default function RevenueStats() {
                   margin: "0 0 0.375rem",
                 }}
               >
-                Total Earned (as Seller)
+                {t("totalEarned")}
               </p>
               <p
                 style={{
@@ -242,7 +244,7 @@ export default function RevenueStats() {
                   margin: "0.25rem 0 0",
                 }}
               >
-                From completed payouts
+                {t("fromPayouts")}
               </p>
             </div>
             <div
@@ -260,7 +262,7 @@ export default function RevenueStats() {
                   margin: "0 0 0.375rem",
                 }}
               >
-                Total Spent (as Buyer)
+                {t("totalSpent")}
               </p>
               <p
                 style={{
@@ -279,7 +281,7 @@ export default function RevenueStats() {
                   margin: "0.25rem 0 0",
                 }}
               >
-                From your purchases
+                {t("fromPurchases")}
               </p>
             </div>
           </div>

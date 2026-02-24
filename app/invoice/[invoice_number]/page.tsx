@@ -2,12 +2,13 @@
 
 import Axios from "axios";
 import { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Navbar from "@/app/components/Navbar";
 import SiteFooter from "@/app/components/SiteFooter";
 import Link from "next/link";
 import { useAuth } from "@/context/UserContext";
 import { InlineSpinner } from "@/app/components/Spinner";
+import { useTranslations } from "next-intl";
 
 type InvoiceStats = {
   id: number;
@@ -37,6 +38,8 @@ export default function InvoicePage() {
   const BASE_API_URL =
     process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
   const { user_id: currentUserId } = useAuth() ?? {};
+  const t = useTranslations("InvoicePage");
+  const router = useRouter();
 
   const [milestones, setMilestones] = useState<Milestone[]>([]);
   const [milestoneLoading, setMilestoneLoading] = useState(false);
@@ -59,6 +62,7 @@ export default function InvoicePage() {
   const [payLoading, setPayLoading] = useState(false);
   const [paySuccess, setPaySuccess] = useState("");
   const [payError, setPayError] = useState("");
+  const [showEmailConfirm, setShowEmailConfirm] = useState(false);
   const [pdfLoading, setPdfLoading] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
   const [resendMsg, setResendMsg] = useState("");
@@ -100,9 +104,7 @@ export default function InvoicePage() {
         {},
         { withCredentials: true },
       );
-      setMilestoneActionMsg(
-        "Milestone marked complete! The buyer has been notified by email.",
-      );
+      setMilestoneActionMsg(t("milestoneMarkedComplete"));
       // Refresh milestones
       const msRes = await Axios.get(
         `${BASE_API_URL}/invoice/milestones/${invoice_number}`,
@@ -111,7 +113,7 @@ export default function InvoicePage() {
     } catch (err: unknown) {
       setMilestoneActionError(
         (err as { response?: { data?: { message?: string } } })?.response?.data
-          ?.message || "Failed to mark milestone complete.",
+          ?.message || t("milestoneMarkError"),
       );
     } finally {
       setMilestoneLoading(false);
@@ -130,15 +132,18 @@ export default function InvoicePage() {
         invoicenumber: invoiceStats.invoicenumber,
         invoiceid: invoiceStats.id,
         email: payerEmail,
-        userid: invoiceStats.userid,
+        userid: currentUserId ?? null,
       });
-      setPaySuccess(
-        "Payment initiated! Please approve the prompt on your phone.",
+      setPaySuccess(t("paySuccess"));
+      // Redirect to the payment-pending page so the buyer sees the
+      // confirmation animation while we wait for the MoMo webhook.
+      router.push(
+        `/payment-pending/${invoiceStats.invoicenumber}?email=${encodeURIComponent(payerEmail)}`,
       );
     } catch (err: unknown) {
       setPayError(
         (err as { response?: { data?: { message?: string } } })?.response?.data
-          ?.message || "Payment failed. Please try again.",
+          ?.message || t("payError"),
       );
     } finally {
       setPayLoading(false);
@@ -181,7 +186,7 @@ export default function InvoicePage() {
             textDecoration: "none",
           }}
         >
-          ← Back
+          {t("back")}
         </Link>
 
         {/* Invoice header card */}
@@ -205,7 +210,7 @@ export default function InvoicePage() {
                   letterSpacing: "0.05em",
                 }}
               >
-                Invoice
+                {t("invoiceLabel")}
               </p>
               <h1
                 style={{
@@ -215,7 +220,7 @@ export default function InvoicePage() {
                   margin: 0,
                 }}
               >
-                {invoiceStats.invoicename || "Loading…"}
+                {invoiceStats.invoicename || t("loading")}
               </h1>
             </div>
             {invoiceStats.status && (
@@ -239,7 +244,7 @@ export default function InvoicePage() {
             }}
           >
             <InvoiceField
-              label="Amount"
+              label={t("fieldAmount")}
               value={
                 invoiceStats.amount
                   ? `${invoiceStats.amount.toLocaleString()} ${invoiceStats.currency}`
@@ -248,19 +253,19 @@ export default function InvoicePage() {
               highlight
             />
             <InvoiceField
-              label="Invoice #"
+              label={t("fieldInvoiceNumber")}
               value={invoiceStats.invoicenumber || "—"}
               mono
             />
             {invoiceStats.clientemail && (
               <InvoiceField
-                label="Client Email"
+                label={t("fieldClientEmail")}
                 value={invoiceStats.clientemail}
               />
             )}
             {invoiceStats.expires_at && (
               <InvoiceField
-                label="Expires"
+                label={t("fieldExpires")}
                 value={new Date(invoiceStats.expires_at).toLocaleDateString(
                   "en-GB",
                   {
@@ -295,7 +300,7 @@ export default function InvoicePage() {
                   letterSpacing: "0.05em",
                 }}
               >
-                Description
+                {t("fieldDescription")}
               </p>
               <p
                 style={{
@@ -322,7 +327,7 @@ export default function InvoicePage() {
                   margin: "0 0 0.25rem",
                 }}
               >
-                Milestone progress
+                {t("milestoneTitle")}
               </h2>
               <p
                 style={{
@@ -331,8 +336,11 @@ export default function InvoicePage() {
                   margin: "0 0 1.25rem",
                 }}
               >
-                {milestones.filter((m) => m.status === "released").length} of{" "}
-                {milestones.length} milestones released
+                {t("milestonesReleased", {
+                  done: milestones.filter((m) => m.status === "released")
+                    .length,
+                  total: milestones.length,
+                })}
               </p>
 
               {milestoneActionMsg && (
@@ -432,7 +440,7 @@ export default function InvoicePage() {
                           {m.deadline && (
                             <>
                               {" "}
-                              &middot; Due{" "}
+                              &middot; {t("due")}{" "}
                               {new Date(m.deadline).toLocaleDateString(
                                 "en-GB",
                                 {
@@ -477,7 +485,7 @@ export default function InvoicePage() {
                             {milestoneLoading ? (
                               <InlineSpinner size="xs" />
                             ) : (
-                              "Mark complete"
+                              t("markComplete")
                             )}
                           </button>
                         )}
@@ -488,7 +496,7 @@ export default function InvoicePage() {
                               color: "var(--color-text-muted)",
                             }}
                           >
-                            Check your email for the release link
+                            {t("checkEmailRelease")}
                           </span>
                         )}
                       </div>
@@ -505,7 +513,7 @@ export default function InvoicePage() {
             className="alert alert-danger"
             style={{ marginBottom: "1.25rem" }}
           >
-            This invoice has expired and can no longer be paid.
+            {t("expired")}
           </div>
         )}
 
@@ -515,7 +523,7 @@ export default function InvoicePage() {
             className="alert alert-success"
             style={{ marginBottom: "1.25rem" }}
           >
-            This invoice has already been paid. Thank you!
+            {t("alreadyPaid")}
           </div>
         )}
 
@@ -530,32 +538,15 @@ export default function InvoicePage() {
                 margin: "0 0 1.25rem",
               }}
             >
-              Pay this invoice
+              {t("payTitle")}
             </h2>
-
-            {paySuccess && (
-              <div
-                className="alert alert-success"
-                style={{ marginBottom: "1rem" }}
-              >
-                {paySuccess}
-              </div>
-            )}
-            {payError && (
-              <div
-                className="alert alert-danger"
-                style={{ marginBottom: "1rem" }}
-              >
-                {payError}
-              </div>
-            )}
 
             <div
               style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
             >
               {/* MoMo number */}
               <div>
-                <label className="label">Mobile Money number</label>
+                <label className="label">{t("momoLabel")}</label>
                 <div style={{ display: "flex", alignItems: "stretch" }}>
                   <span
                     style={{
@@ -578,8 +569,14 @@ export default function InvoicePage() {
                     placeholder="6XXXXXXXX"
                     name="momoNumber"
                     type="tel"
+                    inputMode="numeric"
+                    maxLength={9}
                     value={phoneNumber}
-                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    onChange={(e) =>
+                      setPhoneNumber(
+                        e.target.value.replace(/\D/g, "").slice(0, 9),
+                      )
+                    }
                     style={{
                       borderRadius: "0 var(--radius-sm) var(--radius-sm) 0",
                     }}
@@ -594,16 +591,13 @@ export default function InvoicePage() {
                     fontWeight: 500,
                   }}
                 >
-                  💳 Enter your MTN Mobile Money or Orange Money number. The
-                  payment prompt will be sent to this number. Ensure it is
-                  correct — an incorrect number may result in a failed or
-                  misdirected payment.
+                  {t("momoHint")}
                 </p>
               </div>
 
               {/* Email */}
               <div>
-                <label className="label">Your email address</label>
+                <label className="label">{t("emailLabel")}</label>
                 <input
                   className="input"
                   type="email"
@@ -619,10 +613,7 @@ export default function InvoicePage() {
                     lineHeight: 1.5,
                   }}
                 >
-                  ✉️ Use a valid email address you have access to. Once your
-                  payment is confirmed, a secure one-time fund release link will
-                  be sent to this address. You will need it to release the
-                  seller’s payment after receiving your order.
+                  {t("emailHint")}
                 </p>
               </div>
 
@@ -642,8 +633,7 @@ export default function InvoicePage() {
                     color: "var(--color-text-body)",
                   }}
                 >
-                  A <strong>2% processing fee</strong> will be applied to this
-                  transaction. The seller receives the amount minus 2%.
+                  {t("feeNotice")}
                 </p>
               </div>
 
@@ -656,10 +646,15 @@ export default function InvoicePage() {
                   margin: 0,
                 }}
               >
-                By clicking Pay Now, you confirm that you have reviewed the
-                seller description above and agree to our Terms of Service and
-                Privacy Policy.
+                {t("termsNotice")}
               </p>
+
+              {/* Alerts live right above the button so they are immediately visible */}
+              {payError && (
+                <div className="alert alert-danger" style={{ margin: 0 }}>
+                  {payError}
+                </div>
+              )}
 
               <button
                 className="btn-accent"
@@ -672,15 +667,190 @@ export default function InvoicePage() {
                 }}
                 onClick={(e) => {
                   e.preventDefault();
-                  if (!isDisabled) makePayment();
+                  if (!isDisabled) setShowEmailConfirm(true);
                 }}
               >
-                {payLoading ? <InlineSpinner /> : "Pay Now"}
+                {payLoading ? <InlineSpinner /> : t("payNow")}
               </button>
             </div>
           </div>
         )}
       </div>
+
+      {/* ── Email confirmation modal ────────────────────────────────────── */}
+      {showEmailConfirm && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(15,31,61,0.55)",
+            backdropFilter: "blur(3px)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 1000,
+            padding: "1.25rem",
+          }}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setShowEmailConfirm(false);
+          }}
+        >
+          <div
+            style={{
+              background: "#ffffff",
+              borderRadius: "18px",
+              boxShadow: "0 24px 64px rgba(15,31,61,0.18)",
+              padding: "2rem 2rem 1.75rem",
+              maxWidth: "420px",
+              width: "100%",
+              position: "relative",
+            }}
+          >
+            {/* Close */}
+            <button
+              onClick={() => setShowEmailConfirm(false)}
+              style={{
+                position: "absolute",
+                top: "1rem",
+                right: "1rem",
+                background: "none",
+                border: "none",
+                fontSize: "1.25rem",
+                color: "var(--color-text-muted)",
+                cursor: "pointer",
+                lineHeight: 1,
+                padding: "0.25rem",
+              }}
+              aria-label="Close"
+            >
+              ✕
+            </button>
+
+            {/* Icon */}
+            <div
+              style={{
+                width: "48px",
+                height: "48px",
+                borderRadius: "14px",
+                background: "#eff6ff",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: "1.5rem",
+                marginBottom: "1.125rem",
+              }}
+            >
+              ✉️
+            </div>
+
+            <h3
+              style={{
+                margin: "0 0 0.375rem",
+                fontSize: "1.125rem",
+                fontWeight: 700,
+                color: "var(--color-text-heading)",
+                lineHeight: 1.3,
+              }}
+            >
+              Confirm your email address
+            </h3>
+            <p
+              style={{
+                margin: "0 0 1.25rem",
+                fontSize: "0.875rem",
+                color: "var(--color-text-muted)",
+                lineHeight: 1.6,
+              }}
+            >
+              Your payment confirmation, receipt, and secure download link will
+              be sent to this address. Make sure it&apos;s an inbox you can
+              access right now.
+            </p>
+
+            {/* Email display */}
+            <div
+              style={{
+                background: "#f8fafc",
+                border: "1.5px solid var(--color-border)",
+                borderRadius: "10px",
+                padding: "0.875rem 1rem",
+                marginBottom: "1.25rem",
+                display: "flex",
+                alignItems: "center",
+                gap: "0.625rem",
+              }}
+            >
+              <span style={{ fontSize: "1.1rem" }}>📧</span>
+              <span
+                style={{
+                  fontWeight: 600,
+                  fontSize: "0.9375rem",
+                  color: "var(--color-text-heading)",
+                  wordBreak: "break-all",
+                }}
+              >
+                {payerEmail || (
+                  <span
+                    style={{
+                      color: "var(--color-text-muted)",
+                      fontWeight: 400,
+                    }}
+                  >
+                    No email entered
+                  </span>
+                )}
+              </span>
+            </div>
+
+            {/* Actions */}
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "0.625rem",
+              }}
+            >
+              <button
+                className="btn-accent"
+                disabled={payLoading || !payerEmail}
+                style={{
+                  width: "100%",
+                  justifyContent: "center",
+                  padding: "0.8125rem",
+                  fontSize: "0.9375rem",
+                }}
+                onClick={() => {
+                  setShowEmailConfirm(false);
+                  makePayment();
+                }}
+              >
+                {payLoading ? (
+                  <InlineSpinner />
+                ) : (
+                  "Yes, this is correct — Pay now"
+                )}
+              </button>
+              <button
+                onClick={() => setShowEmailConfirm(false)}
+                style={{
+                  width: "100%",
+                  background: "none",
+                  border: "1.5px solid var(--color-border)",
+                  borderRadius: "var(--radius-sm)",
+                  padding: "0.75rem",
+                  fontSize: "0.9rem",
+                  color: "var(--color-text-body)",
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  transition: "border-color 0.15s",
+                }}
+              >
+                Edit email address
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Download Receipt */}
       {(invoiceStats.status === "paid" ||
@@ -694,7 +864,7 @@ export default function InvoicePage() {
               fontSize: "1rem",
             }}
           >
-            Payment Receipt
+            {t("receiptTitle")}
           </p>
           <p
             style={{
@@ -703,8 +873,7 @@ export default function InvoicePage() {
               marginBottom: "1.25rem",
             }}
           >
-            Download an official PDF receipt for this transaction. Both the
-            buyer and seller can keep this for their records.
+            {t("receiptBody")}
           </p>
           <button
             className="btn-primary"
@@ -725,7 +894,7 @@ export default function InvoicePage() {
                 );
                 if (!res.ok) {
                   const data = await res.json();
-                  alert(data.message || "Failed to generate receipt.");
+                  alert(data.message || t("receiptFailedGenerate"));
                   return;
                 }
                 const blob = await res.blob();
@@ -749,13 +918,13 @@ export default function InvoicePage() {
                   URL.revokeObjectURL(url);
                 }
               } catch {
-                alert("Failed to download receipt. Please try again.");
+                alert(t("receiptFailedDownload"));
               } finally {
                 setPdfLoading(false);
               }
             }}
           >
-            📄 {pdfLoading ? "Generating…" : "Download Receipt (PDF)"}
+            📄 {pdfLoading ? t("generatingPdf") : t("downloadPdf")}
           </button>
         </div>
       )}
@@ -782,7 +951,7 @@ export default function InvoicePage() {
                   fontSize: "0.9375rem",
                 }}
               >
-                Buyer hasn&apos;t responded?
+                {t("resendTitle")}
               </p>
               <p
                 style={{
@@ -793,8 +962,8 @@ export default function InvoicePage() {
                 }}
               >
                 {invoiceStats.payment_type === "installment"
-                  ? "Resend the milestone release link to the buyer's email in case they missed or deleted it."
-                  : "Resend the delivery notification to the buyer's email in case they missed or deleted it."}
+                  ? t("resendBodyInstallment")
+                  : t("resendBodyDelivered")}
               </p>
             </div>
 
@@ -846,15 +1015,14 @@ export default function InvoicePage() {
                     response?: { data?: { message?: string } };
                   };
                   setResendError(
-                    axiosErr.response?.data?.message ||
-                      "Failed to resend email. Please try again.",
+                    axiosErr.response?.data?.message || t("resendError"),
                   );
                 } finally {
                   setResendLoading(false);
                 }
               }}
             >
-              {resendLoading ? "Sending…" : "✉ Resend confirmation email"}
+              {resendLoading ? t("resending") : t("resendBtn")}
             </button>
           </div>
         )}

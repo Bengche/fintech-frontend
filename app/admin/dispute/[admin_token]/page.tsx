@@ -1,6 +1,8 @@
 "use client";
 import { useState, useEffect } from "react";
 import Axios from "axios";
+import { useParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 const API = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
 
@@ -39,16 +41,11 @@ interface UserData {
   [key: string]: unknown;
 }
 
-type PageProps = {
-  params: {
-    admin_token: string;
-  };
-};
-
 // ─── Component ─────────────────────────────────────────────────────────────────
 
-export default function AdminDisputePage({ params }: PageProps) {
-  const { admin_token } = params;
+export default function AdminDisputePage() {
+  const { admin_token } = useParams<{ admin_token: string }>();
+  const t = useTranslations("Admin");
 
   const [dispute, setDispute] = useState<DisputeData | null>(null);
   const [invoice, setInvoice] = useState<InvoiceData | null>(null);
@@ -74,9 +71,7 @@ export default function AdminDisputePage({ params }: PageProps) {
       }
     } catch (error: unknown) {
       const err = error as { response?: { data?: { message?: string } } };
-      setErrorMessage(
-        err.response?.data?.message || "Could not load dispute. Invalid link.",
-      );
+      setErrorMessage(err.response?.data?.message || t("dispute.errorLoad"));
     } finally {
       setIsLoading(false);
     }
@@ -98,15 +93,15 @@ export default function AdminDisputePage({ params }: PageProps) {
       setAdminMessage("");
       loadDisputeData();
     } catch {
-      setErrorMessage("Failed to send message.");
+      setErrorMessage(t("dispute.sendError"));
     }
   };
 
   const resolveDispute = async (decision: "seller" | "buyer") => {
     const confirmText =
       decision === "seller"
-        ? "Release funds to the seller? This cannot be undone."
-        : "Refund the buyer? This cannot be undone.";
+        ? t("dispute.releaseToSeller")
+        : t("dispute.refundBuyer");
     if (!window.confirm(confirmText)) return;
     try {
       await Axios.post(`${API}/dispute/admin/${admin_token}/resolve`, {
@@ -114,15 +109,13 @@ export default function AdminDisputePage({ params }: PageProps) {
       });
       setSuccessMessage(
         decision === "seller"
-          ? "Funds have been released to the seller. Both parties have been notified."
-          : "Refund approved for the buyer. Both parties have been notified.",
+          ? t("dispute.releasedSeller")
+          : t("dispute.refundedBuyer"),
       );
       setIsResolved(true);
     } catch (error: unknown) {
       const err = error as { response?: { data?: { message?: string } } };
-      setErrorMessage(
-        err.response?.data?.message || "Failed to resolve dispute.",
-      );
+      setErrorMessage(err.response?.data?.message || t("dispute.errorDefault"));
     }
   };
 
@@ -139,7 +132,7 @@ export default function AdminDisputePage({ params }: PageProps) {
         }}
       >
         <p style={{ color: "var(--color-text-muted)", fontSize: "0.9375rem" }}>
-          Loading dispute…
+          {t("dispute.loading")}
         </p>
       </div>
     );
@@ -172,7 +165,7 @@ export default function AdminDisputePage({ params }: PageProps) {
               margin: "0 0 0.5rem",
             }}
           >
-            Access Denied
+            {t("dispute.accessDeniedTitle")}
           </h2>
           <p
             style={{ color: "var(--color-text-muted)", fontSize: "0.9375rem" }}
@@ -233,10 +226,10 @@ export default function AdminDisputePage({ params }: PageProps) {
               margin: 0,
             }}
           >
-            Dispute Review
+            {t("dispute.headerTitle")}
           </h1>
           <p style={{ color: "#64748b", fontSize: "0.75rem", margin: 0 }}>
-            Admin Moderator View — Fonlok
+            {t("dispute.headerSubtitle")}
           </p>
         </div>
       </header>
@@ -264,7 +257,8 @@ export default function AdminDisputePage({ params }: PageProps) {
         {/* Resolved banner */}
         {isResolved && (
           <div className="alert alert-info">
-            <strong>Dispute resolved.</strong> Current status:{" "}
+            <strong>{t("dispute.resolvedTitle")}</strong>{" "}
+            {t("dispute.currentStatus")}{" "}
             <span style={{ textTransform: "capitalize", fontWeight: 600 }}>
               {String(dispute?.status ?? "").replace("_", " ")}
             </span>
@@ -281,7 +275,7 @@ export default function AdminDisputePage({ params }: PageProps) {
               color: "var(--color-text-heading)",
             }}
           >
-            Invoice & Dispute Details
+            {t("dispute.detailsTitle")}
           </h2>
           <div
             style={{
@@ -291,16 +285,28 @@ export default function AdminDisputePage({ params }: PageProps) {
             }}
           >
             {[
-              { label: "Invoice #", value: invoice?.invoicenumber },
-              { label: "Invoice Name", value: invoice?.invoicename },
               {
-                label: "Amount",
+                label: t("dispute.detailsInvoiceNum"),
+                value: invoice?.invoicenumber,
+              },
+              {
+                label: t("dispute.detailsInvoiceName"),
+                value: invoice?.invoicename,
+              },
+              {
+                label: t("dispute.detailsAmount"),
                 value: `${invoice?.amount?.toLocaleString() ?? "—"} ${invoice?.currency ?? ""}`,
               },
-              { label: "Invoice Status", value: invoice?.status },
-              { label: "Opened By", value: dispute?.opened_by },
               {
-                label: "Opened At",
+                label: t("dispute.detailsInvoiceStatus"),
+                value: invoice?.status,
+              },
+              {
+                label: t("dispute.detailsOpenedBy"),
+                value: dispute?.opened_by,
+              },
+              {
+                label: t("dispute.detailsOpenedAt"),
                 value: dispute?.created_at
                   ? new Date(dispute.created_at).toLocaleString("en-GB")
                   : "—",
@@ -360,7 +366,7 @@ export default function AdminDisputePage({ params }: PageProps) {
                 margin: "0 0 0.25rem",
               }}
             >
-              Dispute Reason
+              {t("dispute.detailsReason")}
             </p>
             <p
               style={{
@@ -369,7 +375,7 @@ export default function AdminDisputePage({ params }: PageProps) {
                 margin: 0,
               }}
             >
-              {dispute?.reason ?? "No reason provided."}
+              {dispute?.reason ?? t("dispute.noReason")}
             </p>
           </div>
         </div>
@@ -393,7 +399,7 @@ export default function AdminDisputePage({ params }: PageProps) {
                 margin: "0 0 0.5rem",
               }}
             >
-              Buyer
+              {t("dispute.buyerLabel")}
             </p>
             <p
               style={{
@@ -402,7 +408,7 @@ export default function AdminDisputePage({ params }: PageProps) {
                 margin: 0,
               }}
             >
-              {buyer?.name ?? "Unknown"}
+              {buyer?.name ?? t("dispute.unknownName")}
             </p>
             <p
               style={{
@@ -425,7 +431,7 @@ export default function AdminDisputePage({ params }: PageProps) {
                 margin: "0 0 0.5rem",
               }}
             >
-              Seller
+              {t("dispute.sellerLabel")}
             </p>
             <p
               style={{
@@ -434,7 +440,7 @@ export default function AdminDisputePage({ params }: PageProps) {
                 margin: 0,
               }}
             >
-              {seller?.name ?? "Unknown"}
+              {seller?.name ?? t("dispute.unknownName")}
             </p>
             <p
               style={{
@@ -465,7 +471,7 @@ export default function AdminDisputePage({ params }: PageProps) {
                 color: "var(--color-text-heading)",
               }}
             >
-              Chat History
+              {t("dispute.chatTitle")}
             </h2>
           </div>
 
@@ -490,7 +496,7 @@ export default function AdminDisputePage({ params }: PageProps) {
                   marginTop: "2rem",
                 }}
               >
-                No messages yet.
+                {t("dispute.noMessages")}
               </p>
             )}
             {messages.map((msg) => {
@@ -537,12 +543,12 @@ export default function AdminDisputePage({ params }: PageProps) {
                       }}
                     >
                       {isAdmin
-                        ? "Admin Moderator"
+                        ? t("dispute.adminModerator")
                         : isSystem
-                          ? "System"
+                          ? t("dispute.systemLabel")
                           : isSeller
-                            ? `Seller · ${msg.sender_email}`
-                            : `Buyer · ${msg.sender_email}`}
+                            ? `${t("dispute.sellerLabel")} \u00b7 ${msg.sender_email}`
+                            : `${t("dispute.buyerLabel")} \u00b7 ${msg.sender_email}`}
                     </p>
                     {msg.message && (
                       <p style={{ margin: 0, color: "var(--color-text-body)" }}>
@@ -561,7 +567,7 @@ export default function AdminDisputePage({ params }: PageProps) {
                           textDecoration: "underline",
                         }}
                       >
-                        View Uploaded File
+                        {t("dispute.viewFile")}
                       </a>
                     )}
                     <p
@@ -594,7 +600,7 @@ export default function AdminDisputePage({ params }: PageProps) {
                 type="text"
                 className="input"
                 style={{ flex: 1 }}
-                placeholder="Send a message as moderator…"
+                placeholder={t("dispute.messagePlaceholder")}
                 value={adminMessage}
                 onChange={(e) => setAdminMessage(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && sendAdminMessage()}
@@ -604,7 +610,7 @@ export default function AdminDisputePage({ params }: PageProps) {
                 className="btn-accent"
                 style={{ flexShrink: 0 }}
               >
-                Send
+                {t("dispute.sendBtn")}
               </button>
             </div>
           )}
@@ -627,7 +633,7 @@ export default function AdminDisputePage({ params }: PageProps) {
                 color: "var(--color-danger)",
               }}
             >
-              Make a Decision
+              {t("dispute.makeDecision")}
             </h2>
             <p
               style={{
@@ -636,8 +642,7 @@ export default function AdminDisputePage({ params }: PageProps) {
                 margin: "0 0 1.25rem",
               }}
             >
-              Review all chat messages carefully before deciding. Both parties
-              will be notified by email.
+              {t("dispute.makeDecisionBody")}
             </p>
             <div
               style={{
@@ -651,7 +656,7 @@ export default function AdminDisputePage({ params }: PageProps) {
                 className="btn-primary"
                 style={{ padding: "0.875rem", fontSize: "0.9375rem" }}
               >
-                Release Funds to Seller
+                {t("dispute.releaseFunds")}
               </button>
               <button
                 onClick={() => resolveDispute("buyer")}
@@ -666,7 +671,7 @@ export default function AdminDisputePage({ params }: PageProps) {
                   cursor: "pointer",
                 }}
               >
-                Refund the Buyer
+                {t("dispute.refundBtn")}
               </button>
             </div>
           </div>

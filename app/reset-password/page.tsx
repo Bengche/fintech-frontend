@@ -4,8 +4,10 @@ import { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Axios from "axios";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 
 function ResetPasswordForm() {
+  const t = useTranslations("ResetPassword");
   const BASE_API_URL =
     process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
 
@@ -22,9 +24,7 @@ function ResetPasswordForm() {
 
   useEffect(() => {
     if (!token) {
-      setErrorMessage(
-        "No reset token found. Please request a new password reset link.",
-      );
+      setErrorMessage(t("errors.noToken"));
     }
   }, [token]);
 
@@ -33,11 +33,11 @@ function ResetPasswordForm() {
     if (loading) return;
 
     if (password.length < 8) {
-      setErrorMessage("Password must be at least 8 characters long.");
+      setErrorMessage(t("errors.generic"));
       return;
     }
     if (password !== confirmPassword) {
-      setErrorMessage("Passwords do not match. Please try again.");
+      setErrorMessage(t("errors.passwordMismatch"));
       return;
     }
 
@@ -50,17 +50,12 @@ function ResetPasswordForm() {
         token,
         password,
       });
-      setSuccessMessage(
-        response.data.message || "Password updated successfully.",
-      );
+      setSuccessMessage(response.data.message || t("successHeading"));
       // Redirect to login after 3 seconds
       setTimeout(() => router.push("/login"), 3000);
     } catch (err: unknown) {
       const e = err as { response?: { data?: { message?: string } } };
-      setErrorMessage(
-        e.response?.data?.message ||
-          "Something went wrong. Please try again or request a new reset link.",
-      );
+      setErrorMessage(e.response?.data?.message || t("errors.generic"));
     } finally {
       setLoading(false);
     }
@@ -99,7 +94,7 @@ function ResetPasswordForm() {
               fontSize: "0.9375rem",
             }}
           >
-            Create a new password
+            {t("subheading")}
           </p>
         </div>
 
@@ -129,7 +124,7 @@ function ResetPasswordForm() {
                   marginBottom: "0.5rem",
                 }}
               >
-                Password updated
+                {t("successHeading")}
               </h2>
               <p
                 style={{
@@ -139,8 +134,7 @@ function ResetPasswordForm() {
                   marginBottom: "1.5rem",
                 }}
               >
-                {successMessage} You will be redirected to the sign-in page
-                automatically.
+                {successMessage} {t("successBody")}
               </p>
               <Link
                 href="/login"
@@ -151,7 +145,7 @@ function ResetPasswordForm() {
                   textDecoration: "none",
                 }}
               >
-                Sign in now
+                {t("signInNow")}
               </Link>
             </div>
           ) : (
@@ -166,7 +160,7 @@ function ResetPasswordForm() {
                     href="/forgot-password"
                     style={{ color: "var(--color-danger)", fontWeight: 600 }}
                   >
-                    request a new reset link
+                    {t("requestNewLink")}
                   </Link>
                   .
                 </div>
@@ -184,7 +178,7 @@ function ResetPasswordForm() {
                       href="/forgot-password"
                       style={{ color: "var(--color-danger)", fontWeight: 600 }}
                     >
-                      Request a new link
+                      {t("requestNew")}
                     </Link>
                   ) : null}
                 </div>
@@ -200,13 +194,13 @@ function ResetPasswordForm() {
               >
                 <div>
                   <label htmlFor="password" className="label">
-                    New password
+                    {t("password")}
                   </label>
                   <input
                     className="input"
                     id="password"
                     type="password"
-                    placeholder="At least 8 characters"
+                    placeholder={t("passwordPlaceholder")}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
@@ -217,13 +211,13 @@ function ResetPasswordForm() {
 
                 <div>
                   <label htmlFor="confirmPassword" className="label">
-                    Confirm new password
+                    {t("confirmPassword")}
                   </label>
                   <input
                     className="input"
                     id="confirmPassword"
                     type="password"
-                    placeholder="Re-enter your new password"
+                    placeholder={t("confirmPasswordPlaceholder")}
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     required
@@ -238,7 +232,7 @@ function ResetPasswordForm() {
                           color: "var(--color-danger)",
                         }}
                       >
-                        Passwords do not match.
+                        {t("passwordsMismatch")}
                       </p>
                     )}
                 </div>
@@ -253,7 +247,7 @@ function ResetPasswordForm() {
                     padding: "0.75rem",
                   }}
                 >
-                  {loading ? "Updating password…" : "Update password"}
+                  {loading ? t("submitting") : t("submit")}
                 </button>
               </form>
 
@@ -269,7 +263,7 @@ function ResetPasswordForm() {
                   href="/login"
                   style={{ color: "var(--color-primary)", fontWeight: 600 }}
                 >
-                  ← Back to sign in
+                  {t("backToLogin")}
                 </Link>
               </p>
             </>
@@ -284,7 +278,7 @@ function ResetPasswordForm() {
             color: "var(--color-text-muted)",
           }}
         >
-          Your payments are protected by Fonlok Escrow
+          {t("protected")}
         </p>
       </div>
     </div>

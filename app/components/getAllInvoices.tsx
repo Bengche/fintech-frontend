@@ -8,9 +8,10 @@ import { useState, useEffect, useCallback } from "react";
 import DeleteInvoice from "../components/deleteInvoice";
 import EditInvoice from "./editInvoice";
 import MarkDelivered from "./markDelivered";
-import ChatWindow from "./ChatWindow";
 import DisputeButton from "./DisputeButton";
-import { Copy, Check, QrCode } from "lucide-react";
+import Link from "next/link";
+import { MessageSquare, Copy, Check, QrCode } from "lucide-react";
+import { useTranslations } from "next-intl";
 Axios.defaults.withCredentials = true;
 
 interface Invoice {
@@ -49,17 +50,36 @@ function statusBadge(status: string) {
   return map[status] ?? "badge badge-neutral";
 }
 
+/** Returns true only for invoices that have not yet entered a payment lifecycle. */
+function canDeleteInvoice(invoice: Invoice): boolean {
+  return invoice.status === "pending" || invoice.status === "expired";
+}
+
+/** Returns a human-readable (i18n) reason why deletion is blocked, or undefined when deletion is allowed. */
+// Implemented inside component to access the `t` translator from useTranslations.
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default function GetAllInvoices({
   link: _link,
   hideHeader = false,
   onRegisterRefresh,
 }: GetAllProps) {
+  const t = useTranslations("Invoice");
+
+  function getDeleteBlockReason(invoice: Invoice): string | undefined {
+    if (invoice.status === "paid") return t("delete.reasonPaid");
+    if (invoice.status === "delivered") return t("delete.reasonDelivered");
+    if (invoice.status === "completed") return t("delete.reasonCompleted");
+    return undefined;
+  }
+
   const [copiedId, setCopiedId] = useState<number | null>(null);
   const [invoices, setInvoices] = useState<Invoice[] | null>(null);
   const [statusFilter, setStatusFilter] = useState("all");
   const [loading, setLoading] = useState(false);
   const [showQRId, setShowQRId] = useState<number | null>(null);
+  const [visible, setVisible] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
   const { user_id } = useAuth();
 
   const getAllInvoices = useCallback(async () => {
@@ -104,9 +124,16 @@ export default function GetAllInvoices({
   };
 
   const filtered = invoices
-    ? invoices.filter(
-        (inv) => statusFilter === "all" || inv.status === statusFilter,
-      )
+    ? invoices.filter((inv) => {
+        const matchesStatus =
+          statusFilter === "all" || inv.status === statusFilter;
+        const q = searchQuery.trim().toLowerCase();
+        const matchesSearch =
+          !q ||
+          inv.invoicename.toLowerCase().includes(q) ||
+          inv.invoicenumber.toLowerCase().includes(q);
+        return matchesStatus && matchesSearch;
+      })
     : [];
 
   return (
@@ -131,20 +158,54 @@ export default function GetAllInvoices({
               margin: 0,
             }}
           >
-            Your Invoices
+            {t("list.title")}
           </h2>
-          <button
-            className="btn-primary"
-            onClick={getAllInvoices}
-            disabled={loading}
-          >
-            {loading ? "Loading\u2026" : "Refresh Invoices"}
-          </button>
+          <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+            <button
+              className="btn-primary"
+              onClick={getAllInvoices}
+              disabled={loading}
+            >
+              {loading ? t("list.loading") : t("list.refresh")}
+            </button>
+            {invoices && (
+              <button
+                className="btn-ghost"
+                onClick={() => setVisible((v) => !v)}
+                style={{ fontSize: "0.875rem" }}
+              >
+                {visible ? "Hide" : "Show"}
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Search input — shown above the filter tabs whenever invoices are loaded */}
+      {invoices && invoices.length > 0 && visible && (
+        <div style={{ marginBottom: "0.75rem" }}>
+          <input
+            type="text"
+            placeholder="Search by name or invoice number…"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            style={{
+              width: "100%",
+              padding: "0.5rem 0.75rem",
+              fontSize: "0.875rem",
+              borderRadius: "var(--radius-sm)",
+              border: "1px solid var(--color-border)",
+              backgroundColor: "var(--color-mist)",
+              color: "var(--color-text-heading)",
+              outline: "none",
+              boxSizing: "border-box",
+            }}
+          />
         </div>
       )}
 
       {/* Status filter tabs */}
-      {invoices && invoices.length > 0 && (
+      {invoices && invoices.length > 0 && visible && (
         <div
           style={{
             display: "flex",
@@ -176,15 +237,19 @@ export default function GetAllInvoices({
               }}
             >
               {tab === "all"
-                ? "All"
-                : tab.charAt(0).toUpperCase() + tab.slice(1)}
+                ? t("list.statusAll")
+                : t(
+                    `list.status${tab.charAt(0).toUpperCase()}${tab.slice(1)}` as Parameters<
+                      typeof t
+                    >[0],
+                  )}
             </button>
           ))}
         </div>
       )}
 
       {/* Empty state */}
-      {invoices === null && !loading && (
+      {invoices === null && !loading && visible && (
         <div
           style={{
             textAlign: "center",
@@ -192,14 +257,11 @@ export default function GetAllInvoices({
             color: "var(--color-text-muted)",
           }}
         >
-          <p style={{ fontSize: "0.9375rem" }}>
-            No invoices yet. Click &quot;Refresh Invoices&quot; to load or
-            create your first one above.
-          </p>
+          <p style={{ fontSize: "0.9375rem" }}>{t("list.empty")}</p>
         </div>
       )}
 
-      {filtered.length === 0 && invoices !== null && !loading && (
+      {filtered.length === 0 && invoices !== null && !loading && visible && (
         <div
           style={{
             textAlign: "center",
@@ -208,273 +270,299 @@ export default function GetAllInvoices({
             fontSize: "0.875rem",
           }}
         >
-          No invoices match this filter.
+          {t("list.noMatch")}
         </div>
       )}
 
       {/* Invoice cards */}
-      {filtered.map((invoice) => (
-        <div key={invoice.id} className="card" style={{ marginBottom: "1rem" }}>
-          {/* Card header */}
+      {visible &&
+        filtered.map((invoice) => (
           <div
-            style={{
-              display: "flex",
-              alignItems: "flex-start",
-              justifyContent: "space-between",
-              flexWrap: "wrap",
-              gap: "0.5rem",
-              marginBottom: "0.875rem",
-            }}
+            key={invoice.id}
+            className="card"
+            style={{ marginBottom: "1rem" }}
           >
-            <div>
-              <p
-                style={{
-                  fontSize: "1rem",
-                  fontWeight: 700,
-                  color: "var(--color-text-heading)",
-                  margin: 0,
-                }}
-              >
-                {invoice.invoicename}
-              </p>
-              <p
-                style={{
-                  fontSize: "0.8125rem",
-                  color: "var(--color-text-muted)",
-                  margin: "0.125rem 0 0",
-                }}
-              >
-                #{invoice.invoicenumber}
-              </p>
-            </div>
-            <span className={statusBadge(invoice.status)}>
-              {invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1)}
-            </span>
-          </div>
-
-          {/* Details grid */}
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
-              gap: "0.5rem",
-              marginBottom: "0.875rem",
-            }}
-          >
-            <InvoiceField
-              label="Amount"
-              value={`${invoice.amount} ${invoice.currency}`}
-            />
-            <InvoiceField
-              label="Created"
-              value={new Date(invoice.createdat).toLocaleDateString("en-GB", {
-                day: "2-digit",
-                month: "short",
-                year: "numeric",
-              })}
-            />
-            {invoice.expires_at && (
-              <InvoiceField
-                label="Expires"
-                value={new Date(invoice.expires_at).toLocaleDateString(
-                  "en-GB",
-                  {
-                    day: "2-digit",
-                    month: "short",
-                    year: "numeric",
-                  },
-                )}
-              />
-            )}
-          </div>
-
-          {/* Invoice link row */}
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "0.5rem",
-              backgroundColor: "var(--color-mist)",
-              border: "1px solid var(--color-border)",
-              borderRadius: "var(--radius-sm)",
-              padding: "0.5rem 0.75rem",
-              marginBottom: "0.875rem",
-              flexWrap: "wrap",
-            }}
-          >
-            <span
-              style={{
-                flex: 1,
-                fontSize: "0.8rem",
-                color: "var(--color-text-muted)",
-                wordBreak: "break-all",
-              }}
-            >
-              {invoice.invoicelink}
-            </span>
-            <button
-              onClick={() => handleCopy(invoice.id, invoice.invoicelink)}
-              className="btn-ghost"
-              style={{
-                fontSize: "0.75rem",
-                padding: "0.25rem 0.625rem",
-                display: "flex",
-                alignItems: "center",
-                gap: "0.25rem",
-              }}
-            >
-              {copiedId === invoice.id ? (
-                <>
-                  <Check size={13} /> Copied
-                </>
-              ) : (
-                <>
-                  <Copy size={13} /> Copy Link
-                </>
-              )}
-            </button>
-          </div>
-
-          {/* Share: WhatsApp + QR toggle */}
-          <div
-            style={{
-              display: "flex",
-              gap: "0.5rem",
-              flexWrap: "wrap",
-              alignItems: "center",
-              marginBottom: "0.75rem",
-            }}
-          >
-            <a
-              href={`https://wa.me/?text=${encodeURIComponent(
-                `Pay me for "${invoice.invoicename}" on Fonlok 👉 ${invoice.invoicelink}`,
-              )}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "0.35rem",
-                padding: "0.35rem 0.875rem",
-                backgroundColor: "#25D366",
-                color: "#fff",
-                borderRadius: "var(--radius-sm)",
-                fontWeight: 600,
-                fontSize: "0.8125rem",
-                textDecoration: "none",
-              }}
-            >
-              <svg
-                viewBox="0 0 24 24"
-                width="14"
-                height="14"
-                fill="currentColor"
-                aria-hidden="true"
-              >
-                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
-              </svg>
-              WhatsApp
-            </a>
-            <button
-              className="btn-ghost"
-              onClick={() =>
-                setShowQRId(showQRId === invoice.id ? null : invoice.id)
-              }
-              style={{
-                fontSize: "0.8125rem",
-                padding: "0.35rem 0.875rem",
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "0.35rem",
-              }}
-            >
-              <QrCode size={14} />
-              {showQRId === invoice.id ? "Hide QR" : "Show QR"}
-            </button>
-          </div>
-
-          {/* QR Code (expandable) */}
-          {showQRId === invoice.id && (
+            {/* Card header */}
             <div
               style={{
                 display: "flex",
-                flexDirection: "column",
+                alignItems: "flex-start",
+                justifyContent: "space-between",
+                flexWrap: "wrap",
+                gap: "0.5rem",
+                marginBottom: "0.875rem",
+              }}
+            >
+              <div>
+                <p
+                  style={{
+                    fontSize: "1rem",
+                    fontWeight: 700,
+                    color: "var(--color-text-heading)",
+                    margin: 0,
+                  }}
+                >
+                  {invoice.invoicename}
+                </p>
+                <p
+                  style={{
+                    fontSize: "0.8125rem",
+                    color: "var(--color-text-muted)",
+                    margin: "0.125rem 0 0",
+                  }}
+                >
+                  #{invoice.invoicenumber}
+                </p>
+              </div>
+              <span className={statusBadge(invoice.status)}>
+                {invoice.status.charAt(0).toUpperCase() +
+                  invoice.status.slice(1)}
+              </span>
+            </div>
+
+            {/* Details grid */}
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
+                gap: "0.5rem",
+                marginBottom: "0.875rem",
+              }}
+            >
+              <InvoiceField
+                label={t("list.fieldAmount")}
+                value={`${invoice.amount} ${invoice.currency}`}
+              />
+              <InvoiceField
+                label={t("list.fieldCreated")}
+                value={new Date(invoice.createdat).toLocaleDateString("en-GB", {
+                  day: "2-digit",
+                  month: "short",
+                  year: "numeric",
+                })}
+              />
+              {invoice.expires_at && (
+                <InvoiceField
+                  label={t("list.fieldExpires")}
+                  value={new Date(invoice.expires_at).toLocaleDateString(
+                    "en-GB",
+                    {
+                      day: "2-digit",
+                      month: "short",
+                      year: "numeric",
+                    },
+                  )}
+                />
+              )}
+            </div>
+
+            {/* Invoice link row */}
+            <div
+              style={{
+                display: "flex",
                 alignItems: "center",
                 gap: "0.5rem",
-                padding: "0.875rem",
                 backgroundColor: "var(--color-mist)",
                 border: "1px solid var(--color-border)",
                 borderRadius: "var(--radius-sm)",
-                marginBottom: "0.75rem",
-              }}
-            >
-              <div
-                style={{
-                  padding: "0.75rem",
-                  backgroundColor: "#fff",
-                  borderRadius: "var(--radius-sm)",
-                  border: "1px solid var(--color-border)",
-                  display: "inline-block",
-                }}
-              >
-                <QRCodeSVG value={invoice.invoicelink} size={130} />
-              </div>
-              <p
-                style={{
-                  fontSize: "0.75rem",
-                  color: "var(--color-text-muted)",
-                  margin: 0,
-                  textAlign: "center",
-                }}
-              >
-                Buyer scans this to open the payment page.
-              </p>
-            </div>
-          )}
-
-          {/* Action buttons */}
-          <div
-            style={{
-              display: "flex",
-              gap: "0.5rem",
-              flexWrap: "wrap",
-              alignItems: "center",
-            }}
-          >
-            <EditInvoice
-              invoice_number={invoice.invoicenumber}
-              onEdit={getAllInvoices}
-            />
-            <DeleteInvoice invoice_id={invoice.id} onDelete={getAllInvoices} />
-            {invoice.status === "paid" && (
-              <MarkDelivered
-                invoice_id={invoice.id}
-                onDelivered={getAllInvoices}
-              />
-            )}
-          </div>
-
-          {/* Chat & Dispute */}
-          {(invoice.status === "paid" || invoice.status === "delivered") && (
-            <div
-              style={{
-                marginTop: "0.75rem",
-                paddingTop: "0.75rem",
-                borderTop: "1px solid var(--color-border)",
-                display: "flex",
-                gap: "0.5rem",
+                padding: "0.5rem 0.75rem",
+                marginBottom: "0.875rem",
                 flexWrap: "wrap",
               }}
             >
-              <ChatWindow invoice_number={invoice.invoicenumber} />
-              <DisputeButton
-                invoice_number={invoice.invoicenumber}
-                sender_type="seller"
-              />
+              <span
+                style={{
+                  flex: 1,
+                  fontSize: "0.8rem",
+                  color: "var(--color-text-muted)",
+                  wordBreak: "break-all",
+                }}
+              >
+                {invoice.invoicelink}
+              </span>
+              <button
+                onClick={() => handleCopy(invoice.id, invoice.invoicelink)}
+                className="btn-ghost"
+                style={{
+                  fontSize: "0.75rem",
+                  padding: "0.25rem 0.625rem",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.25rem",
+                }}
+              >
+                {copiedId === invoice.id ? (
+                  <>
+                    <Check size={13} /> {t("list.copied")}
+                  </>
+                ) : (
+                  <>
+                    <Copy size={13} /> {t("list.copyLink")}
+                  </>
+                )}
+              </button>
             </div>
-          )}
-        </div>
-      ))}
+
+            {/* Share: WhatsApp + QR toggle */}
+            <div
+              style={{
+                display: "flex",
+                gap: "0.5rem",
+                flexWrap: "wrap",
+                alignItems: "center",
+                marginBottom: "0.75rem",
+              }}
+            >
+              <a
+                href={`https://wa.me/?text=${encodeURIComponent(
+                  `Pay me for "${invoice.invoicename}" on Fonlok 👉 ${invoice.invoicelink}`,
+                )}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "0.35rem",
+                  padding: "0.35rem 0.875rem",
+                  backgroundColor: "#25D366",
+                  color: "#fff",
+                  borderRadius: "var(--radius-sm)",
+                  fontWeight: 600,
+                  fontSize: "0.8125rem",
+                  textDecoration: "none",
+                }}
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  width="14"
+                  height="14"
+                  fill="currentColor"
+                  aria-hidden="true"
+                >
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+                </svg>
+                {t("list.whatsapp")}
+              </a>
+              <button
+                className="btn-ghost"
+                onClick={() =>
+                  setShowQRId(showQRId === invoice.id ? null : invoice.id)
+                }
+                style={{
+                  fontSize: "0.8125rem",
+                  padding: "0.35rem 0.875rem",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "0.35rem",
+                }}
+              >
+                <QrCode size={14} />
+                {showQRId === invoice.id ? t("list.hideQR") : t("list.showQR")}
+              </button>
+            </div>
+
+            {/* QR Code (expandable) */}
+            {showQRId === invoice.id && (
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  gap: "0.5rem",
+                  padding: "0.875rem",
+                  backgroundColor: "var(--color-mist)",
+                  border: "1px solid var(--color-border)",
+                  borderRadius: "var(--radius-sm)",
+                  marginBottom: "0.75rem",
+                }}
+              >
+                <div
+                  style={{
+                    padding: "0.75rem",
+                    backgroundColor: "#fff",
+                    borderRadius: "var(--radius-sm)",
+                    border: "1px solid var(--color-border)",
+                    display: "inline-block",
+                  }}
+                >
+                  <QRCodeSVG value={invoice.invoicelink} size={130} />
+                </div>
+                <p
+                  style={{
+                    fontSize: "0.75rem",
+                    color: "var(--color-text-muted)",
+                    margin: 0,
+                    textAlign: "center",
+                  }}
+                >
+                  {t("list.qrHint")}
+                </p>
+              </div>
+            )}
+
+            {/* Action buttons */}
+            <div
+              style={{
+                display: "flex",
+                gap: "0.5rem",
+                flexWrap: "wrap",
+                alignItems: "center",
+              }}
+            >
+              <EditInvoice
+                invoice_number={invoice.invoicenumber}
+                onEdit={getAllInvoices}
+              />
+              <DeleteInvoice
+                invoice_id={invoice.id}
+                onDelete={getAllInvoices}
+                canDelete={canDeleteInvoice(invoice)}
+                deleteBlockReason={getDeleteBlockReason(invoice)}
+              />
+              {invoice.status === "paid" && (
+                <MarkDelivered
+                  invoice_id={invoice.id}
+                  onDelivered={getAllInvoices}
+                />
+              )}
+            </div>
+
+            {/* Chat & Dispute */}
+            {(invoice.status === "paid" ||
+              invoice.status === "delivered" ||
+              invoice.status === "completed") && (
+              <div
+                style={{
+                  marginTop: "0.75rem",
+                  paddingTop: "0.75rem",
+                  borderTop: "1px solid var(--color-border)",
+                  display: "flex",
+                  gap: "0.5rem",
+                  flexWrap: "wrap",
+                }}
+              >
+                <Link
+                  href={`/dashboard/chat/${invoice.invoicenumber}`}
+                  className="btn-primary"
+                  style={{
+                    fontSize: "0.8125rem",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "0.375rem",
+                    textDecoration: "none",
+                  }}
+                >
+                  <MessageSquare size={14} />
+                  Chat with Buyer
+                </Link>
+                <DisputeButton
+                  invoice_number={invoice.invoicenumber}
+                  sender_type="seller"
+                />
+              </div>
+            )}
+          </div>
+        ))}
     </div>
   );
 }

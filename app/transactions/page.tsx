@@ -6,6 +6,7 @@ import Navbar from "@/app/components/Navbar";
 import SiteFooter from "@/app/components/SiteFooter";
 import Link from "next/link";
 import { SkeletonRow } from "@/app/components/Spinner";
+import { useTranslations } from "next-intl";
 
 const API = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
 
@@ -22,6 +23,7 @@ type Transaction = {
 
 export default function TransactionsPage() {
   const { user_id } = useAuth();
+  const t = useTranslations("Transactions");
   const [sellerTransactions, setSellerTransactions] = useState<Transaction[]>(
     [],
   );
@@ -45,7 +47,7 @@ export default function TransactionsPage() {
         setSellerTransactions(dedup(response.data.sellerTransactions));
         setBuyerTransactions(dedup(response.data.buyerTransactions));
       } catch {
-        setError("Failed to load transaction history. Please try again.");
+        setError(t("errorLoad"));
       } finally {
         setLoading(false);
       }
@@ -108,7 +110,7 @@ export default function TransactionsPage() {
                 margin: 0,
               }}
             >
-              Transaction History
+              {t("title")}
             </h1>
             <p
               style={{
@@ -117,7 +119,7 @@ export default function TransactionsPage() {
                 color: "var(--color-text-muted)",
               }}
             >
-              All your payments and payouts in one place
+              {t("subtitle")}
             </p>
           </div>
           <Link
@@ -128,7 +130,7 @@ export default function TransactionsPage() {
               textDecoration: "none",
             }}
           >
-            ← Dashboard
+            {t("backToDashboard")}
           </Link>
         </div>
 
@@ -165,7 +167,7 @@ export default function TransactionsPage() {
                 boxShadow: activeTab === tab ? "var(--shadow-card)" : "none",
               }}
             >
-              {tab === "received" ? "Money Received" : "Money Spent"}
+              {tab === "received" ? t("tabReceived") : t("tabSpent")}
               <span
                 style={{
                   marginLeft: "0.5rem",
@@ -228,8 +230,8 @@ export default function TransactionsPage() {
                   }}
                 >
                   {activeTab === "received"
-                    ? "No payments received yet. Create an invoice to get started."
-                    : "No transactions yet as a buyer."}
+                    ? t("emptyReceived")
+                    : t("emptySpent")}
                 </p>
               </div>
             ) : (
@@ -304,8 +306,34 @@ export default function TransactionsPage() {
                         </p>
                       </div>
                     </div>
-                    <div style={{ marginTop: "0.625rem" }}>
+                    <div
+                      style={{
+                        marginTop: "0.625rem",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "0.75rem",
+                        flexWrap: "wrap",
+                      }}
+                    >
                       {statusBadge(tx.status)}
+                      {tx.status === "paid" && (
+                        <a
+                          href={`${API}/invoice/receipt/${tx.invoicenumber}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{
+                            fontSize: "0.78rem",
+                            fontWeight: 600,
+                            color: "var(--color-primary)",
+                            textDecoration: "none",
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: "0.25rem",
+                          }}
+                        >
+                          ↓ {t("downloadReceipt")}
+                        </a>
+                      )}
                     </div>
                   </div>
                 ))}

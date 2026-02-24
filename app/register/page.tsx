@@ -3,10 +3,12 @@ import { useState, useEffect, Suspense } from "react";
 import Axios from "axios";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 
 const API = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
 
 function RegisterForm() {
+  const t = useTranslations("Register");
   const [image, setImage] = useState<File | null>(null);
   const [registerMessageSuccess, setRegisterMessageSuccess] = useState("");
   const [registerMessageError, setRegisterMessageError] = useState("");
@@ -55,14 +57,10 @@ function RegisterForm() {
     }
     try {
       await Axios.post(`${API}/auth/register`, newFormData);
-      setRegisterMessageSuccess(
-        "Account created successfully! You can now sign in.",
-      );
+      setRegisterMessageSuccess(t("success"));
       setTimeout(() => setRegisterMessageSuccess(""), 6000);
     } catch (error: any) {
-      const message =
-        error.response?.data?.message ||
-        "Registration failed. Please try again.";
+      const message = error.response?.data?.message || t("errors.generic");
       setRegisterMessageError(message);
       setTimeout(() => setRegisterMessageError(""), 6000);
     } finally {
@@ -78,6 +76,49 @@ function RegisterForm() {
     const file = e.target.files[0];
     if (file) setImage(file);
   };
+
+  // ── Real-time age guard ─────────────────────────────────────────────────────
+  // Returns a human-readable "time until 18" string, or null if the user is old enough.
+  const ageBlock = (() => {
+    if (!formData.dob) return null;
+    const birth = new Date(formData.dob);
+    if (isNaN(birth.getTime())) return null;
+    const today = new Date();
+    // Calculate current age
+    let age = today.getFullYear() - birth.getFullYear();
+    const mDiff = today.getMonth() - birth.getMonth();
+    if (mDiff < 0 || (mDiff === 0 && today.getDate() < birth.getDate())) age--;
+    if (age >= 18) return null;
+    // Calculate the exact 18th birthday
+    const eighteenth = new Date(
+      birth.getFullYear() + 18,
+      birth.getMonth(),
+      birth.getDate(),
+    );
+    let yLeft = eighteenth.getFullYear() - today.getFullYear();
+    let moLeft = eighteenth.getMonth() - today.getMonth();
+    let dLeft = eighteenth.getDate() - today.getDate();
+    if (dLeft < 0) {
+      moLeft--;
+      dLeft += new Date(
+        eighteenth.getFullYear(),
+        eighteenth.getMonth(),
+        0,
+      ).getDate();
+    }
+    if (moLeft < 0) {
+      yLeft--;
+      moLeft += 12;
+    }
+    const parts: string[] = [];
+    if (yLeft > 0) parts.push(`${yLeft} year${yLeft !== 1 ? "s" : ""}`);
+    if (moLeft > 0) parts.push(`${moLeft} month${moLeft !== 1 ? "s" : ""}`);
+    if (dLeft > 0) parts.push(`${dLeft} day${dLeft !== 1 ? "s" : ""}`);
+    if (parts.length === 0) return "less than a day";
+    if (parts.length === 1) return parts[0];
+    if (parts.length === 2) return `${parts[0]} and ${parts[1]}`;
+    return `${parts[0]}, ${parts[1]} and ${parts[2]}`;
+  })();
 
   return (
     <div
@@ -112,7 +153,7 @@ function RegisterForm() {
               fontSize: "0.9375rem",
             }}
           >
-            Create your free account
+            {t("heading")}
           </p>
         </div>
 
@@ -131,7 +172,7 @@ function RegisterForm() {
             >
               <div>
                 <label htmlFor="name" className="label">
-                  Full name
+                  {t("name")}
                 </label>
                 <input
                   className="input"
@@ -146,7 +187,7 @@ function RegisterForm() {
               </div>
               <div>
                 <label htmlFor="username" className="label">
-                  Username
+                  {t("username")}
                 </label>
                 <input
                   className="input"
@@ -164,7 +205,7 @@ function RegisterForm() {
             {/* Email */}
             <div>
               <label htmlFor="email" className="label">
-                Email address
+                {t("email")}
               </label>
               <input
                 className="input"
@@ -184,18 +225,14 @@ function RegisterForm() {
                   lineHeight: 1.5,
                 }}
               >
-                ⚠️ Use an email address you actively check. All transaction
-                receipts, payout confirmations, dispute notifications, and
-                account security alerts will be sent to this address. You will
-                not be able to recover your account without access to this
-                email.
+                ⚠️ {t("emailWarning")}
               </p>
             </div>
 
             {/* Phone */}
             <div>
               <label htmlFor="phone" className="label">
-                Phone number
+                {t("phone")}
               </label>
               <div style={{ display: "flex", alignItems: "center", gap: "0" }}>
                 <span
@@ -219,7 +256,14 @@ function RegisterForm() {
                   id="phone"
                   name="phone"
                   type="tel"
-                  onChange={handleChange}
+                  inputMode="numeric"
+                  maxLength={9}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      phone: e.target.value.replace(/\D/g, "").slice(0, 9),
+                    })
+                  }
                   value={formData.phone}
                   required
                   style={{
@@ -236,10 +280,7 @@ function RegisterForm() {
                   fontWeight: 500,
                 }}
               >
-                💸 This must be your active MTN Mobile Money or Orange Money
-                number. All seller payouts are sent directly to this number. If
-                you enter the wrong number, funds sent to it cannot be
-                recovered.
+                💸 {t("phoneWarning")}
               </p>
             </div>
 
@@ -253,7 +294,7 @@ function RegisterForm() {
             >
               <div>
                 <label htmlFor="password" className="label">
-                  Password
+                  {t("password")}
                 </label>
                 <input
                   className="input"
@@ -268,7 +309,7 @@ function RegisterForm() {
               </div>
               <div>
                 <label htmlFor="confirmPassword" className="label">
-                  Confirm password
+                  {t("confirmPassword")}
                 </label>
                 <input
                   className="input"
@@ -293,7 +334,7 @@ function RegisterForm() {
             >
               <div>
                 <label htmlFor="dob" className="label">
-                  Date of birth
+                  {t("dob")}
                 </label>
                 <input
                   className="input"
@@ -303,11 +344,76 @@ function RegisterForm() {
                   onChange={handleChange}
                   value={formData.dob}
                   required
+                  style={ageBlock ? { borderColor: "#dc2626" } : {}}
                 />
+                {ageBlock && (
+                  <div
+                    style={{
+                      marginTop: "0.75rem",
+                      padding: "1rem 1.125rem",
+                      background: "#fff8f8",
+                      border: "1.5px solid #fca5a5",
+                      borderRadius: "10px",
+                      display: "flex",
+                      gap: "0.625rem",
+                      alignItems: "flex-start",
+                    }}
+                  >
+                    <span style={{ fontSize: "1.2rem", lineHeight: 1.3 }}>
+                      🔞
+                    </span>
+                    <div>
+                      <p
+                        style={{
+                          margin: 0,
+                          fontWeight: 700,
+                          fontSize: "0.875rem",
+                          color: "#991b1b",
+                          lineHeight: 1.4,
+                        }}
+                      >
+                        You must be 18 or older to use Fonlok.
+                      </p>
+                      <p
+                        style={{
+                          margin: "0.35rem 0 0",
+                          fontSize: "0.8125rem",
+                          color: "#b91c1c",
+                          lineHeight: 1.5,
+                        }}
+                      >
+                        Fonlok is a financial platform that handles real money
+                        transactions. To protect minors, we do not permit anyone
+                        under 18 to register.
+                      </p>
+                      <p
+                        style={{
+                          margin: "0.5rem 0 0",
+                          fontSize: "0.8125rem",
+                          color: "#7f1d1d",
+                          fontWeight: 600,
+                          lineHeight: 1.5,
+                        }}
+                      >
+                        You will be eligible to register in{" "}
+                        <span
+                          style={{
+                            background: "#fee2e2",
+                            borderRadius: "5px",
+                            padding: "0.05rem 0.4rem",
+                          }}
+                        >
+                          {ageBlock}
+                        </span>
+                        .
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
               <div>
                 <label htmlFor="country" className="label">
-                  Country
+                  {t("country")}
                 </label>
                 <input
                   className="input"
@@ -325,7 +431,7 @@ function RegisterForm() {
             {/* Profile picture */}
             <div>
               <label htmlFor="profilePicture" className="label">
-                Profile picture (optional)
+                {t("profilePicture")}
               </label>
               <input
                 className="input"
@@ -341,11 +447,11 @@ function RegisterForm() {
             {/* Referral code */}
             <div>
               <label htmlFor="referralCode" className="label">
-                Referral code{" "}
+                {t("referralCode")}{" "}
                 <span
                   style={{ fontWeight: 400, color: "var(--color-text-muted)" }}
                 >
-                  (optional)
+                  {t("referralCodeOptional")}
                 </span>
               </label>
               <input
@@ -366,7 +472,7 @@ function RegisterForm() {
                   color: "var(--color-text-muted)",
                 }}
               >
-                If someone referred you, enter their code to link your account.
+                {t("referralCodeHint")}
               </p>
             </div>
 
@@ -382,15 +488,17 @@ function RegisterForm() {
             <button
               type="submit"
               className="btn-accent"
-              disabled={loading}
+              disabled={loading || !!ageBlock}
               style={{
+                opacity: ageBlock ? 0.45 : undefined,
+                cursor: ageBlock ? "not-allowed" : undefined,
                 width: "100%",
                 justifyContent: "center",
                 padding: "0.75rem",
                 marginTop: "0.5rem",
               }}
             >
-              {loading ? "Creating account…" : "Create account"}
+              {loading ? t("submitting") : t("submit")}
             </button>
           </form>
 
@@ -402,12 +510,12 @@ function RegisterForm() {
               color: "var(--color-text-muted)",
             }}
           >
-            Already have an account?{" "}
+            {t("haveAccount")}{" "}
             <Link
               href="/login"
               style={{ color: "var(--color-primary)", fontWeight: 600 }}
             >
-              Sign in
+              {t("signIn")}
             </Link>
           </p>
         </div>
@@ -420,8 +528,27 @@ function RegisterForm() {
             color: "var(--color-text-muted)",
           }}
         >
-          By creating an account you agree to our Terms of Service and Privacy
-          Policy.
+          {t("terms")}{" "}
+          <Link
+            href="/terms"
+            style={{
+              color: "var(--color-text-muted)",
+              textDecoration: "underline",
+            }}
+          >
+            {t("termsLink")}
+          </Link>{" "}
+          {t("and")}{" "}
+          <Link
+            href="/privacy"
+            style={{
+              color: "var(--color-text-muted)",
+              textDecoration: "underline",
+            }}
+          >
+            {t("privacyLink")}
+          </Link>
+          .
         </p>
       </div>
     </div>

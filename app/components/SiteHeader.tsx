@@ -15,20 +15,23 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/UserContext";
 import FonlokLogo from "./FonlokLogo";
 import axios from "axios";
+import { useTranslations, useLocale } from "next-intl";
 
 const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
 
-const NAV_LINKS = [
-  { href: "/how-it-works", label: "How it works" },
-  { href: "/pricing", label: "Pricing" },
-  { href: "/faq", label: "FAQ" },
-  { href: "/contact", label: "Contact" },
-];
-
 export default function SiteHeader() {
+  const t = useTranslations("SiteHeader");
+  const locale = useLocale();
   const { user_id, setUser_id, setUsername } = useAuth();
   const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  const NAV_LINKS = [
+    { href: "/how-it-works", label: t("nav.howItWorks") },
+    { href: "/pricing", label: t("nav.pricing") },
+    { href: "/faq", label: t("nav.faq") },
+    { href: "/contact", label: t("nav.contact") },
+  ];
 
   const handleLogout = async () => {
     try {
@@ -41,6 +44,13 @@ export default function SiteHeader() {
     setMobileOpen(false);
     localStorage.removeItem("token");
     router.push("/");
+  };
+
+  // Switch language: set a cookie and reload so the server picks up the new locale
+  const switchLocale = () => {
+    const otherLocale = locale === "en" ? "fr" : "en";
+    document.cookie = `NEXT_LOCALE=${otherLocale};path=/;max-age=31536000`;
+    window.location.reload();
   };
 
   return (
@@ -71,7 +81,7 @@ export default function SiteHeader() {
             display: "flex",
             alignItems: "center",
           }}
-          aria-label="Fonlok home"
+          aria-label={t("logoAlt")}
         >
           <FonlokLogo variant="dark" iconSize={32} />
         </Link>
@@ -98,7 +108,7 @@ export default function SiteHeader() {
           ))}
         </nav>
 
-        {/* Desktop auth buttons — hidden on mobile */}
+        {/* Desktop auth buttons + language switcher — hidden on mobile */}
         <div
           className="hidden md:flex"
           style={{ alignItems: "center", gap: "0.75rem" }}
@@ -110,14 +120,14 @@ export default function SiteHeader() {
                 className="btn-primary"
                 style={{ fontSize: "0.875rem", padding: "0.45rem 1.1rem" }}
               >
-                Dashboard
+                {t("auth.dashboard")}
               </Link>
               <button
                 onClick={handleLogout}
                 className="btn-ghost"
                 style={{ fontSize: "0.875rem", padding: "0.45rem 1.1rem" }}
               >
-                Log out
+                {t("auth.logOut")}
               </button>
             </>
           ) : (
@@ -131,24 +141,74 @@ export default function SiteHeader() {
                   textDecoration: "none",
                 }}
               >
-                Sign in
+                {t("auth.signIn")}
               </Link>
               <Link
                 href="/register"
                 className="btn-accent"
                 style={{ fontSize: "0.875rem", padding: "0.5rem 1.25rem" }}
               >
-                Get started
+                {t("auth.getStarted")}
               </Link>
             </>
           )}
+          {/* Language toggle */}
+          <button
+            onClick={switchLocale}
+            aria-label={`Switch language – currently ${locale.toUpperCase()}`}
+            title={locale === "en" ? "Passer en français" : "Switch to English"}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "0.35rem",
+              padding: "0.35rem 0.8rem",
+              borderRadius: "999px",
+              border: "1.5px solid var(--color-border)",
+              background: "#f5f5f7",
+              color: "var(--color-text-body)",
+              fontWeight: 700,
+              fontSize: "0.78rem",
+              letterSpacing: "0.07em",
+              cursor: "pointer",
+              transition: "border-color 0.15s, background 0.15s",
+              whiteSpace: "nowrap",
+            }}
+            onMouseEnter={(e) => {
+              const b = e.currentTarget as HTMLButtonElement;
+              b.style.borderColor = "var(--color-primary)";
+              b.style.background = "#ebebef";
+            }}
+            onMouseLeave={(e) => {
+              const b = e.currentTarget as HTMLButtonElement;
+              b.style.borderColor = "var(--color-border)";
+              b.style.background = "#f5f5f7";
+            }}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="13"
+              height="13"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              style={{ flexShrink: 0 }}
+            >
+              <circle cx="12" cy="12" r="10" />
+              <line x1="2" y1="12" x2="22" y2="12" />
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+            </svg>
+            {locale === "en" ? "Français" : "English"}
+          </button>
         </div>
 
         {/* Mobile hamburger button — visible on mobile only */}
         <button
           className="md:hidden"
           onClick={() => setMobileOpen(!mobileOpen)}
-          aria-label={mobileOpen ? "Close menu" : "Open menu"}
+          aria-label={mobileOpen ? t("mobile.closeMenu") : t("mobile.openMenu")}
           aria-expanded={mobileOpen}
           style={{
             background: "none",
@@ -243,14 +303,14 @@ export default function SiteHeader() {
                   onClick={() => setMobileOpen(false)}
                   style={{ textAlign: "center" }}
                 >
-                  Dashboard
+                  {t("auth.dashboard")}
                 </Link>
                 <button
                   onClick={handleLogout}
                   className="btn-ghost"
                   style={{ width: "100%" }}
                 >
-                  Log out
+                  {t("auth.logOut")}
                 </button>
               </>
             ) : (
@@ -261,7 +321,7 @@ export default function SiteHeader() {
                   onClick={() => setMobileOpen(false)}
                   style={{ textAlign: "center" }}
                 >
-                  Get started — it&apos;s free
+                  {t("auth.getStartedFree")}
                 </Link>
                 <Link
                   href="/login"
@@ -269,10 +329,52 @@ export default function SiteHeader() {
                   onClick={() => setMobileOpen(false)}
                   style={{ textAlign: "center" }}
                 >
-                  Sign in
+                  {t("auth.signIn")}
                 </Link>
               </>
             )}
+            {/* Mobile language toggle */}
+            <button
+              onClick={() => {
+                switchLocale();
+                setMobileOpen(false);
+              }}
+              aria-label={`Switch language – currently ${locale.toUpperCase()}`}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "0.5rem",
+                padding: "0.6rem",
+                borderRadius: "999px",
+                border: "1.5px solid var(--color-border)",
+                background: "#f5f5f7",
+                color: "var(--color-text-body)",
+                fontWeight: 700,
+                fontSize: "0.9rem",
+                letterSpacing: "0.06em",
+                cursor: "pointer",
+                width: "100%",
+              }}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="15"
+                height="15"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                style={{ flexShrink: 0 }}
+              >
+                <circle cx="12" cy="12" r="10" />
+                <line x1="2" y1="12" x2="22" y2="12" />
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+              </svg>
+              {locale === "en" ? "English → Français" : "Français → English"}
+            </button>
           </div>
         </div>
       )}

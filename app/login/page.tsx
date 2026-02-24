@@ -5,11 +5,13 @@ import Axios from "axios";
 import { useAuth } from "@/context/UserContext";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 Axios.defaults.withCredentials = true;
 
 const API = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
 
 export default function Login() {
+  const t = useTranslations("Login");
   const router = useRouter();
   const [formData, setFormData] = useState({ email: "", password: "" });
   const { setUser_id, setUsername } = useAuth();
@@ -25,13 +27,11 @@ export default function Login() {
     setLoginError("");
     setLoading(true);
     try {
-      const newFormData = new FormData();
-      newFormData.append("email", formData.email);
-      newFormData.append("password", formData.password);
-      const response = await Axios.post(`${API}/auth/login`, newFormData, {
-        headers: { "Content-Type": "application/json" },
-        withCredentials: true,
-      });
+      const response = await Axios.post(
+        `${API}/auth/login`,
+        { email: formData.email, password: formData.password },
+        { withCredentials: true },
+      );
       setUser_id(response.data.userId);
       setUsername(response.data.username || null);
       if (response.data.token) {
@@ -82,7 +82,7 @@ export default function Login() {
               fontSize: "0.9375rem",
             }}
           >
-            Welcome back — sign in to your account
+            {t("subheading")}
           </p>
         </div>
 
@@ -107,7 +107,7 @@ export default function Login() {
           >
             <div>
               <label htmlFor="email" className="label">
-                Email or Username
+                {t("email")}
               </label>
               <input
                 className="input"
@@ -124,7 +124,7 @@ export default function Login() {
 
             <div>
               <label htmlFor="password" className="label">
-                Password
+                {t("password")}
               </label>
               <input
                 className="input"
@@ -150,7 +150,7 @@ export default function Login() {
                 padding: "0.75rem",
               }}
             >
-              {loading ? "Signing in…" : "Sign in"}
+              {loading ? t("submitting") : t("submit")}
             </button>
 
             <p
@@ -168,7 +168,7 @@ export default function Login() {
                   textDecoration: "none",
                 }}
               >
-                Forgot your password?
+                {t("forgotPassword")}
               </a>
             </p>
           </form>
@@ -181,12 +181,12 @@ export default function Login() {
               color: "var(--color-text-muted)",
             }}
           >
-            Don&apos;t have an account?{" "}
+            {t("noAccount")}{" "}
             <Link
               href="/register"
               style={{ color: "var(--color-primary)", fontWeight: 600 }}
             >
-              Create one
+              {t("register")}
             </Link>
           </p>
         </div>
@@ -199,7 +199,7 @@ export default function Login() {
             color: "var(--color-text-muted)",
           }}
         >
-          Your payments are protected by Fonlok Escrow
+          {t("protected")}
         </p>
       </div>
     </div>

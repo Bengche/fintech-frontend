@@ -1,15 +1,19 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import SiteHeader from "../components/SiteHeader";
 import SiteFooter from "../components/SiteFooter";
 
-export const metadata: Metadata = {
-  title: "Privacy Policy | Fonlok",
-  description:
-    "Fonlok's privacy policy explains what data we collect, how we use it, and your rights as a user of our escrow payment platform in Cameroon.",
-  alternates: { canonical: "https://fonlok.com/privacy" },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("Privacy.meta");
+  return {
+    title: t("title"),
+    description: t("description"),
+    alternates: { canonical: "https://fonlok.com/privacy" },
+  };
+}
 
-export default function PrivacyPage() {
+export default async function PrivacyPage() {
+  const t = await getTranslations("Privacy.hero");
   const lastUpdated = "1 January 2025";
 
   return (
@@ -32,12 +36,12 @@ export default function PrivacyPage() {
                 marginBottom: "0.5rem",
               }}
             >
-              Privacy Policy
+              {t("h1")}
             </h1>
             <p
               style={{ fontSize: "0.875rem", color: "rgba(255,255,255,0.55)" }}
             >
-              Last updated: {lastUpdated}
+              {t("lastUpdated")} {lastUpdated}
             </p>
           </div>
         </section>

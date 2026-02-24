@@ -3,8 +3,10 @@
 import { useState } from "react";
 import Axios from "axios";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 
 export default function ForgotPassword() {
+  const t = useTranslations("ForgotPassword");
   const BASE_API_URL =
     process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
 
@@ -73,7 +75,7 @@ export default function ForgotPassword() {
               fontSize: "0.9375rem",
             }}
           >
-            Reset your password
+            {t("subheading")}
           </p>
         </div>
 
@@ -103,7 +105,7 @@ export default function ForgotPassword() {
                   marginBottom: "0.5rem",
                 }}
               >
-                Check your inbox
+                {t("checkInbox")}
               </h2>
               <p
                 style={{
@@ -113,8 +115,7 @@ export default function ForgotPassword() {
                   marginBottom: "1.5rem",
                 }}
               >
-                {successMessage} The link expires in <strong>1 hour</strong>. If
-                you do not see the email, please check your spam folder.
+                {successMessage} {t("checkInboxBody", { hours: t("expiry") })}
               </p>
               <Link
                 href="/login"
@@ -125,7 +126,7 @@ export default function ForgotPassword() {
                   textDecoration: "none",
                 }}
               >
-                ← Back to sign in
+                {t("backToLogin")}
               </Link>
             </div>
           ) : (
@@ -138,8 +139,7 @@ export default function ForgotPassword() {
                   marginBottom: "1.5rem",
                 }}
               >
-                Enter the email address associated with your account and we will
-                send you a secure link to reset your password.
+                {t("description")}
               </p>
 
               {errorMessage && (
@@ -161,7 +161,7 @@ export default function ForgotPassword() {
               >
                 <div>
                   <label htmlFor="email" className="label">
-                    Email address
+                    {t("email")}
                   </label>
                   <input
                     className="input"
@@ -185,7 +185,7 @@ export default function ForgotPassword() {
                     padding: "0.75rem",
                   }}
                 >
-                  {loading ? "Sending reset link…" : "Send reset link"}
+                  {loading ? t("submitting") : t("submit")}
                 </button>
               </form>
 
@@ -197,12 +197,12 @@ export default function ForgotPassword() {
                   color: "var(--color-text-muted)",
                 }}
               >
-                Remembered your password?{" "}
+                {t("rememberPassword")}{" "}
                 <Link
                   href="/login"
                   style={{ color: "var(--color-primary)", fontWeight: 600 }}
                 >
-                  Sign in
+                  {t("signIn")}
                 </Link>
               </p>
             </>
@@ -217,7 +217,7 @@ export default function ForgotPassword() {
             color: "var(--color-text-muted)",
           }}
         >
-          Your payments are protected by Fonlok Escrow
+          {t("protected")}
         </p>
       </div>
     </div>

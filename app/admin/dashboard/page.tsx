@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState, useCallback, useRef } from "react";
+import { useTranslations } from "next-intl";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 
@@ -106,23 +107,26 @@ type TabKey =
   | "disputes"
   | "referrals"
   | "messages"
-  | "stuck";
-
-const TABS: { key: TabKey; label: string }[] = [
-  { key: "overview", label: "Overview" },
-  { key: "users", label: "Users" },
-  { key: "invoices", label: "Invoices" },
-  { key: "payments", label: "Payments" },
-  { key: "payouts", label: "Payouts" },
-  { key: "stuck", label: "Pending Releases" },
-  { key: "disputes", label: "Disputes" },
-  { key: "referrals", label: "Referrals" },
-  { key: "messages", label: "Messages" },
-];
+  | "stuck"
+  | "verify";
 
 // ─── Main Component ────────────────────────────────────────────────────────────
 export default function AdminDashboard() {
   const router = useRouter();
+  const t = useTranslations("Admin");
+
+  const TABS: { key: TabKey; label: string }[] = [
+    { key: "overview", label: t("dashboard.tabOverview") },
+    { key: "users", label: t("dashboard.tabUsers") },
+    { key: "invoices", label: t("dashboard.tabInvoices") },
+    { key: "payments", label: t("dashboard.tabPayments") },
+    { key: "payouts", label: t("dashboard.tabPayouts") },
+    { key: "stuck", label: t("dashboard.tabStuck") },
+    { key: "disputes", label: t("dashboard.tabDisputes") },
+    { key: "referrals", label: t("dashboard.tabReferrals") },
+    { key: "messages", label: t("dashboard.tabMessages") },
+    { key: "verify", label: "Verify Receipt" },
+  ];
 
   // Auth state: null = checking, true = ok, false = not authed
   const [authed, setAuthed] = useState<boolean | null>(null);
@@ -233,7 +237,7 @@ export default function AdminDashboard() {
         const msg =
           axios.isAxiosError(err) && err.response?.data?.message
             ? err.response.data.message
-            : "Failed to load data.";
+            : t("dashboard.loadError");
         setter((prev) => ({ ...prev, loading: false, error: msg }));
       }
     },
@@ -242,7 +246,7 @@ export default function AdminDashboard() {
 
   // ── 4. Load data when switching tabs (only if not already loaded) ────────────
   useEffect(() => {
-    if (!authed || activeTab === "overview") return;
+    if (!authed || activeTab === "overview" || activeTab === "verify") return;
     const tabState = {
       users,
       invoices,
@@ -290,15 +294,15 @@ export default function AdminDashboard() {
     setMsgError("");
     setMsgSuccess("");
     if (!msgSubject.trim()) {
-      setMsgError("Subject is required.");
+      setMsgError(t("dashboard.subjectRequired"));
       return;
     }
     if (!msgBody.trim()) {
-      setMsgError("Message body is required.");
+      setMsgError(t("dashboard.bodyRequired"));
       return;
     }
     if (msgRecipientType === "user" && !msgSelectedUser) {
-      setMsgError("Please search for and select a recipient.");
+      setMsgError(t("dashboard.recipientRequired"));
       return;
     }
     setMsgSending(true);
@@ -332,7 +336,7 @@ export default function AdminDashboard() {
       const msg =
         axios.isAxiosError(err) && err.response?.data?.message
           ? err.response.data.message
-          : "Failed to send message. Please try again.";
+          : t("dashboard.msgSendError");
       setMsgError(msg);
     } finally {
       setMsgSending(false);
@@ -358,7 +362,7 @@ export default function AdminDashboard() {
         }}
       >
         <p style={{ color: "#94a3b8", fontSize: "0.9375rem" }}>
-          Verifying session…
+          {t("dashboard.verifyingSession")}
         </p>
       </div>
     );
@@ -423,10 +427,10 @@ export default function AdminDashboard() {
                 lineHeight: 1.2,
               }}
             >
-              Fonlok Admin
+              {t("dashboard.headerTitle")}
             </h1>
             <p style={{ color: "#64748b", fontSize: "0.75rem", margin: 0 }}>
-              Platform management
+              {t("dashboard.headerSubtitle")}
             </p>
           </div>
         </div>
@@ -442,7 +446,7 @@ export default function AdminDashboard() {
             cursor: "pointer",
           }}
         >
-          Sign out
+          {t("dashboard.signOut")}
         </button>
       </header>
 
@@ -465,10 +469,10 @@ export default function AdminDashboard() {
             padding: 0,
           }}
         >
-          {TABS.map((t) => (
-            <li key={t.key}>
+          {TABS.map((tab) => (
+            <li key={tab.key}>
               <button
-                onClick={() => setActiveTab(t.key)}
+                onClick={() => setActiveTab(tab.key)}
                 style={{
                   padding: "0.875rem 1rem",
                   fontSize: "0.875rem",
@@ -477,11 +481,11 @@ export default function AdminDashboard() {
                   borderLeft: "none",
                   borderRight: "none",
                   borderBottom:
-                    activeTab === t.key
+                    activeTab === tab.key
                       ? "2px solid var(--color-primary)"
                       : "2px solid transparent",
                   color:
-                    activeTab === t.key
+                    activeTab === tab.key
                       ? "var(--color-primary)"
                       : "var(--color-text-muted)",
                   background: "none",
@@ -490,7 +494,7 @@ export default function AdminDashboard() {
                   transition: "color 0.15s",
                 }}
               >
-                {t.label}
+                {tab.label}
               </button>
             </li>
           ))}
@@ -520,11 +524,13 @@ export default function AdminDashboard() {
                 margin: 0,
               }}
             >
-              Platform Overview
+              {t("dashboard.overviewTitle")}
             </h2>
 
             {statsLoading ? (
-              <p style={{ color: "var(--color-text-muted)" }}>Loading stats…</p>
+              <p style={{ color: "var(--color-text-muted)" }}>
+                {t("dashboard.loadingStats")}
+              </p>
             ) : stats ? (
               <>
                 {/* First row: activity stats */}
@@ -537,25 +543,25 @@ export default function AdminDashboard() {
                   }}
                 >
                   <StatCard
-                    label="Total Users"
+                    label={t("dashboard.statTotalUsers")}
                     value={stats.totalUsers.toLocaleString()}
                     color="blue"
                     icon="👤"
                   />
                   <StatCard
-                    label="Total Invoices"
+                    label={t("dashboard.statTotalInvoices")}
                     value={stats.totalInvoices.toLocaleString()}
                     color="indigo"
                     icon="🧾"
                   />
                   <StatCard
-                    label="Payments Processed"
+                    label={t("dashboard.statPayments")}
                     value={stats.totalPaymentsCount.toLocaleString()}
                     color="teal"
                     icon="💳"
                   />
                   <StatCard
-                    label="Payouts Made"
+                    label={t("dashboard.statPayouts")}
                     value={stats.totalPayoutsCount.toLocaleString()}
                     color="cyan"
                     icon="📤"
@@ -572,21 +578,21 @@ export default function AdminDashboard() {
                   }}
                 >
                   <StatCard
-                    label="Total Volume Processed"
+                    label={t("dashboard.statVolume")}
                     value={fmtXAF(stats.totalAmountProcessed)}
                     color="green"
                     icon="💰"
                     large
                   />
                   <StatCard
-                    label="Platform Revenue (2% fees)"
+                    label={t("dashboard.statRevenue")}
                     value={fmtXAF(stats.platformRevenue)}
                     color="emerald"
                     icon="📈"
                     large
                   />
                   <StatCard
-                    label="Referral Commissions Paid"
+                    label={t("dashboard.statReferrals")}
                     value={fmtXAF(stats.totalReferralCommissionsPaid)}
                     color="purple"
                     icon="🤝"
@@ -604,19 +610,19 @@ export default function AdminDashboard() {
                   }}
                 >
                   <StatCard
-                    label="Open Disputes"
+                    label={t("dashboard.statOpenDisputes")}
                     value={stats.openDisputes.toLocaleString()}
                     color={stats.openDisputes > 0 ? "red" : "gray"}
                     icon="⚠️"
                   />
                   <StatCard
-                    label="Resolved Disputes"
+                    label={t("dashboard.statResolvedDisputes")}
                     value={stats.resolvedDisputes.toLocaleString()}
                     color="blue"
                     icon="✅"
                   />
                   <StatCard
-                    label="Active Referrers"
+                    label={t("dashboard.statReferrers")}
                     value={stats.activeReferrers.toLocaleString()}
                     color="violet"
                     icon="🔗"
@@ -625,7 +631,7 @@ export default function AdminDashboard() {
               </>
             ) : (
               <p style={{ color: "var(--color-text-muted)" }}>
-                Could not load stats.
+                {t("dashboard.noStats")}
               </p>
             )}
           </section>
@@ -634,10 +640,10 @@ export default function AdminDashboard() {
         {/* ────────────────────── USERS TAB ─────────────────────────────────── */}
         {activeTab === "users" && (
           <TabSection
-            title="Registered Users"
+            title={t("dashboard.usersTitle")}
             state={users}
             onLoadMore={() => loadTab("users", true, users.page)}
-            emptyMessage="No users found."
+            emptyMessage={t("dashboard.usersEmpty")}
           >
             <table
               style={{
@@ -648,14 +654,14 @@ export default function AdminDashboard() {
             >
               <thead>
                 <tr style={{ backgroundColor: "var(--color-mist)" }}>
-                  <Th>Name</Th>
-                  <Th>Username</Th>
-                  <Th>Email</Th>
-                  <Th>Phone</Th>
-                  <Th>Country</Th>
-                  <Th>Invoices</Th>
-                  <Th>Referral Code</Th>
-                  <Th>Joined</Th>
+                  <Th>{t("dashboard.colName")}</Th>
+                  <Th>{t("dashboard.colUsername")}</Th>
+                  <Th>{t("dashboard.colEmail")}</Th>
+                  <Th>{t("dashboard.colPhone")}</Th>
+                  <Th>{t("dashboard.colCountry")}</Th>
+                  <Th>{t("dashboard.colInvoiceCount")}</Th>
+                  <Th>{t("dashboard.colReferralCode")}</Th>
+                  <Th>{t("dashboard.colJoined")}</Th>
                 </tr>
               </thead>
               <tbody>
@@ -682,10 +688,10 @@ export default function AdminDashboard() {
         {/* ────────────────────── INVOICES TAB ──────────────────────────────── */}
         {activeTab === "invoices" && (
           <TabSection
-            title="All Invoices"
+            title={t("dashboard.invoicesTitle")}
             state={invoices}
             onLoadMore={() => loadTab("invoices", true, invoices.page)}
-            emptyMessage="No invoices found."
+            emptyMessage={t("dashboard.invoicesEmpty")}
           >
             <table
               style={{
@@ -696,14 +702,14 @@ export default function AdminDashboard() {
             >
               <thead>
                 <tr style={{ backgroundColor: "var(--color-mist)" }}>
-                  <Th>Invoice #</Th>
-                  <Th>Name</Th>
-                  <Th>Seller</Th>
-                  <Th>Buyer Email</Th>
-                  <Th>Amount</Th>
-                  <Th>Status</Th>
-                  <Th>Created</Th>
-                  <Th>Expires</Th>
+                  <Th>{t("dashboard.colInvoiceNum")}</Th>
+                  <Th>{t("dashboard.colInvoiceName")}</Th>
+                  <Th>{t("dashboard.colSeller")}</Th>
+                  <Th>{t("dashboard.colBuyerEmail")}</Th>
+                  <Th>{t("dashboard.colAmount")}</Th>
+                  <Th>{t("dashboard.colStatus")}</Th>
+                  <Th>{t("dashboard.colCreated")}</Th>
+                  <Th>{t("dashboard.colExpires")}</Th>
                 </tr>
               </thead>
               <tbody>
@@ -756,10 +762,10 @@ export default function AdminDashboard() {
         {/* ────────────────────── PAYMENTS TAB ──────────────────────────────── */}
         {activeTab === "payments" && (
           <TabSection
-            title="Buyer Payments"
+            title={t("dashboard.paymentsTitle")}
             state={payments}
             onLoadMore={() => loadTab("payments", true, payments.page)}
-            emptyMessage="No payments found."
+            emptyMessage={t("dashboard.paymentsEmpty")}
           >
             <table
               style={{
@@ -770,13 +776,13 @@ export default function AdminDashboard() {
             >
               <thead>
                 <tr style={{ backgroundColor: "var(--color-mist)" }}>
-                  <Th>Invoice</Th>
-                  <Th>Invoice Name</Th>
-                  <Th>Seller</Th>
-                  <Th>Amount</Th>
-                  <Th>Method</Th>
-                  <Th>Status</Th>
-                  <Th>Date</Th>
+                  <Th>{t("dashboard.colInvoiceRef")}</Th>
+                  <Th>{t("dashboard.colInvoiceNameRef")}</Th>
+                  <Th>{t("dashboard.colSeller")}</Th>
+                  <Th>{t("dashboard.colAmount")}</Th>
+                  <Th>{t("dashboard.colMethod")}</Th>
+                  <Th>{t("dashboard.colStatus")}</Th>
+                  <Th>{t("dashboard.colDate")}</Th>
                 </tr>
               </thead>
               <tbody>
@@ -806,10 +812,10 @@ export default function AdminDashboard() {
         {/* ────────────────────── PAYOUTS TAB ───────────────────────────────── */}
         {activeTab === "payouts" && (
           <TabSection
-            title="Seller Payouts"
+            title={t("dashboard.payoutsTitle")}
             state={payouts}
             onLoadMore={() => loadTab("payouts", true, payouts.page)}
-            emptyMessage="No payouts found."
+            emptyMessage={t("dashboard.payoutsEmpty")}
           >
             <table
               style={{
@@ -820,14 +826,14 @@ export default function AdminDashboard() {
             >
               <thead>
                 <tr style={{ backgroundColor: "var(--color-mist)" }}>
-                  <Th>#</Th>
-                  <Th>Invoice</Th>
-                  <Th>Seller</Th>
-                  <Th>Phone</Th>
-                  <Th>Amount</Th>
-                  <Th>Method</Th>
-                  <Th>Status</Th>
-                  <Th>Date</Th>
+                  <Th>{t("dashboard.colNum")}</Th>
+                  <Th>{t("dashboard.colInvoiceRef")}</Th>
+                  <Th>{t("dashboard.colSeller")}</Th>
+                  <Th>{t("dashboard.colPhone")}</Th>
+                  <Th>{t("dashboard.colAmount")}</Th>
+                  <Th>{t("dashboard.colMethod")}</Th>
+                  <Th>{t("dashboard.colStatus")}</Th>
+                  <Th>{t("dashboard.colDate")}</Th>
                 </tr>
               </thead>
               <tbody>
@@ -874,10 +880,10 @@ export default function AdminDashboard() {
         {/* ─────────────── PENDING RELEASES (STUCK INVOICES) TAB ────────────── */}
         {activeTab === "stuck" && (
           <TabSection
-            title="Pending Releases"
+            title={t("dashboard.stuckTitle")}
             state={stuck}
             onLoadMore={() => loadTab("stuck", true, stuck.page)}
-            emptyMessage="No pending invoices — all funds have been released."
+            emptyMessage={t("dashboard.stuckEmpty")}
           >
             <table
               style={{
@@ -888,14 +894,14 @@ export default function AdminDashboard() {
             >
               <thead>
                 <tr style={{ backgroundColor: "var(--color-mist)" }}>
-                  <Th>Invoice #</Th>
-                  <Th>Invoice Name</Th>
-                  <Th>Seller</Th>
-                  <Th>Buyer Email</Th>
-                  <Th>Amount</Th>
-                  <Th>Status</Th>
-                  <Th>Paid At</Th>
-                  <Th>Delivered At</Th>
+                  <Th>{t("dashboard.colInvoiceNum")}</Th>
+                  <Th>{t("dashboard.colInvoiceName")}</Th>
+                  <Th>{t("dashboard.colSeller")}</Th>
+                  <Th>{t("dashboard.colBuyerEmail")}</Th>
+                  <Th>{t("dashboard.colAmount")}</Th>
+                  <Th>{t("dashboard.colStatus")}</Th>
+                  <Th>{t("dashboard.colPaidAt")}</Th>
+                  <Th>{t("dashboard.colDeliveredAt")}</Th>
                 </tr>
               </thead>
               <tbody>
@@ -946,10 +952,10 @@ export default function AdminDashboard() {
         {/* ────────────────────── DISPUTES TAB ──────────────────────────────── */}
         {activeTab === "disputes" && (
           <TabSection
-            title="Disputes"
+            title={t("dashboard.disputesTitle")}
             state={disputes}
             onLoadMore={() => loadTab("disputes", true, disputes.page)}
-            emptyMessage="No disputes found."
+            emptyMessage={t("dashboard.disputesEmpty")}
           >
             <table
               style={{
@@ -960,15 +966,15 @@ export default function AdminDashboard() {
             >
               <thead>
                 <tr style={{ backgroundColor: "var(--color-mist)" }}>
-                  <Th>Invoice #</Th>
-                  <Th>Invoice Name</Th>
-                  <Th>Seller</Th>
-                  <Th>Amount</Th>
-                  <Th>Opened By</Th>
-                  <Th>Reason</Th>
-                  <Th>Status</Th>
-                  <Th>Date</Th>
-                  <Th>Action</Th>
+                  <Th>{t("dashboard.colInvoiceNum")}</Th>
+                  <Th>{t("dashboard.colInvoiceName")}</Th>
+                  <Th>{t("dashboard.colSeller")}</Th>
+                  <Th>{t("dashboard.colAmount")}</Th>
+                  <Th>{t("dashboard.colOpenedBy")}</Th>
+                  <Th>{t("dashboard.colReason")}</Th>
+                  <Th>{t("dashboard.colStatus")}</Th>
+                  <Th>{t("dashboard.colDate")}</Th>
+                  <Th>{t("dashboard.colAction")}</Th>
                 </tr>
               </thead>
               <tbody>
@@ -1030,7 +1036,7 @@ export default function AdminDashboard() {
                           textDecoration: "underline",
                         }}
                       >
-                        Moderate
+                        {t("dashboard.moderate")}
                       </a>
                     </Td>
                   </tr>
@@ -1053,7 +1059,7 @@ export default function AdminDashboard() {
                 margin: 0,
               }}
             >
-              Send Message
+              {t("dashboard.msgSendTitle")}
             </h2>
 
             {/* ─── Compose card ──────────────────────────────────────────────── */}
@@ -1081,7 +1087,7 @@ export default function AdminDashboard() {
                     marginBottom: "0.625rem",
                   }}
                 >
-                  Recipients
+                  {t("dashboard.msgRecipientsLabel")}
                 </p>
                 <div style={{ display: "flex", gap: "1.25rem" }}>
                   {(["all", "user"] as const).map((type) => (
@@ -1114,8 +1120,8 @@ export default function AdminDashboard() {
                         style={{ accentColor: "var(--color-primary)" }}
                       />
                       {type === "all"
-                        ? "Broadcast to all users"
-                        : "Send to a specific user"}
+                        ? t("dashboard.msgBroadcastAll")
+                        : t("dashboard.msgSendSpecific")}
                     </label>
                   ))}
                 </div>
@@ -1135,7 +1141,7 @@ export default function AdminDashboard() {
                       marginBottom: "0.375rem",
                     }}
                   >
-                    Recipient
+                    {t("dashboard.msgRecipientLabel")}
                   </label>
                   {msgSelectedUser ? (
                     <div
@@ -1184,7 +1190,7 @@ export default function AdminDashboard() {
                           lineHeight: 1,
                           padding: "0 0.25rem",
                         }}
-                        title="Remove"
+                        title={t("dashboard.msgRemove")}
                       >
                         &times;
                       </button>
@@ -1193,7 +1199,7 @@ export default function AdminDashboard() {
                     <>
                       <input
                         type="text"
-                        placeholder="Search by name, username, or email…"
+                        placeholder={t("dashboard.msgSearchPlaceholder")}
                         value={msgUserSearch}
                         onChange={(e) => setMsgUserSearch(e.target.value)}
                         className="form-input"
@@ -1224,7 +1230,7 @@ export default function AdminDashboard() {
                                 fontSize: "0.875rem",
                               }}
                             >
-                              Searching…
+                              {t("dashboard.msgSearching")}
                             </p>
                           )}
                           {!msgUserSearching &&
@@ -1292,7 +1298,7 @@ export default function AdminDashboard() {
                                   fontSize: "0.875rem",
                                 }}
                               >
-                                No users found.
+                                {t("dashboard.msgNoUsers")}
                               </p>
                             )}
                         </div>
@@ -1315,11 +1321,11 @@ export default function AdminDashboard() {
                     marginBottom: "0.375rem",
                   }}
                 >
-                  Subject
+                  {t("dashboard.msgSubjectLabel")}
                 </label>
                 <input
                   type="text"
-                  placeholder="Email subject line…"
+                  placeholder={t("dashboard.msgSubjectPlaceholder")}
                   value={msgSubject}
                   onChange={(e) => setMsgSubject(e.target.value)}
                   className="form-input"
@@ -1340,11 +1346,11 @@ export default function AdminDashboard() {
                     marginBottom: "0.375rem",
                   }}
                 >
-                  Message
+                  {t("dashboard.msgBodyLabel")}
                 </label>
                 <textarea
                   rows={7}
-                  placeholder="Write your message here. Each new line becomes a new paragraph in the email."
+                  placeholder={t("dashboard.msgBodyPlaceholder")}
                   value={msgBody}
                   onChange={(e) => setMsgBody(e.target.value)}
                   className="form-input"
@@ -1391,10 +1397,10 @@ export default function AdminDashboard() {
                   style={{ minWidth: "11rem", fontSize: "0.9375rem" }}
                 >
                   {msgSending
-                    ? "Sending…"
+                    ? t("dashboard.msgSendingBtn")
                     : msgRecipientType === "all"
-                      ? "📢 Broadcast to all users"
-                      : "📩 Send message"}
+                      ? t("dashboard.msgBroadcastBtn")
+                      : t("dashboard.msgDirectBtn")}
                 </button>
                 {msgRecipientType === "all" && (
                   <p
@@ -1404,7 +1410,7 @@ export default function AdminDashboard() {
                       margin: 0,
                     }}
                   >
-                    This will send an email to every registered user.
+                    {t("dashboard.msgBroadcastNote")}
                   </p>
                 )}
               </div>
@@ -1412,10 +1418,10 @@ export default function AdminDashboard() {
 
             {/* ─── Sent message history ────────────────────────────────────── */}
             <TabSection
-              title="Message History"
+              title={t("dashboard.msgHistoryTitle")}
               state={broadcasts}
               onLoadMore={() => loadTab("messages", true, broadcasts.page)}
-              emptyMessage="No messages have been sent yet."
+              emptyMessage={t("dashboard.msgHistoryEmpty")}
             >
               <table
                 style={{
@@ -1426,11 +1432,11 @@ export default function AdminDashboard() {
               >
                 <thead>
                   <tr style={{ backgroundColor: "var(--color-mist)" }}>
-                    <Th>Type</Th>
-                    <Th>Recipient</Th>
-                    <Th>Subject</Th>
-                    <Th>Delivered to</Th>
-                    <Th>Sent</Th>
+                    <Th>{t("dashboard.colType")}</Th>
+                    <Th>{t("dashboard.colRecipient")}</Th>
+                    <Th>{t("dashboard.colSubject")}</Th>
+                    <Th>{t("dashboard.colDeliveredTo")}</Th>
+                    <Th>{t("dashboard.colSent")}</Th>
                   </tr>
                 </thead>
                 <tbody>
@@ -1447,7 +1453,9 @@ export default function AdminDashboard() {
                               : "badge badge-neutral"
                           }
                         >
-                          {b.recipient_type === "all" ? "Broadcast" : "Direct"}
+                          {b.recipient_type === "all"
+                            ? t("dashboard.typeBroadcast")
+                            : t("dashboard.typeDirect")}
                         </span>
                       </Td>
                       <Td>
@@ -1458,7 +1466,7 @@ export default function AdminDashboard() {
                               fontStyle: "italic",
                             }}
                           >
-                            All users
+                            {t("dashboard.recipientAllUsers")}
                           </span>
                         ) : (
                           <>
@@ -1491,10 +1499,12 @@ export default function AdminDashboard() {
                               color: "var(--color-primary)",
                             }}
                           >
-                            {b.recipients_count} users
+                            {t("dashboard.usersCountLabel", {
+                              count: b.recipients_count,
+                            })}
                           </span>
                         ) : (
-                          "1 user"
+                          t("dashboard.oneUserLabel")
                         )}
                       </Td>
                       <Td muted>{fmtDate(b.sent_at)}</Td>
@@ -1509,10 +1519,10 @@ export default function AdminDashboard() {
         {/* ────────────────────── REFERRALS TAB ─────────────────────────────── */}
         {activeTab === "referrals" && (
           <TabSection
-            title="Active Referrers"
+            title={t("dashboard.referralsTitle")}
             state={referrals}
             onLoadMore={() => loadTab("referrals", true, referrals.page)}
-            emptyMessage="No users have made referrals yet."
+            emptyMessage={t("dashboard.referralsEmpty")}
           >
             <table
               style={{
@@ -1523,13 +1533,13 @@ export default function AdminDashboard() {
             >
               <thead>
                 <tr style={{ backgroundColor: "var(--color-mist)" }}>
-                  <Th>Name</Th>
-                  <Th>Username</Th>
-                  <Th>Email</Th>
-                  <Th>Referral Code</Th>
-                  <Th>People Referred</Th>
-                  <Th>Total Earned</Th>
-                  <Th>Current Balance</Th>
+                  <Th>{t("dashboard.colName")}</Th>
+                  <Th>{t("dashboard.colUsername")}</Th>
+                  <Th>{t("dashboard.colEmail")}</Th>
+                  <Th>{t("dashboard.colReferralCode")}</Th>
+                  <Th>{t("dashboard.colPeopleReferred")}</Th>
+                  <Th>{t("dashboard.colTotalEarned")}</Th>
+                  <Th>{t("dashboard.colCurrentBalance")}</Th>
                 </tr>
               </thead>
               <tbody>
@@ -1573,8 +1583,8 @@ export default function AdminDashboard() {
                         }}
                       >
                         {parseInt(String(r.referred_count)) === 1
-                          ? "person"
-                          : "people"}
+                          ? t("dashboard.personSingular")
+                          : t("dashboard.personPlural")}
                       </span>
                     </Td>
                     <Td bold>{fmtXAF(r.total_earned)}</Td>
@@ -1597,8 +1607,418 @@ export default function AdminDashboard() {
             </table>
           </TabSection>
         )}
+
+        {/* ─────────────────────── VERIFY RECEIPT TAB ─────────────────────── */}
+        {activeTab === "verify" && <AdminVerifyTab />}
       </main>
     </div>
+  );
+}
+
+// ─── Admin Verify Receipt Component ──────────────────────────────────────────
+function AdminVerifyTab() {
+  const [invoiceNumber, setInvoiceNumber] = useState("");
+  const [code, setCode] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState<{
+    verified: boolean;
+    message?: string;
+    invoice?: {
+      invoice_number: string;
+      invoice_name: string;
+      amount: number;
+      currency: string;
+      status: string;
+      payment_type: string;
+      created_at: string;
+      paid_at: string | null;
+      description: string;
+      seller_name: string;
+      seller_username: string;
+      seller_country: string;
+    };
+  } | null>(null);
+  const [formError, setFormError] = useState("");
+
+  const fmtDate = (iso: string | null) =>
+    iso
+      ? new Date(iso).toLocaleDateString("en-GB", {
+          day: "2-digit",
+          month: "long",
+          year: "numeric",
+        })
+      : "—";
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setFormError("");
+    setResult(null);
+    const num = invoiceNumber.trim();
+    const c = code.trim().replace(/\s+/g, "").toUpperCase();
+    if (!num || !c) {
+      setFormError(
+        "Please enter both the invoice number and verification code.",
+      );
+      return;
+    }
+    if (c.length !== 16) {
+      setFormError("Verification code must be exactly 16 characters.");
+      return;
+    }
+    setLoading(true);
+    try {
+      const res = await axios.post(`${API_URL}/invoice/verify`, {
+        invoice_number: num,
+        code: c,
+      });
+      setResult(res.data);
+    } catch {
+      setResult({
+        verified: false,
+        message: "Server error. Please try again.",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <section style={{ padding: "1.5rem 0" }}>
+      <div style={{ maxWidth: 580, margin: "0 auto" }}>
+        <h2
+          style={{
+            fontSize: "1.25rem",
+            fontWeight: 700,
+            color: "var(--color-text-heading)",
+            marginBottom: "0.5rem",
+          }}
+        >
+          Receipt Verification Tool
+        </h2>
+        <p
+          style={{
+            fontSize: "0.875rem",
+            color: "var(--color-text-muted)",
+            marginBottom: "1.5rem",
+          }}
+        >
+          Enter the invoice number and verification code from a Fonlok receipt
+          to check if it is authentic and unaltered.
+        </p>
+
+        {/* Form card */}
+        <div
+          style={{
+            background: "var(--color-card)",
+            border: "1px solid var(--color-border)",
+            borderRadius: 10,
+            padding: "1.5rem",
+            marginBottom: "1.25rem",
+          }}
+        >
+          <form onSubmit={handleSubmit}>
+            <div style={{ marginBottom: "1rem" }}>
+              <label
+                style={{
+                  display: "block",
+                  fontSize: "0.8125rem",
+                  fontWeight: 600,
+                  color: "var(--color-text-body)",
+                  marginBottom: "0.375rem",
+                }}
+              >
+                Invoice Number
+              </label>
+              <input
+                type="text"
+                value={invoiceNumber}
+                onChange={(e) => setInvoiceNumber(e.target.value)}
+                placeholder="e.g. INV-20240001"
+                autoComplete="off"
+                style={{
+                  width: "100%",
+                  padding: "0.6rem 0.75rem",
+                  border: "1px solid var(--color-border)",
+                  borderRadius: 6,
+                  fontSize: "0.875rem",
+                  background: "var(--color-input-bg, #fff)",
+                  color: "var(--color-text-body)",
+                  outline: "none",
+                  boxSizing: "border-box",
+                }}
+              />
+            </div>
+            <div style={{ marginBottom: "1.25rem" }}>
+              <label
+                style={{
+                  display: "block",
+                  fontSize: "0.8125rem",
+                  fontWeight: 600,
+                  color: "var(--color-text-body)",
+                  marginBottom: "0.375rem",
+                }}
+              >
+                Verification Code{" "}
+                <span
+                  style={{
+                    fontWeight: 400,
+                    color: "var(--color-text-muted)",
+                    fontSize: "0.75rem",
+                  }}
+                >
+                  (16 chars, printed on the receipt)
+                </span>
+              </label>
+              <input
+                type="text"
+                value={code}
+                onChange={(e) => setCode(e.target.value.toUpperCase())}
+                placeholder="e.g. A1B2C3D4E5F67890"
+                maxLength={20}
+                autoComplete="off"
+                style={{
+                  width: "100%",
+                  padding: "0.6rem 0.75rem",
+                  border: "1px solid var(--color-border)",
+                  borderRadius: 6,
+                  fontSize: "0.875rem",
+                  fontFamily: "monospace",
+                  letterSpacing: 2,
+                  background: "var(--color-input-bg, #fff)",
+                  color: "var(--color-text-body)",
+                  outline: "none",
+                  boxSizing: "border-box",
+                }}
+              />
+            </div>
+
+            {formError && (
+              <p
+                style={{
+                  fontSize: "0.8125rem",
+                  color: "#dc2626",
+                  background: "#fef2f2",
+                  border: "1px solid #fecaca",
+                  borderRadius: 6,
+                  padding: "0.5rem 0.75rem",
+                  marginBottom: "1rem",
+                }}
+              >
+                {formError}
+              </p>
+            )}
+
+            <button
+              type="submit"
+              disabled={loading}
+              style={{
+                background: loading
+                  ? "#94a3b8"
+                  : "var(--color-primary, #0F1F3D)",
+                color: "#fff",
+                border: "none",
+                borderRadius: 6,
+                padding: "0.65rem 1.5rem",
+                fontSize: "0.875rem",
+                fontWeight: 700,
+                cursor: loading ? "not-allowed" : "pointer",
+              }}
+            >
+              {loading ? "Verifying..." : "Verify"}
+            </button>
+          </form>
+        </div>
+
+        {/* Result */}
+        {result && result.verified && result.invoice && (
+          <div
+            style={{
+              background: "#f0fdf4",
+              border: "2px solid #22c55e",
+              borderRadius: 10,
+              padding: "1.25rem",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                marginBottom: "1rem",
+              }}
+            >
+              <div
+                style={{
+                  width: 36,
+                  height: 36,
+                  background: "#22c55e",
+                  borderRadius: "50%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexShrink: 0,
+                }}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                  <path
+                    d="M5 13l4 4L19 7"
+                    stroke="#fff"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </div>
+              <div>
+                <div
+                  style={{
+                    fontWeight: 700,
+                    color: "#166534",
+                    fontSize: "1rem",
+                  }}
+                >
+                  Authentic Fonlok Receipt
+                </div>
+                <div style={{ fontSize: "0.8125rem", color: "#15803d" }}>
+                  This receipt is genuine and unaltered.
+                </div>
+              </div>
+            </div>
+            <table
+              style={{
+                width: "100%",
+                fontSize: "0.8125rem",
+                borderCollapse: "collapse",
+                background: "#fff",
+                borderRadius: 6,
+                overflow: "hidden",
+                border: "1px solid #bbf7d0",
+              }}
+            >
+              <tbody>
+                {[
+                  ["Invoice No.", result.invoice.invoice_number],
+                  ["Name", result.invoice.invoice_name],
+                  [
+                    "Amount",
+                    `${Number(result.invoice.amount).toLocaleString()} ${result.invoice.currency}`,
+                  ],
+                  ["Status", result.invoice.status.toUpperCase()],
+                  [
+                    "Payment Type",
+                    result.invoice.payment_type === "installment"
+                      ? "Installment"
+                      : "One-Time",
+                  ],
+                  [
+                    "Seller",
+                    `${result.invoice.seller_name} (@${result.invoice.seller_username})`,
+                  ],
+                  ["Seller Country", result.invoice.seller_country ?? "—"],
+                  ["Issued", fmtDate(result.invoice.created_at)],
+                  ["Paid", fmtDate(result.invoice.paid_at)],
+                  ["Description", result.invoice.description ?? "—"],
+                ].map(([lbl, val], i) => (
+                  <tr
+                    key={lbl}
+                    style={{ background: i % 2 === 0 ? "#f0fdf4" : "#fff" }}
+                  >
+                    <td
+                      style={{
+                        padding: "0.5rem 0.75rem",
+                        fontWeight: 600,
+                        color: "#6b7280",
+                        width: 130,
+                        borderBottom: "1px solid #dcfce7",
+                      }}
+                    >
+                      {lbl}
+                    </td>
+                    <td
+                      style={{
+                        padding: "0.5rem 0.75rem",
+                        color: "#111827",
+                        borderBottom: "1px solid #dcfce7",
+                        wordBreak: "break-all",
+                      }}
+                    >
+                      {val}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <p
+              style={{
+                fontSize: "0.75rem",
+                color: "#6b7280",
+                marginTop: "0.75rem",
+                marginBottom: 0,
+              }}
+            >
+              Verified at {new Date().toUTCString()}
+            </p>
+          </div>
+        )}
+
+        {result && !result.verified && (
+          <div
+            style={{
+              background: "#fff1f2",
+              border: "2px solid #f43f5e",
+              borderRadius: 10,
+              padding: "1.25rem",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
+              <div
+                style={{
+                  width: 36,
+                  height: 36,
+                  background: "#f43f5e",
+                  borderRadius: "50%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexShrink: 0,
+                }}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                  <path
+                    d="M6 18L18 6M6 6l12 12"
+                    stroke="#fff"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </div>
+              <div>
+                <div
+                  style={{
+                    fontWeight: 700,
+                    color: "#be123c",
+                    fontSize: "1rem",
+                  }}
+                >
+                  Verification Failed
+                </div>
+                <div
+                  style={{
+                    fontSize: "0.875rem",
+                    color: "#9f1239",
+                    marginTop: 4,
+                    lineHeight: 1.5,
+                  }}
+                >
+                  {result.message ??
+                    "The code does not match. This receipt may be fraudulent."}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </section>
   );
 }
 
@@ -1697,6 +2117,7 @@ function TabSection({
   emptyMessage: string;
   children: React.ReactNode;
 }) {
+  const t = useTranslations("Admin");
   return (
     <section style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
       <div
@@ -1718,8 +2139,7 @@ function TabSection({
         </h2>
         {state.loaded && (
           <p style={{ fontSize: "0.875rem", color: "var(--color-text-muted)" }}>
-            Showing {state.data.length} record
-            {state.data.length !== 1 ? "s" : ""}
+            {t("dashboard.recordsShowing", { count: state.data.length })}
           </p>
         )}
       </div>
@@ -1733,7 +2153,7 @@ function TabSection({
             padding: "2rem",
           }}
         >
-          Loading\u2026
+          {t("dashboard.tabLoading")}
         </p>
       )}
 
@@ -1789,7 +2209,9 @@ function TabSection({
             className="btn-ghost"
             style={{ fontSize: "0.875rem" }}
           >
-            {state.loading ? "Loading\u2026" : "Load more"}
+            {state.loading
+              ? t("dashboard.tabLoading")
+              : t("dashboard.loadMore")}
           </button>
         </div>
       )}

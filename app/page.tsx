@@ -8,30 +8,32 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import SiteHeader from "./components/SiteHeader";
 import SiteFooter from "./components/SiteFooter";
+import { getTranslations } from "next-intl/server";
 
-export const metadata: Metadata = {
-  title: "Fonlok — Secure Escrow Payments for Cameroon",
-  description:
-    "Fonlok holds your money until both buyer and seller are satisfied. Pay and get paid safely with MTN Mobile Money and Orange Money. No more scams.",
-  keywords: [
-    "escrow Cameroon",
-    "secure payment Cameroon",
-    "MTN Mobile Money escrow",
-    "Orange Money escrow",
-    "safe online payment Cameroon",
-    "Fonlok",
-    "paiement sécurisé Cameroun",
-  ],
-  openGraph: {
-    title: "Fonlok — Secure Escrow Payments for Cameroon",
-    description:
-      "Pay and get paid safely. Fonlok holds the money until the deal is done.",
-    url: "https://fonlok.com",
-    siteName: "Fonlok",
-    type: "website",
-  },
-  alternates: { canonical: "https://fonlok.com" },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("Landing.meta");
+  return {
+    title: t("title"),
+    description: t("description"),
+    keywords: [
+      "escrow Cameroon",
+      "secure payment Cameroon",
+      "MTN Mobile Money escrow",
+      "Orange Money escrow",
+      "safe online payment Cameroon",
+      "Fonlok",
+      "paiement sécurisé Cameroun",
+    ],
+    openGraph: {
+      title: t("title"),
+      description: t("description"),
+      url: "https://fonlok.com",
+      siteName: "Fonlok",
+      type: "website",
+    },
+    alternates: { canonical: "https://fonlok.com" },
+  };
+}
 
 const orgSchema = {
   "@context": "https://schema.org",
@@ -51,7 +53,8 @@ const orgSchema = {
   sameAs: ["https://fonlok.com"],
 };
 
-export default function LandingPage() {
+export default async function LandingPage() {
+  const t = await getTranslations("Landing");
   return (
     <>
       <script
@@ -92,7 +95,7 @@ export default function LandingPage() {
                   marginBottom: "1rem",
                 }}
               >
-                Cameroon&apos;s escrow payment service
+                {t("hero.badge")}
               </p>
 
               <h1
@@ -104,9 +107,9 @@ export default function LandingPage() {
                   marginBottom: "1.25rem",
                 }}
               >
-                Pay safely.{" "}
+                {t("hero.h1Part1")}{" "}
                 <span style={{ color: "var(--color-accent)" }}>
-                  Get paid fully.
+                  {t("hero.h1Part2")}
                 </span>
               </h1>
 
@@ -119,9 +122,7 @@ export default function LandingPage() {
                   maxWidth: "480px",
                 }}
               >
-                Fonlok holds the money until both buyer and seller are
-                satisfied. Stop losing money to online scams. Start every deal
-                with confidence.
+                {t("hero.description")}
               </p>
 
               <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap" }}>
@@ -130,7 +131,7 @@ export default function LandingPage() {
                   className="btn-accent"
                   style={{ fontSize: "1rem", padding: "0.75rem 1.75rem" }}
                 >
-                  Create a free account
+                  {t("hero.ctaPrimary")}
                 </Link>
                 <Link
                   href="/how-it-works"
@@ -143,7 +144,7 @@ export default function LandingPage() {
                     borderBottom: "2px solid rgba(255,255,255,0.3)",
                   }}
                 >
-                  See how it works →
+                  {t("hero.ctaSecondary")}
                 </Link>
               </div>
 
@@ -159,9 +160,18 @@ export default function LandingPage() {
                 }}
               >
                 {[
-                  { value: "Free", label: "to create an account" },
-                  { value: "3%", label: "seller fee per transaction" },
-                  { value: "MTN + Orange", label: "Mobile Money supported" },
+                  {
+                    value: t("hero.stats.free.value"),
+                    label: t("hero.stats.free.label"),
+                  },
+                  {
+                    value: t("hero.stats.fee.value"),
+                    label: t("hero.stats.fee.label"),
+                  },
+                  {
+                    value: t("hero.stats.momo.value"),
+                    label: t("hero.stats.momo.label"),
+                  },
                 ].map((item) => (
                   <div key={item.value}>
                     <p
@@ -220,7 +230,7 @@ export default function LandingPage() {
                   marginBottom: "0.75rem",
                 }}
               >
-                Simple. Safe. Straightforward.
+                {t("howItWorks.heading")}
               </h2>
               <p
                 style={{
@@ -230,7 +240,7 @@ export default function LandingPage() {
                   margin: "0 auto",
                 }}
               >
-                Three steps is all it takes to do a safe deal on Fonlok.
+                {t("howItWorks.subheading")}
               </p>
             </div>
 
@@ -243,7 +253,7 @@ export default function LandingPage() {
                 margin: "0 auto",
               }}
             >
-              {HOW_IT_WORKS_STEPS.map((item) => (
+              {HOW_IT_WORKS_STEPS(t).map((item) => (
                 <div
                   key={item.step}
                   className="card"
@@ -295,7 +305,7 @@ export default function LandingPage() {
                 className="btn-ghost"
                 style={{ fontSize: "0.9375rem" }}
               >
-                Read the full guide →
+                {t("howItWorks.readGuide")}
               </Link>
             </div>
           </div>
@@ -317,7 +327,7 @@ export default function LandingPage() {
                   marginBottom: "0.75rem",
                 }}
               >
-                Why people choose Fonlok
+                {t("benefits.heading")}
               </h2>
               <p
                 style={{
@@ -327,7 +337,7 @@ export default function LandingPage() {
                   margin: "0 auto",
                 }}
               >
-                Built specifically for the way people pay and sell in Cameroon.
+                {t("benefits.subheading")}
               </p>
             </div>
 
@@ -338,7 +348,7 @@ export default function LandingPage() {
                 gap: "1.5rem",
               }}
             >
-              {BENEFITS.map((item) => (
+              {BENEFITS(t).map((item) => (
                 <div
                   key={item.title}
                   style={{
@@ -389,7 +399,7 @@ export default function LandingPage() {
                 marginBottom: "0.75rem",
               }}
             >
-              One simple fee
+              {t("pricing.heading")}
             </h2>
             <p
               style={{
@@ -398,7 +408,7 @@ export default function LandingPage() {
                 marginBottom: "2.5rem",
               }}
             >
-              No monthly plans. No setup cost. Just 3% when you use it.
+              {t("pricing.subheading")}
             </p>
 
             <div
@@ -429,7 +439,7 @@ export default function LandingPage() {
                   marginBottom: "1.5rem",
                 }}
               >
-                per escrow transaction
+                {t("pricing.feeLabel")}
               </p>
               <ul
                 style={{
@@ -442,11 +452,11 @@ export default function LandingPage() {
                 }}
               >
                 {[
-                  "Free for buyers — Fonlok charges buyers 0%",
-                  "Free account creation",
-                  "No monthly fee",
-                  "MTN & Orange Money",
-                  "Dispute resolution included",
+                  t("pricing.features.freeBuyers"),
+                  t("pricing.features.freeAccount"),
+                  t("pricing.features.noMonthlyFee"),
+                  t("pricing.features.momo"),
+                  t("pricing.features.dispute"),
                 ].map((item) => (
                   <li
                     key={item}
@@ -478,7 +488,7 @@ export default function LandingPage() {
                   color: "var(--color-primary)",
                 }}
               >
-                Full pricing details →
+                {t("pricing.fullDetails")}
               </Link>
               <p
                 style={{
@@ -490,9 +500,7 @@ export default function LandingPage() {
                   borderTop: "1px solid var(--color-border)",
                 }}
               >
-                MTN and Orange Mobile Money network charges (typically 2%) are
-                applied by the mobile network at the point of payment and are
-                not collected by Fonlok.
+                {t("pricing.networkNote")}
               </p>
             </div>
           </div>
@@ -559,7 +567,7 @@ export default function LandingPage() {
                   textTransform: "uppercase",
                 }}
               >
-                Referral Programme
+                {t("referral.badge")}
               </span>
             </div>
 
@@ -572,9 +580,12 @@ export default function LandingPage() {
                   lineHeight: 1.25,
                 }}
               >
-                Earn <span style={{ color: "#F59E0B" }}>0.5% commission</span>
+                {t("referral.heading")}{" "}
+                <span style={{ color: "#F59E0B" }}>
+                  {t("referral.headingHighlight")}
+                </span>
                 <br />
-                on every deal — forever.
+                {t("referral.headingEnd")}
               </h2>
               <p
                 style={{
@@ -585,12 +596,11 @@ export default function LandingPage() {
                   lineHeight: 1.75,
                 }}
               >
-                Share your unique referral link. Every time someone you refer
-                completes a transaction on Fonlok, you earn{" "}
+                {t("referral.description")}{" "}
                 <strong style={{ color: "rgba(255,255,255,0.88)" }}>
-                  0.5% of the transaction value
+                  {t("referral.descriptionHighlight")}
                 </strong>{" "}
-                — automatically, with no time limit.
+                {t("referral.descriptionEnd")}
               </p>
             </div>
 
@@ -604,22 +614,9 @@ export default function LandingPage() {
                 margin: "0 auto 3rem",
               }}
             >
-              {[
-                {
-                  title: "One link, infinite earning",
-                  desc: "Share your referral link once. Every person who signs up through it earns you money — on every single transaction they make, for life.",
-                },
-                {
-                  title: "No expiry. Ever.",
-                  desc: "Your commission does not expire. As your referrals grow their businesses on Fonlok, your passive income grows with them.",
-                },
-                {
-                  title: "Paid instantly to your wallet",
-                  desc: "Referral earnings are credited to your Fonlok wallet automatically at the moment each transaction settles.",
-                },
-              ].map((card) => (
+              {([0, 1, 2] as const).map((i) => (
                 <div
-                  key={card.title}
+                  key={i}
                   style={{
                     backgroundColor: "rgba(255,255,255,0.05)",
                     border: "1px solid rgba(255,255,255,0.1)",
@@ -635,7 +632,7 @@ export default function LandingPage() {
                       marginBottom: "0.5rem",
                     }}
                   >
-                    {card.title}
+                    {t(`referral.cards.${i}.title`)}
                   </h3>
                   <p
                     style={{
@@ -645,7 +642,7 @@ export default function LandingPage() {
                       lineHeight: 1.7,
                     }}
                   >
-                    {card.desc}
+                    {t(`referral.cards.${i}.desc`)}
                   </p>
                 </div>
               ))}
@@ -673,7 +670,7 @@ export default function LandingPage() {
                   marginBottom: "0.75rem",
                 }}
               >
-                Example
+                {t("referral.exampleLabel")}
               </p>
               <p
                 style={{
@@ -683,13 +680,11 @@ export default function LandingPage() {
                   margin: 0,
                 }}
               >
-                Your friend refers 10 people. Each of those people does 100,000
-                XAF in transactions every month. That&apos;s{" "}
+                {t("referral.example")}{" "}
                 <span style={{ color: "#F59E0B", fontWeight: 700 }}>
-                  5,000 XAF in your pocket every month
+                  {t("referral.exampleHighlight")}
                 </span>{" "}
-                — growing as their businesses grow, with zero extra effort from
-                you.
+                {t("referral.exampleEnd")}
               </p>
             </div>
 
@@ -699,7 +694,7 @@ export default function LandingPage() {
                 className="btn-accent"
                 style={{ fontSize: "1rem", padding: "0.875rem 2.25rem" }}
               >
-                Get your referral link →
+                {t("referral.cta")}
               </Link>
               <p
                 style={{
@@ -708,7 +703,7 @@ export default function LandingPage() {
                   marginTop: "1rem",
                 }}
               >
-                Free to join. Minimum payout: 2,000 XAF.
+                {t("referral.ctaNote")}
               </p>
             </div>
           </div>
@@ -731,7 +726,7 @@ export default function LandingPage() {
                 marginBottom: "1rem",
               }}
             >
-              Ready to do business safely?
+              {t("finalCta.heading")}
             </h2>
             <p
               style={{
@@ -741,8 +736,7 @@ export default function LandingPage() {
                 lineHeight: 1.75,
               }}
             >
-              Join Cameroonians who use Fonlok to protect their money and
-              complete deals with confidence.
+              {t("finalCta.description")}
             </p>
             <div
               style={{
@@ -757,7 +751,7 @@ export default function LandingPage() {
                 className="btn-accent"
                 style={{ fontSize: "1rem", padding: "0.875rem 2rem" }}
               >
-                Create your free account
+                {t("finalCta.ctaPrimary")}
               </Link>
               <Link
                 href="/how-it-works"
@@ -770,7 +764,7 @@ export default function LandingPage() {
                   textDecoration: "none",
                 }}
               >
-                Learn how it works →
+                {t("finalCta.ctaSecondary")}
               </Link>
             </div>
           </div>
@@ -784,48 +778,48 @@ export default function LandingPage() {
 
 // ── Data ────────────────────────────────────────────────────────
 
-const HOW_IT_WORKS_STEPS = [
+const HOW_IT_WORKS_STEPS = (t: (key: string) => string) => [
   {
     step: "1",
-    title: "Seller creates an invoice",
-    desc: "Takes 2 minutes. Log in, enter your email, the amount, and a description of what you are selling. Fonlok generates a unique payment link instantly.",
+    title: t("howItWorks.steps.1.title"),
+    desc: t("howItWorks.steps.1.desc"),
   },
   {
     step: "2",
-    title: "Buyer pays securely",
-    desc: "Share the payment link with your client. They open it and pay using MTN Mobile Money or Orange Money. Fonlok holds the funds safely in escrow.",
+    title: t("howItWorks.steps.2.title"),
+    desc: t("howItWorks.steps.2.desc"),
   },
   {
     step: "3",
-    title: "Both sides confirm",
-    desc: "Deliver what was agreed. The buyer confirms receipt and Fonlok releases the money straight to the seller. Everyone wins.",
+    title: t("howItWorks.steps.3.title"),
+    desc: t("howItWorks.steps.3.desc"),
   },
 ];
 
-const BENEFITS = [
+const BENEFITS = (t: (key: string) => string) => [
   {
-    title: "Buyer protection",
-    desc: "Your money is held until you confirm you received exactly what you paid for. You are never at risk.",
+    title: t("benefits.items.buyerProtection.title"),
+    desc: t("benefits.items.buyerProtection.desc"),
   },
   {
-    title: "Seller guarantee",
-    desc: "Once you deliver, you get paid. No more chasing unpaid invoices. No more broken promises.",
+    title: t("benefits.items.sellerGuarantee.title"),
+    desc: t("benefits.items.sellerGuarantee.desc"),
   },
   {
-    title: "Dispute resolution",
-    desc: "If there is a problem, our team reviews the evidence and resolves it fairly. Neither side can run.",
+    title: t("benefits.items.disputeResolution.title"),
+    desc: t("benefits.items.disputeResolution.desc"),
   },
   {
-    title: "Mobile Money payments",
-    desc: "Buyers pay with MTN or Orange Money. No bank account or card required.",
+    title: t("benefits.items.mobileMoney.title"),
+    desc: t("benefits.items.mobileMoney.desc"),
   },
   {
-    title: "No hidden charges",
-    desc: "3% per transaction for sellers. Buyers pay nothing. No monthly fee. No setup cost.",
+    title: t("benefits.items.noHiddenCharges.title"),
+    desc: t("benefits.items.noHiddenCharges.desc"),
   },
   {
-    title: "Fully online",
-    desc: "Create invoices, track payments, and manage disputes — all from your phone.",
+    title: t("benefits.items.fullyOnline.title"),
+    desc: t("benefits.items.fullyOnline.desc"),
   },
 ];
 

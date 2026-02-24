@@ -6,6 +6,7 @@ import Axios from "axios";
 import SiteHeader from "../components/SiteHeader";
 import SiteFooter from "../components/SiteFooter";
 import { useAuth } from "@/context/UserContext";
+import { useTranslations } from "next-intl";
 
 const API = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
 
@@ -78,6 +79,7 @@ function Section({
 export default function SettingsPage() {
   const { user_id, authLoading } = useAuth();
   const router = useRouter();
+  const t = useTranslations("Settings");
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loadError, setLoadError] = useState("");
 
@@ -95,7 +97,7 @@ export default function SettingsPage() {
         const profileRes = await Axios.get(`${API}/profile/${username}`);
         setProfile(profileRes.data.seller);
       })
-      .catch(() => setLoadError("Failed to load account information."));
+      .catch(() => setLoadError(t("loadError")));
   }, [authLoading, user_id, router]);
 
   if (authLoading || !user_id) return null;
@@ -141,7 +143,7 @@ export default function SettingsPage() {
               marginBottom: "0.375rem",
             }}
           >
-            Account settings
+            {t("title")}
           </h1>
           <p
             style={{
@@ -150,7 +152,7 @@ export default function SettingsPage() {
               marginBottom: "2.5rem",
             }}
           >
-            Manage your Fonlok account information.
+            {t("subtitle")}
           </p>
 
           <UpdateNameForm
@@ -194,6 +196,7 @@ function UpdateNameForm({
     type: "success" | "error";
     text: string;
   } | null>(null);
+  const t = useTranslations("Settings");
 
   useEffect(() => {
     if (current) setName(current);
@@ -211,12 +214,12 @@ function UpdateNameForm({
         { withCredentials: true },
       );
       onSaved(res.data.name);
-      setMsg({ type: "success", text: "Name updated successfully." });
+      setMsg({ type: "success", text: t("name.success") });
     } catch (err: unknown) {
       const e = err as { response?: { data?: { message?: string } } };
       setMsg({
         type: "error",
-        text: e.response?.data?.message || "Failed to update name.",
+        text: e.response?.data?.message || t("name.error"),
       });
     } finally {
       setLoading(false);
@@ -224,12 +227,12 @@ function UpdateNameForm({
   };
 
   return (
-    <Section title="Display name">
+    <Section title={t("name.sectionTitle")}>
       <Feedback msg={msg} />
       <form onSubmit={handleSubmit}>
         <div style={{ marginBottom: "1.25rem" }}>
           <label className="label" htmlFor="s-name">
-            Full name
+            {t("name.label")}
           </label>
           <input
             id="s-name"
@@ -242,7 +245,7 @@ function UpdateNameForm({
           />
         </div>
         <button type="submit" className="btn-primary" disabled={loading}>
-          {loading ? "Saving…" : "Save name"}
+          {loading ? t("name.saving") : t("name.save")}
         </button>
       </form>
     </Section>
@@ -263,6 +266,7 @@ function UpdateEmailForm({
     type: "success" | "error";
     text: string;
   } | null>(null);
+  const t = useTranslations("Settings");
 
   useEffect(() => {
     if (current) setEmail(current);
@@ -279,12 +283,12 @@ function UpdateEmailForm({
         { withCredentials: true },
       );
       onSaved(res.data.email);
-      setMsg({ type: "success", text: "Email updated successfully." });
+      setMsg({ type: "success", text: t("email.success") });
     } catch (err: unknown) {
       const e = err as { response?: { data?: { message?: string } } };
       setMsg({
         type: "error",
-        text: e.response?.data?.message || "Failed to update email.",
+        text: e.response?.data?.message || t("email.error"),
       });
     } finally {
       setLoading(false);
@@ -292,12 +296,12 @@ function UpdateEmailForm({
   };
 
   return (
-    <Section title="Email address">
+    <Section title={t("email.sectionTitle")}>
       <Feedback msg={msg} />
       <form onSubmit={handleSubmit}>
         <div style={{ marginBottom: "1.25rem" }}>
           <label className="label" htmlFor="s-email">
-            Email
+            {t("email.label")}
           </label>
           <input
             id="s-email"
@@ -309,7 +313,7 @@ function UpdateEmailForm({
           />
         </div>
         <button type="submit" className="btn-primary" disabled={loading}>
-          {loading ? "Saving…" : "Save email"}
+          {loading ? t("email.saving") : t("email.save")}
         </button>
       </form>
     </Section>
@@ -332,12 +336,13 @@ function UpdateProfilePictureForm({
     text: string;
   } | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const t = useTranslations("Settings");
 
   const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
     if (!f) return;
     if (f.size > 5 * 1024 * 1024) {
-      setMsg({ type: "error", text: "Image must be 5 MB or smaller." });
+      setMsg({ type: "error", text: t("picture.sizeError") });
       return;
     }
     setFile(f);
@@ -362,7 +367,7 @@ function UpdateProfilePictureForm({
         },
       );
       onSaved(res.data.profilepicture);
-      setMsg({ type: "success", text: "Profile picture updated." });
+      setMsg({ type: "success", text: t("picture.success") });
       setFile(null);
       setPreview(null);
       if (inputRef.current) inputRef.current.value = "";
@@ -370,7 +375,7 @@ function UpdateProfilePictureForm({
       const e = err as { response?: { data?: { message?: string } } };
       setMsg({
         type: "error",
-        text: e.response?.data?.message || "Failed to update profile picture.",
+        text: e.response?.data?.message || t("picture.error"),
       });
     } finally {
       setLoading(false);
@@ -384,7 +389,10 @@ function UpdateProfilePictureForm({
       : null;
 
   return (
-    <Section title="Profile picture" subtitle="JPEG, PNG or WebP · max 5 MB">
+    <Section
+      title={t("picture.sectionTitle")}
+      subtitle={t("picture.sectionSubtitle")}
+    >
       <Feedback msg={msg} />
       <form onSubmit={handleSubmit}>
         <div
@@ -439,7 +447,7 @@ function UpdateProfilePictureForm({
               className="btn-ghost"
               style={{ cursor: "pointer", display: "inline-block" }}
             >
-              Choose image
+              {t("picture.chooseImage")}
             </label>
             {file && (
               <p
@@ -459,7 +467,7 @@ function UpdateProfilePictureForm({
           className="btn-primary"
           disabled={loading || !file}
         >
-          {loading ? "Uploading…" : "Save picture"}
+          {loading ? t("picture.uploading") : t("picture.save")}
         </button>
       </form>
     </Section>
@@ -483,6 +491,7 @@ function UpdatePhoneForm({
     type: "success" | "error";
     text: string;
   } | null>(null);
+  const t = useTranslations("Settings");
 
   useEffect(() => {
     setLocal(current?.startsWith("237") ? current.slice(3) : (current ?? ""));
@@ -500,12 +509,12 @@ function UpdatePhoneForm({
         { withCredentials: true },
       );
       onSaved(res.data.phone);
-      setMsg({ type: "success", text: "MoMo number updated successfully." });
+      setMsg({ type: "success", text: t("phone.success") });
     } catch (err: unknown) {
       const e = err as { response?: { data?: { message?: string } } };
       setMsg({
         type: "error",
-        text: e.response?.data?.message || "Failed to update phone.",
+        text: e.response?.data?.message || t("phone.error"),
       });
     } finally {
       setLoading(false);
@@ -514,14 +523,14 @@ function UpdatePhoneForm({
 
   return (
     <Section
-      title="MoMo phone number"
-      subtitle="This is the number buyers see on your profile. Payouts are sent to this number."
+      title={t("phone.sectionTitle")}
+      subtitle={t("phone.sectionSubtitle")}
     >
       <Feedback msg={msg} />
       <form onSubmit={handleSubmit}>
         <div style={{ marginBottom: "1.25rem" }}>
           <label className="label" htmlFor="s-phone">
-            Phone number
+            {t("phone.label")}
           </label>
           <div
             style={{
@@ -548,7 +557,7 @@ function UpdatePhoneForm({
             <input
               id="s-phone"
               type="tel"
-              placeholder="6XXXXXXXX (9 digits)"
+              placeholder={t("phone.inputPlaceholder")}
               maxLength={9}
               value={local}
               onChange={(e) => setLocal(e.target.value.replace(/\D/g, ""))}
@@ -570,12 +579,11 @@ function UpdatePhoneForm({
               color: "var(--color-text-muted)",
             }}
           >
-            Must start a with 6... e.g. 677298709 (9 digits after the the fixed
-            +237)
+            {t("phone.hint")}
           </p>
         </div>
         <button type="submit" className="btn-primary" disabled={loading}>
-          {loading ? "Saving…" : "Save phone number"}
+          {loading ? t("phone.saving") : t("phone.save")}
         </button>
       </form>
     </Section>
@@ -590,6 +598,7 @@ function ChangePasswordForm() {
     type: "success" | "error";
     text: string;
   } | null>(null);
+  const t = useTranslations("Settings");
 
   const update =
     (key: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) =>
@@ -598,13 +607,13 @@ function ChangePasswordForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (form.next !== form.confirm) {
-      setMsg({ type: "error", text: "New passwords do not match." });
+      setMsg({ type: "error", text: t("password.mismatch") });
       return;
     }
     if (form.next.length < 8) {
       setMsg({
         type: "error",
-        text: "New password must be at least 8 characters.",
+        text: t("password.tooShort"),
       });
       return;
     }
@@ -616,13 +625,13 @@ function ChangePasswordForm() {
         { current_password: form.current, new_password: form.next },
         { withCredentials: true },
       );
-      setMsg({ type: "success", text: "Password changed successfully." });
+      setMsg({ type: "success", text: t("password.success") });
       setForm({ current: "", next: "", confirm: "" });
     } catch (err: unknown) {
       const e = err as { response?: { data?: { message?: string } } };
       setMsg({
         type: "error",
-        text: e.response?.data?.message || "Failed to change password.",
+        text: e.response?.data?.message || t("password.error"),
       });
     } finally {
       setLoading(false);
@@ -630,7 +639,7 @@ function ChangePasswordForm() {
   };
 
   return (
-    <Section title="Change password">
+    <Section title={t("password.sectionTitle")}>
       <Feedback msg={msg} />
       <form onSubmit={handleSubmit}>
         <div
@@ -644,21 +653,21 @@ function ChangePasswordForm() {
           {[
             {
               id: "cp-cur",
-              label: "Current password",
+              label: t("password.currentLabel"),
               key: "current" as const,
-              placeholder: "Your current password",
+              placeholder: t("password.currentPlaceholder"),
             },
             {
               id: "cp-new",
-              label: "New password",
+              label: t("password.newLabel"),
               key: "next" as const,
-              placeholder: "At least 8 characters",
+              placeholder: t("password.newPlaceholder"),
             },
             {
               id: "cp-con",
-              label: "Confirm new password",
+              label: t("password.confirmLabel"),
               key: "confirm" as const,
-              placeholder: "Repeat new password",
+              placeholder: t("password.confirmPlaceholder"),
             },
           ].map((f) => (
             <div key={f.id}>
@@ -678,7 +687,7 @@ function ChangePasswordForm() {
           ))}
         </div>
         <button type="submit" className="btn-primary" disabled={loading}>
-          {loading ? "Saving…" : "Change password"}
+          {loading ? t("password.saving") : t("password.save")}
         </button>
       </form>
     </Section>
@@ -695,6 +704,7 @@ function DeleteAccountSection() {
     type: "success" | "error";
     text: string;
   } | null>(null);
+  const t = useTranslations("Settings");
 
   const handleDelete = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -710,7 +720,7 @@ function DeleteAccountSection() {
       const e = err as { response?: { data?: { message?: string } } };
       setMsg({
         type: "error",
-        text: e.response?.data?.message || "Failed to delete account.",
+        text: e.response?.data?.message || t("delete.error"),
       });
     } finally {
       setLoading(false);
@@ -735,7 +745,7 @@ function DeleteAccountSection() {
             margin: "0 0 0.375rem",
           }}
         >
-          Delete account
+          {t("delete.sectionTitle")}
         </h2>
         <p
           style={{
@@ -745,8 +755,7 @@ function DeleteAccountSection() {
             lineHeight: 1.6,
           }}
         >
-          Permanently delete your account and all associated data. This cannot
-          be undone. Accounts with active escrow transactions cannot be deleted.
+          {t("delete.sectionBody")}
         </p>
         <button
           className="btn-primary"
@@ -760,7 +769,7 @@ function DeleteAccountSection() {
             setPassword("");
           }}
         >
-          Delete my account
+          {t("delete.trigger")}
         </button>
       </div>
 
@@ -798,7 +807,7 @@ function DeleteAccountSection() {
                 margin: "0 0 0.75rem",
               }}
             >
-              Are you absolutely sure?
+              {t("delete.modalTitle")}
             </h3>
             <p
               style={{
@@ -808,11 +817,10 @@ function DeleteAccountSection() {
                 lineHeight: 1.6,
               }}
             >
-              This will <strong>permanently delete</strong> your account,
-              profile, invoices, and all data. This cannot be reversed.
+              {t("delete.modalBody")}
               <br />
               <br />
-              Enter your password to confirm.
+              {t("delete.modalBodyConfirm")}
             </p>
 
             <Feedback msg={msg} />
@@ -820,13 +828,13 @@ function DeleteAccountSection() {
             <form onSubmit={handleDelete}>
               <div style={{ marginBottom: "1.25rem" }}>
                 <label className="label" htmlFor="del-pass">
-                  Your password
+                  {t("delete.passwordLabel")}
                 </label>
                 <input
                   id="del-pass"
                   className="input"
                   type="password"
-                  placeholder="Enter your password to confirm"
+                  placeholder={t("delete.passwordPlaceholder")}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -848,7 +856,7 @@ function DeleteAccountSection() {
                     justifyContent: "center",
                   }}
                 >
-                  {loading ? "Deleting…" : "Yes, delete my account"}
+                  {loading ? t("delete.deleting") : t("delete.confirm")}
                 </button>
                 <button
                   type="button"
@@ -857,7 +865,7 @@ function DeleteAccountSection() {
                   disabled={loading}
                   style={{ flex: 1, justifyContent: "center" }}
                 >
-                  Cancel
+                  {t("delete.cancel")}
                 </button>
               </div>
             </form>

@@ -1,8 +1,9 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import Axios from "axios";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useParams } from "next/navigation";
 import DisputeButton from "../../components/DisputeButton";
+import { useTranslations } from "next-intl";
 
 const API = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
 
@@ -15,14 +16,9 @@ type Message = {
   created_at: string;
 };
 
-type PageProps = {
-  params: {
-    invoice_number: string;
-  };
-};
-
-export default function BuyerChatPage({ params }: PageProps) {
-  const { invoice_number } = params;
+export default function BuyerChatPage() {
+  const { invoice_number } = useParams<{ invoice_number: string }>();
+  const t = useTranslations("BuyerChat");
 
   // Read the token from the URL e.g. /chat/INV-123?token=abc123
   const searchParams = useSearchParams();
@@ -36,6 +32,7 @@ export default function BuyerChatPage({ params }: PageProps) {
   const [errorMessage, setErrorMessage] = useState("");
   const [isAccessDenied, setIsAccessDenied] = useState(false);
   const bottomOfChat = useRef<HTMLDivElement>(null);
+  const prevMsgCount = useRef(0);
 
   // Fetch all messages for this invoice
   const fetchMessages = async () => {
@@ -53,11 +50,12 @@ export default function BuyerChatPage({ params }: PageProps) {
     }
   };
 
-  // Scroll to the latest message whenever messages update
+  // Only scroll to bottom when the message count actually increases
   useEffect(() => {
-    if (bottomOfChat.current) {
-      bottomOfChat.current.scrollIntoView({ behavior: "smooth" });
+    if (messages.length > prevMsgCount.current) {
+      bottomOfChat.current?.scrollIntoView({ behavior: "smooth" });
     }
+    prevMsgCount.current = messages.length;
   }, [messages]);
 
   // Poll for new messages every 5 seconds
@@ -89,7 +87,7 @@ export default function BuyerChatPage({ params }: PageProps) {
       setNewMessage("");
       fetchMessages();
     } catch (error: any) {
-      setErrorMessage("Failed to send message. Please try again.");
+      setErrorMessage(t("errorSend"));
     }
   };
 
@@ -109,7 +107,7 @@ export default function BuyerChatPage({ params }: PageProps) {
       setSelectedFile(null);
       fetchMessages();
     } catch (error: any) {
-      setErrorMessage("Failed to upload file. Please try again.");
+      setErrorMessage(t("errorUpload"));
     }
   };
 
@@ -117,26 +115,27 @@ export default function BuyerChatPage({ params }: PageProps) {
   if (isAccessDenied) {
     return (
       <div className="flex flex-col items-center justify-center h-screen">
-        <h2 className="text-2xl font-bold text-red-700">Access Denied</h2>
-        <p className="text-gray-600 mt-2">
-          This chat link is invalid or has expired. Please check your email for
-          the correct link.
-        </p>
+        <h2 className="text-2xl font-bold text-red-700">
+          {t("accessDeniedTitle")}
+        </h2>
+        <p className="text-gray-600 mt-2">{t("accessDeniedBody")}</p>
       </div>
     );
   }
 
   return (
     <div className="flex flex-col items-center p-4">
-      <h2 className="text-xl font-bold mb-1">Chat with the Seller</h2>
-      <p className="text-gray-500 text-sm mb-4">Invoice: {invoice_number}</p>
+      <h2 className="text-xl font-bold mb-1">{t("title")}</h2>
+      <p className="text-gray-500 text-sm mb-4">
+        {t("invoiceLabel")} {invoice_number}
+      </p>
 
       {/* Messages area */}
       <div className="w-full max-w-xl border border-gray-300 rounded-md bg-white">
         <div className="h-96 overflow-y-auto p-3 flex flex-col gap-2">
           {messages.length === 0 && (
             <p className="text-gray-400 text-sm text-center mt-4">
-              No messages yet. Feel free to ask the seller a question!
+              {t("empty")}
             </p>
           )}
 
@@ -151,21 +150,21 @@ export default function BuyerChatPage({ params }: PageProps) {
             >
               {/* Who sent it */}
               <span className="text-xs text-gray-500 mb-1">
-                {msg.sender_type === "buyer" ? "You (Buyer)" : "Seller"}
+                {msg.sender_type === "buyer" ? t("youBuyer") : t("seller")}
               </span>
 
               {/* Text message */}
               {msg.message && <p>{msg.message}</p>}
 
-              {/* File */}
+              {/* File — buyer token is appended so the backend can auth the request */}
               {msg.file_url && (
                 <a
-                  href={msg.file_url}
+                  href={`${msg.file_url}?token=${encodeURIComponent(token || "")}&invoice=${encodeURIComponent(invoice_number)}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-blue-600 underline"
                 >
-                  View Uploaded File
+                  {t("viewFile")}
                 </a>
               )}
 
@@ -196,7 +195,7 @@ export default function BuyerChatPage({ params }: PageProps) {
               onClick={uploadFile}
               className="bg-gray-600 text-white text-sm rounded p-1"
             >
-              Upload
+              {t("uploadBtn")}
             </button>
           )}
         </div>
@@ -205,7 +204,7 @@ export default function BuyerChatPage({ params }: PageProps) {
         <div className="flex gap-2 p-3 border-t border-gray-200">
           <input
             type="text"
-            placeholder="Type a message..."
+            placeholder={t("messagePlaceholder")}
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && sendMessage()}
@@ -215,16 +214,14 @@ export default function BuyerChatPage({ params }: PageProps) {
             onClick={sendMessage}
             className="bg-blue-600 text-white rounded p-2 text-sm font-bold"
           >
-            Send
+            {t("send")}
           </button>
         </div>
       </div>
 
       {/* Dispute button - buyer can open a dispute from their chat page */}
       <div className="w-full max-w-xl mt-4">
-        <p className="text-sm text-gray-500 mb-1">
-          Have a problem with your order?
-        </p>
+        <p className="text-sm text-gray-500 mb-1">{t("haveAProblem")}</p>
         <DisputeButton
           invoice_number={invoice_number}
           sender_type="buyer"

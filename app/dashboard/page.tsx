@@ -3,6 +3,7 @@ import CreateInvoice from "../components/createInvoice";
 import GetAllInvoices from "../components/getAllInvoices";
 import FilterInvoice from "../components/filterInvoice";
 import RevenueStats from "../components/RevenueStats";
+import EscrowBalance from "../components/EscrowBalance";
 import Navbar from "../components/Navbar";
 import SiteFooter from "../components/SiteFooter";
 import { useState } from "react";
@@ -10,6 +11,7 @@ import axios from "axios";
 import { useAuth } from "@/context/UserContext";
 import { useRouter } from "next/navigation";
 import { InlineSpinner } from "@/app/components/Spinner";
+import { useTranslations } from "next-intl";
 
 const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
 
@@ -18,6 +20,7 @@ type Tab = "invoices" | "filter" | "payment" | "stats";
 export default function Dashboard() {
   const { user_id } = useAuth();
   const router = useRouter();
+  const t = useTranslations("Dashboard");
 
   // Tab state
   const [activeTab, setActiveTab] = useState<Tab>("invoices");
@@ -64,7 +67,7 @@ export default function Dashboard() {
         code,
         invoiceNumber,
       });
-      setPaySuccess(response.data.message || "Funds released successfully!");
+      setPaySuccess(response.data.message || t("payoutTab.successDefault"));
       setCode("");
       setInvoiceNumber("");
     } catch (err: unknown) {
@@ -74,7 +77,7 @@ export default function Dashboard() {
       setPayError(
         e.response?.data?.error ||
           e.response?.data?.message ||
-          "Failed to release funds. Please check your code and invoice number.",
+          t("payoutTab.errorDefault"),
       );
     } finally {
       setPayLoading(false);
@@ -82,10 +85,10 @@ export default function Dashboard() {
   };
 
   const tabs: { key: Tab; label: string }[] = [
-    { key: "invoices", label: "My Invoices" },
-    { key: "filter", label: "Search & Filter" },
-    { key: "payment", label: "Request Payout" },
-    { key: "stats", label: "Revenue & Stats" },
+    { key: "invoices", label: t("tabs.invoices") },
+    { key: "filter", label: t("tabs.filter") },
+    { key: "payment", label: t("tabs.payment") },
+    { key: "stats", label: t("tabs.stats") },
   ];
 
   return (
@@ -119,7 +122,7 @@ export default function Dashboard() {
                 margin: 0,
               }}
             >
-              Dashboard
+              {t("title")}
             </h1>
             <p
               style={{
@@ -129,7 +132,7 @@ export default function Dashboard() {
                 margin: "0.3rem 0 0",
               }}
             >
-              Manage your invoices and track your earnings
+              {t("subtitle")}
             </p>
           </div>
 
@@ -147,7 +150,7 @@ export default function Dashboard() {
               className="btn-ghost"
               style={{ fontSize: "0.8125rem", padding: "0.4rem 0.875rem" }}
             >
-              Transactions
+              {t("transactions")}
             </button>
             <button
               onClick={goToMyProfile}
@@ -160,21 +163,31 @@ export default function Dashboard() {
                 cursor: profileLoading ? "not-allowed" : "pointer",
               }}
             >
-              {profileLoading ? <InlineSpinner size="xs" /> : "My Profile"}
+              {profileLoading ? <InlineSpinner size="xs" /> : t("myProfile")}
             </button>
             <button
               onClick={() => router.push("/referral")}
               className="btn-ghost"
               style={{ fontSize: "0.8125rem", padding: "0.4rem 0.875rem" }}
             >
-              Referrals
+              {t("referrals")}
             </button>
           </div>
         </div>
 
-        {/* ── Create invoice — primary CTA ─────────────────────────────────── */}
+        {/* ── Escrow balance ───────────────────────────────────────────────── */}
         <div style={{ marginTop: "1.75rem" }}>
-          <CreateInvoice />
+          <EscrowBalance />
+        </div>
+
+        {/* ── Create invoice — primary CTA ─────────────────────────────────── */}
+        <div style={{ marginTop: "1.25rem" }}>
+          <CreateInvoice
+            onCreated={() => {
+              setActiveTab("invoices");
+              triggerRefresh?.();
+            }}
+          />
         </div>
 
         {/* ── Tab bar ──────────────────────────────────────────────────────── */}
@@ -240,7 +253,7 @@ export default function Dashboard() {
                       color: "var(--color-text-heading)",
                     }}
                   >
-                    Your Invoices
+                    {t("invoicesTab.title")}
                   </h2>
                   <p
                     style={{
@@ -249,7 +262,7 @@ export default function Dashboard() {
                       color: "var(--color-text-muted)",
                     }}
                   >
-                    All invoices you have created
+                    {t("invoicesTab.subtitle")}
                   </p>
                 </div>
                 <button
@@ -267,7 +280,7 @@ export default function Dashboard() {
                   {refreshLoading ? (
                     <InlineSpinner size="xs" />
                   ) : (
-                    "Refresh Invoices"
+                    t("invoicesTab.refresh")
                   )}
                 </button>
               </div>
@@ -295,7 +308,7 @@ export default function Dashboard() {
                     color: "var(--color-text-heading)",
                   }}
                 >
-                  Revenue &amp; Stats
+                  {t("statsTab.title")}
                 </h2>
                 <p
                   style={{
@@ -304,7 +317,7 @@ export default function Dashboard() {
                     color: "var(--color-text-muted)",
                   }}
                 >
-                  An overview of your earnings and invoice activity
+                  {t("statsTab.subtitle")}
                 </p>
               </div>
               <RevenueStats />
@@ -324,7 +337,7 @@ export default function Dashboard() {
                     color: "var(--color-text-heading)",
                   }}
                 >
-                  Already completed an invoice?
+                  {t("payoutTab.title")}
                 </h2>
                 <p
                   style={{
@@ -333,9 +346,7 @@ export default function Dashboard() {
                     color: "var(--color-text-muted)",
                   }}
                 >
-                  Once the buyer confirms delivery, they receive a unique code.
-                  Enter it below along with your invoice number to release your
-                  funds instantly.
+                  {t("payoutTab.body")}
                 </p>
               </div>
 
@@ -367,22 +378,22 @@ export default function Dashboard() {
                 }}
               >
                 <div>
-                  <label className="label">Invoice number</label>
+                  <label className="label">
+                    {t("payoutTab.invoiceNumberLabel")}
+                  </label>
                   <input
                     className="input"
-                    placeholder="e.g. INV-00001"
+                    placeholder={t("payoutTab.invoiceNumberPlaceholder")}
                     type="text"
                     value={invoiceNumber}
                     onChange={(e) => setInvoiceNumber(e.target.value)}
                   />
                 </div>
                 <div>
-                  <label className="label">
-                    Buyer&apos;s confirmation code
-                  </label>
+                  <label className="label">{t("payoutTab.codeLabel")}</label>
                   <input
                     className="input"
-                    placeholder="Enter code"
+                    placeholder={t("payoutTab.codePlaceholder")}
                     type="text"
                     value={code}
                     onChange={(e) => setCode(e.target.value)}
@@ -400,7 +411,7 @@ export default function Dashboard() {
                   padding: "0.7rem",
                 }}
               >
-                {payLoading ? "Processing…" : "Request Payment"}
+                {payLoading ? t("payoutTab.processing") : t("payoutTab.submit")}
               </button>
             </div>
           )}
