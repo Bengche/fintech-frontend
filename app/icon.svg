@@ -2,12 +2,12 @@
   <!-- Background — navy rounded square -->
   <rect width="48" height="48" rx="11" fill="#0F1F3D"/>
 
-  <!-- Amber top crossbar — signature brand element -->
-  <rect x="12.5" y="10" width="22.5" height="7.5" rx="3.75" fill="#F59E0B"/>
+  <!-- Vertical stem -->
+  <rect x="12" y="10" width="7" height="28" rx="3" fill="#F59E0B"/>
 
-  <!-- White middle crossbar -->
-  <rect x="12.5" y="21.5" width="15" height="5.5" rx="2.75" fill="#FFFFFF"/>
+  <!-- Top horizontal bar (full width) -->
+  <rect x="12" y="10" width="24" height="7.5" rx="3.75" fill="#F59E0B"/>
 
-  <!-- White vertical stroke — drawn last, covers left rounded corners of crossbars -->
-  <rect x="12.5" y="10" width="6.5" height="27.5" rx="3" fill="#FFFFFF"/>
+  <!-- Middle horizontal bar (shorter) -->
+  <rect x="12" y="21.5" width="16" height="5.5" rx="2.75" fill="#F59E0B"/>
 </svg>
