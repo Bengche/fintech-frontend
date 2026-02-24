@@ -1500,7 +1500,7 @@ export default function AdminDashboard() {
                             }}
                           >
                             {t("dashboard.usersCountLabel", {
-                              count: b.recipients_count,
+                              count: Number(b.recipients_count ?? 0),
                             })}
                           </span>
                         ) : (
