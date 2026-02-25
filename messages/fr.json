@@ -59,8 +59,8 @@
       "h1Part1": "Payez en sécurité.",
       "h1Part2": "Encaissez intégralement.",
       "description": "Fonlok conserve l'argent jusqu'à ce que l'acheteur et le vendeur soient satisfaits. Arrêtez de perdre de l'argent à cause des arnaques en ligne. Concluez chaque deal avec confiance.",
-      "ctaPrimary": "Créer un compte gratuit",
-      "ctaSecondary": "Voir comment ça marche →",
+      "ctaPrimary": "Compte gratuit",
+      "ctaSecondary": "Comment ça marche",
       "stats": {
         "free": { "value": "Gratuit", "label": "pour créer un compte" },
         "fee": { "value": "3%", "label": "frais vendeur par transaction" },

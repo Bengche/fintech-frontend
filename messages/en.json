@@ -59,8 +59,8 @@
       "h1Part1": "Pay safely.",
       "h1Part2": "Get paid fully.",
       "description": "Fonlok holds the money until both buyer and seller are satisfied. Stop losing money to online scams. Start every deal with confidence.",
-      "ctaPrimary": "Create a free account",
-      "ctaSecondary": "See how it works →",
+      "ctaPrimary": "Free account",
+      "ctaSecondary": "How it works",
       "stats": {
         "free": { "value": "Free", "label": "to create an account" },
         "fee": { "value": "3%", "label": "seller fee per transaction" },

@@ -313,6 +313,29 @@ a:hover {
   border-color: var(--color-info-border);
 }
 
+/* White-outlined ghost button — for use on dark (navy) backgrounds */
+.btn-outline-white {
+  background-color: transparent;
+  color: #ffffff;
+  font-weight: 600;
+  padding: 0.625rem 1.5rem;
+  border-radius: var(--radius-md);
+  border: 1.5px solid rgba(255, 255, 255, 0.38);
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+}
+.btn-outline-white:hover {
+  border-color: rgba(255, 255, 255, 0.85);
+  background-color: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+}
+
 /* Page wrapper — max width container */
 .page-wrapper {
   max-width: 72rem;
@@ -339,14 +362,19 @@ a:hover {
     padding: 2.75rem 1.25rem 3rem !important;
   }
 
-  /* Phone illustration hidden on mobile — saves ~380px height */
+  /* Phone illustration — shown but scaled down on mobile */
   .lp-hero-illo {
-    display: none !important;
+    flex: 0 1 100% !important;
+    justify-content: center !important;
+  }
+  .lp-hero-illo svg {
+    width: 220px !important;
+    height: auto !important;
   }
 
-  /* Reduce gap: illustration is gone so gap is just wasted space */
+  /* Gap between text and illustration */
   .lp-hero-inner {
-    gap: 1.5rem !important;
+    gap: 2rem !important;
   }
 
   /* Hero text takes full width */
@@ -355,9 +383,9 @@ a:hover {
     flex: 1 1 100% !important;
   }
 
-  /* Trust stats: tighter spacing, wrap naturally */
+  /* Trust stats: badge cards — tighter gap */
   .lp-trust-stats {
-    gap: 0.875rem 1.5rem !important;
+    gap: 0.75rem !important;
     margin-top: 1.75rem !important;
     padding-top: 1.5rem !important;
   }

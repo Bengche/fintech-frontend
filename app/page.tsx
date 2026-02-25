@@ -8,6 +8,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import SiteHeader from "./components/SiteHeader";
 import SiteFooter from "./components/SiteFooter";
+import BenefitsSlider from "./components/BenefitsSlider";
 import { getTranslations } from "next-intl/server";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -84,7 +85,10 @@ export default async function LandingPage() {
             }}
           >
             {/* Text */}
-            <div className="lp-hero-text" style={{ flex: "1 1 320px", maxWidth: "580px" }}>
+            <div
+              className="lp-hero-text"
+              style={{ flex: "1 1 320px", maxWidth: "580px" }}
+            >
               <p
                 style={{
                   display: "inline-block",
@@ -126,7 +130,7 @@ export default async function LandingPage() {
                 {t("hero.description")}
               </p>
 
-              <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap" }}>
+              <div style={{ display: "flex", gap: "0.875rem", flexWrap: "wrap" }}>
                 <Link
                   href="/register"
                   className="btn-accent"
@@ -136,67 +140,213 @@ export default async function LandingPage() {
                 </Link>
                 <Link
                   href="/how-it-works"
-                  style={{
-                    fontSize: "1rem",
-                    fontWeight: 600,
-                    color: "rgba(255,255,255,0.8)",
-                    padding: "0.75rem 0",
-                    textDecoration: "none",
-                    borderBottom: "2px solid rgba(255,255,255,0.3)",
-                  }}
+                  className="btn-outline-white"
+                  style={{ fontSize: "1rem", padding: "0.75rem 1.75rem" }}
                 >
                   {t("hero.ctaSecondary")}
                 </Link>
               </div>
 
-              {/* Trust stats */}
+              {/* ── Selling-point badges ── */}
               <div
                 className="lp-trust-stats"
                 style={{
                   display: "flex",
                   flexWrap: "wrap",
-                  gap: "2rem",
+                  gap: "0.75rem",
                   marginTop: "2.5rem",
                   paddingTop: "2rem",
                   borderTop: "1px solid rgba(255,255,255,0.1)",
                 }}
               >
-                {[
-                  {
-                    value: t("hero.stats.free.value"),
-                    label: t("hero.stats.free.label"),
-                  },
-                  {
-                    value: t("hero.stats.fee.value"),
-                    label: t("hero.stats.fee.label"),
-                  },
-                  {
-                    value: t("hero.stats.momo.value"),
-                    label: t("hero.stats.momo.label"),
-                  },
-                ].map((item) => (
-                  <div key={item.value}>
+                {/* Free badge */}
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.75rem",
+                    backgroundColor: "rgba(255,255,255,0.06)",
+                    border: "1px solid rgba(255,255,255,0.1)",
+                    borderRadius: "var(--radius-md)",
+                    padding: "0.75rem 1.125rem",
+                  }}
+                >
+                  <div
+                    style={{
+                      width: "2rem",
+                      height: "2rem",
+                      borderRadius: "50%",
+                      backgroundColor: "rgba(34,197,94,0.18)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      flexShrink: 0,
+                    }}
+                  >
+                    <svg
+                      width="13"
+                      height="13"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="#22c55e"
+                      strokeWidth="2.8"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                  </div>
+                  <div>
                     <p
                       style={{
                         fontSize: "1rem",
                         fontWeight: 800,
                         color: "#ffffff",
-                        margin: "0 0 0.125rem",
+                        margin: "0 0 0.1rem",
+                        lineHeight: 1,
                       }}
                     >
-                      {item.value}
+                      {t("hero.stats.free.value")}
                     </p>
                     <p
                       style={{
-                        fontSize: "0.8rem",
-                        color: "rgba(255,255,255,0.5)",
+                        fontSize: "0.72rem",
+                        color: "rgba(255,255,255,0.45)",
                         margin: 0,
+                        whiteSpace: "nowrap",
                       }}
                     >
-                      {item.label}
+                      {t("hero.stats.free.label")}
                     </p>
                   </div>
-                ))}
+                </div>
+
+                {/* 3% fee badge */}
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.75rem",
+                    backgroundColor: "rgba(255,255,255,0.06)",
+                    border: "1px solid rgba(255,255,255,0.1)",
+                    borderRadius: "var(--radius-md)",
+                    padding: "0.75rem 1.125rem",
+                  }}
+                >
+                  <div
+                    style={{
+                      width: "2rem",
+                      height: "2rem",
+                      borderRadius: "50%",
+                      backgroundColor: "rgba(245,158,11,0.18)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      flexShrink: 0,
+                    }}
+                  >
+                    <svg
+                      width="13"
+                      height="13"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="#F59E0B"
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <line x1="19" y1="5" x2="5" y2="19" />
+                      <circle cx="6.5" cy="6.5" r="2.5" />
+                      <circle cx="17.5" cy="17.5" r="2.5" />
+                    </svg>
+                  </div>
+                  <div>
+                    <p
+                      style={{
+                        fontSize: "1rem",
+                        fontWeight: 800,
+                        color: "#ffffff",
+                        margin: "0 0 0.1rem",
+                        lineHeight: 1,
+                      }}
+                    >
+                      {t("hero.stats.fee.value")}
+                    </p>
+                    <p
+                      style={{
+                        fontSize: "0.72rem",
+                        color: "rgba(255,255,255,0.45)",
+                        margin: 0,
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {t("hero.stats.fee.label")}
+                    </p>
+                  </div>
+                </div>
+
+                {/* MTN + Orange badge */}
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.75rem",
+                    backgroundColor: "rgba(255,255,255,0.06)",
+                    border: "1px solid rgba(255,255,255,0.1)",
+                    borderRadius: "var(--radius-md)",
+                    padding: "0.75rem 1.125rem",
+                  }}
+                >
+                  <div
+                    style={{
+                      width: "2rem",
+                      height: "2rem",
+                      borderRadius: "50%",
+                      backgroundColor: "rgba(96,165,250,0.18)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      flexShrink: 0,
+                    }}
+                  >
+                    <svg
+                      width="13"
+                      height="13"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="#60a5fa"
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <rect x="5" y="2" width="14" height="20" rx="2" ry="2" />
+                      <line x1="12" y1="18" x2="12.01" y2="18" />
+                    </svg>
+                  </div>
+                  <div>
+                    <p
+                      style={{
+                        fontSize: "1rem",
+                        fontWeight: 800,
+                        color: "#ffffff",
+                        margin: "0 0 0.1rem",
+                        lineHeight: 1,
+                      }}
+                    >
+                      {t("hero.stats.momo.value")}
+                    </p>
+                    <p
+                      style={{
+                        fontSize: "0.72rem",
+                        color: "rgba(255,255,255,0.45)",
+                        margin: 0,
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {t("hero.stats.momo.label")}
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -227,7 +377,10 @@ export default async function LandingPage() {
           }}
         >
           <div className="page-wrapper">
-            <div className="lp-section-header" style={{ textAlign: "center", marginBottom: "3rem" }}>
+            <div
+              className="lp-section-header"
+              style={{ textAlign: "center", marginBottom: "3rem" }}
+            >
               <h2
                 style={{
                   fontSize: "clamp(1.5rem, 3vw, 2rem)",
@@ -325,7 +478,10 @@ export default async function LandingPage() {
           }}
         >
           <div className="page-wrapper">
-            <div className="lp-section-header" style={{ textAlign: "center", marginBottom: "3rem" }}>
+            <div
+              className="lp-section-header"
+              style={{ textAlign: "center", marginBottom: "3rem" }}
+            >
               <h2
                 style={{
                   fontSize: "clamp(1.5rem, 3vw, 2rem)",
@@ -346,45 +502,7 @@ export default async function LandingPage() {
               </p>
             </div>
 
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
-                gap: "1.5rem",
-              }}
-            >
-              {BENEFITS(t).map((item) => (
-                <div
-                  key={item.title}
-                  style={{
-                    padding: "1.5rem",
-                    borderRadius: "var(--radius-lg)",
-                    border: "1px solid var(--color-border)",
-                    backgroundColor: "var(--color-cloud)",
-                  }}
-                >
-                  <h3
-                    style={{
-                      fontSize: "1rem",
-                      fontWeight: 700,
-                      marginBottom: "0.5rem",
-                    }}
-                  >
-                    {item.title}
-                  </h3>
-                  <p
-                    style={{
-                      margin: 0,
-                      fontSize: "0.9rem",
-                      color: "var(--color-text-muted)",
-                      lineHeight: 1.7,
-                    }}
-                  >
-                    {item.desc}
-                  </p>
-                </div>
-              ))}
-            </div>
+            <BenefitsSlider items={BENEFITS(t)} />
           </div>
         </section>
 
@@ -908,6 +1026,17 @@ function HeroIllustration() {
         <clipPath id="screenClip">
           <rect x="88" y="54" width="164" height="354" rx="6" />
         </clipPath>
+        {/* Titanium-dark metallic gradient for phone body */}
+        <linearGradient id="phoneMetal" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#2e2e46" />
+          <stop offset="40%" stopColor="#1c1c30" />
+          <stop offset="100%" stopColor="#0c0c1a" />
+        </linearGradient>
+        {/* Left-edge specular rim highlight */}
+        <linearGradient id="rimLight" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor="rgba(255,255,255,0.22)" />
+          <stop offset="100%" stopColor="rgba(255,255,255,0)" />
+        </linearGradient>
       </defs>
 
       {/* ── Ambient glow ── */}
@@ -915,8 +1044,8 @@ function HeroIllustration() {
 
       {/* ── Phone body ── */}
       <g filter="url(#phoneShadow)">
-        {/* Outer shell — titanium-dark */}
-        <rect x="82" y="24" width="176" height="422" rx="36" fill="#1a1a2e" />
+        {/* Outer shell — titanium-dark metallic */}
+        <rect x="82" y="24" width="176" height="422" rx="36" fill="url(#phoneMetal)" />
         {/* Inner bezel inset */}
         <rect x="86" y="28" width="168" height="414" rx="33" fill="#0d0d1a" />
         {/* Antenna line left */}
@@ -929,6 +1058,10 @@ function HeroIllustration() {
         <rect x="82" y="192" width="3" height="32" rx="1.5" fill="#333350" />
         {/* Power button */}
         <rect x="255" y="170" width="3" height="48" rx="1.5" fill="#333350" />
+        {/* Left-edge specular rim */}
+        <rect x="82" y="24" width="7" height="422" rx="5" fill="url(#rimLight)" />
+        {/* Right-edge subtle shadow rim */}
+        <rect x="252" y="24" width="6" height="422" rx="5" fill="rgba(0,0,0,0.25)" />
       </g>
 
       {/* ── Screen ── */}
@@ -980,10 +1113,10 @@ function HeroIllustration() {
         />
         <rect x="238" y="62" width="9" height="5" rx="0.8" fill="#22c55e" />
 
-        {/* ── Punch-hole camera ── */}
-        <circle cx="170" cy="68" r="4.5" fill="#080f1e" />
-        <circle cx="170" cy="68" r="3" fill="#0d141f" />
-        <circle cx="171.5" cy="66.5" r="0.8" fill="rgba(255,255,255,0.15)" />
+        {/* ── Dynamic Island ── */}
+        <rect x="148" y="61" width="44" height="13" rx="6.5" fill="#020810" />
+        <circle cx="184" cy="67.5" r="3" fill="#0c172a" />
+        <circle cx="185.2" cy="66.3" r="0.75" fill="rgba(255,255,255,0.18)" />
 
         {/* ── App header bar ── */}
         <rect x="88" y="76" width="164" height="38" fill="#0F1F3D" />
