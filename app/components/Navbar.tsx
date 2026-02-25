@@ -156,7 +156,7 @@ export default function Navbar() {
           </Link>
 
           {/* ── Desktop links ──────────────────────────────── */}
-          <div style={{ display: "flex", alignItems: "center", gap: "0.25rem" }} className="hidden md:flex">
+          <div style={{ alignItems: "center", gap: "0.25rem" }} className="hidden md:flex">
             {user_id ? (
               <>
                 <NavLink href="/dashboard">{t("dashboard")}</NavLink>
@@ -206,7 +206,7 @@ export default function Navbar() {
           </div>
 
           {/* ── Mobile right controls ──────────────────────── */}
-          <div className="md:hidden" style={{ display:"flex",alignItems:"center",gap:"0.25rem" }}>
+          <div className="flex md:hidden" style={{ alignItems:"center",gap:"0.25rem" }}>
             {user_id && (
               <NotificationBell notifications={notifData.notifications} unreadCount={notifData.unreadCount}
                 markRead={notifData.markRead} markAllRead={notifData.markAllRead} />
