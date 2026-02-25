@@ -67,6 +67,10 @@ const STYLES = `
       height: 100dvh !important;
       border-radius: 0 !important;
     }
+    /* Hide FAB when chat is open — header already has a close button */
+    .kila-fab--open {
+      display: none !important;
+    }
   }
 
   .kila-msg-text a { color: #F59E0B; text-decoration: underline; }
@@ -648,7 +652,7 @@ export default function AiChatWidget() {
 
       {/* ── Floating action button ─────────────────────────────────────────── */}
       <button
-        className="kila-fab"
+        className={`kila-fab${open ? " kila-fab--open" : ""}`}
         onClick={open ? closeChat : openChat}
         style={{
           position: "fixed",
