@@ -87,8 +87,8 @@ export default function NotificationBell({
     <>
       <style>{`
         @keyframes notif-in {
-          from { opacity: 0; transform: translateY(-10px) scale(0.97); }
-          to   { opacity: 1; transform: translateY(0) scale(1); }
+          from { opacity: 0; transform: translateY(-8px); }
+          to   { opacity: 1; transform: translateY(0); }
         }
         @keyframes notif-bg-in {
           from { opacity: 0; }
@@ -181,7 +181,7 @@ export default function NotificationBell({
             onClick={closePanel}
             style={{
               position: "absolute",
-              inset: 0,
+              top: 0, left: 0, right: 0, bottom: 0,
               background: "rgba(4,10,25,0.6)",
             } as React.CSSProperties}
           />
@@ -191,7 +191,7 @@ export default function NotificationBell({
             className="notif-panel-anim"
             style={{
               position: "relative",
-              width: "100%",
+              width: "calc(100vw - 24px)",
               maxWidth: "480px",
               height: "auto",
               maxHeight: "calc(100vh - 96px)",
