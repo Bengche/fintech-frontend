@@ -54,6 +54,21 @@ const STYLES = `
     to   { opacity: 1; transform: translateY(0); }
   }
 
+  /* Mobile: full-screen chat panel */
+  @media (max-width: 640px) {
+    .kila-panel {
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      bottom: 0 !important;
+      width: 100vw !important;
+      max-height: 100dvh !important;
+      height: 100dvh !important;
+      border-radius: 0 !important;
+    }
+  }
+
   .kila-msg-text a { color: #F59E0B; text-decoration: underline; }
   .kila-msg-text strong { font-weight: 700; }
   .kila-msg-text p { margin: 0 0 6px; }
@@ -222,6 +237,7 @@ export default function AiChatWidget() {
       {/* ── Chat panel ─────────────────────────────────────────────────────── */}
       {(open || closing) && (
         <div
+          className="kila-panel"
           style={{
             position: "fixed",
             bottom: 100,

@@ -415,6 +415,15 @@ a:hover {
   }
 
   /* ── Referral section ───────────────────────────────────── */
+  /* Teaser block: left-align on mobile */
+  .lp-referral-teaser {
+    text-align: left !important;
+  }
+  .lp-referral-teaser p {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
   /* Feature cards: single column on mobile */
   .lp-referral-cards {
     grid-template-columns: 1fr !important;

@@ -117,11 +117,45 @@ export default function CookieConsent() {
         }
         .fonlok-cc-link:hover { color: var(--color-accent) !important; }
 
-        /* Mobile: stack buttons vertically */
-        @media (max-width: 540px) {
-          .fonlok-cc-actions { flex-direction: column !important; }
-          .fonlok-cc-actions button { width: 100% !important; }
-          .fonlok-cc-link { margin-right: 0 !important; margin-bottom: 0.25rem; }
+        /* Mobile: full-width bottom sheet */
+        @media (max-width: 600px) {
+          .fonlok-cc-banner {
+            bottom: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            transform: none !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            border-bottom-left-radius: 0 !important;
+            border-bottom-right-radius: 0 !important;
+            border-top-left-radius: 16px !important;
+            border-top-right-radius: 16px !important;
+            padding: 1.25rem 1.125rem 1.75rem !important;
+            max-height: 88dvh;
+            overflow-y: auto;
+          }
+          .fonlok-cc-actions {
+            flex-direction: column !important;
+            gap: 0.5rem !important;
+          }
+          .fonlok-cc-actions button {
+            width: 100% !important;
+            justify-content: center !important;
+          }
+          .fonlok-cc-link {
+            margin-right: auto !important;
+            margin-bottom: 0.25rem !important;
+            order: -1;
+          }
+          .fonlok-cc-actions .fonlok-cc-accept {
+            order: 1;
+          }
+          .fonlok-cc-actions .fonlok-cc-decline {
+            order: 2;
+          }
+          .fonlok-cc-actions .fonlok-cc-reject {
+            order: 3;
+          }
         }
       `}</style>
 
@@ -151,6 +185,7 @@ export default function CookieConsent() {
         role="dialog"
         aria-modal="true"
         aria-label="Cookie preferences"
+        className="fonlok-cc-banner"
         style={{
           position: "fixed",
           bottom: "1.25rem",

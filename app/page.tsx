@@ -456,7 +456,7 @@ export default async function LandingPage() {
         {/* ── REFERRAL PROGRAM ─────────────────────────────────────── */}
         <section
           aria-label="Referral program"
-          className="lp-section"
+          className="lp-section lp-referral-teaser"
           style={{
             background:
               "linear-gradient(135deg, #0F1F3D 0%, #1a2f4a 60%, #0F1F3D 100%)",
