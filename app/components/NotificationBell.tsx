@@ -184,16 +184,17 @@ export default function NotificationBell({
               const rect = el.getBoundingClientRect();
               return `${rect.bottom + 10}px`;
             })(),
-            right: (() => {
-              if (typeof window === "undefined") return "8px";
-              if (window.innerWidth <= 640) return "8px";
-              const el = containerRef.current;
-              if (!el) return "12px";
-              const rect = el.getBoundingClientRect();
-              const rightEdge = window.innerWidth - rect.right;
-              return `${Math.max(rightEdge, 12)}px`;
-            })(),
-            width: "min(360px, calc(100vw - 24px))",
+            ...(typeof window !== "undefined" && window.innerWidth <= 640
+              ? { left: "8px", right: "8px", width: "auto" }
+              : {
+                  right: (() => {
+                    const el = containerRef.current;
+                    if (!el) return "12px";
+                    const rect = el.getBoundingClientRect();
+                    return `${Math.max(window.innerWidth - rect.right, 12)}px`;
+                  })(),
+                  width: "min(360px, calc(100vw - 24px))",
+                }),
             background: "#ffffff",
             borderRadius: "14px",
             boxShadow:
