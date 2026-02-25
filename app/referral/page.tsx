@@ -85,6 +85,12 @@ export default function ReferralPage() {
   // Copy-to-clipboard state
   const [copied, setCopied] = useState(false);
 
+  // Show more / show less state for the three list sections
+  const SHOW_LIMIT = 3;
+  const [showAllEarnings, setShowAllEarnings] = useState(false);
+  const [showAllReferrals, setShowAllReferrals] = useState(false);
+  const [showAllWithdrawals, setShowAllWithdrawals] = useState(false);
+
   // ── Redirect if not logged in ──────────────────────────────────────────────
   useEffect(() => {
     if (!authLoading && user_id === null) {
@@ -255,6 +261,16 @@ export default function ReferralPage() {
   const hasReferrals = data.referred_users.length > 0;
   const hasWithdrawals = data.withdrawals.length > 0;
 
+  const visibleEarnings = showAllEarnings
+    ? data.earnings
+    : data.earnings.slice(0, SHOW_LIMIT);
+  const visibleReferrals = showAllReferrals
+    ? data.referred_users
+    : data.referred_users.slice(0, SHOW_LIMIT);
+  const visibleWithdrawals = showAllWithdrawals
+    ? data.withdrawals
+    : data.withdrawals.slice(0, SHOW_LIMIT);
+
   return (
     <div style={{ minHeight: "100vh", backgroundColor: "var(--color-cloud)" }}>
       <Navbar />
@@ -288,85 +304,54 @@ export default function ReferralPage() {
           </p>
         </div>
 
-        {/* ── How It Works ────────────────────────────────────────────────── */}
-        <div className="card" style={{ marginBottom: "1.5rem" }}>
-          <h2
+        {/* ── 1. Balance ──────────────────────────────────────────────────── */}
+        <div
+          className="card"
+          style={{
+            marginBottom: "1.5rem",
+            background: data.balance > 0
+              ? "linear-gradient(135deg, #0f1f3d 0%, #1e3a5f 100%)"
+              : undefined,
+            border: data.balance > 0 ? "none" : undefined,
+            boxShadow: data.balance > 0 ? "0 4px 24px rgba(15,31,61,0.18)" : undefined,
+          }}
+        >
+          <p
             style={{
-              fontSize: "1.0625rem",
-              fontWeight: 700,
-              color: "var(--color-text-heading)",
-              margin: "0 0 1.25rem",
+              fontSize: "0.75rem",
+              fontWeight: 600,
+              textTransform: "uppercase",
+              letterSpacing: "0.05em",
+              color: data.balance > 0 ? "rgba(255,255,255,0.55)" : "var(--color-text-muted)",
+              margin: "0 0 0.5rem",
             }}
           >
-            {t("howItWorksTitle")}
-          </h2>
-          <div
+            {t("currentBalance")}
+          </p>
+          <p
             style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
-              gap: "1rem",
+              fontSize: "2.5rem",
+              fontWeight: 800,
+              color: data.balance > 0 ? "#ffffff" : "var(--color-primary)",
+              margin: "0 0 0.25rem",
+              lineHeight: 1.1,
+              letterSpacing: "-0.01em",
             }}
           >
-            <HowItWorksStep
-              number="1"
-              title={t("step1Title")}
-              body={t("step1Body")}
-            />
-            <HowItWorksStep
-              number="2"
-              title={t("step2Title")}
-              body={t("step2Body")}
-            />
-            <HowItWorksStep
-              number="3"
-              title={t("step3Title")}
-              body={t("step3Body")}
-            />
-          </div>
-          <div
+            {fmt(data.balance)}
+          </p>
+          <p
             style={{
-              marginTop: "1.25rem",
-              padding: "1rem",
-              backgroundColor: "var(--color-mist)",
-              borderRadius: "var(--radius-sm)",
-              border: "1px solid var(--color-border)",
-              fontSize: "0.875rem",
-              color: "var(--color-text-body)",
+              fontSize: "0.8rem",
+              color: data.balance > 0 ? "rgba(255,255,255,0.45)" : "var(--color-text-muted)",
+              margin: 0,
             }}
           >
-            <p
-              style={{
-                fontWeight: 700,
-                color: "var(--color-text-heading)",
-                marginBottom: "0.5rem",
-                margin: "0 0 0.5rem",
-              }}
-            >
-              {t("importantTitle")}
-            </p>
-            <ul
-              style={{
-                margin: 0,
-                paddingLeft: "1.2rem",
-                display: "flex",
-                flexDirection: "column",
-                gap: "0.25rem",
-                color: "var(--color-text-muted)",
-              }}
-            >
-              <li>{t("bullet1")}</li>
-              <li>{t("bullet2")}</li>
-              <li>
-                {t("minWithdrawal")} <strong>{fmt(data.min_withdrawal)}</strong>
-                .
-              </li>
-              <li>{t("bullet4")}</li>
-              <li>{t("bullet5")}</li>
-            </ul>
-          </div>
+            {t("minToWithdraw", { min: fmt(data.min_withdrawal) })}
+          </p>
         </div>
 
-        {/* -- Referral Code & Link ------------------------------------------- */}
+        {/* ── 2. Referral Code & Link ─────────────────────────────────────── */}
         <div className="card" style={{ marginBottom: "1.5rem" }}>
           <h2
             style={{
@@ -434,6 +419,7 @@ export default function ReferralPage() {
                 <div
                   style={{
                     flex: 1,
+                    minWidth: 0,
                     backgroundColor: "var(--color-mist)",
                     borderRadius: "var(--radius-sm)",
                     padding: "0.625rem 0.875rem",
@@ -463,164 +449,122 @@ export default function ReferralPage() {
           </div>
         </div>
 
-        {/* -- Balance & Withdraw --------------------------------------------- */}
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
-            gap: "1.25rem",
-            marginBottom: "1.5rem",
-          }}
-        >
-          {/* Balance card */}
-          <div className="card">
-            <p
-              style={{
-                fontSize: "0.75rem",
-                fontWeight: 600,
-                textTransform: "uppercase",
-                letterSpacing: "0.05em",
-                color: "var(--color-text-muted)",
-                margin: "0 0 0.5rem",
-              }}
-            >
-              {t("currentBalance")}
-            </p>
-            <p
-              style={{
-                fontSize: "2.25rem",
-                fontWeight: 800,
-                color: "var(--color-primary)",
-                margin: "0 0 0.25rem",
-              }}
-            >
-              {fmt(data.balance)}
-            </p>
-            <p
-              style={{
-                fontSize: "0.8rem",
-                color: "var(--color-text-muted)",
-                margin: 0,
-              }}
-            >
-              {t("minToWithdraw", { min: fmt(data.min_withdrawal) })}
-            </p>
-          </div>
-
-          {/* Withdraw form */}
-          <div className="card">
-            <h3
-              style={{
-                margin: "0 0 1rem",
-                fontSize: "1rem",
-                fontWeight: 700,
-                color: "var(--color-text-heading)",
-              }}
-            >
-              {t("withdrawTitle")}
-            </h3>
-            <form
-              onSubmit={handleWithdraw}
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: "0.875rem",
-              }}
-            >
-              <div>
-                <label className="label">{t("withdrawAmountLabel")}</label>
+        {/* ── 3. Withdraw Earnings ────────────────────────────────────────── */}
+        <div className="card" style={{ marginBottom: "1.5rem" }}>
+          <h2
+            style={{
+              margin: "0 0 1rem",
+              fontSize: "1.0625rem",
+              fontWeight: 700,
+              color: "var(--color-text-heading)",
+            }}
+          >
+            {t("withdrawTitle")}
+          </h2>
+          <form
+            onSubmit={handleWithdraw}
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))",
+              gap: "0.875rem",
+            }}
+          >
+            <div>
+              <label className="label">{t("withdrawAmountLabel")}</label>
+              <input
+                type="number"
+                min={data.min_withdrawal}
+                max={data.balance}
+                value={withdrawAmount}
+                onChange={(e) => setWithdrawAmount(e.target.value)}
+                placeholder={`Min. ${data.min_withdrawal.toLocaleString()}`}
+                className="input"
+                required
+              />
+            </div>
+            <div>
+              <label className="label">{t("momoLabel")}</label>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  border: "1px solid var(--color-border)",
+                  borderRadius: "var(--radius-sm)",
+                  overflow: "hidden",
+                  background: "var(--color-white)",
+                }}
+              >
+                <span
+                  style={{
+                    padding: "0.625rem 0.75rem",
+                    background: "var(--color-cloud)",
+                    color: "var(--color-text-muted)",
+                    fontSize: "0.9rem",
+                    borderRight: "1px solid var(--color-border)",
+                    whiteSpace: "nowrap",
+                    fontWeight: 600,
+                  }}
+                >
+                  +237
+                </span>
                 <input
-                  type="number"
-                  min={data.min_withdrawal}
-                  max={data.balance}
-                  value={withdrawAmount}
-                  onChange={(e) => setWithdrawAmount(e.target.value)}
-                  placeholder={`Min. ${data.min_withdrawal.toLocaleString()}`}
-                  className="input"
+                  type="tel"
+                  inputMode="numeric"
+                  maxLength={9}
+                  value={momoNumber}
+                  onChange={(e) =>
+                    setMomoNumber(
+                      e.target.value.replace(/\D/g, "").slice(0, 9),
+                    )
+                  }
+                  placeholder="6XXXXXXXX"
+                  style={{
+                    border: "none",
+                    outline: "none",
+                    padding: "0.625rem 0.75rem",
+                    fontSize: "0.9375rem",
+                    flex: 1,
+                    width: 0,
+                    background: "transparent",
+                  }}
                   required
                 />
               </div>
-              <div>
-                <label className="label">{t("momoLabel")}</label>
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    border: "1px solid var(--color-border)",
-                    borderRadius: "var(--radius-sm)",
-                    overflow: "hidden",
-                    background: "var(--color-white)",
-                  }}
-                >
-                  <span
-                    style={{
-                      padding: "0.625rem 0.75rem",
-                      background: "var(--color-cloud)",
-                      color: "var(--color-text-muted)",
-                      fontSize: "0.9rem",
-                      borderRight: "1px solid var(--color-border)",
-                      whiteSpace: "nowrap",
-                      fontWeight: 600,
-                    }}
-                  >
-                    +237
-                  </span>
-                  <input
-                    type="tel"
-                    inputMode="numeric"
-                    maxLength={9}
-                    value={momoNumber}
-                    onChange={(e) =>
-                      setMomoNumber(
-                        e.target.value.replace(/\D/g, "").slice(0, 9),
-                      )
-                    }
-                    placeholder="6XXXXXXXX"
-                    style={{
-                      border: "none",
-                      outline: "none",
-                      padding: "0.625rem 0.75rem",
-                      fontSize: "0.9375rem",
-                      flex: 1,
-                      width: 0,
-                      background: "transparent",
-                    }}
-                    required
-                  />
-                </div>
+            </div>
+            {/* Feedback + submit span full width */}
+            {withdrawMsg && (
+              <div
+                className={`alert ${withdrawMsg.type === "success" ? "alert-success" : "alert-danger"}`}
+                style={{ gridColumn: "1 / -1" }}
+              >
+                {withdrawMsg.text}
               </div>
-              {withdrawMsg && (
-                <div
-                  className={`alert ${withdrawMsg.type === "success" ? "alert-success" : "alert-danger"}`}
-                >
-                  {withdrawMsg.text}
-                </div>
-              )}
+            )}
+            <div style={{ gridColumn: "1 / -1" }}>
               <button
                 type="submit"
                 className="btn-primary"
                 disabled={withdrawing || data.balance < data.min_withdrawal}
-                style={{ width: "100%", justifyContent: "center" }}
+                style={{ justifyContent: "center" }}
               >
                 {withdrawing ? t("withdrawing") : t("withdrawBtn")}
               </button>
               {data.balance < data.min_withdrawal && (
                 <p
                   style={{
-                    textAlign: "center",
                     fontSize: "0.8rem",
                     color: "var(--color-text-muted)",
-                    margin: 0,
+                    margin: "0.5rem 0 0",
                   }}
                 >
                   {t("needAtLeast", { min: fmt(data.min_withdrawal) })}
                 </p>
               )}
-            </form>
-          </div>
+            </div>
+          </form>
         </div>
 
-        {/* -- Earnings History ----------------------------------------------- */}
+        {/* ── 4. Earnings History ─────────────────────────────────────────── */}
         <div className="card" style={{ marginBottom: "1.5rem" }}>
           <h2
             style={{
@@ -656,141 +600,158 @@ export default function ReferralPage() {
               {t("noEarnings")}
             </p>
           ) : (
-            <div style={{ overflowX: "auto" }}>
-              <table
-                style={{
-                  width: "100%",
-                  fontSize: "0.875rem",
-                  borderCollapse: "collapse",
-                }}
-              >
-                <thead>
-                  <tr style={{ borderBottom: "2px solid var(--color-border)" }}>
-                    {[
-                      { label: t("colInvoice"), right: false },
-                      { label: t("colSeller"), right: false },
-                      { label: t("colInvoiceAmount"), right: true },
-                      { label: t("colEarned"), right: true },
-                      { label: t("colDate"), right: false },
-                    ].map((h) => (
-                      <th
-                        key={h.label}
+            <>
+              <div style={{ overflowX: "auto" }}>
+                <table
+                  style={{
+                    width: "100%",
+                    fontSize: "0.875rem",
+                    borderCollapse: "collapse",
+                  }}
+                >
+                  <thead>
+                    <tr style={{ borderBottom: "2px solid var(--color-border)" }}>
+                      {[
+                        { label: t("colInvoice"), right: false },
+                        { label: t("colSeller"), right: false },
+                        { label: t("colInvoiceAmount"), right: true },
+                        { label: t("colEarned"), right: true },
+                        { label: t("colDate"), right: false },
+                      ].map((h) => (
+                        <th
+                          key={h.label}
+                          style={{
+                            paddingBottom: "0.75rem",
+                            paddingRight: "1rem",
+                            textAlign: h.right ? "right" : "left",
+                            fontSize: "0.75rem",
+                            fontWeight: 700,
+                            color: "var(--color-text-muted)",
+                            textTransform: "uppercase",
+                            letterSpacing: "0.05em",
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          {h.label}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {visibleEarnings.map((e) => (
+                      <tr
+                        key={e.id}
+                        style={{ borderBottom: "1px solid var(--color-border)" }}
+                      >
+                        <td
+                          style={{
+                            padding: "0.75rem 1rem 0.75rem 0",
+                            fontFamily: "monospace",
+                            fontSize: "0.8125rem",
+                            color: "var(--color-text-muted)",
+                          }}
+                        >
+                          {e.invoice_number}
+                        </td>
+                        <td
+                          style={{
+                            padding: "0.75rem 1rem 0.75rem 0",
+                            color: "var(--color-text-body)",
+                          }}
+                        >
+                          {e.referred_user_name}{" "}
+                          <span
+                            style={{
+                              color: "var(--color-text-muted)",
+                              fontSize: "0.8rem",
+                            }}
+                          >
+                            @{e.referred_user_username}
+                          </span>
+                        </td>
+                        <td
+                          style={{
+                            padding: "0.75rem 1rem 0.75rem 0",
+                            textAlign: "right",
+                          }}
+                        >
+                          {fmt(e.invoice_amount)}
+                        </td>
+                        <td
+                          style={{
+                            padding: "0.75rem 1rem 0.75rem 0",
+                            textAlign: "right",
+                            fontWeight: 700,
+                            color: "var(--color-success)",
+                          }}
+                        >
+                          +{fmt(e.earned_amount)}
+                        </td>
+                        <td
+                          style={{
+                            padding: "0.75rem 0 0.75rem 0",
+                            color: "var(--color-text-muted)",
+                            fontSize: "0.8rem",
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          {fmtDate(e.created_at)}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                  <tfoot>
+                    <tr style={{ borderTop: "2px solid var(--color-border)" }}>
+                      <td
+                        colSpan={3}
                         style={{
-                          paddingBottom: "0.75rem",
-                          paddingRight: "1rem",
-                          textAlign: h.right ? "right" : "left",
-                          fontSize: "0.75rem",
+                          paddingTop: "0.75rem",
+                          fontSize: "0.8125rem",
                           fontWeight: 700,
                           color: "var(--color-text-muted)",
                           textTransform: "uppercase",
-                          letterSpacing: "0.05em",
-                          whiteSpace: "nowrap",
                         }}
                       >
-                        {h.label}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {data.earnings.map((e) => (
-                    <tr
-                      key={e.id}
-                      style={{ borderBottom: "1px solid var(--color-border)" }}
-                    >
-                      <td
-                        style={{
-                          padding: "0.75rem 1rem 0.75rem 0",
-                          fontFamily: "monospace",
-                          fontSize: "0.8125rem",
-                          color: "var(--color-text-muted)",
-                        }}
-                      >
-                        {e.invoice_number}
+                        {t("totalEarned")}
                       </td>
                       <td
                         style={{
-                          padding: "0.75rem 1rem 0.75rem 0",
-                          color: "var(--color-text-body)",
-                        }}
-                      >
-                        {e.referred_user_name}{" "}
-                        <span
-                          style={{
-                            color: "var(--color-text-muted)",
-                            fontSize: "0.8rem",
-                          }}
-                        >
-                          @{e.referred_user_username}
-                        </span>
-                      </td>
-                      <td
-                        style={{
-                          padding: "0.75rem 1rem 0.75rem 0",
+                          paddingTop: "0.75rem",
                           textAlign: "right",
-                        }}
-                      >
-                        {fmt(e.invoice_amount)}
-                      </td>
-                      <td
-                        style={{
-                          padding: "0.75rem 1rem 0.75rem 0",
-                          textAlign: "right",
-                          fontWeight: 700,
+                          fontWeight: 800,
                           color: "var(--color-success)",
+                          fontSize: "1rem",
                         }}
                       >
-                        +{fmt(e.earned_amount)}
+                        {fmt(
+                          data.earnings.reduce((s, e) => s + e.earned_amount, 0),
+                        )}
                       </td>
-                      <td
-                        style={{
-                          padding: "0.75rem 0 0.75rem 0",
-                          color: "var(--color-text-muted)",
-                          fontSize: "0.8rem",
-                          whiteSpace: "nowrap",
-                        }}
-                      >
-                        {fmtDate(e.created_at)}
-                      </td>
+                      <td />
                     </tr>
-                  ))}
-                </tbody>
-                <tfoot>
-                  <tr style={{ borderTop: "2px solid var(--color-border)" }}>
-                    <td
-                      colSpan={3}
-                      style={{
-                        paddingTop: "0.75rem",
-                        fontSize: "0.8125rem",
-                        fontWeight: 700,
-                        color: "var(--color-text-muted)",
-                        textTransform: "uppercase",
-                      }}
-                    >
-                      {t("totalEarned")}
-                    </td>
-                    <td
-                      style={{
-                        paddingTop: "0.75rem",
-                        textAlign: "right",
-                        fontWeight: 800,
-                        color: "var(--color-success)",
-                        fontSize: "1rem",
-                      }}
-                    >
-                      {fmt(
-                        data.earnings.reduce((s, e) => s + e.earned_amount, 0),
-                      )}
-                    </td>
-                    <td />
-                  </tr>
-                </tfoot>
-              </table>
-            </div>
+                  </tfoot>
+                </table>
+              </div>
+              {data.earnings.length > SHOW_LIMIT && (
+                <button
+                  className="btn-ghost"
+                  onClick={() => setShowAllEarnings((v) => !v)}
+                  style={{
+                    marginTop: "0.875rem",
+                    fontSize: "0.875rem",
+                    width: "100%",
+                  }}
+                >
+                  {showAllEarnings
+                    ? "Show less"
+                    : `Show ${data.earnings.length - SHOW_LIMIT} more`}
+                </button>
+              )}
+            </>
           )}
         </div>
 
-        {/* -- Referred Users ------------------------------------------------- */}
+        {/* ── 5. People You've Referred ───────────────────────────────────── */}
         <div className="card" style={{ marginBottom: "1.5rem" }}>
           <h2
             style={{
@@ -826,73 +787,90 @@ export default function ReferralPage() {
               {t("noReferred")}
             </p>
           ) : (
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))",
-                gap: "0.75rem",
-              }}
-            >
-              {data.referred_users.map((u) => (
-                <div
-                  key={u.id}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "0.75rem",
-                    padding: "0.875rem",
-                    border: "1px solid var(--color-border)",
-                    borderRadius: "var(--radius-sm)",
-                    backgroundColor: "var(--color-mist)",
-                  }}
-                >
+            <>
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))",
+                  gap: "0.75rem",
+                }}
+              >
+                {visibleReferrals.map((u) => (
                   <div
+                    key={u.id}
                     style={{
-                      width: "2.25rem",
-                      height: "2.25rem",
-                      borderRadius: "9999px",
-                      backgroundColor: "var(--color-primary-light)",
-                      color: "var(--color-primary)",
                       display: "flex",
                       alignItems: "center",
-                      justifyContent: "center",
-                      fontWeight: 700,
-                      fontSize: "0.9375rem",
-                      flexShrink: 0,
+                      gap: "0.75rem",
+                      padding: "0.875rem",
+                      border: "1px solid var(--color-border)",
+                      borderRadius: "var(--radius-sm)",
+                      backgroundColor: "var(--color-mist)",
                     }}
                   >
-                    {u.name.charAt(0).toUpperCase()}
-                  </div>
-                  <div>
-                    <p
+                    <div
                       style={{
-                        margin: 0,
-                        fontWeight: 600,
-                        fontSize: "0.9rem",
-                        color: "var(--color-text-heading)",
+                        width: "2.25rem",
+                        height: "2.25rem",
+                        borderRadius: "9999px",
+                        backgroundColor: "var(--color-primary-light)",
+                        color: "var(--color-primary)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontWeight: 700,
+                        fontSize: "0.9375rem",
+                        flexShrink: 0,
                       }}
                     >
-                      {u.name}
-                    </p>
-                    <p
-                      style={{
-                        margin: 0,
-                        fontSize: "0.8rem",
-                        color: "var(--color-text-muted)",
-                      }}
-                    >
-                      @{u.username}
-                      {u.created_at ? ` · ${fmtDate(u.created_at)}` : ""}
-                    </p>
+                      {u.name.charAt(0).toUpperCase()}
+                    </div>
+                    <div>
+                      <p
+                        style={{
+                          margin: 0,
+                          fontWeight: 600,
+                          fontSize: "0.9rem",
+                          color: "var(--color-text-heading)",
+                        }}
+                      >
+                        {u.name}
+                      </p>
+                      <p
+                        style={{
+                          margin: 0,
+                          fontSize: "0.8rem",
+                          color: "var(--color-text-muted)",
+                        }}
+                      >
+                        @{u.username}
+                        {u.created_at ? ` · ${fmtDate(u.created_at)}` : ""}
+                      </p>
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+              {data.referred_users.length > SHOW_LIMIT && (
+                <button
+                  className="btn-ghost"
+                  onClick={() => setShowAllReferrals((v) => !v)}
+                  style={{
+                    marginTop: "0.875rem",
+                    fontSize: "0.875rem",
+                    width: "100%",
+                  }}
+                >
+                  {showAllReferrals
+                    ? "Show less"
+                    : `Show ${data.referred_users.length - SHOW_LIMIT} more`}
+                </button>
+              )}
+            </>
           )}
         </div>
 
-        {/* -- Withdrawal History --------------------------------------------- */}
-        <div className="card">
+        {/* ── 6. Withdrawal History ───────────────────────────────────────── */}
+        <div className="card" style={{ marginBottom: "1.5rem" }}>
           <h2
             style={{
               fontSize: "1.0625rem",
@@ -927,87 +905,181 @@ export default function ReferralPage() {
               {t("noWithdrawals")}
             </p>
           ) : (
-            <div style={{ overflowX: "auto" }}>
-              <table
-                style={{
-                  width: "100%",
-                  fontSize: "0.875rem",
-                  borderCollapse: "collapse",
-                }}
-              >
-                <thead>
-                  <tr style={{ borderBottom: "2px solid var(--color-border)" }}>
-                    {[
-                      t("withdrawColAmount"),
-                      t("withdrawColMomo"),
-                      t("withdrawColStatus"),
-                      t("colDate"),
-                    ].map((h) => (
-                      <th
-                        key={h}
-                        style={{
-                          paddingBottom: "0.75rem",
-                          paddingRight: "1rem",
-                          textAlign: "left",
-                          fontSize: "0.75rem",
-                          fontWeight: 700,
-                          color: "var(--color-text-muted)",
-                          textTransform: "uppercase",
-                          letterSpacing: "0.05em",
-                        }}
-                      >
-                        {h}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {data.withdrawals.map((w) => (
-                    <tr
-                      key={w.id}
-                      style={{ borderBottom: "1px solid var(--color-border)" }}
-                    >
-                      <td
-                        style={{
-                          padding: "0.75rem 1rem 0.75rem 0",
-                          fontWeight: 700,
-                          color: "var(--color-text-heading)",
-                        }}
-                      >
-                        {fmt(w.amount)}
-                      </td>
-                      <td
-                        style={{
-                          padding: "0.75rem 1rem 0.75rem 0",
-                          fontFamily: "monospace",
-                          fontSize: "0.8125rem",
-                          color: "var(--color-text-muted)",
-                        }}
-                      >
-                        {w.momo_number}
-                      </td>
-                      <td style={{ padding: "0.75rem 1rem 0.75rem 0" }}>
-                        <span
-                          className={`badge ${w.status === "paid" ? "badge-success" : w.status === "pending" ? "badge-warning" : "badge-danger"}`}
+            <>
+              <div style={{ overflowX: "auto" }}>
+                <table
+                  style={{
+                    width: "100%",
+                    fontSize: "0.875rem",
+                    borderCollapse: "collapse",
+                  }}
+                >
+                  <thead>
+                    <tr style={{ borderBottom: "2px solid var(--color-border)" }}>
+                      {[
+                        t("withdrawColAmount"),
+                        t("withdrawColMomo"),
+                        t("withdrawColStatus"),
+                        t("colDate"),
+                      ].map((h) => (
+                        <th
+                          key={h}
+                          style={{
+                            paddingBottom: "0.75rem",
+                            paddingRight: "1rem",
+                            textAlign: "left",
+                            fontSize: "0.75rem",
+                            fontWeight: 700,
+                            color: "var(--color-text-muted)",
+                            textTransform: "uppercase",
+                            letterSpacing: "0.05em",
+                          }}
                         >
-                          {w.status}
-                        </span>
-                      </td>
-                      <td
-                        style={{
-                          padding: "0.75rem 0 0.75rem 0",
-                          color: "var(--color-text-muted)",
-                          fontSize: "0.8rem",
-                        }}
-                      >
-                        {fmtDate(w.created_at)}
-                      </td>
+                          {h}
+                        </th>
+                      ))}
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody>
+                    {visibleWithdrawals.map((w) => (
+                      <tr
+                        key={w.id}
+                        style={{ borderBottom: "1px solid var(--color-border)" }}
+                      >
+                        <td
+                          style={{
+                            padding: "0.75rem 1rem 0.75rem 0",
+                            fontWeight: 700,
+                            color: "var(--color-text-heading)",
+                          }}
+                        >
+                          {fmt(w.amount)}
+                        </td>
+                        <td
+                          style={{
+                            padding: "0.75rem 1rem 0.75rem 0",
+                            fontFamily: "monospace",
+                            fontSize: "0.8125rem",
+                            color: "var(--color-text-muted)",
+                          }}
+                        >
+                          {w.momo_number}
+                        </td>
+                        <td style={{ padding: "0.75rem 1rem 0.75rem 0" }}>
+                          <span
+                            className={`badge ${w.status === "paid" ? "badge-success" : w.status === "pending" ? "badge-warning" : "badge-danger"}`}
+                          >
+                            {w.status}
+                          </span>
+                        </td>
+                        <td
+                          style={{
+                            padding: "0.75rem 0 0.75rem 0",
+                            color: "var(--color-text-muted)",
+                            fontSize: "0.8rem",
+                          }}
+                        >
+                          {fmtDate(w.created_at)}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              {data.withdrawals.length > SHOW_LIMIT && (
+                <button
+                  className="btn-ghost"
+                  onClick={() => setShowAllWithdrawals((v) => !v)}
+                  style={{
+                    marginTop: "0.875rem",
+                    fontSize: "0.875rem",
+                    width: "100%",
+                  }}
+                >
+                  {showAllWithdrawals
+                    ? "Show less"
+                    : `Show ${data.withdrawals.length - SHOW_LIMIT} more`}
+                </button>
+              )}
+            </>
           )}
+        </div>
+
+        {/* ── 7. How It Works ─────────────────────────────────────────────── */}
+        <div className="card">
+          <h2
+            style={{
+              fontSize: "1.0625rem",
+              fontWeight: 700,
+              color: "var(--color-text-heading)",
+              margin: "0 0 1.25rem",
+            }}
+          >
+            {t("howItWorksTitle")}
+          </h2>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
+              gap: "1rem",
+            }}
+          >
+            <HowItWorksStep
+              number="1"
+              title={t("step1Title")}
+              body={t("step1Body")}
+            />
+            <HowItWorksStep
+              number="2"
+              title={t("step2Title")}
+              body={t("step2Body")}
+            />
+            <HowItWorksStep
+              number="3"
+              title={t("step3Title")}
+              body={t("step3Body")}
+            />
+          </div>
+          <div
+            style={{
+              marginTop: "1.25rem",
+              padding: "1rem",
+              backgroundColor: "var(--color-mist)",
+              borderRadius: "var(--radius-sm)",
+              border: "1px solid var(--color-border)",
+              fontSize: "0.875rem",
+              color: "var(--color-text-body)",
+            }}
+          >
+            <p
+              style={{
+                fontWeight: 700,
+                color: "var(--color-text-heading)",
+                margin: "0 0 0.5rem",
+              }}
+            >
+              {t("importantTitle")}
+            </p>
+            <ul
+              style={{
+                margin: 0,
+                paddingLeft: "1.2rem",
+                display: "flex",
+                flexDirection: "column",
+                gap: "0.25rem",
+                color: "var(--color-text-muted)",
+              }}
+            >
+              <li>{t("bullet1")}</li>
+              <li>{t("bullet2")}</li>
+              <li>
+                {t("minWithdrawal")} <strong>{fmt(data.min_withdrawal)}</strong>
+                .
+              </li>
+              <li>{t("bullet4")}</li>
+              <li>{t("bullet5")}</li>
+            </ul>
+          </div>
         </div>
       </div>
 
