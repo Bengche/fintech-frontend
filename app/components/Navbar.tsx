@@ -139,11 +139,11 @@ export default function Navbar() {
         style={{
           position: "fixed", top: 0, left: 0, right: 0, zIndex: 50,
           transition: "background-color 0.38s ease, box-shadow 0.38s ease, border-color 0.38s ease",
-          backgroundColor: scrolled ? "rgba(8,18,44,0.38)" : "var(--color-primary)",
-          backdropFilter: scrolled ? "blur(22px) saturate(1.6)" : "none",
-          WebkitBackdropFilter: scrolled ? "blur(22px) saturate(1.6)" : "none",
-          boxShadow: scrolled ? "0 1px 0 rgba(255,255,255,0.07),0 6px 28px rgba(0,0,0,0.28)" : "none",
-          borderBottom: scrolled ? "1px solid rgba(255,255,255,0.18)" : "1px solid rgba(255,255,255,0.07)",
+          backgroundColor: scrolled ? "rgba(8,18,44,0.12)" : "var(--color-primary)",
+          backdropFilter: "none",
+          WebkitBackdropFilter: "none",
+          boxShadow: scrolled ? "0 1px 0 rgba(255,255,255,0.08)" : "none",
+          borderBottom: scrolled ? "1px solid rgba(255,255,255,0.12)" : "1px solid rgba(255,255,255,0.07)",
         }}
       >
         <div style={{
