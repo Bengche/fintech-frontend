@@ -184,15 +184,13 @@ export default function NotificationBell({
               const rect = el.getBoundingClientRect();
               return `${rect.bottom + 10}px`;
             })(),
-            // On narrow screens centre the panel; on wider screens align to bell
             right: (() => {
-              if (typeof window === "undefined") return "12px";
+              if (typeof window === "undefined") return "8px";
+              if (window.innerWidth <= 640) return "8px";
               const el = containerRef.current;
               if (!el) return "12px";
               const rect = el.getBoundingClientRect();
-              const panelWidth = Math.min(360, window.innerWidth - 24);
               const rightEdge = window.innerWidth - rect.right;
-              // Don't let the panel bleed off the left edge
               return `${Math.max(rightEdge, 12)}px`;
             })(),
             width: "min(360px, calc(100vw - 24px))",
@@ -286,7 +284,7 @@ export default function NotificationBell({
           {/* ── Notification list ─────────────────────────────────────────── */}
           <div
             style={{
-              maxHeight: "min(420px, calc(100dvh - 140px))",
+              maxHeight: "min(440px, calc(100dvh - 120px))",
               overflowY: "auto",
               overscrollBehavior: "contain",
             }}
@@ -316,7 +314,7 @@ export default function NotificationBell({
                     style={{
                       display: "flex",
                       gap: "12px",
-                      padding: "13px 16px",
+                      padding: "14px 16px",
                       cursor: "pointer",
                       background: n.is_read ? "transparent" : "#fffbeb",
                       borderBottom: "1px solid #f1f5f9",
