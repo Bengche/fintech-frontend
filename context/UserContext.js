@@ -21,6 +21,28 @@ export const AuthProvider = ({ children }) => {
   // Track the interceptor ID so we can eject it on unmount and avoid
   // registering it twice in React Strict Mode (which mounts twice in dev).
   const interceptorRef = useRef(null);
+  const reqInterceptorRef = useRef(null);
+
+  useEffect(() => {
+    // ── Request interceptor: attach Bearer token to every Axios request ───
+    if (reqInterceptorRef.current === null) {
+      reqInterceptorRef.current = Axios.interceptors.request.use((config) => {
+        const token = localStorage.getItem("token");
+        if (token && token !== "undefined" && token !== "null") {
+          config.headers = config.headers || {};
+          config.headers["Authorization"] = `Bearer ${token}`;
+        }
+        return config;
+      });
+    }
+
+    return () => {
+      if (reqInterceptorRef.current !== null) {
+        Axios.interceptors.request.eject(reqInterceptorRef.current);
+        reqInterceptorRef.current = null;
+      }
+    };
+  }, []);
 
   useEffect(() => {
     // ── Global 401 interceptor ────────────────────────────────────────────
