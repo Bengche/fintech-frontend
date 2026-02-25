@@ -270,12 +270,7 @@ export default function Navbar() {
               <Link href="/" onClick={() => setMenuOpen(false)} style={{ textDecoration:"none" }}>
                 <FonlokLogo variant="light" iconSize={26} />
               </Link>
-              <button onClick={() => setMenuOpen(false)} aria-label="Close menu"
-                style={{ background:"rgba(255,255,255,0.07)",border:"1.5px solid rgba(255,255,255,0.14)",
-                  borderRadius:"8px",color:"rgba(255,255,255,0.7)",cursor:"pointer",
-                  padding:"0.35rem",display:"flex",alignItems:"center",justifyContent:"center" }}>
-                <X size={16} strokeWidth={2.2} />
-              </button>
+
             </div>
 
             {/* Links */}
