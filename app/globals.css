@@ -451,6 +451,119 @@ a:hover {
   }
 }
 
+/* ─── Dashboard responsive ──────────────────────────────────────────────── */
+
+/*
+ * Scrollable tab bar on all screen sizes — prevents the tab row from
+ * wrapping onto multiple lines or clipping at the viewport edge.
+ */
+.db-tabs {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;        /* Firefox */
+}
+.db-tabs::-webkit-scrollbar {
+  display: none;                /* Chrome / Safari */
+}
+
+@media (max-width: 640px) {
+  /* ── Container ────────────────────────────────────────────── */
+  .db-container {
+    padding: 1rem 0.875rem 3rem !important;
+  }
+
+  /* ── Page header: stack title + nav buttons ───────────────── */
+  .db-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.875rem !important;
+  }
+
+  /* Nav links row takes full width, wraps nicely */
+  .db-nav-btns {
+    width: 100% !important;
+    justify-content: flex-start !important;
+    gap: 0.375rem !important;
+  }
+
+  /* ── Tab bar ──────────────────────────────────────────────── */
+  .db-tab-btn {
+    padding: 0.5rem 0.875rem !important;
+    font-size: 0.8125rem !important;
+  }
+
+  /* ── Payment / payout form ────────────────────────────────── */
+  /* 2-column field grid → single column on mobile */
+  .db-payment-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Payment card: full-width on mobile */
+  .db-payment-card {
+    max-width: 100% !important;
+  }
+
+  /* ── Invoice cards ────────────────────────────────────────── */
+  /* Slightly tighter card padding on mobile */
+  .card {
+    padding: 0.875rem !important;
+  }
+
+  /* ── Escrow balance card ──────────────────────────────────── */
+  .db-escrow {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.875rem !important;
+  }
+
+  .db-escrow-right {
+    width: 100% !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 0.5rem !important;
+  }
+
+  .db-escrow-badges {
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    gap: 0.375rem !important;
+    text-align: left !important;
+  }
+
+  .db-escrow-badge {
+    white-space: normal !important;
+  }
+  /* ── Create invoice modal ─────────────────────────────────── */
+  /* Reduce top/bottom gap in the modal overlay on small screens */
+  .create-invoice-overlay {
+    padding: 0.75rem 0.5rem !important;
+    align-items: flex-start !important;
+  }
+
+  /* Modal itself: reduce body padding */
+  .create-invoice-modal {
+    border-radius: var(--radius-md) !important;
+  }
+
+  .create-invoice-modal-body {
+    padding: 1rem !important;
+  }
+
+  /* ── Create invoice modal — milestone rows ───────────────── */
+  /* 4-column milestone row (label / amount / deadline / del) 
+     → 2×2 grid on mobile so nothing overflows */
+  .create-milestone-row {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  /* ── Filter form ──────────────────────────────────────────── */
+  .filter-form-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
 /* ─── Footer mobile ─────────────────────────────────────────── */
 @media (max-width: 640px) {
   /* Footer grid: 2 columns instead of auto-fill on small screens */

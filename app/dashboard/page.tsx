@@ -96,6 +96,7 @@ export default function Dashboard() {
       <Navbar />
 
       <div
+        className="db-container"
         style={{
           maxWidth: "1100px",
           margin: "0 auto",
@@ -104,6 +105,7 @@ export default function Dashboard() {
       >
         {/* ── Page header ──────────────────────────────────────────────────── */}
         <div
+          className="db-header"
           style={{
             display: "flex",
             alignItems: "flex-start",
@@ -138,6 +140,7 @@ export default function Dashboard() {
 
           {/* Secondary nav links */}
           <div
+            className="db-nav-btns"
             style={{
               display: "flex",
               gap: "0.5rem",
@@ -192,6 +195,7 @@ export default function Dashboard() {
 
         {/* ── Tab bar ──────────────────────────────────────────────────────── */}
         <div
+          className="db-tabs"
           style={{
             marginTop: "2rem",
             borderBottom: "2px solid var(--color-border)",
@@ -203,6 +207,7 @@ export default function Dashboard() {
             <button
               key={t.key}
               onClick={() => setActiveTab(t.key)}
+              className="db-tab-btn"
               style={{
                 background: "none",
                 border: "none",
@@ -326,7 +331,7 @@ export default function Dashboard() {
 
           {/* Request Payment */}
           {activeTab === "payment" && (
-            <div className="card" style={{ maxWidth: "560px" }}>
+            <div className="card db-payment-card" style={{ maxWidth: "560px" }}>
               {/* Header */}
               <div style={{ marginBottom: "1.5rem" }}>
                 <h2
@@ -370,6 +375,7 @@ export default function Dashboard() {
 
               {/* Fields */}
               <div
+                className="db-payment-grid"
                 style={{
                   display: "grid",
                   gridTemplateColumns: "1fr 1fr",

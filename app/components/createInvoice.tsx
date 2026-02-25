@@ -254,6 +254,7 @@ export default function CreateInvoice({
           onClick={(e) => {
             if (e.target === e.currentTarget) closeModal();
           }}
+          className="create-invoice-overlay"
           style={{
             position: "fixed",
             inset: 0,
@@ -267,6 +268,7 @@ export default function CreateInvoice({
           }}
         >
           <div
+            className="create-invoice-modal"
             style={{
               backgroundColor: "var(--color-white, #fff)",
               borderRadius: "var(--radius-lg, 12px)",
@@ -331,7 +333,7 @@ export default function CreateInvoice({
             </div>
 
             {/* Modal body */}
-            <div style={{ padding: "1.5rem" }}>
+            <div className="create-invoice-modal-body" style={{ padding: "1.5rem" }}>
               <form onSubmit={handleCreation} id="create-invoice-form">
                 {/* Inline error */}
                 {invoiceError && (
@@ -654,6 +656,7 @@ export default function CreateInvoice({
                     {milestones.map((m, i) => (
                       <div
                         key={i}
+                        className="create-milestone-row"
                         style={{
                           display: "grid",
                           gridTemplateColumns: "1fr 110px 130px auto",

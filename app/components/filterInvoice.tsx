@@ -74,6 +74,7 @@ export default function FilterInvoice() {
 
           <form onSubmit={handleFilter}>
             <div
+              className="filter-form-grid"
               style={{
                 display: "grid",
                 gridTemplateColumns: "2fr 1fr",

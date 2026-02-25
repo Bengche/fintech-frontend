@@ -47,6 +47,7 @@ export default function EscrowBalance() {
 
   return (
     <div
+      className="db-escrow"
       style={{
         background: hasBalance
           ? "linear-gradient(135deg, #0f1f3d 0%, #1e3a5f 100%)"
@@ -153,15 +154,17 @@ export default function EscrowBalance() {
 
       {/* Right — info badges + refresh */}
       <div
+        className="db-escrow-right"
         style={{
           display: "flex",
           alignItems: "center",
           gap: "0.625rem",
-          flexShrink: 0,
+          flexShrink: 1,
         }}
       >
         {hasBalance && (
           <div
+            className="db-escrow-badges"
             style={{
               display: "flex",
               flexDirection: "column",
@@ -170,6 +173,7 @@ export default function EscrowBalance() {
             }}
           >
             <span
+              className="db-escrow-badge"
               style={{
                 fontSize: "0.6875rem",
                 backgroundColor: "rgba(255,255,255,0.1)",
@@ -184,6 +188,7 @@ export default function EscrowBalance() {
               Gross: {data!.grossAmount.toLocaleString()} XAF
             </span>
             <span
+              className="db-escrow-badge"
               style={{
                 fontSize: "0.6875rem",
                 backgroundColor: "rgba(16,185,129,0.18)",
