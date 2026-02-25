@@ -84,13 +84,9 @@ function ArrowBtn({
         height: "2.625rem",
         borderRadius: "50%",
         border: "1.5px solid",
-        borderColor: disabled
-          ? "var(--color-border)"
-          : "var(--color-accent)",
+        borderColor: disabled ? "var(--color-border)" : "var(--color-accent)",
         backgroundColor: disabled ? "transparent" : "var(--color-accent)",
-        color: disabled
-          ? "var(--color-text-muted)"
-          : "var(--color-primary)",
+        color: disabled ? "var(--color-text-muted)" : "var(--color-primary)",
         cursor: disabled ? "not-allowed" : "pointer",
         display: "flex",
         alignItems: "center",
@@ -181,7 +177,8 @@ export default function BenefitsSlider({ items }: { items: BenefitItem[] }) {
                     letterSpacing: "0.06em",
                   }}
                 >
-                  {String(i + 1).padStart(2, "0")}&thinsp;/&thinsp;{String(n).padStart(2, "0")}
+                  {String(i + 1).padStart(2, "0")}&thinsp;/&thinsp;
+                  {String(n).padStart(2, "0")}
                 </span>
 
                 {/* Icon badge */}

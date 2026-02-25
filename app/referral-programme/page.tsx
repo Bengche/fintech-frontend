@@ -135,7 +135,12 @@ export default async function ReferralProgrammePage() {
             </p>
 
             <div
-              style={{ display: "flex", gap: "1rem", justifyContent: "center", flexWrap: "wrap" }}
+              style={{
+                display: "flex",
+                gap: "1rem",
+                justifyContent: "center",
+                flexWrap: "wrap",
+              }}
             >
               <Link
                 href="/register"

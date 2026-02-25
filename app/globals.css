@@ -365,6 +365,8 @@ a:hover {
     justify-content: center !important;
     text-align: center !important;
     min-width: 0 !important;
+    font-size: 0.8125rem !important;
+    padding: 0.7rem 0.875rem !important;
   }
 
   /* ── Hero ─────────────────────────────────────────────────── */

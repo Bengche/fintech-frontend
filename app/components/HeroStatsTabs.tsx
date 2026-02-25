@@ -77,11 +77,12 @@ export default function HeroStatsTabs({ tabs }: { tabs: StatTab[] }) {
               )}
               <span
                 style={{
-                  fontSize: "0.9375rem",
+                  fontSize: "clamp(0.7rem, 2.6vw, 0.9375rem)",
                   fontWeight: 800,
                   lineHeight: 1,
                   color: isActive ? "#F59E0B" : "rgba(255,255,255,0.75)",
                   letterSpacing: "-0.01em",
+                  whiteSpace: "nowrap",
                 }}
               >
                 {tab.value}

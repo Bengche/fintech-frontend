@@ -62,9 +62,21 @@
       "ctaPrimary": "Compte gratuit",
       "ctaSecondary": "Comment ça marche",
       "stats": {
-        "free": { "value": "Gratuit", "label": "Compte", "detail": "Créez votre compte et utilisez Fonlok sans frais. Aucune carte bancaire, aucun frais d'installation — inscrivez-vous et c'est parti." },
-        "fee": { "value": "3%", "label": "Frais vendeur", "detail": "Les vendeurs paient un forfait de 3% uniquement lorsqu'une transaction est finalisée. Les acheteurs ne paient rien." },
-        "momo": { "value": "MTN + Orange", "label": "Mobile Money", "detail": "Payez et recevez via MTN Mobile Money ou Orange Money — fonctionne sur tout téléphone au Cameroun." }
+        "free": {
+          "value": "Gratuit",
+          "label": "Compte",
+          "detail": "Créez votre compte et utilisez Fonlok sans frais. Aucune carte bancaire, aucun frais d'installation — inscrivez-vous et c'est parti."
+        },
+        "fee": {
+          "value": "3%",
+          "label": "Frais vendeur",
+          "detail": "Les vendeurs paient un forfait de 3% uniquement lorsqu'une transaction est finalisée. Les acheteurs ne paient rien."
+        },
+        "momo": {
+          "value": "MTN + Orange",
+          "label": "Mobile Money",
+          "detail": "Payez et recevez via MTN Mobile Money ou Orange Money — fonctionne sur tout téléphone au Cameroun."
+        }
       }
     },
     "howItWorks": {

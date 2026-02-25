@@ -737,7 +737,14 @@ function HeroIllustration() {
       {/* ── Phone body ── */}
       <g filter="url(#phoneShadow)">
         {/* Outer shell — titanium-dark metallic */}
-        <rect x="82" y="24" width="176" height="422" rx="36" fill="url(#phoneMetal)" />
+        <rect
+          x="82"
+          y="24"
+          width="176"
+          height="422"
+          rx="36"
+          fill="url(#phoneMetal)"
+        />
         {/* Inner bezel inset */}
         <rect x="86" y="28" width="168" height="414" rx="33" fill="#0d0d1a" />
         {/* Antenna line left */}
@@ -751,9 +758,23 @@ function HeroIllustration() {
         {/* Power button */}
         <rect x="255" y="170" width="3" height="48" rx="1.5" fill="#333350" />
         {/* Left-edge specular rim */}
-        <rect x="82" y="24" width="7" height="422" rx="5" fill="url(#rimLight)" />
+        <rect
+          x="82"
+          y="24"
+          width="7"
+          height="422"
+          rx="5"
+          fill="url(#rimLight)"
+        />
         {/* Right-edge subtle shadow rim */}
-        <rect x="252" y="24" width="6" height="422" rx="5" fill="rgba(0,0,0,0.25)" />
+        <rect
+          x="252"
+          y="24"
+          width="6"
+          height="422"
+          rx="5"
+          fill="rgba(0,0,0,0.25)"
+        />
       </g>
 
       {/* ── Screen ── */}
@@ -1125,9 +1146,33 @@ function HeroIllustration() {
           stroke="rgba(255,255,255,0.4)"
           strokeWidth="1"
         />
-        <line x1="168" y1="391" x2="172" y2="391" stroke="rgba(255,255,255,0.4)" strokeWidth="1" strokeLinecap="round" />
-        <line x1="168" y1="394" x2="172" y2="394" stroke="rgba(255,255,255,0.4)" strokeWidth="1" strokeLinecap="round" />
-        <line x1="168" y1="397" x2="171" y2="397" stroke="rgba(255,255,255,0.4)" strokeWidth="1" strokeLinecap="round" />
+        <line
+          x1="168"
+          y1="391"
+          x2="172"
+          y2="391"
+          stroke="rgba(255,255,255,0.4)"
+          strokeWidth="1"
+          strokeLinecap="round"
+        />
+        <line
+          x1="168"
+          y1="394"
+          x2="172"
+          y2="394"
+          stroke="rgba(255,255,255,0.4)"
+          strokeWidth="1"
+          strokeLinecap="round"
+        />
+        <line
+          x1="168"
+          y1="397"
+          x2="171"
+          y2="397"
+          stroke="rgba(255,255,255,0.4)"
+          strokeWidth="1"
+          strokeLinecap="round"
+        />
         {/* Settings icon — cx=225 */}
         <circle
           cx="225"
