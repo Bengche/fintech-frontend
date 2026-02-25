@@ -49,36 +49,31 @@ const INIT: BannerState = {
 };
 
 export default function PwaInstallBanner() {
-  // ── iOS is detected synchronously at init time via a lazy useState ─────────
-  // This avoids calling setState() inside a useEffect body (lint rule).
-  // The beforeinstallprompt event (Android/Chrome) still needs a useEffect
-  // because it fires asynchronously after the component mounts.
-  const [state, setState] = useState<BannerState>(() => {
-    if (typeof window === "undefined") return INIT;
-    if (window.matchMedia("(display-mode: standalone)").matches) return INIT;
-    if (sessionStorage.getItem(DISMISSED_KEY)) return INIT;
+  const [mounted, setMounted] = useState(false);
+  const [state, setState] = useState<BannerState>(INIT);
+  const { platform, visible, deferredPrompt, iosStep } = state;
 
+  useEffect(() => {
+    setMounted(true);
+
+    if (window.matchMedia("(display-mode: standalone)").matches) return;
+    if (sessionStorage.getItem(DISMISSED_KEY)) return;
+
+    // ── iOS Safari detection ─────────────────────────────────────────────────
     const nav = navigator as Navigator & { standalone?: boolean };
     const isIos =
       /iphone|ipad|ipod/i.test(navigator.userAgent) && !nav.standalone;
     if (isIos) {
-      return {
+      setState({
         platform: "ios",
         visible: true,
         deferredPrompt: null,
         iosStep: false,
-      };
+      });
+      return;
     }
-    return INIT;
-  });
-  const { platform, visible, deferredPrompt, iosStep } = state;
-
-  useEffect(() => {
-    if (window.matchMedia("(display-mode: standalone)").matches) return;
-    if (sessionStorage.getItem(DISMISSED_KEY)) return;
 
     // ── Android/Chrome/Edge/Samsung: listen for beforeinstallprompt ─────────
-    // setState here is inside an event handler callback — that's fine.
     const handler = (e: Event) => {
       e.preventDefault();
       setState({
@@ -107,7 +102,7 @@ export default function PwaInstallBanner() {
     setState((s) => ({ ...s, deferredPrompt: null }));
   };
 
-  if (!visible || !platform) return null;
+  if (!mounted || !visible || !platform) return null;
 
   return (
     <div
