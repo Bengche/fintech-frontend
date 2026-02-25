@@ -3,35 +3,25 @@
 /**
  * NotificationBell.tsx
  *
- * A bell icon button with a red unread-count badge and a dropdown list
- * of the user's most recent notifications.
- *
- * Features:
- *   - Unread count badge (disappears when count is 0)
- *   - Click bell to open/close dropdown
- *   - "Mark all read" button
- *   - Individual notification click marks it read
- *   - "View full" / "Minimize" inline expand per notification
- *   - Humanized timestamps ("2 minutes ago")
- *   - Colour-coded icons per notification type
- *   - Clicking outside closes the dropdown
- *   - Fully responsive — anchors to screen edge on narrow viewports
+ * Bell icon + full-screen overlay notification panel.
+ * Clicking the bell opens a centered panel with a backdrop.
+ * Closed via the X button at top-right, or by clicking the backdrop.
  */
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import type { AppNotification } from "@/hooks/useNotifications";
 import { useTranslations } from "next-intl";
 
 // ── Per-type icon + accent colour ─────────────────────────────────────────────
 const typeConfig: Record<string, { icon: string; color: string }> = {
-  invoice_paid: { icon: "💰", color: "#16a34a" },
-  payout_sent: { icon: "🎉", color: "#2563eb" },
-  dispute_opened: { icon: "⚠️", color: "#dc2626" },
+  invoice_paid:       { icon: "💰", color: "#16a34a" },
+  payout_sent:        { icon: "🎉", color: "#2563eb" },
+  dispute_opened:     { icon: "⚠️",  color: "#dc2626" },
   milestone_released: { icon: "🏁", color: "#7c3aed" },
-  new_message: { icon: "💬", color: "#0891b2" },
-  delivered_marked: { icon: "📦", color: "#d97706" },
-  referral_earned: { icon: "🤝", color: "#16a34a" },
-  default: { icon: "🔔", color: "#6b7280" },
+  new_message:        { icon: "💬", color: "#0891b2" },
+  delivered_marked:   { icon: "📦", color: "#d97706" },
+  referral_earned:    { icon: "🤝", color: "#16a34a" },
+  default:            { icon: "🔔", color: "#6b7280" },
 };
 
 // ── Humanize timestamps ────────────────────────────────────────────────────────
@@ -49,13 +39,8 @@ function timeAgo(
   return t("daysAgo", { days });
 }
 
-// A notification body is considered "long" if it exceeds this character count —
-// below this threshold we skip the expand toggle to keep the UI clean.
 const EXPAND_THRESHOLD = 90;
 
-// Props are supplied by the parent (Navbar) which calls useNotifications() once.
-// This prevents multiple polling intervals when the bell is rendered in both
-// the desktop nav and the mobile header simultaneously.
 interface NotificationBellProps {
   notifications: AppNotification[];
   unreadCount: number;
@@ -71,34 +56,25 @@ export default function NotificationBell({
 }: NotificationBellProps) {
   const t = useTranslations("Notifications");
   const [open, setOpen] = useState(false);
-  // Set of notification IDs whose body is currently expanded
   const [expandedIds, setExpandedIds] = useState<Set<number>>(new Set());
-  const containerRef = useRef<HTMLDivElement>(null);
 
-  // Close the dropdown when clicking outside
+  // Lock body scroll when panel is open
   useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (
-        containerRef.current &&
-        !containerRef.current.contains(e.target as Node)
-      ) {
-        setOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, []);
-
-  // Collapse all expanded notifications when the dropdown closes
-  useEffect(() => {
-    if (!open) setExpandedIds(new Set());
+    document.body.style.overflow = open ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
   }, [open]);
 
+  // Collapse expanded notifications when closed
+  const closePanel = () => {
+    setOpen(false);
+    setExpandedIds(new Set());
+  };
+
   const toggleExpand = (e: React.MouseEvent, id: number) => {
-    e.stopPropagation(); // don't also trigger markRead on the row
+    e.stopPropagation();
     setExpandedIds((prev) => {
       const next = new Set(prev);
-      next.has(id) ? next.delete(id) : next.add(id);
+      if (next.has(id)) { next.delete(id); } else { next.add(id); }
       return next;
     });
   };
@@ -108,13 +84,39 @@ export default function NotificationBell({
   };
 
   return (
-    <div
-      ref={containerRef}
-      style={{ position: "relative", display: "inline-block" }}
-    >
+    <>
+      <style>{`
+        @keyframes notif-in {
+          from { opacity: 0; transform: translateY(-10px) scale(0.97); }
+          to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes notif-bg-in {
+          from { opacity: 0; }
+          to   { opacity: 1; }
+        }
+        .notif-panel-anim {
+          animation: notif-in 0.22s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+        .notif-bg-anim {
+          animation: notif-bg-in 0.18s ease forwards;
+        }
+        .notif-row {
+          transition: background 0.13s;
+        }
+        .notif-row:hover {
+          background: #f8fafc !important;
+        }
+        .notif-row-unread:hover {
+          background: #fef3c7 !important;
+        }
+        .notif-scroll::-webkit-scrollbar { width: 4px; }
+        .notif-scroll::-webkit-scrollbar-track { background: transparent; }
+        .notif-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+      `}</style>
+
       {/* ── Bell button ───────────────────────────────────────────────────── */}
       <button
-        onClick={() => setOpen((v) => !v)}
+        onClick={() => setOpen(true)}
         aria-label={`Notifications${unreadCount > 0 ? ` (${unreadCount} unread)` : ""}`}
         style={{
           position: "relative",
@@ -131,358 +133,273 @@ export default function NotificationBell({
           color: "white",
         }}
       >
-        {/* Bell SVG */}
-        <svg
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
           <path d="M13.73 21a2 2 0 0 1-3.46 0" />
         </svg>
-
-        {/* Unread badge */}
         {unreadCount > 0 && (
-          <span
-            style={{
-              position: "absolute",
-              top: "-6px",
-              right: "-6px",
-              background: "#dc2626",
-              color: "white",
-              fontSize: "10px",
-              fontWeight: 700,
-              minWidth: "18px",
-              height: "18px",
-              borderRadius: "9px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              padding: "0 4px",
-              lineHeight: 1,
-              border: "2px solid #0F1F3D",
-            }}
-          >
+          <span style={{
+            position: "absolute", top: "-6px", right: "-6px",
+            background: "#dc2626", color: "white",
+            fontSize: "10px", fontWeight: 700,
+            minWidth: "18px", height: "18px", borderRadius: "9px",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            padding: "0 4px", lineHeight: 1,
+            border: "2px solid #0F1F3D",
+          }}>
             {unreadCount > 99 ? "99+" : unreadCount}
           </span>
         )}
       </button>
 
-      {/* ── Dropdown ──────────────────────────────────────────────────────── */}
+      {/* ── Overlay panel ─────────────────────────────────────────────────── */}
       {open && (
         <div
           style={{
             position: "fixed",
-            top: (() => {
-              const el = containerRef.current;
-              if (!el) return "60px";
-              const rect = el.getBoundingClientRect();
-              return `${rect.bottom + 10}px`;
-            })(),
-            ...(typeof window !== "undefined" && window.innerWidth <= 640
-              ? { left: "8px", right: "8px", width: "auto" }
-              : {
-                  right: (() => {
-                    const el = containerRef.current;
-                    if (!el) return "12px";
-                    const rect = el.getBoundingClientRect();
-                    return `${Math.max(window.innerWidth - rect.right, 12)}px`;
-                  })(),
-                  width: "min(360px, calc(100vw - 24px))",
-                }),
-            background: "#ffffff",
-            borderRadius: "14px",
-            boxShadow:
-              "0 8px 40px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.08)",
+            inset: 0,
             zIndex: 99999,
-            overflow: "hidden",
-            border: "1px solid #e5e7eb",
+            display: "flex",
+            alignItems: "flex-start",
+            justifyContent: "center",
+            padding: "72px 12px 12px",
+            boxSizing: "border-box",
           }}
         >
-          {/* ── Panel header ─────────────────────────────────────────────── */}
+          {/* Backdrop */}
           <div
+            className="notif-bg-anim"
+            onClick={closePanel}
             style={{
+              position: "absolute",
+              inset: 0,
+              background: "rgba(4,10,25,0.6)",
+            } as React.CSSProperties}
+          />
+
+          {/* Panel */}
+          <div
+            className="notif-panel-anim"
+            style={{
+              position: "relative",
+              width: "100%",
+              maxWidth: "480px",
+              maxHeight: "calc(100dvh - 96px)",
+              background: "#ffffff",
+              borderRadius: "20px",
+              boxShadow: "0 32px 80px rgba(0,0,0,0.25), 0 4px 20px rgba(0,0,0,0.1)",
+              display: "flex",
+              flexDirection: "column",
+              overflow: "hidden",
+              border: "1px solid #e2e8f0",
+            }}
+          >
+            {/* ── Header ──────────────────────────────────────────────────── */}
+            <div style={{
               display: "flex",
               alignItems: "center",
               justifyContent: "space-between",
-              padding: "14px 16px 12px",
+              padding: "18px 20px",
               borderBottom: "1px solid #f1f5f9",
               background: "#fafafa",
-            }}
-          >
-            <span
-              style={{
-                fontWeight: 700,
-                fontSize: "15px",
-                color: "#0F1F3D",
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-              }}
-            >
-              {t("title")}
-              {unreadCount > 0 && (
-                <span
-                  style={{
-                    background: "#dc2626",
-                    color: "#fff",
-                    fontSize: "11px",
-                    fontWeight: 700,
-                    padding: "1px 7px",
-                    borderRadius: "10px",
-                  }}
-                >
-                  {unreadCount}
-                </span>
-              )}
-            </span>
-            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-              {unreadCount > 0 && (
-                <button
-                  onClick={markAllRead}
-                  style={{
-                    background: "none",
-                    border: "none",
-                    color: "#F59E0B",
-                    fontSize: "12px",
-                    fontWeight: 600,
-                    cursor: "pointer",
-                    padding: "4px 6px",
-                    borderRadius: "6px",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  {t("markAllRead")}
-                </button>
-              )}
-              {/* Close button */}
-              <button
-                onClick={() => setOpen(false)}
-                aria-label="Close notifications"
-                style={{
-                  background: "none",
-                  border: "none",
-                  cursor: "pointer",
-                  color: "#94a3b8",
-                  fontSize: "18px",
-                  lineHeight: 1,
-                  padding: "2px 4px",
-                  borderRadius: "6px",
-                  display: "flex",
-                  alignItems: "center",
-                }}
-              >
-                ×
-              </button>
-            </div>
-          </div>
-
-          {/* ── Notification list ─────────────────────────────────────────── */}
-          <div
-            style={{
-              maxHeight: "min(440px, calc(100dvh - 120px))",
-              overflowY: "auto",
-              overscrollBehavior: "contain",
-            }}
-          >
-            {notifications.length === 0 ? (
-              <div
-                style={{
-                  padding: "40px 20px",
-                  textAlign: "center",
-                  color: "#94a3b8",
-                  fontSize: "14px",
-                }}
-              >
-                <div style={{ fontSize: "30px", marginBottom: "10px" }}>🔔</div>
-                {t("empty")}
+              flexShrink: 0,
+            }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                <div style={{
+                  width: "40px", height: "40px", borderRadius: "12px",
+                  background: "linear-gradient(135deg,#0F1F3D 0%,#1e3a6e 100%)",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  flexShrink: 0,
+                }}>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                    stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                    <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                  </svg>
+                </div>
+                <div>
+                  <h2 style={{ margin: 0, fontSize: "16px", fontWeight: 700, color: "#0F1F3D" }}>
+                    {t("title")}
+                  </h2>
+                  <p style={{ margin: 0, fontSize: "12px", color: "#94a3b8" }}>
+                    {unreadCount > 0 ? `${unreadCount} unread` : "All caught up"}
+                  </p>
+                </div>
               </div>
-            ) : (
-              notifications.map((n) => {
-                const cfg = typeConfig[n.type] || typeConfig.default;
-                const isExpanded = expandedIds.has(n.id);
-                const isLong = n.body && n.body.length > EXPAND_THRESHOLD;
 
-                return (
-                  <div
-                    key={n.id}
-                    onClick={() => handleRowClick(n)}
+              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                {unreadCount > 0 && (
+                  <button
+                    onClick={markAllRead}
                     style={{
-                      display: "flex",
-                      gap: "12px",
-                      padding: "14px 16px",
-                      cursor: "pointer",
-                      background: n.is_read ? "transparent" : "#fffbeb",
-                      borderBottom: "1px solid #f1f5f9",
-                      transition: "background 0.15s",
-                      alignItems: "flex-start",
-                    }}
-                    onMouseEnter={(e) => {
-                      (e.currentTarget as HTMLDivElement).style.background =
-                        "#f8fafc";
-                    }}
-                    onMouseLeave={(e) => {
-                      (e.currentTarget as HTMLDivElement).style.background =
-                        n.is_read ? "transparent" : "#fffbeb";
+                      background: "none", border: "1.5px solid #F59E0B",
+                      color: "#d97706", fontSize: "12px", fontWeight: 600,
+                      cursor: "pointer", padding: "5px 10px",
+                      borderRadius: "8px", whiteSpace: "nowrap",
                     }}
                   >
-                    {/* ── Icon circle ──────────────────────────────────── */}
+                    {t("markAllRead")}
+                  </button>
+                )}
+                <button
+                  onClick={closePanel}
+                  aria-label="Close notifications"
+                  style={{
+                    width: "36px", height: "36px", borderRadius: "10px",
+                    background: "#f1f5f9", border: "1.5px solid #e2e8f0",
+                    cursor: "pointer", display: "flex",
+                    alignItems: "center", justifyContent: "center",
+                    color: "#64748b", flexShrink: 0,
+                    transition: "background 0.13s",
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.background = "#e2e8f0"; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = "#f1f5f9"; }}
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" strokeWidth="2.5"
+                    strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            {/* ── Notification list ─────────────────────────────────────── */}
+            <div
+              className="notif-scroll"
+              style={{ flex: 1, overflowY: "auto", overscrollBehavior: "contain" }}
+            >
+              {notifications.length === 0 ? (
+                <div style={{
+                  padding: "60px 24px",
+                  textAlign: "center",
+                  color: "#94a3b8",
+                }}>
+                  <div style={{ fontSize: "44px", marginBottom: "14px" }}>🔔</div>
+                  <p style={{ margin: "0 0 4px", fontWeight: 600, fontSize: "15px", color: "#64748b" }}>
+                    No notifications yet
+                  </p>
+                  <p style={{ margin: 0, fontSize: "13px" }}>{t("empty")}</p>
+                </div>
+              ) : (
+                notifications.map((n) => {
+                  const cfg = typeConfig[n.type] || typeConfig.default;
+                  const isExpanded = expandedIds.has(n.id);
+                  const isLong = n.body && n.body.length > EXPAND_THRESHOLD;
+
+                  return (
                     <div
+                      key={n.id}
+                      onClick={() => handleRowClick(n)}
+                      className={`notif-row${n.is_read ? "" : " notif-row-unread"}`}
                       style={{
-                        flexShrink: 0,
-                        width: "36px",
-                        height: "36px",
-                        borderRadius: "50%",
-                        background: cfg.color + "18",
                         display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        fontSize: "16px",
-                        marginTop: "1px",
+                        gap: "14px",
+                        padding: "16px 20px",
+                        cursor: "pointer",
+                        background: n.is_read ? "transparent" : "#fffbeb",
+                        borderBottom: "1px solid #f1f5f9",
+                        alignItems: "flex-start",
                       }}
                     >
-                      {cfg.icon}
-                    </div>
-
-                    {/* ── Body ─────────────────────────────────────────── */}
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      {/* Title row */}
-                      <div
-                        style={{
-                          display: "flex",
-                          alignItems: "flex-start",
-                          justifyContent: "space-between",
-                          gap: "8px",
-                          marginBottom: "4px",
-                        }}
-                      >
-                        <span
-                          style={{
-                            fontWeight: n.is_read ? 500 : 700,
-                            fontSize: "13px",
-                            color: "#0F1F3D",
-                            lineHeight: 1.35,
-                          }}
-                        >
-                          {n.title}
-                        </span>
-                        <span
-                          style={{
-                            flexShrink: 0,
-                            fontSize: "11px",
-                            color: "#94a3b8",
-                            marginTop: "1px",
-                            whiteSpace: "nowrap",
-                          }}
-                        >
-                          {timeAgo(n.created_at, t)}
-                        </span>
+                      {/* Icon */}
+                      <div style={{
+                        flexShrink: 0,
+                        width: "44px", height: "44px", borderRadius: "12px",
+                        background: cfg.color + "18",
+                        display: "flex", alignItems: "center",
+                        justifyContent: "center", fontSize: "20px",
+                      }}>
+                        {cfg.icon}
                       </div>
 
-                      {/* Notification body — clamped or full */}
-                      <p
-                        style={{
+                      {/* Content */}
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{
+                          display: "flex", alignItems: "flex-start",
+                          justifyContent: "space-between",
+                          gap: "8px", marginBottom: "5px",
+                        }}>
+                          <span style={{
+                            fontWeight: n.is_read ? 500 : 700,
+                            fontSize: "14px", color: "#0F1F3D", lineHeight: 1.35,
+                          }}>
+                            {n.title}
+                          </span>
+                          <span style={{
+                            flexShrink: 0, fontSize: "11px",
+                            color: "#94a3b8", marginTop: "2px", whiteSpace: "nowrap",
+                          }}>
+                            {timeAgo(n.created_at, t)}
+                          </span>
+                        </div>
+
+                        <p style={{
                           margin: 0,
-                          fontSize: "12.5px",
-                          color: "#475569",
-                          lineHeight: 1.55,
-                          wordBreak: "break-word",
-                          ...(isExpanded
-                            ? {}
-                            : {
-                                overflow: "hidden",
-                                display: "-webkit-box",
-                                WebkitLineClamp: 2,
-                                WebkitBoxOrient: "vertical",
-                              }),
-                        }}
-                      >
-                        {n.body}
-                      </p>
+                          fontSize: "13px", color: "#475569",
+                          lineHeight: 1.6, wordBreak: "break-word",
+                          ...(isExpanded ? {} : {
+                            overflow: "hidden",
+                            display: "-webkit-box",
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: "vertical",
+                          }),
+                        }}>
+                          {n.body}
+                        </p>
 
-                      {/* Expand / Minimize toggle — only shown for long bodies */}
-                      {isLong && (
-                        <button
-                          onClick={(e) => toggleExpand(e, n.id)}
-                          style={{
-                            marginTop: "6px",
-                            display: "inline-flex",
-                            alignItems: "center",
-                            gap: "4px",
-                            background: "none",
-                            border: "none",
-                            padding: "3px 0",
-                            cursor: "pointer",
-                            fontSize: "12px",
-                            fontWeight: 600,
-                            color: cfg.color,
-                            lineHeight: 1,
-                          }}
-                        >
-                          {isExpanded ? (
-                            <>
-                              {/* Chevron up */}
-                              <svg
-                                width="12"
-                                height="12"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2.5"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              >
-                                <polyline points="18 15 12 9 6 15" />
-                              </svg>
-                              Minimize
-                            </>
-                          ) : (
-                            <>
-                              {/* Chevron down */}
-                              <svg
-                                width="12"
-                                height="12"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2.5"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              >
-                                <polyline points="6 9 12 15 18 9" />
-                              </svg>
-                              View full
-                            </>
-                          )}
-                        </button>
-                      )}
-                    </div>
+                        {isLong && (
+                          <button
+                            onClick={(e) => toggleExpand(e, n.id)}
+                            style={{
+                              marginTop: "6px",
+                              display: "inline-flex", alignItems: "center", gap: "4px",
+                              background: "none", border: "none", padding: "3px 0",
+                              cursor: "pointer", fontSize: "12px", fontWeight: 600,
+                              color: cfg.color,
+                            }}
+                          >
+                            {isExpanded ? (
+                              <>
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
+                                  stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                  <polyline points="18 15 12 9 6 15" />
+                                </svg>
+                                Minimize
+                              </>
+                            ) : (
+                              <>
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
+                                  stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                  <polyline points="6 9 12 15 18 9" />
+                                </svg>
+                                View full
+                              </>
+                            )}
+                          </button>
+                        )}
+                      </div>
 
-                    {/* ── Unread dot ───────────────────────────────────── */}
-                    {!n.is_read && (
-                      <div
-                        style={{
+                      {/* Unread dot */}
+                      {!n.is_read && (
+                        <div style={{
                           flexShrink: 0,
-                          width: "8px",
-                          height: "8px",
+                          width: "8px", height: "8px",
                           borderRadius: "50%",
                           background: "#F59E0B",
-                          marginTop: "5px",
-                        }}
-                      />
-                    )}
-                  </div>
-                );
-              })
-            )}
+                          marginTop: "6px",
+                        }} />
+                      )}
+                    </div>
+                  );
+                })
+              )}
+            </div>
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }
