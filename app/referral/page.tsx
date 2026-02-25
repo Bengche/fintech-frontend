@@ -309,11 +309,13 @@ export default function ReferralPage() {
           className="card"
           style={{
             marginBottom: "1.5rem",
-            background: data.balance > 0
-              ? "linear-gradient(135deg, #0f1f3d 0%, #1e3a5f 100%)"
-              : undefined,
+            background:
+              data.balance > 0
+                ? "linear-gradient(135deg, #0f1f3d 0%, #1e3a5f 100%)"
+                : undefined,
             border: data.balance > 0 ? "none" : undefined,
-            boxShadow: data.balance > 0 ? "0 4px 24px rgba(15,31,61,0.18)" : undefined,
+            boxShadow:
+              data.balance > 0 ? "0 4px 24px rgba(15,31,61,0.18)" : undefined,
           }}
         >
           <p
@@ -322,7 +324,10 @@ export default function ReferralPage() {
               fontWeight: 600,
               textTransform: "uppercase",
               letterSpacing: "0.05em",
-              color: data.balance > 0 ? "rgba(255,255,255,0.55)" : "var(--color-text-muted)",
+              color:
+                data.balance > 0
+                  ? "rgba(255,255,255,0.55)"
+                  : "var(--color-text-muted)",
               margin: "0 0 0.5rem",
             }}
           >
@@ -343,7 +348,10 @@ export default function ReferralPage() {
           <p
             style={{
               fontSize: "0.8rem",
-              color: data.balance > 0 ? "rgba(255,255,255,0.45)" : "var(--color-text-muted)",
+              color:
+                data.balance > 0
+                  ? "rgba(255,255,255,0.45)"
+                  : "var(--color-text-muted)",
               margin: 0,
             }}
           >
@@ -513,9 +521,7 @@ export default function ReferralPage() {
                   maxLength={9}
                   value={momoNumber}
                   onChange={(e) =>
-                    setMomoNumber(
-                      e.target.value.replace(/\D/g, "").slice(0, 9),
-                    )
+                    setMomoNumber(e.target.value.replace(/\D/g, "").slice(0, 9))
                   }
                   placeholder="6XXXXXXXX"
                   style={{
@@ -610,7 +616,9 @@ export default function ReferralPage() {
                   }}
                 >
                   <thead>
-                    <tr style={{ borderBottom: "2px solid var(--color-border)" }}>
+                    <tr
+                      style={{ borderBottom: "2px solid var(--color-border)" }}
+                    >
                       {[
                         { label: t("colInvoice"), right: false },
                         { label: t("colSeller"), right: false },
@@ -641,7 +649,9 @@ export default function ReferralPage() {
                     {visibleEarnings.map((e) => (
                       <tr
                         key={e.id}
-                        style={{ borderBottom: "1px solid var(--color-border)" }}
+                        style={{
+                          borderBottom: "1px solid var(--color-border)",
+                        }}
                       >
                         <td
                           style={{
@@ -724,7 +734,10 @@ export default function ReferralPage() {
                         }}
                       >
                         {fmt(
-                          data.earnings.reduce((s, e) => s + e.earned_amount, 0),
+                          data.earnings.reduce(
+                            (s, e) => s + e.earned_amount,
+                            0,
+                          ),
                         )}
                       </td>
                       <td />
@@ -915,7 +928,9 @@ export default function ReferralPage() {
                   }}
                 >
                   <thead>
-                    <tr style={{ borderBottom: "2px solid var(--color-border)" }}>
+                    <tr
+                      style={{ borderBottom: "2px solid var(--color-border)" }}
+                    >
                       {[
                         t("withdrawColAmount"),
                         t("withdrawColMomo"),
@@ -944,7 +959,9 @@ export default function ReferralPage() {
                     {visibleWithdrawals.map((w) => (
                       <tr
                         key={w.id}
-                        style={{ borderBottom: "1px solid var(--color-border)" }}
+                        style={{
+                          borderBottom: "1px solid var(--color-border)",
+                        }}
                       >
                         <td
                           style={{

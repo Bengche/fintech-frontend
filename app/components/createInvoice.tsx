@@ -333,7 +333,10 @@ export default function CreateInvoice({
             </div>
 
             {/* Modal body */}
-            <div className="create-invoice-modal-body" style={{ padding: "1.5rem" }}>
+            <div
+              className="create-invoice-modal-body"
+              style={{ padding: "1.5rem" }}
+            >
               <form onSubmit={handleCreation} id="create-invoice-form">
                 {/* Inline error */}
                 {invoiceError && (
