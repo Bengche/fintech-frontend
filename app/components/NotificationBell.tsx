@@ -9,6 +9,7 @@
  */
 
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import type { AppNotification } from "@/hooks/useNotifications";
 import { useTranslations } from "next-intl";
 
@@ -153,8 +154,8 @@ export default function NotificationBell({
         )}
       </button>
 
-      {/* ── Overlay panel ─────────────────────────────────────────────────── */}
-      {open && (
+      {/* ── Overlay panel — rendered via portal so CSS transform on parent navbar div doesn't trap position:fixed ── */}
+      {open && typeof document !== "undefined" && createPortal(
         <div
           style={{
             position: "fixed",
@@ -409,7 +410,7 @@ export default function NotificationBell({
             </div>
           </div>
         </div>
-      )}
+      , document.body)}
     </>
   );
 }
