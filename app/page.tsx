@@ -67,13 +67,14 @@ export default async function LandingPage() {
         {/* ── HERO ─────────────────────────────────────────────────── */}
         <section
           aria-label="Hero"
+          className="lp-hero"
           style={{
             backgroundColor: "var(--color-primary)",
             padding: "5rem 1.5rem",
           }}
         >
           <div
-            className="page-wrapper"
+            className="page-wrapper lp-hero-inner"
             style={{
               display: "flex",
               alignItems: "center",
@@ -83,7 +84,7 @@ export default async function LandingPage() {
             }}
           >
             {/* Text */}
-            <div style={{ flex: "1 1 320px", maxWidth: "580px" }}>
+            <div className="lp-hero-text" style={{ flex: "1 1 320px", maxWidth: "580px" }}>
               <p
                 style={{
                   display: "inline-block",
@@ -150,6 +151,7 @@ export default async function LandingPage() {
 
               {/* Trust stats */}
               <div
+                className="lp-trust-stats"
                 style={{
                   display: "flex",
                   flexWrap: "wrap",
@@ -201,6 +203,7 @@ export default async function LandingPage() {
             {/* Hero illustration */}
             <div
               aria-hidden="true"
+              className="lp-hero-illo"
               style={{
                 flex: "0 1 380px",
                 display: "flex",
@@ -217,13 +220,14 @@ export default async function LandingPage() {
         {/* ── HOW IT WORKS ─────────────────────────────────────────── */}
         <section
           aria-label="How it works"
+          className="lp-section"
           style={{
             backgroundColor: "var(--color-cloud)",
             padding: "5rem 1.5rem",
           }}
         >
           <div className="page-wrapper">
-            <div style={{ textAlign: "center", marginBottom: "3rem" }}>
+            <div className="lp-section-header" style={{ textAlign: "center", marginBottom: "3rem" }}>
               <h2
                 style={{
                   fontSize: "clamp(1.5rem, 3vw, 2rem)",
@@ -314,13 +318,14 @@ export default async function LandingPage() {
         {/* ── WHY FONLOK ───────────────────────────────────────────── */}
         <section
           aria-label="Benefits"
+          className="lp-section"
           style={{
             backgroundColor: "var(--color-white)",
             padding: "5rem 1.5rem",
           }}
         >
           <div className="page-wrapper">
-            <div style={{ textAlign: "center", marginBottom: "3rem" }}>
+            <div className="lp-section-header" style={{ textAlign: "center", marginBottom: "3rem" }}>
               <h2
                 style={{
                   fontSize: "clamp(1.5rem, 3vw, 2rem)",
@@ -386,6 +391,7 @@ export default async function LandingPage() {
         {/* ── PRICING PREVIEW ──────────────────────────────────────── */}
         <section
           aria-label="Pricing"
+          className="lp-section"
           style={{
             backgroundColor: "var(--color-mist)",
             padding: "5rem 1.5rem",
@@ -509,6 +515,7 @@ export default async function LandingPage() {
         {/* ── REFERRAL PROGRAM ─────────────────────────────────────── */}
         <section
           aria-label="Referral program"
+          className="lp-section"
           style={{
             background:
               "linear-gradient(135deg, #0F1F3D 0%, #1a2f4a 60%, #0F1F3D 100%)",
@@ -606,6 +613,7 @@ export default async function LandingPage() {
 
             {/* Feature cards */}
             <div
+              className="lp-referral-cards"
               style={{
                 display: "grid",
                 gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
@@ -650,6 +658,7 @@ export default async function LandingPage() {
 
             {/* Example calculation */}
             <div
+              className="lp-referral-box"
               style={{
                 backgroundColor: "rgba(245,158,11,0.08)",
                 border: "1px solid rgba(245,158,11,0.2)",
@@ -712,6 +721,7 @@ export default async function LandingPage() {
         {/* ── FINAL CTA ────────────────────────────────────────────── */}
         <section
           aria-label="Call to action"
+          className="lp-section"
           style={{
             backgroundColor: "var(--color-primary)",
             padding: "5rem 1.5rem",
@@ -739,6 +749,7 @@ export default async function LandingPage() {
               {t("finalCta.description")}
             </p>
             <div
+              className="lp-cta-buttons"
               style={{
                 display: "flex",
                 gap: "1rem",

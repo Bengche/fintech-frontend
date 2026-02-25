@@ -27,7 +27,7 @@ export default function SiteFooter() {
     >
       {/* â”€â”€ Main footer grid â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <div
-        className="page-wrapper"
+        className="page-wrapper lp-footer-grid"
         style={{
           paddingTop: "3.5rem",
           paddingBottom: "3rem",
@@ -37,7 +37,7 @@ export default function SiteFooter() {
         }}
       >
         {/* Brand column */}
-        <div style={{ gridColumn: "span 1" }}>
+        <div className="lp-footer-brand" style={{ gridColumn: "span 1" }}>
           <Link
             href="/"
             style={{
@@ -180,7 +180,7 @@ export default function SiteFooter() {
 
       {/* â”€â”€ Bottom bar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <div
-        className="page-wrapper"
+        className="page-wrapper lp-footer-bottom"
         style={{
           borderTop: "1px solid rgba(255,255,255,0.07)",
           paddingTop: "1.25rem",

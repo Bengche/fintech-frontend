@@ -327,3 +327,99 @@ a:hover {
   padding-top: 5rem;
   padding-bottom: 5rem;
 }
+
+/* ─────────────────────────────────────────────────────────────
+   LANDING PAGE — Premium mobile responsiveness
+   All .lp-* classes are namespaced to public landing page only
+   ───────────────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  /* ── Hero ─────────────────────────────────────────────────── */
+  /* Tighter vertical padding on small screens */
+  .lp-hero {
+    padding: 2.75rem 1.25rem 3rem !important;
+  }
+
+  /* Phone illustration hidden on mobile — saves ~380px height */
+  .lp-hero-illo {
+    display: none !important;
+  }
+
+  /* Reduce gap: illustration is gone so gap is just wasted space */
+  .lp-hero-inner {
+    gap: 1.5rem !important;
+  }
+
+  /* Hero text takes full width */
+  .lp-hero-text {
+    max-width: 100% !important;
+    flex: 1 1 100% !important;
+  }
+
+  /* Trust stats: tighter spacing, wrap naturally */
+  .lp-trust-stats {
+    gap: 0.875rem 1.5rem !important;
+    margin-top: 1.75rem !important;
+    padding-top: 1.5rem !important;
+  }
+
+  /* ── Content sections ────────────────────────────────────── */
+  /* All sections: reduce 5rem → 2.75rem vertical padding */
+  .lp-section {
+    padding: 2.75rem 1.25rem !important;
+  }
+
+  /* Section heading groups: tighter bottom margin */
+  .lp-section-header {
+    margin-bottom: 1.75rem !important;
+  }
+
+  /* ── Referral section ───────────────────────────────────── */
+  /* Feature cards: single column on mobile */
+  .lp-referral-cards {
+    grid-template-columns: 1fr !important;
+    gap: 0.875rem !important;
+    margin-bottom: 2rem !important;
+  }
+
+  /* Referral example box: reduce side padding */
+  .lp-referral-box {
+    padding: 1.25rem !important;
+    margin-bottom: 2rem !important;
+  }
+
+  /* ── Final CTA buttons ──────────────────────────────────── */
+  /* Stack buttons vertically, full-width — premium feel */
+  .lp-cta-buttons {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0.75rem !important;
+  }
+
+  .lp-cta-buttons > * {
+    justify-content: center !important;
+    text-align: center !important;
+  }
+}
+
+/* ─── Footer mobile ─────────────────────────────────────────── */
+@media (max-width: 640px) {
+  /* Footer grid: 2 columns instead of auto-fill on small screens */
+  .lp-footer-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 2rem !important;
+    padding-top: 2.5rem !important;
+    padding-bottom: 2rem !important;
+  }
+
+  /* Brand column spans full width on mobile */
+  .lp-footer-brand {
+    grid-column: 1 / -1 !important;
+  }
+
+  /* Footer bottom: stack items vertically */
+  .lp-footer-bottom {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.5rem !important;
+  }
+}
