@@ -139,21 +139,32 @@ export default function Navbar() {
         style={{
           position: "fixed", top: 0, left: 0, right: 0, zIndex: 50,
           transition: "background-color 0.38s ease, box-shadow 0.38s ease, border-color 0.38s ease",
-          backgroundColor: scrolled ? "rgba(10,23,50,0.82)" : "var(--color-primary)",
-          backdropFilter: scrolled ? "blur(14px)" : "none",
-          WebkitBackdropFilter: scrolled ? "blur(14px)" : "none",
+          backgroundColor: scrolled ? "rgba(8,18,44,0.38)" : "var(--color-primary)",
+          backdropFilter: scrolled ? "blur(22px) saturate(1.6)" : "none",
+          WebkitBackdropFilter: scrolled ? "blur(22px) saturate(1.6)" : "none",
           boxShadow: scrolled ? "0 1px 0 rgba(255,255,255,0.07),0 6px 28px rgba(0,0,0,0.28)" : "none",
-          borderBottom: scrolled ? "1px solid rgba(255,255,255,0.11)" : "1px solid rgba(255,255,255,0.07)",
+          borderBottom: scrolled ? "1px solid rgba(255,255,255,0.18)" : "1px solid rgba(255,255,255,0.07)",
         }}
       >
         <div style={{
           maxWidth: "1200px", margin: "0 auto", padding: "0 1.25rem",
-          display: "flex", alignItems: "center", justifyContent: "space-between", height: "62px",
+          display: "flex", alignItems: "center", justifyContent: "space-between", height: "62px", position: "relative",
         }}>
           {/* Logo */}
           <Link href="/" style={{ display: "flex", alignItems: "center", textDecoration: "none" }} aria-label="Fonlok home">
             <FonlokLogo variant="light" iconSize={30} />
           </Link>
+
+          {/* Mobile-only centred notification bell */}
+          {user_id && (
+            <div className="flex md:hidden" style={{
+              position: "absolute", left: "50%", top: "50%",
+              transform: "translate(-50%, -50%)", pointerEvents: "auto", zIndex: 1,
+            }}>
+              <NotificationBell notifications={notifData.notifications} unreadCount={notifData.unreadCount}
+                markRead={notifData.markRead} markAllRead={notifData.markAllRead} />
+            </div>
+          )}
 
           {/* ── Desktop links ──────────────────────────────── */}
           <div style={{ alignItems: "center", gap: "0.25rem" }} className="hidden md:flex">
@@ -207,10 +218,6 @@ export default function Navbar() {
 
           {/* ── Mobile right controls ──────────────────────── */}
           <div className="flex md:hidden" style={{ alignItems:"center",gap:"0.25rem" }}>
-            {user_id && (
-              <NotificationBell notifications={notifData.notifications} unreadCount={notifData.unreadCount}
-                markRead={notifData.markRead} markAllRead={notifData.markAllRead} />
-            )}
             {/* Hamburger / X */}
             <button
               onClick={() => setMenuOpen((v) => !v)}
