@@ -158,12 +158,20 @@ export default function NotificationBell({
         <div
           style={{
             position: "fixed",
-            inset: 0,
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            width: "100%",
+            height: "100%",
             zIndex: 99999,
             display: "flex",
             alignItems: "flex-start",
             justifyContent: "center",
-            padding: "72px 12px 12px",
+            paddingTop: "72px",
+            paddingLeft: "12px",
+            paddingRight: "12px",
+            paddingBottom: "12px",
             boxSizing: "border-box",
           }}
         >
@@ -185,7 +193,9 @@ export default function NotificationBell({
               position: "relative",
               width: "100%",
               maxWidth: "480px",
-              maxHeight: "calc(100dvh - 96px)",
+              height: "auto",
+              maxHeight: "calc(100vh - 96px)",
+              minHeight: "200px",
               background: "#ffffff",
               borderRadius: "20px",
               boxShadow: "0 32px 80px rgba(0,0,0,0.25), 0 4px 20px rgba(0,0,0,0.1)",
@@ -269,7 +279,7 @@ export default function NotificationBell({
             {/* ── Notification list ─────────────────────────────────────── */}
             <div
               className="notif-scroll"
-              style={{ flex: 1, overflowY: "auto", overscrollBehavior: "contain" }}
+              style={{ flex: 1, overflowY: "auto", overscrollBehavior: "contain", minHeight: "80px" }}
             >
               {notifications.length === 0 ? (
                 <div style={{
