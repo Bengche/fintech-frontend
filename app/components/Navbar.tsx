@@ -141,7 +141,6 @@ export default function Navbar() {
           transition: "background-color 0.38s ease, box-shadow 0.38s ease, border-color 0.38s ease",
           backgroundColor: scrolled ? "rgba(10,23,50,0.82)" : "var(--color-primary)",
           backdropFilter: scrolled ? "blur(14px)" : "none",
-          // @ts-expect-error – non-standard Safari prefix
           WebkitBackdropFilter: scrolled ? "blur(14px)" : "none",
           boxShadow: scrolled ? "0 1px 0 rgba(255,255,255,0.07),0 6px 28px rgba(0,0,0,0.28)" : "none",
           borderBottom: scrolled ? "1px solid rgba(255,255,255,0.11)" : "1px solid rgba(255,255,255,0.07)",
