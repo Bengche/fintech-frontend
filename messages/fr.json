@@ -62,9 +62,9 @@
       "ctaPrimary": "Compte gratuit",
       "ctaSecondary": "Comment ça marche",
       "stats": {
-        "free": { "value": "Gratuit", "label": "pour créer un compte" },
-        "fee": { "value": "3%", "label": "frais vendeur par transaction" },
-        "momo": { "value": "MTN + Orange", "label": "Mobile Money acceptés" }
+        "free": { "value": "Gratuit", "label": "Compte", "detail": "Créez votre compte et utilisez Fonlok sans frais. Aucune carte bancaire, aucun frais d'installation — inscrivez-vous et c'est parti." },
+        "fee": { "value": "3%", "label": "Frais vendeur", "detail": "Les vendeurs paient un forfait de 3% uniquement lorsqu'une transaction est finalisée. Les acheteurs ne paient rien." },
+        "momo": { "value": "MTN + Orange", "label": "Mobile Money", "detail": "Payez et recevez via MTN Mobile Money ou Orange Money — fonctionne sur tout téléphone au Cameroun." }
       }
     },
     "howItWorks": {
@@ -157,7 +157,8 @@
       "exampleHighlight": "5 000 XAF dans votre poche chaque mois",
       "exampleEnd": "— qui augmentent au fur et à mesure que leurs activités grandissent, sans aucun effort supplémentaire de votre part.",
       "cta": "Obtenir votre lien de parrainage →",
-      "ctaNote": "Inscription gratuite. Paiement minimum : 2 000 XAF."
+      "ctaNote": "Inscription gratuite. Paiement minimum : 2 000 XAF.",
+      "learnMore": "En savoir plus sur notre programme de parrainage →"
     },
     "finalCta": {
       "heading": "Prêt à faire des affaires en toute sécurité ?",

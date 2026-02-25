@@ -9,6 +9,7 @@ import Link from "next/link";
 import SiteHeader from "./components/SiteHeader";
 import SiteFooter from "./components/SiteFooter";
 import BenefitsSlider from "./components/BenefitsSlider";
+import HeroStatsTabs from "./components/HeroStatsTabs";
 import { getTranslations } from "next-intl/server";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -130,7 +131,10 @@ export default async function LandingPage() {
                 {t("hero.description")}
               </p>
 
-              <div style={{ display: "flex", gap: "0.875rem", flexWrap: "wrap" }}>
+              <div
+                className="lp-hero-cta"
+                style={{ display: "flex", gap: "0.875rem", flexWrap: "wrap" }}
+              >
                 <Link
                   href="/register"
                   className="btn-accent"
@@ -147,207 +151,26 @@ export default async function LandingPage() {
                 </Link>
               </div>
 
-              {/* ── Selling-point badges ── */}
-              <div
-                className="lp-trust-stats"
-                style={{
-                  display: "flex",
-                  flexWrap: "wrap",
-                  gap: "0.75rem",
-                  marginTop: "2.5rem",
-                  paddingTop: "2rem",
-                  borderTop: "1px solid rgba(255,255,255,0.1)",
-                }}
-              >
-                {/* Free badge */}
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "0.75rem",
-                    backgroundColor: "rgba(255,255,255,0.06)",
-                    border: "1px solid rgba(255,255,255,0.1)",
-                    borderRadius: "var(--radius-md)",
-                    padding: "0.75rem 1.125rem",
-                  }}
-                >
-                  <div
-                    style={{
-                      width: "2rem",
-                      height: "2rem",
-                      borderRadius: "50%",
-                      backgroundColor: "rgba(34,197,94,0.18)",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      flexShrink: 0,
-                    }}
-                  >
-                    <svg
-                      width="13"
-                      height="13"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="#22c55e"
-                      strokeWidth="2.8"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <polyline points="20 6 9 17 4 12" />
-                    </svg>
-                  </div>
-                  <div>
-                    <p
-                      style={{
-                        fontSize: "1rem",
-                        fontWeight: 800,
-                        color: "#ffffff",
-                        margin: "0 0 0.1rem",
-                        lineHeight: 1,
-                      }}
-                    >
-                      {t("hero.stats.free.value")}
-                    </p>
-                    <p
-                      style={{
-                        fontSize: "0.72rem",
-                        color: "rgba(255,255,255,0.45)",
-                        margin: 0,
-                        whiteSpace: "nowrap",
-                      }}
-                    >
-                      {t("hero.stats.free.label")}
-                    </p>
-                  </div>
-                </div>
-
-                {/* 3% fee badge */}
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "0.75rem",
-                    backgroundColor: "rgba(255,255,255,0.06)",
-                    border: "1px solid rgba(255,255,255,0.1)",
-                    borderRadius: "var(--radius-md)",
-                    padding: "0.75rem 1.125rem",
-                  }}
-                >
-                  <div
-                    style={{
-                      width: "2rem",
-                      height: "2rem",
-                      borderRadius: "50%",
-                      backgroundColor: "rgba(245,158,11,0.18)",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      flexShrink: 0,
-                    }}
-                  >
-                    <svg
-                      width="13"
-                      height="13"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="#F59E0B"
-                      strokeWidth="2.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <line x1="19" y1="5" x2="5" y2="19" />
-                      <circle cx="6.5" cy="6.5" r="2.5" />
-                      <circle cx="17.5" cy="17.5" r="2.5" />
-                    </svg>
-                  </div>
-                  <div>
-                    <p
-                      style={{
-                        fontSize: "1rem",
-                        fontWeight: 800,
-                        color: "#ffffff",
-                        margin: "0 0 0.1rem",
-                        lineHeight: 1,
-                      }}
-                    >
-                      {t("hero.stats.fee.value")}
-                    </p>
-                    <p
-                      style={{
-                        fontSize: "0.72rem",
-                        color: "rgba(255,255,255,0.45)",
-                        margin: 0,
-                        whiteSpace: "nowrap",
-                      }}
-                    >
-                      {t("hero.stats.fee.label")}
-                    </p>
-                  </div>
-                </div>
-
-                {/* MTN + Orange badge */}
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "0.75rem",
-                    backgroundColor: "rgba(255,255,255,0.06)",
-                    border: "1px solid rgba(255,255,255,0.1)",
-                    borderRadius: "var(--radius-md)",
-                    padding: "0.75rem 1.125rem",
-                  }}
-                >
-                  <div
-                    style={{
-                      width: "2rem",
-                      height: "2rem",
-                      borderRadius: "50%",
-                      backgroundColor: "rgba(96,165,250,0.18)",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      flexShrink: 0,
-                    }}
-                  >
-                    <svg
-                      width="13"
-                      height="13"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="#60a5fa"
-                      strokeWidth="2.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <rect x="5" y="2" width="14" height="20" rx="2" ry="2" />
-                      <line x1="12" y1="18" x2="12.01" y2="18" />
-                    </svg>
-                  </div>
-                  <div>
-                    <p
-                      style={{
-                        fontSize: "1rem",
-                        fontWeight: 800,
-                        color: "#ffffff",
-                        margin: "0 0 0.1rem",
-                        lineHeight: 1,
-                      }}
-                    >
-                      {t("hero.stats.momo.value")}
-                    </p>
-                    <p
-                      style={{
-                        fontSize: "0.72rem",
-                        color: "rgba(255,255,255,0.45)",
-                        margin: 0,
-                        whiteSpace: "nowrap",
-                      }}
-                    >
-                      {t("hero.stats.momo.label")}
-                    </p>
-                  </div>
-                </div>
-              </div>
+              {/* ── Selling-point tabs ── */}
+              <HeroStatsTabs
+                tabs={[
+                  {
+                    value: t("hero.stats.free.value"),
+                    label: t("hero.stats.free.label"),
+                    detail: t("hero.stats.free.detail"),
+                  },
+                  {
+                    value: t("hero.stats.fee.value"),
+                    label: t("hero.stats.fee.label"),
+                    detail: t("hero.stats.fee.detail"),
+                  },
+                  {
+                    value: t("hero.stats.momo.value"),
+                    label: t("hero.stats.momo.label"),
+                    detail: t("hero.stats.momo.detail"),
+                  },
+                ]}
+              />
             </div>
 
             {/* Hero illustration */}
@@ -638,201 +461,70 @@ export default async function LandingPage() {
             background:
               "linear-gradient(135deg, #0F1F3D 0%, #1a2f4a 60%, #0F1F3D 100%)",
             padding: "5rem 1.5rem",
-            overflow: "hidden",
-            position: "relative",
+            textAlign: "center",
           }}
         >
-          {/* Decorative amber blobs */}
-          <div
-            aria-hidden="true"
-            style={{
-              position: "absolute",
-              top: "-80px",
-              right: "-80px",
-              width: "360px",
-              height: "360px",
-              borderRadius: "50%",
-              background:
-                "radial-gradient(circle, rgba(245,158,11,0.12) 0%, transparent 70%)",
-              pointerEvents: "none",
-            }}
-          />
-          <div
-            aria-hidden="true"
-            style={{
-              position: "absolute",
-              bottom: "-60px",
-              left: "-60px",
-              width: "280px",
-              height: "280px",
-              borderRadius: "50%",
-              background:
-                "radial-gradient(circle, rgba(245,158,11,0.1) 0%, transparent 70%)",
-              pointerEvents: "none",
-            }}
-          />
-
-          <div
-            className="page-wrapper"
-            style={{ position: "relative", zIndex: 1 }}
-          >
+          <div className="page-wrapper" style={{ maxWidth: "640px" }}>
             {/* Badge */}
-            <div style={{ textAlign: "center", marginBottom: "2rem" }}>
-              <span
-                style={{
-                  display: "inline-block",
-                  backgroundColor: "rgba(245,158,11,0.15)",
-                  border: "1px solid rgba(245,158,11,0.4)",
-                  color: "#F59E0B",
-                  borderRadius: "999px",
-                  padding: "0.375rem 1rem",
-                  fontSize: "0.8rem",
-                  fontWeight: 700,
-                  letterSpacing: "0.06em",
-                  textTransform: "uppercase",
-                }}
-              >
-                {t("referral.badge")}
+            <span
+              style={{
+                display: "inline-block",
+                backgroundColor: "rgba(245,158,11,0.15)",
+                border: "1px solid rgba(245,158,11,0.4)",
+                color: "#F59E0B",
+                borderRadius: "999px",
+                padding: "0.375rem 1rem",
+                fontSize: "0.8rem",
+                fontWeight: 700,
+                letterSpacing: "0.07em",
+                textTransform: "uppercase",
+                marginBottom: "1.75rem",
+              }}
+            >
+              {t("referral.badge")}
+            </span>
+
+            <h2
+              style={{
+                fontSize: "clamp(1.75rem, 5vw, 2.75rem)",
+                fontWeight: 800,
+                color: "#ffffff",
+                lineHeight: 1.2,
+                marginBottom: "1.25rem",
+              }}
+            >
+              {t("referral.heading")}{" "}
+              <span style={{ color: "#F59E0B" }}>
+                {t("referral.headingHighlight")}
               </span>
-            </div>
+              <br />
+              {t("referral.headingEnd")}
+            </h2>
 
-            <div style={{ textAlign: "center", marginBottom: "3rem" }}>
-              <h2
-                style={{
-                  fontSize: "clamp(1.625rem, 4vw, 2.375rem)",
-                  color: "#ffffff",
-                  marginBottom: "1rem",
-                  lineHeight: 1.25,
-                }}
-              >
-                {t("referral.heading")}{" "}
-                <span style={{ color: "#F59E0B" }}>
-                  {t("referral.headingHighlight")}
-                </span>
-                <br />
-                {t("referral.headingEnd")}
-              </h2>
-              <p
-                style={{
-                  fontSize: "1.0625rem",
-                  color: "rgba(255,255,255,0.65)",
-                  maxWidth: "520px",
-                  margin: "0 auto",
-                  lineHeight: 1.75,
-                }}
-              >
-                {t("referral.description")}{" "}
-                <strong style={{ color: "rgba(255,255,255,0.88)" }}>
-                  {t("referral.descriptionHighlight")}
-                </strong>{" "}
-                {t("referral.descriptionEnd")}
-              </p>
-            </div>
-
-            {/* Feature cards */}
-            <div
-              className="lp-referral-cards"
+            <p
               style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-                gap: "1.25rem",
-                maxWidth: "860px",
-                margin: "0 auto 3rem",
+                fontSize: "1.0625rem",
+                color: "rgba(255,255,255,0.7)",
+                lineHeight: 1.8,
+                marginBottom: "2.25rem",
+                maxWidth: "520px",
+                margin: "0 auto 2.25rem",
               }}
             >
-              {([0, 1, 2] as const).map((i) => (
-                <div
-                  key={i}
-                  style={{
-                    backgroundColor: "rgba(255,255,255,0.05)",
-                    border: "1px solid rgba(255,255,255,0.1)",
-                    borderRadius: "var(--radius-lg)",
-                    padding: "1.75rem",
-                  }}
-                >
-                  <h3
-                    style={{
-                      fontSize: "1rem",
-                      fontWeight: 700,
-                      color: "#ffffff",
-                      marginBottom: "0.5rem",
-                    }}
-                  >
-                    {t(`referral.cards.${i}.title`)}
-                  </h3>
-                  <p
-                    style={{
-                      margin: 0,
-                      fontSize: "0.9rem",
-                      color: "rgba(255,255,255,0.55)",
-                      lineHeight: 1.7,
-                    }}
-                  >
-                    {t(`referral.cards.${i}.desc`)}
-                  </p>
-                </div>
-              ))}
-            </div>
+              {t("referral.description")}{" "}
+              <strong style={{ color: "rgba(255,255,255,0.9)" }}>
+                {t("referral.descriptionHighlight")}
+              </strong>{" "}
+              {t("referral.descriptionEnd")}
+            </p>
 
-            {/* Example calculation */}
-            <div
-              className="lp-referral-box"
-              style={{
-                backgroundColor: "rgba(245,158,11,0.08)",
-                border: "1px solid rgba(245,158,11,0.2)",
-                borderRadius: "var(--radius-lg)",
-                padding: "1.5rem 2rem",
-                maxWidth: "560px",
-                margin: "0 auto 3rem",
-                textAlign: "center",
-              }}
+            <Link
+              href="/referral-programme"
+              className="btn-outline-white"
+              style={{ fontSize: "0.9375rem", padding: "0.75rem 1.75rem" }}
             >
-              <p
-                style={{
-                  color: "rgba(255,255,255,0.5)",
-                  fontSize: "0.8rem",
-                  fontWeight: 700,
-                  letterSpacing: "0.06em",
-                  textTransform: "uppercase",
-                  marginBottom: "0.75rem",
-                }}
-              >
-                {t("referral.exampleLabel")}
-              </p>
-              <p
-                style={{
-                  color: "rgba(255,255,255,0.8)",
-                  fontSize: "0.9875rem",
-                  lineHeight: 1.7,
-                  margin: 0,
-                }}
-              >
-                {t("referral.example")}{" "}
-                <span style={{ color: "#F59E0B", fontWeight: 700 }}>
-                  {t("referral.exampleHighlight")}
-                </span>{" "}
-                {t("referral.exampleEnd")}
-              </p>
-            </div>
-
-            <div style={{ textAlign: "center" }}>
-              <Link
-                href="/register"
-                className="btn-accent"
-                style={{ fontSize: "1rem", padding: "0.875rem 2.25rem" }}
-              >
-                {t("referral.cta")}
-              </Link>
-              <p
-                style={{
-                  color: "rgba(255,255,255,0.35)",
-                  fontSize: "0.8125rem",
-                  marginTop: "1rem",
-                }}
-              >
-                {t("referral.ctaNote")}
-              </p>
-            </div>
+              {t("referral.learnMore")}
+            </Link>
           </div>
         </section>
 
@@ -1024,7 +716,7 @@ function HeroIllustration() {
           <stop offset="100%" stopColor="#22c55e" stopOpacity="0" />
         </radialGradient>
         <clipPath id="screenClip">
-          <rect x="88" y="54" width="164" height="354" rx="6" />
+          <rect x="88" y="54" width="164" height="354" rx="20" />
         </clipPath>
         {/* Titanium-dark metallic gradient for phone body */}
         <linearGradient id="phoneMetal" x1="0" y1="0" x2="1" y2="1">
@@ -1070,7 +762,7 @@ function HeroIllustration() {
         y="54"
         width="164"
         height="354"
-        rx="6"
+        rx="20"
         fill="url(#screenGrad)"
       />
 
@@ -1416,51 +1108,37 @@ function HeroIllustration() {
 
         {/* ── Bottom nav bar ── */}
         <rect x="88" y="380" width="164" height="28" fill="#0a1628" />
-        {/* Home icon */}
+        {/* Three icons evenly spaced at x=115, 170, 225 — centered at y=394 */}
+        {/* Home icon — cx=115 */}
         <path
-          d="M116 398 L120 393 L124 398 L124 404 L118.5 404 L118.5 401 L121.5 401 L121.5 404 L116 404 Z"
-          fill="rgba(255,255,255,0.8)"
+          d="M110 393 L115 387 L120 393 L120 399 L117.5 399 L117.5 394 L112.5 394 L112.5 399 L110 399 Z"
+          fill="rgba(255,255,255,0.85)"
         />
-        {/* Invoices icon */}
+        {/* Invoices icon — cx=170 */}
         <rect
-          x="156"
-          y="393"
+          x="166"
+          y="388"
           width="8"
-          height="10"
+          height="12"
           rx="1"
           fill="none"
           stroke="rgba(255,255,255,0.4)"
           strokeWidth="1"
         />
-        <line
-          x1="158"
-          y1="396"
-          x2="162"
-          y2="396"
-          stroke="rgba(255,255,255,0.4)"
-          strokeWidth="1"
-          strokeLinecap="round"
-        />
-        <line
-          x1="158"
-          y1="399"
-          x2="162"
-          y2="399"
-          stroke="rgba(255,255,255,0.4)"
-          strokeWidth="1"
-          strokeLinecap="round"
-        />
-        {/* Settings icon */}
+        <line x1="168" y1="391" x2="172" y2="391" stroke="rgba(255,255,255,0.4)" strokeWidth="1" strokeLinecap="round" />
+        <line x1="168" y1="394" x2="172" y2="394" stroke="rgba(255,255,255,0.4)" strokeWidth="1" strokeLinecap="round" />
+        <line x1="168" y1="397" x2="171" y2="397" stroke="rgba(255,255,255,0.4)" strokeWidth="1" strokeLinecap="round" />
+        {/* Settings icon — cx=225 */}
         <circle
-          cx="210"
-          cy="398"
-          r="4"
+          cx="225"
+          cy="394"
+          r="5"
           fill="none"
           stroke="rgba(255,255,255,0.4)"
           strokeWidth="1"
         />
-        <circle cx="210" cy="398" r="1.5" fill="rgba(255,255,255,0.4)" />
-        {/* Home indicator */}
+        <circle cx="225" cy="394" r="2" fill="rgba(255,255,255,0.4)" />
+        {/* Home indicator pill */}
         <rect
           x="150"
           y="406"
@@ -1472,7 +1150,7 @@ function HeroIllustration() {
       </g>
 
       {/* ── Glass glare overlay ── */}
-      <rect x="88" y="54" width="164" height="354" rx="6" fill="url(#glare)" />
+      <rect x="88" y="54" width="164" height="354" rx="20" fill="url(#glare)" />
 
       {/* ── Camera module (rear, top-right) ── */}
       <rect x="228" y="32" width="22" height="16" rx="4" fill="#111" />

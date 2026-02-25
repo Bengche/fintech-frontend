@@ -356,6 +356,17 @@ a:hover {
    All .lp-* classes are namespaced to public landing page only
    ───────────────────────────────────────────────────────────── */
 @media (max-width: 640px) {
+  /* ── Hero CTA buttons: force side-by-side row on mobile ─ */
+  .lp-hero-cta {
+    flex-wrap: nowrap !important;
+  }
+  .lp-hero-cta > a {
+    flex: 1 1 0 !important;
+    justify-content: center !important;
+    text-align: center !important;
+    min-width: 0 !important;
+  }
+
   /* ── Hero ─────────────────────────────────────────────────── */
   /* Tighter vertical padding on small screens */
   .lp-hero {
