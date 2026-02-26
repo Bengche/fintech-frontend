@@ -1332,8 +1332,8 @@
     }
   },
   "Maintenance": {
-    "title": "We\'ll be back shortly",
-    "body": "Fonlok is currently undergoing scheduled maintenance. We\'re working hard to restore the service as quickly as possible.",
+    "title": "We'll be back shortly",
+    "body": "Fonlok is currently undergoing scheduled maintenance. We're working hard to restore the service as quickly as possible.",
     "sub": "We apologise for any inconvenience. Please check back in a few minutes.",
     "refresh": "Try Again"
   },
