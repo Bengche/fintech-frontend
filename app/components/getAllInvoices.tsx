@@ -4,6 +4,8 @@ import { useAuth } from "@/context/UserContext";
 import { QRCodeSVG } from "qrcode.react";
 
 const API = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
+const FRONTEND_URL =
+  process.env.NEXT_PUBLIC_FRONTEND_URL || "http://localhost:3000";
 import { useState, useEffect, useCallback } from "react";
 import DeleteInvoice from "../components/deleteInvoice";
 import EditInvoice from "./editInvoice";
@@ -378,10 +380,10 @@ export default function GetAllInvoices({
                   wordBreak: "break-all",
                 }}
               >
-                {invoice.invoicelink}
+                {`${FRONTEND_URL}/invoice/${invoice.invoicenumber}`}
               </span>
               <button
-                onClick={() => handleCopy(invoice.id, invoice.invoicelink)}
+                onClick={() => handleCopy(invoice.id, `${FRONTEND_URL}/invoice/${invoice.invoicenumber}`)}
                 className="btn-ghost"
                 style={{
                   fontSize: "0.75rem",
@@ -415,7 +417,7 @@ export default function GetAllInvoices({
             >
               <a
                 href={`https://wa.me/?text=${encodeURIComponent(
-                  `Pay me for "${invoice.invoicename}" on Fonlok 👉 ${invoice.invoicelink}`,
+                  `Pay me for "${invoice.invoicename}" on Fonlok 👉 ${FRONTEND_URL}/invoice/${invoice.invoicenumber}`,
                 )}`}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -485,7 +487,7 @@ export default function GetAllInvoices({
                     display: "inline-block",
                   }}
                 >
-                  <QRCodeSVG value={invoice.invoicelink} size={130} />
+                  <QRCodeSVG value={`${FRONTEND_URL}/invoice/${invoice.invoicenumber}`} size={130} />
                 </div>
                 <p
                   style={{
