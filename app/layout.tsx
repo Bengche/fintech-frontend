@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "../context/UserContext";
+import LayoutShell from "./components/LayoutShell";
 import CookieConsent from "./components/CookieConsent";
 import AiChatWidgetWrapper from "./components/AiChatWidgetWrapper";
 import PwaRegister from "./components/PwaRegister";
@@ -122,7 +123,9 @@ export default async function RootLayout({
         suppressHydrationWarning
       >
         <NextIntlClientProvider locale={locale} messages={messages}>
-          <AuthProvider>{children}</AuthProvider>
+          <AuthProvider>
+            <LayoutShell>{children}</LayoutShell>
+          </AuthProvider>
           <CookieConsent />
           <AiChatWidgetWrapper />
         </NextIntlClientProvider>

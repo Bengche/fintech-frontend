@@ -3,13 +3,11 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useAuth } from "@/context/UserContext";
 import { useRouter } from "next/navigation";
-import Navbar from "@/app/components/Navbar";
-import SiteFooter from "@/app/components/SiteFooter";
 import { useTranslations } from "next-intl";
 
 const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 interface Earning {
   id: number;
@@ -46,7 +44,7 @@ interface DashboardData {
   withdrawals: Withdrawal[];
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const fmt = (n: number) =>
   new Intl.NumberFormat("fr-CM", {
@@ -62,7 +60,7 @@ const fmtDate = (iso: string) =>
     year: "numeric",
   });
 
-// ─── Component ────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Component â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export default function ReferralPage() {
   const { user_id, authLoading } = useAuth();
@@ -91,14 +89,14 @@ export default function ReferralPage() {
   const [showAllReferrals, setShowAllReferrals] = useState(false);
   const [showAllWithdrawals, setShowAllWithdrawals] = useState(false);
 
-  // ── Redirect if not logged in ──────────────────────────────────────────────
+  // â”€â”€ Redirect if not logged in â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   useEffect(() => {
     if (!authLoading && user_id === null) {
       router.push("/login");
     }
   }, [authLoading, user_id, router]);
 
-  // ── Load dashboard data ────────────────────────────────────────────────────
+  // â”€â”€ Load dashboard data â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   useEffect(() => {
     if (authLoading || !user_id) return;
 
@@ -122,7 +120,7 @@ export default function ReferralPage() {
     fetchDashboard();
   }, [authLoading, user_id]);
 
-  // ── Copy referral link ─────────────────────────────────────────────────────
+  // â”€â”€ Copy referral link â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const copyLink = async () => {
     if (!data) return;
     try {
@@ -142,11 +140,11 @@ export default function ReferralPage() {
       setCopied(true);
       setTimeout(() => setCopied(false), 2500);
     } catch {
-      // Silent fail — user can copy the link manually
+      // Silent fail â€” user can copy the link manually
     }
   };
 
-  // ── Submit withdrawal ──────────────────────────────────────────────────────
+  // â”€â”€ Submit withdrawal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const handleWithdraw = async (e: React.FormEvent) => {
     e.preventDefault();
     setWithdrawMsg(null);
@@ -202,14 +200,13 @@ export default function ReferralPage() {
     }
   };
 
-  // ── Render states ──────────────────────────────────────────────────────────
+  // â”€â”€ Render states â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   if (!user_id || loading) {
     return (
       <div
         style={{ minHeight: "100vh", backgroundColor: "var(--color-cloud)" }}
       >
-        <Navbar />
         <div
           style={{
             display: "flex",
@@ -223,7 +220,6 @@ export default function ReferralPage() {
           </p>
         </div>
 
-        <SiteFooter />
       </div>
     );
   }
@@ -233,7 +229,6 @@ export default function ReferralPage() {
       <div
         style={{ minHeight: "100vh", backgroundColor: "var(--color-cloud)" }}
       >
-        <Navbar />
         <div
           style={{
             display: "flex",
@@ -250,7 +245,6 @@ export default function ReferralPage() {
           </div>
         </div>
 
-        <SiteFooter />
       </div>
     );
   }
@@ -273,7 +267,6 @@ export default function ReferralPage() {
 
   return (
     <div style={{ minHeight: "100vh", backgroundColor: "var(--color-cloud)" }}>
-      <Navbar />
       <div
         style={{
           maxWidth: "900px",
@@ -281,7 +274,7 @@ export default function ReferralPage() {
           padding: "2rem 1.25rem 4rem",
         }}
       >
-        {/* ── Page Header ─────────────────────────────────────────────────── */}
+        {/* â”€â”€ Page Header â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         <div style={{ marginBottom: "2rem" }}>
           <h1
             style={{
@@ -304,7 +297,7 @@ export default function ReferralPage() {
           </p>
         </div>
 
-        {/* ── 1. Balance ──────────────────────────────────────────────────── */}
+        {/* â”€â”€ 1. Balance â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         <div
           className="card"
           style={{
@@ -359,7 +352,7 @@ export default function ReferralPage() {
           </p>
         </div>
 
-        {/* ── 2. Referral Code & Link ─────────────────────────────────────── */}
+        {/* â”€â”€ 2. Referral Code & Link â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         <div className="card" style={{ marginBottom: "1.5rem" }}>
           <h2
             style={{
@@ -457,7 +450,7 @@ export default function ReferralPage() {
           </div>
         </div>
 
-        {/* ── 3. Withdraw Earnings ────────────────────────────────────────── */}
+        {/* â”€â”€ 3. Withdraw Earnings â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         <div className="card" style={{ marginBottom: "1.5rem" }}>
           <h2
             style={{
@@ -570,7 +563,7 @@ export default function ReferralPage() {
           </form>
         </div>
 
-        {/* ── 4. Earnings History ─────────────────────────────────────────── */}
+        {/* â”€â”€ 4. Earnings History â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         <div className="card" style={{ marginBottom: "1.5rem" }}>
           <h2
             style={{
@@ -764,7 +757,7 @@ export default function ReferralPage() {
           )}
         </div>
 
-        {/* ── 5. People You've Referred ───────────────────────────────────── */}
+        {/* â”€â”€ 5. People You've Referred â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         <div className="card" style={{ marginBottom: "1.5rem" }}>
           <h2
             style={{
@@ -857,7 +850,7 @@ export default function ReferralPage() {
                         }}
                       >
                         @{u.username}
-                        {u.created_at ? ` · ${fmtDate(u.created_at)}` : ""}
+                        {u.created_at ? ` Â· ${fmtDate(u.created_at)}` : ""}
                       </p>
                     </div>
                   </div>
@@ -882,7 +875,7 @@ export default function ReferralPage() {
           )}
         </div>
 
-        {/* ── 6. Withdrawal History ───────────────────────────────────────── */}
+        {/* â”€â”€ 6. Withdrawal History â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         <div className="card" style={{ marginBottom: "1.5rem" }}>
           <h2
             style={{
@@ -1022,7 +1015,7 @@ export default function ReferralPage() {
           )}
         </div>
 
-        {/* ── 7. How It Works ─────────────────────────────────────────────── */}
+        {/* â”€â”€ 7. How It Works â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         <div className="card">
           <h2
             style={{
@@ -1100,7 +1093,6 @@ export default function ReferralPage() {
         </div>
       </div>
 
-      <SiteFooter />
     </div>
   );
 }

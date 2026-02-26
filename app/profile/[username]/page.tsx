@@ -3,8 +3,6 @@ import { useState, useEffect } from "react";
 import Axios from "axios";
 import { useParams } from "next/navigation";
 import { useAuth } from "@/context/UserContext";
-import Navbar from "@/app/components/Navbar";
-import SiteFooter from "@/app/components/SiteFooter";
 import { useTranslations } from "next-intl";
 
 const API = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
@@ -126,7 +124,6 @@ export default function SellerProfilePage() {
       <div
         style={{ minHeight: "100vh", backgroundColor: "var(--color-cloud)" }}
       >
-        <Navbar />
         <div
           style={{
             textAlign: "center",
@@ -144,14 +141,12 @@ export default function SellerProfilePage() {
       <div
         style={{ minHeight: "100vh", backgroundColor: "var(--color-cloud)" }}
       >
-        <Navbar />
         <div
           style={{ maxWidth: "480px", margin: "4rem auto", padding: "1.25rem" }}
         >
           <div className="alert alert-danger">{error}</div>
         </div>
 
-        <SiteFooter />
       </div>
     );
 
@@ -161,7 +156,6 @@ export default function SellerProfilePage() {
 
   return (
     <div style={{ minHeight: "100vh", backgroundColor: "var(--color-cloud)" }}>
-      <Navbar />
       <div
         style={{
           maxWidth: "720px",
@@ -743,7 +737,6 @@ export default function SellerProfilePage() {
         )}
       </div>
 
-      <SiteFooter />
     </div>
   );
 }

@@ -4,7 +4,6 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Axios from "axios";
 import SiteHeader from "../components/SiteHeader";
-import SiteFooter from "../components/SiteFooter";
 import { useAuth } from "@/context/UserContext";
 import { useTranslations } from "next-intl";
 
@@ -20,7 +19,7 @@ type UserProfile = {
   country: string | null;
 };
 
-// ── Shared feedback component ────────────────────────────────────────────────
+// â”€â”€ Shared feedback component â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function Feedback({
   msg,
 }: {
@@ -37,7 +36,7 @@ function Feedback({
   );
 }
 
-// ── Section card wrapper ─────────────────────────────────────────────────────
+// â”€â”€ Section card wrapper â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function Section({
   title,
   subtitle,
@@ -120,7 +119,6 @@ export default function SettingsPage() {
             {loadError}
           </div>
         </main>
-        <SiteFooter />
       </>
     );
 
@@ -177,12 +175,11 @@ export default function SettingsPage() {
           <DeleteAccountSection />
         </div>
       </main>
-      <SiteFooter />
     </>
   );
 }
 
-// ── 1. Update name ───────────────────────────────────────────────────────────
+// â”€â”€ 1. Update name â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function UpdateNameForm({
   current,
   onSaved,
@@ -252,7 +249,7 @@ function UpdateNameForm({
   );
 }
 
-// ── 2. Update email ──────────────────────────────────────────────────────────
+// â”€â”€ 2. Update email â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function UpdateEmailForm({
   current,
   onSaved,
@@ -320,7 +317,7 @@ function UpdateEmailForm({
   );
 }
 
-// ── 3. Update profile picture ────────────────────────────────────────────────
+// â”€â”€ 3. Update profile picture â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function UpdateProfilePictureForm({
   current,
   onSaved,
@@ -474,7 +471,7 @@ function UpdateProfilePictureForm({
   );
 }
 
-// ── 4. Update phone ──────────────────────────────────────────────────────────
+// â”€â”€ 4. Update phone â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function UpdatePhoneForm({
   current,
   onSaved,
@@ -590,7 +587,7 @@ function UpdatePhoneForm({
   );
 }
 
-// ── 5. Change password ───────────────────────────────────────────────────────
+// â”€â”€ 5. Change password â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function ChangePasswordForm() {
   const [form, setForm] = useState({ current: "", next: "", confirm: "" });
   const [loading, setLoading] = useState(false);
@@ -694,7 +691,7 @@ function ChangePasswordForm() {
   );
 }
 
-// ── 6. Delete account ────────────────────────────────────────────────────────
+// â”€â”€ 6. Delete account â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function DeleteAccountSection() {
   const router = useRouter();
   const [showModal, setShowModal] = useState(false);

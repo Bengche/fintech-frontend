@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import SiteHeader from "../components/SiteHeader";
-import SiteFooter from "../components/SiteFooter";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("Pricing.meta");
@@ -42,7 +41,7 @@ export default async function PricingPage() {
       <SiteHeader />
 
       <main>
-        {/* ── PAGE HEADER ─────────────────────────────── */}
+        {/* â”€â”€ PAGE HEADER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         <section
           style={{
             backgroundColor: "var(--color-primary)",
@@ -73,7 +72,7 @@ export default async function PricingPage() {
           </div>
         </section>
 
-        {/* ── MAIN FEE CARD ───────────────────────────── */}
+        {/* â”€â”€ MAIN FEE CARD â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         <section
           style={{
             backgroundColor: "var(--color-cloud)",
@@ -172,7 +171,7 @@ export default async function PricingPage() {
                           flexShrink: 0,
                         }}
                       >
-                        ✓
+                        âœ“
                       </span>
                       {t(`seller.included.${i}`)}
                     </li>
@@ -264,7 +263,7 @@ export default async function PricingPage() {
           </div>
         </section>
 
-        {/* ── WHAT YOU GET FOR 3% ──────────────────────── */}
+        {/* â”€â”€ WHAT YOU GET FOR 3% â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         <section
           style={{
             backgroundColor: "var(--color-white)",
@@ -335,7 +334,7 @@ export default async function PricingPage() {
           </div>
         </section>
 
-        {/* ── EXAMPLE CALCULATIONS ────────────────────── */}
+        {/* â”€â”€ EXAMPLE CALCULATIONS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         <section
           style={{
             backgroundColor: "var(--color-mist)",
@@ -436,7 +435,7 @@ export default async function PricingPage() {
           </div>
         </section>
 
-        {/* ── PRICING FAQ ─────────────────────────────── */}
+        {/* â”€â”€ PRICING FAQ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         <section
           style={{
             backgroundColor: "var(--color-mist)",
@@ -501,7 +500,6 @@ export default async function PricingPage() {
         </section>
       </main>
 
-      <SiteFooter />
     </>
   );
 }

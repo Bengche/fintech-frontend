@@ -2,8 +2,6 @@
 import { useState, useEffect } from "react";
 import Axios from "axios";
 import { useAuth } from "@/context/UserContext";
-import Navbar from "@/app/components/Navbar";
-import SiteFooter from "@/app/components/SiteFooter";
 import Link from "next/link";
 import { SkeletonRow } from "@/app/components/Spinner";
 import { useTranslations } from "next-intl";
@@ -85,7 +83,6 @@ export default function TransactionsPage() {
 
   return (
     <div style={{ minHeight: "100vh", backgroundColor: "var(--color-cloud)" }}>
-      <Navbar />
 
       <div
         style={{ maxWidth: "860px", margin: "0 auto", padding: "2rem 1.25rem" }}
@@ -292,7 +289,7 @@ export default function TransactionsPage() {
                                 : "var(--color-text-heading)",
                           }}
                         >
-                          {activeTab === "received" ? "+" : "−"}
+                          {activeTab === "received" ? "+" : "âˆ’"}
                           {tx.amount.toLocaleString()} {tx.currency}
                         </p>
                         <p
@@ -331,7 +328,7 @@ export default function TransactionsPage() {
                             gap: "0.25rem",
                           }}
                         >
-                          ↓ {t("downloadReceipt")}
+                          â†“ {t("downloadReceipt")}
                         </a>
                       )}
                     </div>
@@ -343,7 +340,6 @@ export default function TransactionsPage() {
         )}
       </div>
 
-      <SiteFooter />
     </div>
   );
 }

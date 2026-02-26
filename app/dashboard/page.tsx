@@ -4,8 +4,6 @@ import GetAllInvoices from "../components/getAllInvoices";
 import FilterInvoice from "../components/filterInvoice";
 import RevenueStats from "../components/RevenueStats";
 import EscrowBalance from "../components/EscrowBalance";
-import Navbar from "../components/Navbar";
-import SiteFooter from "../components/SiteFooter";
 import { useState } from "react";
 import axios from "axios";
 import { useAuth } from "@/context/UserContext";
@@ -95,7 +93,6 @@ export default function Dashboard() {
 
   return (
     <div style={{ minHeight: "100vh", backgroundColor: "var(--color-cloud)" }}>
-      <Navbar />
 
       <div
         className="db-container"
@@ -105,12 +102,12 @@ export default function Dashboard() {
           padding: "2rem 1.25rem 4rem",
         }}
       >
-        {/* ── Escrow balance ───────────────────────────────────────────────── */}
+        {/* â”€â”€ Escrow balance â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         <div style={{ marginTop: "1.75rem" }}>
           <EscrowBalance />
         </div>
 
-        {/* ── Create invoice — primary CTA ─────────────────────────────────── */}
+        {/* â”€â”€ Create invoice â€” primary CTA â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         <div style={{ marginTop: "1.25rem" }}>
           <CreateInvoice
             onCreated={() => {
@@ -120,7 +117,7 @@ export default function Dashboard() {
           />
         </div>
 
-        {/* ── Tab bar ──────────────────────────────────────────────────────── */}
+        {/* â”€â”€ Tab bar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         <div
           className="db-tabs"
           style={{
@@ -163,7 +160,7 @@ export default function Dashboard() {
           ))}
         </div>
 
-        {/* ── Tab content ──────────────────────────────────────────────────── */}
+        {/* â”€â”€ Tab content â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         <div style={{ marginTop: "1.5rem" }}>
           {/* My Invoices */}
           {activeTab === "invoices" && (
@@ -354,7 +351,6 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <SiteFooter />
     </div>
   );
 }

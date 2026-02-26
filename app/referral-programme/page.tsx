@@ -1,14 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import SiteHeader from "@/app/components/SiteHeader";
-import SiteFooter from "@/app/components/SiteFooter";
 import { getTranslations } from "next-intl/server";
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
-    title: "Referral Programme — Earn 0.5% on every deal | Fonlok",
+    title: "Referral Programme â€” Earn 0.5% on every deal | Fonlok",
     description:
-      "Share your unique referral link and earn 0.5% commission on every transaction your referrals complete — automatically, forever, with no expiry.",
+      "Share your unique referral link and earn 0.5% commission on every transaction your referrals complete â€” automatically, forever, with no expiry.",
     alternates: { canonical: "https://fonlok.com/referral-programme" },
   };
 }
@@ -36,7 +35,7 @@ export default async function ReferralProgrammePage() {
       <SiteHeader />
 
       <main>
-        {/* ── HERO ── */}
+        {/* â”€â”€ HERO â”€â”€ */}
         <section
           style={{
             background:
@@ -170,7 +169,7 @@ export default async function ReferralProgrammePage() {
           </div>
         </section>
 
-        {/* ── HOW IT WORKS ── */}
+        {/* â”€â”€ HOW IT WORKS â”€â”€ */}
         <section
           style={{
             backgroundColor: "var(--color-cloud)",
@@ -259,7 +258,7 @@ export default async function ReferralProgrammePage() {
           </div>
         </section>
 
-        {/* ── EXAMPLE CALCULATION ── */}
+        {/* â”€â”€ EXAMPLE CALCULATION â”€â”€ */}
         <section
           style={{
             backgroundColor: "var(--color-mist)",
@@ -355,7 +354,6 @@ export default async function ReferralProgrammePage() {
         </section>
       </main>
 
-      <SiteFooter />
     </>
   );
 }

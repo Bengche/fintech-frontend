@@ -1,8 +1,6 @@
 "use client";
 import { useState } from "react";
 import axios from "axios";
-import Navbar from "@/app/components/Navbar";
-import SiteFooter from "@/app/components/SiteFooter";
 
 const API = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
 
@@ -28,7 +26,7 @@ interface VerifyResp {
 }
 
 function fmtDate(iso: string | null) {
-  if (!iso) return "—";
+  if (!iso) return "â€”";
   return new Date(iso).toLocaleDateString("en-GB", {
     day: "2-digit",
     month: "long",
@@ -107,7 +105,6 @@ export default function VerifyReceiptPage() {
 
   return (
     <>
-      <Navbar />
       <main
         style={{
           minHeight: "calc(100vh - 62px)",
@@ -299,7 +296,6 @@ export default function VerifyReceiptPage() {
           </p>
         </div>
       </main>
-      <SiteFooter />
     </>
   );
 }

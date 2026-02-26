@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import SiteHeader from "../components/SiteHeader";
-import SiteFooter from "../components/SiteFooter";
 import { getTranslations } from "next-intl/server";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -51,13 +50,13 @@ const howToSchema = {
       "@type": "HowToStep",
       position: 3,
       name: "Buyer pays with Mobile Money",
-      text: "The buyer opens the link and pays using MTN Mobile Money or Orange Money. The money goes into Fonlok&#39;s secure escrow account — not directly to the seller yet.",
+      text: "The buyer opens the link and pays using MTN Mobile Money or Orange Money. The money goes into Fonlok&#39;s secure escrow account â€” not directly to the seller yet.",
     },
     {
       "@type": "HowToStep",
       position: 4,
       name: "Deliver the goods or service",
-      text: "Once Fonlok confirms the payment, the seller is notified and delivers whatever was agreed — physical goods, a service, digital files, or anything else.",
+      text: "Once Fonlok confirms the payment, the seller is notified and delivers whatever was agreed â€” physical goods, a service, digital files, or anything else.",
     },
     {
       "@type": "HowToStep",
@@ -117,7 +116,7 @@ export default async function HowItWorksPage() {
       <SiteHeader />
 
       <main>
-        {/* ── PAGE HEADER ─────────────────────────────── */}
+        {/* â”€â”€ PAGE HEADER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         <section
           style={{
             backgroundColor: "var(--color-primary)",
@@ -148,7 +147,7 @@ export default async function HowItWorksPage() {
           </div>
         </section>
 
-        {/* ── FIVE STEPS ──────────────────────────────── */}
+        {/* â”€â”€ FIVE STEPS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         <section
           style={{
             backgroundColor: "var(--color-cloud)",
@@ -251,7 +250,7 @@ export default async function HowItWorksPage() {
           </div>
         </section>
 
-        {/* ── SAFETY Q&A ──────────────────────────────── */}
+        {/* â”€â”€ SAFETY Q&A â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         <section
           style={{
             backgroundColor: "var(--color-white)",
@@ -311,7 +310,7 @@ export default async function HowItWorksPage() {
           </div>
         </section>
 
-        {/* ── CTA ─────────────────────────────────────── */}
+        {/* â”€â”€ CTA â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         <section
           style={{
             backgroundColor: "var(--color-mist)",
@@ -365,7 +364,6 @@ export default async function HowItWorksPage() {
         </section>
       </main>
 
-      <SiteFooter />
     </>
   );
 }

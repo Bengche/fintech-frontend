@@ -4,8 +4,6 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import Navbar from "@/app/components/Navbar";
-import SiteFooter from "@/app/components/SiteFooter";
 import { useAuth } from "@/context/UserContext";
 import { useTranslations } from "next-intl";
 
@@ -50,7 +48,7 @@ function fmt(n: number) {
 }
 
 function fmtDate(d: string | null) {
-  if (!d) return "—";
+  if (!d) return "â€”";
   return new Date(d).toLocaleDateString("en-GB", {
     day: "2-digit",
     month: "short",
@@ -107,7 +105,6 @@ export default function PurchasesPage() {
 
   return (
     <div style={{ minHeight: "100vh", backgroundColor: "var(--color-cloud)" }}>
-      <Navbar />
 
       <div
         style={{
@@ -241,7 +238,7 @@ export default function PurchasesPage() {
             style={{ textAlign: "center", padding: "4rem 2rem" }}
           >
             <div style={{ fontSize: "2.5rem", marginBottom: "0.75rem" }}>
-              🛒
+              ðŸ›’
             </div>
             <h2
               style={{
@@ -413,7 +410,7 @@ export default function PurchasesPage() {
                         {p.payment_type === "installment"
                           ? t("installment")
                           : t("oneTime")}
-                        {" · "}
+                        {" Â· "}
                         {t("paidOn")} {fmtDate(p.paid_at)}
                       </div>
                     </div>
@@ -430,7 +427,7 @@ export default function PurchasesPage() {
                       }}
                     >
                       {p.description.length > 120
-                        ? p.description.slice(0, 120) + "…"
+                        ? p.description.slice(0, 120) + "â€¦"
                         : p.description}
                     </div>
                   )}
@@ -471,7 +468,6 @@ export default function PurchasesPage() {
         )}
       </div>
 
-      <SiteFooter />
     </div>
   );
 }

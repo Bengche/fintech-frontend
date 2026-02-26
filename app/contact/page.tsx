@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import SiteHeader from "../components/SiteHeader";
-import SiteFooter from "../components/SiteFooter";
 import ContactForm from "./ContactForm";
 import { getTranslations } from "next-intl/server";
 
@@ -20,7 +19,7 @@ export default async function ContactPage() {
       <SiteHeader />
 
       <main>
-        {/* ── PAGE HEADER ─────────────────────────────── */}
+        {/* â”€â”€ PAGE HEADER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         <section
           style={{
             backgroundColor: "var(--color-primary)",
@@ -51,7 +50,7 @@ export default async function ContactPage() {
           </div>
         </section>
 
-        {/* ── CONTACT OPTIONS + FORM ───────────────────── */}
+        {/* â”€â”€ CONTACT OPTIONS + FORM â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         <section
           style={{
             backgroundColor: "var(--color-cloud)",
@@ -211,7 +210,6 @@ export default async function ContactPage() {
         </section>
       </main>
 
-      <SiteFooter />
     </>
   );
 }

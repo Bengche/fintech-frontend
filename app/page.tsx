@@ -1,13 +1,13 @@
 /**
- * Landing page — the main marketing page for Fonlok.
+ * Landing page â€” the main marketing page for Fonlok.
  *
  * SEO: This is a server component so metadata is statically embedded in the HTML.
- * The page imports client components (SiteHeader, SiteFooter) for the dynamic nav.
+ * The page uses SiteHeader (the public-facing nav) for the landing page chrome.
+ * SiteFooter is injected globally by LayoutShell in the root layout.
  */
 import type { Metadata } from "next";
 import Link from "next/link";
 import SiteHeader from "./components/SiteHeader";
-import SiteFooter from "./components/SiteFooter";
 import BenefitsSlider from "./components/BenefitsSlider";
 import HeroStatsTabs from "./components/HeroStatsTabs";
 import { getTranslations } from "next-intl/server";
@@ -24,7 +24,7 @@ export async function generateMetadata(): Promise<Metadata> {
       "Orange Money escrow",
       "safe online payment Cameroon",
       "Fonlok",
-      "paiement sécurisé Cameroun",
+      "paiement sÃ©curisÃ© Cameroun",
     ],
     openGraph: {
       title: t("title"),
@@ -66,7 +66,7 @@ export default async function LandingPage() {
       <SiteHeader />
 
       <main>
-        {/* ── HERO ─────────────────────────────────────────────────── */}
+        {/* â”€â”€ HERO â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         <section
           aria-label="Hero"
           className="lp-hero"
@@ -151,7 +151,7 @@ export default async function LandingPage() {
                 </Link>
               </div>
 
-              {/* ── Selling-point tabs ── */}
+              {/* â”€â”€ Selling-point tabs â”€â”€ */}
               <HeroStatsTabs
                 tabs={[
                   {
@@ -190,7 +190,7 @@ export default async function LandingPage() {
           </div>
         </section>
 
-        {/* ── HOW IT WORKS ─────────────────────────────────────────── */}
+        {/* â”€â”€ HOW IT WORKS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         <section
           aria-label="How it works"
           className="lp-section"
@@ -291,7 +291,7 @@ export default async function LandingPage() {
           </div>
         </section>
 
-        {/* ── WHY FONLOK ───────────────────────────────────────────── */}
+        {/* â”€â”€ WHY FONLOK â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         <section
           aria-label="Benefits"
           className="lp-section"
@@ -329,7 +329,7 @@ export default async function LandingPage() {
           </div>
         </section>
 
-        {/* ── PRICING PREVIEW ──────────────────────────────────────── */}
+        {/* â”€â”€ PRICING PREVIEW â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         <section
           aria-label="Pricing"
           className="lp-section"
@@ -421,7 +421,7 @@ export default async function LandingPage() {
                         flexShrink: 0,
                       }}
                     >
-                      ✓
+                      âœ“
                     </span>
                     {item}
                   </li>
@@ -453,7 +453,7 @@ export default async function LandingPage() {
           </div>
         </section>
 
-        {/* ── REFERRAL PROGRAM ─────────────────────────────────────── */}
+        {/* â”€â”€ REFERRAL PROGRAM â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         <section
           aria-label="Referral program"
           className="lp-section lp-referral-teaser"
@@ -528,7 +528,7 @@ export default async function LandingPage() {
           </div>
         </section>
 
-        {/* ── FINAL CTA ────────────────────────────────────────────── */}
+        {/* â”€â”€ FINAL CTA â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         <section
           aria-label="Call to action"
           className="lp-section"
@@ -592,12 +592,11 @@ export default async function LandingPage() {
         </section>
       </main>
 
-      <SiteFooter />
     </>
   );
 }
 
-// ── Data ────────────────────────────────────────────────────────
+// â”€â”€ Data â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const HOW_IT_WORKS_STEPS = (t: (key: string) => string) => [
   {
@@ -644,7 +643,7 @@ const BENEFITS = (t: (key: string) => string) => [
   },
 ];
 
-// ── Hero illustration — Premium phone mockup ─────────────────
+// â”€â”€ Hero illustration â€” Premium phone mockup â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function HeroIllustration() {
   return (
     <svg
@@ -731,12 +730,12 @@ function HeroIllustration() {
         </linearGradient>
       </defs>
 
-      {/* ── Ambient glow ── */}
+      {/* â”€â”€ Ambient glow â”€â”€ */}
       <ellipse cx="170" cy="280" rx="170" ry="130" fill="url(#glow)" />
 
-      {/* ── Phone body ── */}
+      {/* â”€â”€ Phone body â”€â”€ */}
       <g filter="url(#phoneShadow)">
-        {/* Outer shell — titanium-dark metallic */}
+        {/* Outer shell â€” titanium-dark metallic */}
         <rect
           x="82"
           y="24"
@@ -777,7 +776,7 @@ function HeroIllustration() {
         />
       </g>
 
-      {/* ── Screen ── */}
+      {/* â”€â”€ Screen â”€â”€ */}
       <rect
         x="88"
         y="54"
@@ -787,7 +786,7 @@ function HeroIllustration() {
         fill="url(#screenGrad)"
       />
 
-      {/* ── Status bar ── */}
+      {/* â”€â”€ Status bar â”€â”€ */}
       <g clipPath="url(#screenClip)">
         <rect x="88" y="54" width="164" height="22" fill="#0a1628" />
         {/* Time */}
@@ -826,12 +825,12 @@ function HeroIllustration() {
         />
         <rect x="238" y="62" width="9" height="5" rx="0.8" fill="#22c55e" />
 
-        {/* ── Dynamic Island ── */}
+        {/* â”€â”€ Dynamic Island â”€â”€ */}
         <rect x="148" y="61" width="44" height="13" rx="6.5" fill="#020810" />
         <circle cx="184" cy="67.5" r="3" fill="#0c172a" />
         <circle cx="185.2" cy="66.3" r="0.75" fill="rgba(255,255,255,0.18)" />
 
-        {/* ── App header bar ── */}
+        {/* â”€â”€ App header bar â”€â”€ */}
         <rect x="88" y="76" width="164" height="38" fill="#0F1F3D" />
         {/* Fonlok wordmark */}
         <text
@@ -862,7 +861,7 @@ function HeroIllustration() {
         {/* Green notification dot */}
         <circle cx="236" cy="89" r="2.5" fill="#22c55e" />
 
-        {/* ── Dashboard greeting ── */}
+        {/* â”€â”€ Dashboard greeting â”€â”€ */}
         <rect x="88" y="114" width="164" height="28" fill="#142036" />
         <text
           x="104"
@@ -881,10 +880,10 @@ function HeroIllustration() {
           fill="#ffffff"
           fontFamily="system-ui,sans-serif"
         >
-          Jean-Paul 👋
+          Jean-Paul ðŸ‘‹
         </text>
 
-        {/* ── Revenue card ── */}
+        {/* â”€â”€ Revenue card â”€â”€ */}
         <rect
           x="96"
           y="146"
@@ -952,7 +951,7 @@ function HeroIllustration() {
           strokeLinecap="round"
         />
 
-        {/* ── Section label ── */}
+        {/* â”€â”€ Section label â”€â”€ */}
         <text
           x="104"
           y="213"
@@ -965,7 +964,7 @@ function HeroIllustration() {
           RECENT INVOICES
         </text>
 
-        {/* ── Invoice row 1 — PAID ── */}
+        {/* â”€â”€ Invoice row 1 â€” PAID â”€â”€ */}
         <rect x="96" y="218" width="148" height="38" rx="7" fill="#1a2f4a" />
         <rect x="96" y="218" width="4" height="38" rx="2" fill="#22c55e" />
         <text
@@ -1019,7 +1018,7 @@ function HeroIllustration() {
           PAID
         </text>
 
-        {/* ── Invoice row 2 — PENDING ── */}
+        {/* â”€â”€ Invoice row 2 â€” PENDING â”€â”€ */}
         <rect x="96" y="260" width="148" height="38" rx="7" fill="#1a2f4a" />
         <rect x="96" y="260" width="4" height="38" rx="2" fill="#F59E0B" />
         <text
@@ -1073,7 +1072,7 @@ function HeroIllustration() {
           PENDING
         </text>
 
-        {/* ── Invoice row 3 — DELIVERED ── */}
+        {/* â”€â”€ Invoice row 3 â€” DELIVERED â”€â”€ */}
         <rect x="96" y="302" width="148" height="38" rx="7" fill="#1a2f4a" />
         <rect x="96" y="302" width="4" height="38" rx="2" fill="#60a5fa" />
         <text
@@ -1127,15 +1126,15 @@ function HeroIllustration() {
           DELIVERED
         </text>
 
-        {/* ── Bottom nav bar ── */}
+        {/* â”€â”€ Bottom nav bar â”€â”€ */}
         <rect x="88" y="380" width="164" height="28" fill="#0a1628" />
-        {/* Three icons evenly spaced at x=115, 170, 225 — centered at y=394 */}
-        {/* Home icon — cx=115 */}
+        {/* Three icons evenly spaced at x=115, 170, 225 â€” centered at y=394 */}
+        {/* Home icon â€” cx=115 */}
         <path
           d="M110 393 L115 387 L120 393 L120 399 L117.5 399 L117.5 394 L112.5 394 L112.5 399 L110 399 Z"
           fill="rgba(255,255,255,0.85)"
         />
-        {/* Invoices icon — cx=170 */}
+        {/* Invoices icon â€” cx=170 */}
         <rect
           x="166"
           y="388"
@@ -1173,7 +1172,7 @@ function HeroIllustration() {
           strokeWidth="1"
           strokeLinecap="round"
         />
-        {/* Settings icon — cx=225 */}
+        {/* Settings icon â€” cx=225 */}
         <circle
           cx="225"
           cy="394"
@@ -1194,10 +1193,10 @@ function HeroIllustration() {
         />
       </g>
 
-      {/* ── Glass glare overlay ── */}
+      {/* â”€â”€ Glass glare overlay â”€â”€ */}
       <rect x="88" y="54" width="164" height="354" rx="20" fill="url(#glare)" />
 
-      {/* ── Camera module (rear, top-right) ── */}
+      {/* â”€â”€ Camera module (rear, top-right) â”€â”€ */}
       <rect x="228" y="32" width="22" height="16" rx="4" fill="#111" />
       <circle
         cx="234"
@@ -1227,7 +1226,7 @@ function HeroIllustration() {
         strokeWidth="0.5"
       />
 
-      {/* ── Floating pill — payment confirmed ── */}
+      {/* â”€â”€ Floating pill â€” payment confirmed â”€â”€ */}
       <g filter="url(#pillShadow)" transform="translate(-22, 60)">
         <rect
           x="14"
@@ -1271,7 +1270,7 @@ function HeroIllustration() {
         </text>
       </g>
 
-      {/* ── Floating pill — escrow badge ── */}
+      {/* â”€â”€ Floating pill â€” escrow badge â”€â”€ */}
       <g filter="url(#pillShadow)" transform="translate(148, -18)">
         <rect
           x="14"
@@ -1318,7 +1317,7 @@ function HeroIllustration() {
         </text>
       </g>
 
-      {/* ── Subtle star sparkles ── */}
+      {/* â”€â”€ Subtle star sparkles â”€â”€ */}
       <g fill="#F59E0B" opacity="0.6">
         <circle cx="72" cy="90" r="2" />
         <circle cx="270" cy="140" r="1.5" />

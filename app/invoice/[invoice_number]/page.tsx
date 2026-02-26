@@ -3,8 +3,6 @@
 import Axios from "axios";
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import Navbar from "@/app/components/Navbar";
-import SiteFooter from "@/app/components/SiteFooter";
 import Link from "next/link";
 import { useAuth } from "@/context/UserContext";
 import { InlineSpinner } from "@/app/components/Spinner";
@@ -164,7 +162,6 @@ export default function InvoicePage() {
 
   return (
     <div style={{ minHeight: "100vh", backgroundColor: "var(--color-cloud)" }}>
-      <Navbar />
 
       <div
         style={{
@@ -1027,7 +1024,6 @@ export default function InvoicePage() {
           </div>
         )}
 
-      <SiteFooter />
     </div>
   );
 }

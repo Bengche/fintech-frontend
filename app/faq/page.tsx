@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import SiteHeader from "../components/SiteHeader";
-import SiteFooter from "../components/SiteFooter";
 import FAQAccordion from "./FAQAccordion";
 import { getTranslations } from "next-intl/server";
 
@@ -49,7 +48,7 @@ const faqSchema = {
     },
     {
       "@type": "Question",
-      name: "Who pays the Fonlok fee — buyer or seller?",
+      name: "Who pays the Fonlok fee â€” buyer or seller?",
       acceptedAnswer: {
         "@type": "Answer",
         text: "The seller pays a 3% fee on each transaction. Buyers pay the exact invoice amount with no additional charges from Fonlok.",
@@ -192,7 +191,7 @@ export default async function FAQPage() {
       <SiteHeader />
 
       <main>
-        {/* ── PAGE HEADER ─────────────────────────────── */}
+        {/* â”€â”€ PAGE HEADER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         <section
           style={{
             backgroundColor: "var(--color-primary)",
@@ -234,7 +233,7 @@ export default async function FAQPage() {
           </div>
         </section>
 
-        {/* ── FAQ SECTIONS ────────────────────────────── */}
+        {/* â”€â”€ FAQ SECTIONS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         <section
           style={{
             backgroundColor: "var(--color-cloud)",
@@ -263,7 +262,7 @@ export default async function FAQPage() {
           </div>
         </section>
 
-        {/* ── BOTTOM CTA ──────────────────────────────── */}
+        {/* â”€â”€ BOTTOM CTA â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         <section
           style={{
             backgroundColor: "var(--color-primary)",
@@ -316,7 +315,6 @@ export default async function FAQPage() {
         </section>
       </main>
 
-      <SiteFooter />
     </>
   );
 }
