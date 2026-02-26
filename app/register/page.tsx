@@ -4,6 +4,7 @@ import Axios from "axios";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
+import { haptic } from "@/hooks/useHaptic";
 
 const API = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
 
@@ -37,6 +38,7 @@ function RegisterForm() {
 
   const handleRegister = async (e: any) => {
     e.preventDefault();
+    haptic("medium");
     setLoading(true);
     const prefix = 237;
     const fullPhoneNumber = `${prefix}${formData.phone}`;

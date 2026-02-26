@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
@@ -8,6 +8,7 @@ import NotificationBell from "./NotificationBell";
 import FonlokLogo from "./FonlokLogo";
 import { useNotifications } from "@/hooks/useNotifications";
 import { useTranslations, useLocale } from "next-intl";
+import { haptic } from "@/hooks/useHaptic";
 import { startTransition } from "react";
 import {
   LayoutDashboard,
@@ -220,7 +221,7 @@ export default function Navbar() {
           <div className="flex md:hidden" style={{ alignItems:"center",gap:"0.25rem" }}>
             {/* Hamburger / X */}
             <button
-              onClick={() => setMenuOpen((v) => !v)}
+              onClick={() => { haptic("soft"); setMenuOpen((v) => !v); }}
               aria-label={menuOpen ? "Close menu" : "Open menu"}
               aria-expanded={menuOpen}
               style={{ background: menuOpen ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.07)",

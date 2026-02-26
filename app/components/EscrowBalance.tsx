@@ -136,7 +136,9 @@ export default function EscrowBalance() {
               >
                 {t("feeNote", { fee: (FEE * 100).toFixed(0) })} &nbsp;·&nbsp;{" "}
                 {data!.invoiceCount}{" "}
-                {data!.invoiceCount === 1 ? t("invoicesSingular") : t("invoicesPlural")}
+                {data!.invoiceCount === 1
+                  ? t("invoicesSingular")
+                  : t("invoicesPlural")}
               </p>
             </>
           ) : (

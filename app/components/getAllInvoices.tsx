@@ -14,6 +14,7 @@ import DisputeButton from "./DisputeButton";
 import Link from "next/link";
 import { MessageSquare, Copy, Check, QrCode } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { haptic } from "@/hooks/useHaptic";
 Axios.defaults.withCredentials = true;
 
 interface Invoice {
@@ -111,6 +112,7 @@ export default function GetAllInvoices({
   }, [onRegisterRefresh, getAllInvoices]);
 
   const handleCopy = async (id: number, copyLink: string) => {
+    haptic("soft");
     try {
       if (navigator.clipboard && window.isSecureContext) {
         await navigator.clipboard.writeText(copyLink);
@@ -172,7 +174,7 @@ export default function GetAllInvoices({
           <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
             <button
               className="btn-primary"
-              onClick={getAllInvoices}
+              onClick={() => { haptic("soft"); getAllInvoices(); }}
               disabled={loading}
             >
               {loading ? t("list.loading") : t("list.refresh")}
@@ -226,7 +228,7 @@ export default function GetAllInvoices({
           {STATUS_TABS.map((tab) => (
             <button
               key={tab}
-              onClick={() => setStatusFilter(tab)}
+              onClick={() => { haptic("soft"); setStatusFilter(tab); }}
               style={{
                 padding: "0.3125rem 0.875rem",
                 borderRadius: "999px",
@@ -390,7 +392,12 @@ export default function GetAllInvoices({
                 {`${FRONTEND_URL}/invoice/${invoice.invoicenumber}`}
               </span>
               <button
-                onClick={() => handleCopy(invoice.id, `${FRONTEND_URL}/invoice/${invoice.invoicenumber}`)}
+                onClick={() =>
+                  handleCopy(
+                    invoice.id,
+                    `${FRONTEND_URL}/invoice/${invoice.invoicenumber}`,
+                  )
+                }
                 className="btn-ghost"
                 style={{
                   fontSize: "0.75rem",
@@ -494,7 +501,10 @@ export default function GetAllInvoices({
                     display: "inline-block",
                   }}
                 >
-                  <QRCodeSVG value={`${FRONTEND_URL}/invoice/${invoice.invoicenumber}`} size={130} />
+                  <QRCodeSVG
+                    value={`${FRONTEND_URL}/invoice/${invoice.invoicenumber}`}
+                    size={130}
+                  />
                 </div>
                 <p
                   style={{

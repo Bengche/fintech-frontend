@@ -3,6 +3,7 @@ import { useState } from "react";
 import Axios from "axios";
 import { useTranslations } from "next-intl";
 import { Lock } from "lucide-react";
+import { haptic } from "@/hooks/useHaptic";
 
 const API = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
 
@@ -26,6 +27,7 @@ export default function DeleteInvoice({
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = async () => {
+    haptic("heavy");
     setIsDeleting(true);
     try {
       await Axios.delete(`${API}/invoice/delete/${invoice_id}`);
@@ -133,7 +135,7 @@ export default function DeleteInvoice({
           color: "var(--color-danger)",
           borderColor: "var(--color-danger)",
         }}
-        onClick={() => setShowModal(true)}
+        onClick={() => { haptic("soft"); setShowModal(true); }}
         title={t("delete.eligibleHint")}
       >
         {t("delete.trigger")}

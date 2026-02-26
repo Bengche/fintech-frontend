@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import Axios from "axios";
 import InvoiceTemplates from "./InvoiceTemplates";
 import { useTranslations } from "next-intl";
+import { haptic } from "@/hooks/useHaptic";
 
 const API = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
 
@@ -100,6 +101,7 @@ export default function CreateInvoice({
 
   const handleCreation = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    haptic("medium");
     if (isSubmitting) return;
     setIsSubmitting(true);
 
@@ -225,7 +227,7 @@ export default function CreateInvoice({
       {/* Trigger button */}
       <button
         className="btn-primary"
-        onClick={() => setOpenModal(true)}
+        onClick={() => { haptic("medium"); setOpenModal(true); }}
         style={{ fontSize: "0.9375rem", padding: "0.625rem 1.5rem" }}
       >
         {t("create.trigger")}

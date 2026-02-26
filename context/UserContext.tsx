@@ -80,8 +80,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               window.location.pathname.startsWith(p),
             );
             // Exclude /referral-programme which starts with /referral
-            const onPublicReferralPage =
-              window.location.pathname.startsWith("/referral-programme");
+            const onPublicReferralPage = window.location.pathname.startsWith(
+              "/referral-programme",
+            );
             if (onProtectedPage && !onPublicReferralPage) {
               setUser_id(null);
               setUsername(null);

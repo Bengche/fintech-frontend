@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import Axios from "axios";
 import { useTranslations } from "next-intl";
 import { Lock } from "lucide-react";
+import { haptic } from "@/hooks/useHaptic";
 
 const API = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
 
@@ -38,6 +39,7 @@ export default function EditInvoice({
 
   const handleEdit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    haptic("medium");
     setIsSubmitting(true);
     const newFormData = new FormData();
     newFormData.append("currency", formData.currency || "XAF");
@@ -145,7 +147,7 @@ export default function EditInvoice({
       <button
         className="btn-ghost"
         style={{ fontSize: "0.8125rem" }}
-        onClick={() => setShowEdit(!showEdit)}
+        onClick={() => { haptic("soft"); setShowEdit(!showEdit); }}
         title={t("edit.eligibleHint")}
       >
         {showEdit ? t("edit.cancel") : t("edit.trigger")}

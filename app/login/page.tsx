@@ -6,6 +6,7 @@ import { useAuth } from "@/context/UserContext";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
+import { haptic } from "@/hooks/useHaptic";
 Axios.defaults.withCredentials = true;
 
 const API = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
@@ -24,6 +25,7 @@ export default function Login() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    haptic("medium");
     setLoginError("");
     setLoading(true);
     try {

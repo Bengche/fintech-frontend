@@ -12,6 +12,7 @@ import { useAuth } from "@/context/UserContext";
 import { useRouter } from "next/navigation";
 import { InlineSpinner } from "@/app/components/Spinner";
 import { useTranslations } from "next-intl";
+import { haptic } from "@/hooks/useHaptic";
 
 const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
 
@@ -58,6 +59,7 @@ export default function Dashboard() {
   };
 
   const handleReleaseFunds = async () => {
+    haptic("medium");
     if (!code || !invoiceNumber) return;
     setPayLoading(true);
     setPaySuccess("");
@@ -131,7 +133,7 @@ export default function Dashboard() {
           {tabs.map((t) => (
             <button
               key={t.key}
-              onClick={() => setActiveTab(t.key)}
+              onClick={() => { haptic("soft"); setActiveTab(t.key); }}
               className="db-tab-btn"
               style={{
                 background: "none",
