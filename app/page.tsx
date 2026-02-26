@@ -591,7 +591,6 @@ export default async function LandingPage() {
           </div>
         </section>
       </main>
-
     </>
   );
 }
@@ -644,695 +643,285 @@ const BENEFITS = (t: (key: string) => string) => [
 ];
 
 // â”€â”€ Hero illustration â€” Premium phone mockup â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Hero illustration — Premium phone mockup ───────────────────────────────
 function HeroIllustration() {
   return (
     <svg
       width="340"
-      height="480"
-      viewBox="0 0 340 480"
+      height="490"
+      viewBox="0 0 340 490"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       role="img"
-      aria-label="Fonlok dashboard displayed on a smartphone"
+      aria-label="Fonlok app on a smartphone"
       style={{ overflow: "visible" }}
     >
       <defs>
-        {/* Ambient glow behind phone */}
-        <radialGradient id="glow" cx="50%" cy="55%" r="50%">
-          <stop offset="0%" stopColor="#F59E0B" stopOpacity="0.28" />
+        <radialGradient id="bgGlow" cx="50%" cy="58%" r="52%">
+          <stop offset="0%" stopColor="#F59E0B" stopOpacity="0.22" />
           <stop offset="100%" stopColor="#F59E0B" stopOpacity="0" />
         </radialGradient>
-        {/* Screen gradient */}
         <linearGradient id="screenGrad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#0F1F3D" />
-          <stop offset="100%" stopColor="#162847" />
+          <stop offset="0%" stopColor="#0c1932" />
+          <stop offset="100%" stopColor="#0e2140" />
         </linearGradient>
-        {/* Glass glare */}
-        <linearGradient id="glare" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stopColor="#ffffff" stopOpacity="0.12" />
-          <stop offset="60%" stopColor="#ffffff" stopOpacity="0" />
+        <linearGradient id="titanium" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#3c3c52" />
+          <stop offset="35%" stopColor="#242438" />
+          <stop offset="65%" stopColor="#1c1c2e" />
+          <stop offset="100%" stopColor="#111120" />
         </linearGradient>
-        {/* Card shadow */}
-        <filter id="cardShadow" x="-20%" y="-20%" width="140%" height="140%">
-          <feDropShadow
-            dx="0"
-            dy="4"
-            stdDeviation="6"
-            floodColor="#000"
-            floodOpacity="0.35"
-          />
-        </filter>
-        {/* Phone outer shadow */}
-        <filter id="phoneShadow" x="-15%" y="-8%" width="130%" height="125%">
-          <feDropShadow
-            dx="0"
-            dy="20"
-            stdDeviation="28"
-            floodColor="#000"
-            floodOpacity="0.55"
-          />
-          <feDropShadow
-            dx="0"
-            dy="6"
-            stdDeviation="8"
-            floodColor="#000"
-            floodOpacity="0.3"
-          />
-        </filter>
-        {/* Floating pill shadow */}
-        <filter id="pillShadow" x="-30%" y="-50%" width="160%" height="200%">
-          <feDropShadow
-            dx="0"
-            dy="6"
-            stdDeviation="10"
-            floodColor="#000"
-            floodOpacity="0.4"
-          />
-        </filter>
-        {/* Green dot glow */}
-        <radialGradient id="greenGlow" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stopColor="#22c55e" stopOpacity="1" />
-          <stop offset="100%" stopColor="#22c55e" stopOpacity="0" />
-        </radialGradient>
-        <clipPath id="screenClip">
-          <rect x="88" y="54" width="164" height="354" rx="20" />
-        </clipPath>
-        {/* Titanium-dark metallic gradient for phone body */}
-        <linearGradient id="phoneMetal" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stopColor="#2e2e46" />
-          <stop offset="40%" stopColor="#1c1c30" />
-          <stop offset="100%" stopColor="#0c0c1a" />
+        <linearGradient id="titaniumH" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#48485e" />
+          <stop offset="50%" stopColor="#252535" />
+          <stop offset="100%" stopColor="#181828" />
         </linearGradient>
-        {/* Left-edge specular rim highlight */}
-        <linearGradient id="rimLight" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0%" stopColor="rgba(255,255,255,0.22)" />
+        <linearGradient id="screenGlare" x1="0" y1="0" x2="0.4" y2="1">
+          <stop offset="0%" stopColor="rgba(255,255,255,0.09)" />
+          <stop offset="45%" stopColor="rgba(255,255,255,0.02)" />
           <stop offset="100%" stopColor="rgba(255,255,255,0)" />
         </linearGradient>
+        <linearGradient id="escrowGrad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#193558" />
+          <stop offset="100%" stopColor="#0c2040" />
+        </linearGradient>
+        <filter id="phoneShadow" x="-18%" y="-7%" width="136%" height="128%">
+          <feDropShadow dx="0" dy="26" stdDeviation="34" floodColor="#000" floodOpacity="0.62" />
+          <feDropShadow dx="0" dy="8" stdDeviation="10" floodColor="#000" floodOpacity="0.28" />
+        </filter>
+        <filter id="cardShadow" x="-15%" y="-15%" width="130%" height="140%">
+          <feDropShadow dx="0" dy="3" stdDeviation="5" floodColor="#000" floodOpacity="0.28" />
+        </filter>
+        <filter id="pillShadow" x="-25%" y="-40%" width="150%" height="180%">
+          <feDropShadow dx="0" dy="8" stdDeviation="14" floodColor="#000" floodOpacity="0.48" />
+        </filter>
+        <clipPath id="screenClip">
+          <rect x="91" y="50" width="158" height="374" rx="24" />
+        </clipPath>
       </defs>
 
-      {/* â”€â”€ Ambient glow â”€â”€ */}
-      <ellipse cx="170" cy="280" rx="170" ry="130" fill="url(#glow)" />
+      {/* ── Ambient glow ── */}
+      <ellipse cx="170" cy="295" rx="168" ry="142" fill="url(#bgGlow)" />
 
-      {/* â”€â”€ Phone body â”€â”€ */}
+      {/* ── Phone body ── */}
       <g filter="url(#phoneShadow)">
-        {/* Outer shell â€” titanium-dark metallic */}
+        {/* Outer titanium frame */}
+        <rect x="78" y="16" width="184" height="458" rx="44" fill="url(#titanium)" />
+        {/* Frame border highlight */}
         <rect
-          x="82"
-          y="24"
-          width="176"
-          height="422"
-          rx="36"
-          fill="url(#phoneMetal)"
+          x="78" y="16" width="184" height="458" rx="44"
+          fill="none"
+          stroke="rgba(255,255,255,0.07)"
+          strokeWidth="1.5"
         />
-        {/* Inner bezel inset */}
-        <rect x="86" y="28" width="168" height="414" rx="33" fill="#0d0d1a" />
-        {/* Antenna line left */}
-        <rect x="82" y="120" width="3" height="60" rx="1.5" fill="#2a2a3e" />
-        {/* Antenna line right */}
-        <rect x="255" y="160" width="3" height="80" rx="1.5" fill="#2a2a3e" />
+        {/* Left-edge specular highlight */}
+        <rect x="78" y="16" width="8" height="458" rx="4"
+          fill="url(#titaniumH)"
+          opacity="0.6"
+        />
+        {/* Black glass front face */}
+        <rect x="83" y="21" width="174" height="448" rx="40" fill="#080d1c" />
+        {/* Screen surface */}
+        <rect x="91" y="50" width="158" height="374" rx="24" fill="url(#screenGrad)" />
+
+        {/* ── Side buttons ── */}
+        {/* Action button */}
+        <rect x="78" y="114" width="4.5" height="20" rx="2.25" fill="#2b2b42" />
+        <rect x="79.5" y="115" width="1.5" height="18" rx="0.75" fill="rgba(255,255,255,0.07)" />
         {/* Volume up */}
-        <rect x="82" y="150" width="3" height="32" rx="1.5" fill="#333350" />
+        <rect x="78" y="144" width="4.5" height="40" rx="2.25" fill="#2b2b42" />
+        <rect x="79.5" y="145" width="1.5" height="38" rx="0.75" fill="rgba(255,255,255,0.07)" />
         {/* Volume down */}
-        <rect x="82" y="192" width="3" height="32" rx="1.5" fill="#333350" />
+        <rect x="78" y="194" width="4.5" height="40" rx="2.25" fill="#2b2b42" />
+        <rect x="79.5" y="195" width="1.5" height="38" rx="0.75" fill="rgba(255,255,255,0.07)" />
         {/* Power button */}
-        <rect x="255" y="170" width="3" height="48" rx="1.5" fill="#333350" />
-        {/* Left-edge specular rim */}
-        <rect
-          x="82"
-          y="24"
-          width="7"
-          height="422"
-          rx="5"
-          fill="url(#rimLight)"
-        />
-        {/* Right-edge subtle shadow rim */}
-        <rect
-          x="252"
-          y="24"
-          width="6"
-          height="422"
-          rx="5"
-          fill="rgba(0,0,0,0.25)"
-        />
+        <rect x="257.5" y="156" width="4.5" height="70" rx="2.25" fill="#2b2b42" />
+        <rect x="259" y="157" width="1.5" height="68" rx="0.75" fill="rgba(255,255,255,0.07)" />
+
+        {/* ── Bottom edge hardware ── */}
+        <circle cx="130" cy="465" r="1.3" fill="#0e0e20" />
+        <circle cx="136" cy="465" r="1.3" fill="#0e0e20" />
+        <circle cx="142" cy="465" r="1.3" fill="#0e0e20" />
+        {/* USB-C port */}
+        <rect x="155" y="461" width="30" height="8" rx="4" fill="#0a0a18" />
+        <rect x="157.5" y="462.5" width="25" height="5" rx="2.5" fill="#060610" />
+        <circle cx="198" cy="465" r="1.3" fill="#0e0e20" />
+        <circle cx="204" cy="465" r="1.3" fill="#0e0e20" />
+        <circle cx="210" cy="465" r="1.3" fill="#0e0e20" />
       </g>
 
-      {/* â”€â”€ Screen â”€â”€ */}
-      <rect
-        x="88"
-        y="54"
-        width="164"
-        height="354"
-        rx="20"
-        fill="url(#screenGrad)"
-      />
-
-      {/* â”€â”€ Status bar â”€â”€ */}
+      {/* ── Screen content ── */}
       <g clipPath="url(#screenClip)">
-        <rect x="88" y="54" width="164" height="22" fill="#0a1628" />
-        {/* Time */}
-        <text
-          x="100"
-          y="68"
-          fontSize="8"
-          fontWeight="700"
-          fill="rgba(255,255,255,0.9)"
-          fontFamily="system-ui,sans-serif"
-        >
-          9:41
-        </text>
-        {/* Signal dots */}
-        <circle cx="220" cy="65" r="2" fill="rgba(255,255,255,0.8)" />
-        <circle cx="226" cy="65" r="2" fill="rgba(255,255,255,0.8)" />
-        <circle cx="232" cy="65" r="2" fill="rgba(255,255,255,0.5)" />
+
+        {/* Status bar */}
+        <rect x="91" y="50" width="158" height="24" fill="#07101e" />
+        <text x="102" y="65" fontSize="8" fontWeight="700" fill="rgba(255,255,255,0.88)" fontFamily="system-ui,sans-serif">9:41</text>
+        {/* WiFi bars */}
+        <rect x="209" y="61" width="3" height="5" rx="1" fill="rgba(255,255,255,0.28)" />
+        <rect x="214" y="59" width="3" height="7" rx="1" fill="rgba(255,255,255,0.55)" />
+        <rect x="219" y="57" width="3" height="9" rx="1" fill="rgba(255,255,255,0.88)" />
         {/* Battery */}
-        <rect
-          x="237"
-          y="61"
-          width="12"
-          height="7"
-          rx="1.5"
-          fill="none"
-          stroke="rgba(255,255,255,0.5)"
-          strokeWidth="0.8"
-        />
-        <rect
-          x="249"
-          y="63"
-          width="1.5"
-          height="3"
-          rx="0.75"
-          fill="rgba(255,255,255,0.5)"
-        />
-        <rect x="238" y="62" width="9" height="5" rx="0.8" fill="#22c55e" />
+        <rect x="226" y="58" width="14" height="8" rx="2" fill="none" stroke="rgba(255,255,255,0.5)" strokeWidth="1" />
+        <rect x="240" y="60.5" width="2" height="3" rx="1" fill="rgba(255,255,255,0.5)" />
+        <rect x="227.5" y="59.5" width="10" height="5" rx="1" fill="#22c55e" />
 
-        {/* â”€â”€ Dynamic Island â”€â”€ */}
-        <rect x="148" y="61" width="44" height="13" rx="6.5" fill="#020810" />
-        <circle cx="184" cy="67.5" r="3" fill="#0c172a" />
-        <circle cx="185.2" cy="66.3" r="0.75" fill="rgba(255,255,255,0.18)" />
+        {/* Dynamic Island */}
+        <rect x="143" y="55" width="54" height="16" rx="8" fill="#000" />
+        {/* Front camera inside island */}
+        <circle cx="187" cy="63" r="3.5" fill="#0a0a0a" />
+        <circle cx="187" cy="63" r="2" fill="#111" />
+        <circle cx="185.8" cy="61.8" r="0.6" fill="rgba(255,255,255,0.14)" />
 
-        {/* â”€â”€ App header bar â”€â”€ */}
-        <rect x="88" y="76" width="164" height="38" fill="#0F1F3D" />
-        {/* Fonlok wordmark */}
-        <text
-          x="104"
-          y="100"
-          fontSize="13"
-          fontWeight="800"
-          fill="#F59E0B"
-          fontFamily="system-ui,sans-serif"
-          letterSpacing="-0.3"
-        >
-          Fonlok
-        </text>
-        {/* Notification bell icon */}
-        <circle cx="232" cy="95" r="8" fill="rgba(255,255,255,0.07)" />
-        <path
-          d="M232 90 C229.5 90 227.5 91.8 227.5 94 L227.5 97.5 L226 99 L238 99 L236.5 97.5 L236.5 94 C236.5 91.8 234.5 90 232 90Z"
-          fill="rgba(255,255,255,0.85)"
-        />
-        <rect
-          x="230.5"
-          y="99"
-          width="3"
-          height="1.5"
-          rx="0.75"
-          fill="rgba(255,255,255,0.85)"
-        />
-        {/* Green notification dot */}
-        <circle cx="236" cy="89" r="2.5" fill="#22c55e" />
+        {/* App header */}
+        <rect x="91" y="74" width="158" height="44" fill="#0b1a30" />
+        <rect x="91" y="117" width="158" height="1" fill="rgba(255,255,255,0.05)" />
+        {/* Logo mark */}
+        <rect x="102" y="83" width="20" height="20" rx="6" fill="#F59E0B" />
+        <text x="106.5" y="98" fontSize="13" fontWeight="900" fill="#0F1F3D" fontFamily="system-ui,sans-serif">F</text>
+        {/* Wordmark */}
+        <text x="127" y="97" fontSize="13" fontWeight="800" fill="#ffffff" fontFamily="system-ui,sans-serif" letterSpacing="-0.3">Fonlok</text>
+        {/* Bell */}
+        <circle cx="228" cy="92" r="10" fill="rgba(255,255,255,0.05)" />
+        <path d="M228 86c-2.8 0-5 2-5 4.5V95l-1.5 1.5h13L233 95v-4.5C233 88 230.8 86 228 86z" fill="rgba(255,255,255,0.82)" />
+        <rect x="226.5" y="97" width="3" height="1.8" rx="0.9" fill="rgba(255,255,255,0.82)" />
+        <circle cx="233" cy="85.5" r="3" fill="#F59E0B" />
+        <text x="233" y="88.5" fontSize="5" fontWeight="800" fill="#0F1F3D" fontFamily="system-ui,sans-serif" textAnchor="middle">1</text>
 
-        {/* â”€â”€ Dashboard greeting â”€â”€ */}
-        <rect x="88" y="114" width="164" height="28" fill="#142036" />
-        <text
-          x="104"
-          y="126"
-          fontSize="7"
-          fill="rgba(255,255,255,0.5)"
-          fontFamily="system-ui,sans-serif"
-        >
-          Good morning
-        </text>
-        <text
-          x="104"
-          y="136"
-          fontSize="8.5"
-          fontWeight="700"
-          fill="#ffffff"
-          fontFamily="system-ui,sans-serif"
-        >
-          Jean-Paul ðŸ‘‹
-        </text>
+        {/* Greeting strip */}
+        <rect x="91" y="118" width="158" height="30" fill="#0c1d38" />
+        <text x="102" y="131" fontSize="6.5" fill="rgba(255,255,255,0.42)" fontFamily="system-ui,sans-serif">Wednesday · Feb 26</text>
+        <text x="102" y="143" fontSize="9" fontWeight="700" fill="#ffffff" fontFamily="system-ui,sans-serif">Good morning, Jean 👋</text>
 
-        {/* â”€â”€ Revenue card â”€â”€ */}
-        <rect
-          x="96"
-          y="146"
-          width="148"
-          height="52"
-          rx="8"
-          fill="#1e3a5f"
-          filter="url(#cardShadow)"
-        />
-        <rect
-          x="96"
-          y="146"
-          width="148"
-          height="52"
-          rx="8"
-          fill="none"
-          stroke="rgba(245,158,11,0.25)"
-          strokeWidth="1"
-        />
-        <text
-          x="108"
-          y="160"
-          fontSize="6.5"
-          fill="rgba(255,255,255,0.5)"
-          fontFamily="system-ui,sans-serif"
-          letterSpacing="0.5"
-        >
-          TOTAL EARNINGS
-        </text>
-        <text
-          x="108"
-          y="175"
-          fontSize="15"
-          fontWeight="800"
-          fill="#F59E0B"
-          fontFamily="system-ui,sans-serif"
-        >
-          245,000 XAF
-        </text>
-        <text
-          x="108"
-          y="188"
-          fontSize="6"
-          fill="rgba(255,255,255,0.4)"
-          fontFamily="system-ui,sans-serif"
-        >
-          +12% this month
-        </text>
-        {/* Up arrow */}
-        <path
-          d="M215 183 L218 179 L221 183"
-          stroke="#22c55e"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          fill="none"
-        />
-        <line
-          x1="218"
-          y1="179"
-          x2="218"
-          y2="188"
-          stroke="#22c55e"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-        />
-
-        {/* â”€â”€ Section label â”€â”€ */}
-        <text
-          x="104"
-          y="213"
-          fontSize="7"
-          fontWeight="700"
-          fill="rgba(255,255,255,0.6)"
-          fontFamily="system-ui,sans-serif"
-          letterSpacing="0.4"
-        >
-          RECENT INVOICES
-        </text>
-
-        {/* â”€â”€ Invoice row 1 â€” PAID â”€â”€ */}
-        <rect x="96" y="218" width="148" height="38" rx="7" fill="#1a2f4a" />
-        <rect x="96" y="218" width="4" height="38" rx="2" fill="#22c55e" />
-        <text
-          x="108"
-          y="232"
-          fontSize="7.5"
-          fontWeight="600"
-          fill="#ffffff"
-          fontFamily="system-ui,sans-serif"
-        >
-          Website Design
-        </text>
-        <text
-          x="108"
-          y="244"
-          fontSize="6.5"
-          fill="rgba(255,255,255,0.4)"
-          fontFamily="system-ui,sans-serif"
-        >
-          INV-2024-0041
-        </text>
-        <text
-          x="210"
-          y="232"
-          fontSize="8"
-          fontWeight="700"
-          fill="#F59E0B"
-          fontFamily="system-ui,sans-serif"
-          textAnchor="end"
-        >
-          75,000
-        </text>
-        {/* Paid badge */}
-        <rect
-          x="200"
-          y="238"
-          width="27"
-          height="10"
-          rx="5"
-          fill="rgba(34,197,94,0.18)"
-        />
-        <text
-          x="213.5"
-          y="246"
-          fontSize="5.5"
-          fontWeight="700"
-          fill="#22c55e"
-          fontFamily="system-ui,sans-serif"
-          textAnchor="middle"
-        >
-          PAID
-        </text>
-
-        {/* â”€â”€ Invoice row 2 â€” PENDING â”€â”€ */}
-        <rect x="96" y="260" width="148" height="38" rx="7" fill="#1a2f4a" />
-        <rect x="96" y="260" width="4" height="38" rx="2" fill="#F59E0B" />
-        <text
-          x="108"
-          y="274"
-          fontSize="7.5"
-          fontWeight="600"
-          fill="#ffffff"
-          fontFamily="system-ui,sans-serif"
-        >
-          Logo Package
-        </text>
-        <text
-          x="108"
-          y="286"
-          fontSize="6.5"
-          fill="rgba(255,255,255,0.4)"
-          fontFamily="system-ui,sans-serif"
-        >
-          INV-2024-0042
-        </text>
-        <text
-          x="210"
-          y="274"
-          fontSize="8"
-          fontWeight="700"
-          fill="#F59E0B"
-          fontFamily="system-ui,sans-serif"
-          textAnchor="end"
-        >
-          35,000
-        </text>
-        {/* Pending badge */}
-        <rect
-          x="193"
-          y="280"
-          width="34"
-          height="10"
-          rx="5"
-          fill="rgba(245,158,11,0.18)"
-        />
-        <text
-          x="210"
-          y="288"
-          fontSize="5.5"
-          fontWeight="700"
-          fill="#F59E0B"
-          fontFamily="system-ui,sans-serif"
-          textAnchor="middle"
-        >
-          PENDING
-        </text>
-
-        {/* â”€â”€ Invoice row 3 â€” DELIVERED â”€â”€ */}
-        <rect x="96" y="302" width="148" height="38" rx="7" fill="#1a2f4a" />
-        <rect x="96" y="302" width="4" height="38" rx="2" fill="#60a5fa" />
-        <text
-          x="108"
-          y="316"
-          fontSize="7.5"
-          fontWeight="600"
-          fill="#ffffff"
-          fontFamily="system-ui,sans-serif"
-        >
-          Social Media Pack
-        </text>
-        <text
-          x="108"
-          y="328"
-          fontSize="6.5"
-          fill="rgba(255,255,255,0.4)"
-          fontFamily="system-ui,sans-serif"
-        >
-          INV-2024-0043
-        </text>
-        <text
-          x="210"
-          y="316"
-          fontSize="8"
-          fontWeight="700"
-          fill="#F59E0B"
-          fontFamily="system-ui,sans-serif"
-          textAnchor="end"
-        >
-          50,000
-        </text>
-        {/* Delivered badge */}
-        <rect
-          x="190"
-          y="322"
-          width="37"
-          height="10"
-          rx="5"
-          fill="rgba(96,165,250,0.18)"
-        />
-        <text
-          x="208.5"
-          y="330"
-          fontSize="5.5"
-          fontWeight="700"
-          fill="#60a5fa"
-          fontFamily="system-ui,sans-serif"
-          textAnchor="middle"
-        >
-          DELIVERED
-        </text>
-
-        {/* â”€â”€ Bottom nav bar â”€â”€ */}
-        <rect x="88" y="380" width="164" height="28" fill="#0a1628" />
-        {/* Three icons evenly spaced at x=115, 170, 225 â€” centered at y=394 */}
-        {/* Home icon â€” cx=115 */}
-        <path
-          d="M110 393 L115 387 L120 393 L120 399 L117.5 399 L117.5 394 L112.5 394 L112.5 399 L110 399 Z"
-          fill="rgba(255,255,255,0.85)"
-        />
-        {/* Invoices icon â€” cx=170 */}
-        <rect
-          x="166"
-          y="388"
-          width="8"
-          height="12"
-          rx="1"
-          fill="none"
-          stroke="rgba(255,255,255,0.4)"
-          strokeWidth="1"
-        />
-        <line
-          x1="168"
-          y1="391"
-          x2="172"
-          y2="391"
-          stroke="rgba(255,255,255,0.4)"
-          strokeWidth="1"
-          strokeLinecap="round"
-        />
-        <line
-          x1="168"
-          y1="394"
-          x2="172"
-          y2="394"
-          stroke="rgba(255,255,255,0.4)"
-          strokeWidth="1"
-          strokeLinecap="round"
-        />
-        <line
-          x1="168"
-          y1="397"
-          x2="171"
-          y2="397"
-          stroke="rgba(255,255,255,0.4)"
-          strokeWidth="1"
-          strokeLinecap="round"
-        />
-        {/* Settings icon â€” cx=225 */}
-        <circle
-          cx="225"
-          cy="394"
-          r="5"
-          fill="none"
-          stroke="rgba(255,255,255,0.4)"
-          strokeWidth="1"
-        />
-        <circle cx="225" cy="394" r="2" fill="rgba(255,255,255,0.4)" />
-        {/* Home indicator pill */}
-        <rect
-          x="150"
-          y="406"
-          width="40"
-          height="3"
-          rx="1.5"
-          fill="rgba(255,255,255,0.15)"
-        />
-      </g>
-
-      {/* â”€â”€ Glass glare overlay â”€â”€ */}
-      <rect x="88" y="54" width="164" height="354" rx="20" fill="url(#glare)" />
-
-      {/* â”€â”€ Camera module (rear, top-right) â”€â”€ */}
-      <rect x="228" y="32" width="22" height="16" rx="4" fill="#111" />
-      <circle
-        cx="234"
-        cy="40"
-        r="4.5"
-        fill="#0d0d0d"
-        stroke="#222"
-        strokeWidth="0.8"
-      />
-      <circle cx="234" cy="40" r="3" fill="#1a1a1a" />
-      <circle cx="232.5" cy="38.5" r="0.8" fill="rgba(255,255,255,0.25)" />
-      <circle
-        cx="244"
-        cy="40"
-        r="3"
-        fill="#1a1a1a"
-        stroke="#222"
-        strokeWidth="0.8"
-      />
-      <circle cx="243" cy="39" r="0.7" fill="rgba(255,255,255,0.2)" />
-      <circle
-        cx="234"
-        cy="45.5"
-        r="1.2"
-        fill="#1a1a1a"
-        stroke="#222"
-        strokeWidth="0.5"
-      />
-
-      {/* â”€â”€ Floating pill â€” payment confirmed â”€â”€ */}
-      <g filter="url(#pillShadow)" transform="translate(-22, 60)">
-        <rect
-          x="14"
-          y="200"
-          width="130"
-          height="38"
-          rx="19"
-          fill="#0F1F3D"
-          stroke="rgba(245,158,11,0.4)"
-          strokeWidth="1.5"
-        />
-        {/* Green check circle */}
-        <circle cx="37" cy="219" r="11" fill="rgba(34,197,94,0.15)" />
-        <circle cx="37" cy="219" r="7" fill="#22c55e" />
-        <path
-          d="M33.5 219 L36 221.5 L40.5 216"
-          stroke="#fff"
-          strokeWidth="1.8"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          fill="none"
-        />
-        <text
-          x="52"
-          y="215"
-          fontSize="8"
-          fontWeight="700"
-          fill="#ffffff"
-          fontFamily="system-ui,sans-serif"
-        >
-          Payment Confirmed
-        </text>
-        <text
-          x="52"
-          y="226"
-          fontSize="7"
-          fill="rgba(255,255,255,0.5)"
-          fontFamily="system-ui,sans-serif"
-        >
-          75,000 XAF secured
-        </text>
-      </g>
-
-      {/* â”€â”€ Floating pill â€” escrow badge â”€â”€ */}
-      <g filter="url(#pillShadow)" transform="translate(148, -18)">
-        <rect
-          x="14"
-          y="320"
-          width="110"
-          height="36"
-          rx="18"
-          fill="#1a2f4a"
-          stroke="rgba(245,158,11,0.3)"
-          strokeWidth="1.2"
-        />
+        {/* Escrow balance card */}
+        <rect x="99" y="155" width="142" height="66" rx="12" fill="url(#escrowGrad)" filter="url(#cardShadow)" />
+        <rect x="99" y="155" width="142" height="66" rx="12" fill="none" stroke="rgba(245,158,11,0.28)" strokeWidth="1" />
         {/* Shield icon */}
-        <path
-          d="M32 331 L38 334 L38 341 C38 345 35.5 347.5 32 349 C28.5 347.5 26 345 26 341 L26 334 Z"
-          fill="#F59E0B"
-        />
-        <path
-          d="M29.5 341 L31.5 343 L34.5 339"
-          stroke="#0F1F3D"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          fill="none"
-        />
-        <text
-          x="44"
-          y="336"
-          fontSize="7.5"
-          fontWeight="700"
-          fill="#ffffff"
-          fontFamily="system-ui,sans-serif"
-        >
-          Funds in
-        </text>
-        <text
-          x="44"
-          y="347"
-          fontSize="7.5"
-          fontWeight="700"
-          fill="#F59E0B"
-          fontFamily="system-ui,sans-serif"
-        >
-          Escrow
-        </text>
+        <path d="M113 163l6.5 2.8v7.5c0 4.5-3.2 6.8-6.5 8.2c-3.3-1.4-6.5-3.7-6.5-8.2v-7.5z" fill="rgba(245,158,11,0.16)" />
+        <path d="M113 164.5l5 2.2v6c0 3.5-2.5 5.5-5 6.8c-2.5-1.3-5-3.3-5-6.8v-6z" fill="#F59E0B" />
+        <path d="M110.5 173l2 2 4-4" stroke="#0f1f3d" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+        <text x="126" y="168" fontSize="6" fill="rgba(255,255,255,0.45)" fontFamily="system-ui,sans-serif" letterSpacing="0.6">ESCROW BALANCE</text>
+        <text x="126" y="182" fontSize="17" fontWeight="800" fill="#F59E0B" fontFamily="system-ui,sans-serif" letterSpacing="-0.5">245,000 XAF</text>
+        <rect x="126" y="187" width="44" height="13" rx="6.5" fill="rgba(34,197,94,0.15)" />
+        <text x="148" y="197" fontSize="5.5" fontWeight="700" fill="#22c55e" fontFamily="system-ui,sans-serif" textAnchor="middle">● SECURED</text>
+        <text x="236" y="197" fontSize="6" fill="rgba(255,255,255,0.3)" fontFamily="system-ui,sans-serif" textAnchor="end">3 active</text>
+
+        {/* Stats mini-cards */}
+        <rect x="99" y="229" width="66" height="36" rx="9" fill="#101e34" />
+        <text x="132" y="243" fontSize="6" fill="rgba(255,255,255,0.4)" fontFamily="system-ui,sans-serif" textAnchor="middle">Total Paid</text>
+        <text x="132" y="257" fontSize="10" fontWeight="800" fill="#22c55e" fontFamily="system-ui,sans-serif" textAnchor="middle">1.2M</text>
+        <rect x="175" y="229" width="66" height="36" rx="9" fill="#101e34" />
+        <text x="208" y="243" fontSize="6" fill="rgba(255,255,255,0.4)" fontFamily="system-ui,sans-serif" textAnchor="middle">Active Jobs</text>
+        <text x="208" y="257" fontSize="10" fontWeight="800" fill="#F59E0B" fontFamily="system-ui,sans-serif" textAnchor="middle">8</text>
+
+        {/* Section header */}
+        <text x="102" y="281" fontSize="7" fontWeight="700" fill="rgba(255,255,255,0.5)" fontFamily="system-ui,sans-serif" letterSpacing="0.5">RECENT INVOICES</text>
+        <text x="237" y="281" fontSize="6.5" fill="rgba(245,158,11,0.75)" fontFamily="system-ui,sans-serif" textAnchor="end">See all →</text>
+
+        {/* Invoice row 1 — PAID */}
+        <rect x="99" y="287" width="142" height="34" rx="8" fill="#0f1c30" />
+        <rect x="99" y="287" width="3.5" height="34" rx="1.75" fill="#22c55e" />
+        <circle cx="116" cy="304" r="9" fill="#122040" />
+        <text x="116" y="308" fontSize="7.5" fontWeight="700" fill="#60a5fa" fontFamily="system-ui,sans-serif" textAnchor="middle">WD</text>
+        <text x="130" y="299" fontSize="7.5" fontWeight="600" fill="#f1f5f9" fontFamily="system-ui,sans-serif">Website Design</text>
+        <text x="130" y="311" fontSize="6" fill="rgba(255,255,255,0.32)" fontFamily="system-ui,sans-serif">INV-2025-0041</text>
+        <rect x="187" y="294" width="27" height="11" rx="5.5" fill="rgba(34,197,94,0.16)" />
+        <text x="200.5" y="303" fontSize="5.5" fontWeight="700" fill="#22c55e" fontFamily="system-ui,sans-serif" textAnchor="middle">PAID</text>
+        <text x="236" y="299" fontSize="8" fontWeight="700" fill="#F59E0B" fontFamily="system-ui,sans-serif" textAnchor="end">75,000</text>
+        <text x="236" y="311" fontSize="5.5" fill="rgba(255,255,255,0.28)" fontFamily="system-ui,sans-serif" textAnchor="end">XAF</text>
+
+        {/* Invoice row 2 — PENDING */}
+        <rect x="99" y="327" width="142" height="34" rx="8" fill="#0f1c30" />
+        <rect x="99" y="327" width="3.5" height="34" rx="1.75" fill="#F59E0B" />
+        <circle cx="116" cy="344" r="9" fill="#21190a" />
+        <text x="116" y="348" fontSize="7.5" fontWeight="700" fill="#F59E0B" fontFamily="system-ui,sans-serif" textAnchor="middle">LP</text>
+        <text x="130" y="339" fontSize="7.5" fontWeight="600" fill="#f1f5f9" fontFamily="system-ui,sans-serif">Logo Package</text>
+        <text x="130" y="351" fontSize="6" fill="rgba(255,255,255,0.32)" fontFamily="system-ui,sans-serif">INV-2025-0042</text>
+        <rect x="179" y="334" width="38" height="11" rx="5.5" fill="rgba(245,158,11,0.16)" />
+        <text x="198" y="343" fontSize="5.5" fontWeight="700" fill="#F59E0B" fontFamily="system-ui,sans-serif" textAnchor="middle">PENDING</text>
+        <text x="236" y="339" fontSize="8" fontWeight="700" fill="#F59E0B" fontFamily="system-ui,sans-serif" textAnchor="end">35,000</text>
+        <text x="236" y="351" fontSize="5.5" fill="rgba(255,255,255,0.28)" fontFamily="system-ui,sans-serif" textAnchor="end">XAF</text>
+
+        {/* Invoice row 3 — IN ESCROW */}
+        <rect x="99" y="367" width="142" height="34" rx="8" fill="#0f1c30" />
+        <rect x="99" y="367" width="3.5" height="34" rx="1.75" fill="#818cf8" />
+        <circle cx="116" cy="384" r="9" fill="#181830" />
+        <text x="116" y="388" fontSize="7.5" fontWeight="700" fill="#818cf8" fontFamily="system-ui,sans-serif" textAnchor="middle">SM</text>
+        <text x="130" y="379" fontSize="7.5" fontWeight="600" fill="#f1f5f9" fontFamily="system-ui,sans-serif">Social Media</text>
+        <text x="130" y="391" fontSize="6" fill="rgba(255,255,255,0.32)" fontFamily="system-ui,sans-serif">INV-2025-0043</text>
+        <rect x="178" y="374" width="42" height="11" rx="5.5" fill="rgba(129,140,248,0.16)" />
+        <text x="199" y="383" fontSize="5.5" fontWeight="700" fill="#818cf8" fontFamily="system-ui,sans-serif" textAnchor="middle">IN ESCROW</text>
+        <text x="236" y="379" fontSize="8" fontWeight="700" fill="#F59E0B" fontFamily="system-ui,sans-serif" textAnchor="end">50,000</text>
+        <text x="236" y="391" fontSize="5.5" fill="rgba(255,255,255,0.28)" fontFamily="system-ui,sans-serif" textAnchor="end">XAF</text>
+
+        {/* Bottom navigation */}
+        <rect x="91" y="404" width="158" height="42" fill="#070c1a" />
+        <rect x="91" y="404" width="158" height="1" fill="rgba(255,255,255,0.07)" />
+        {/* Home — active */}
+        <rect x="102" y="410" width="30" height="26" rx="7" fill="rgba(245,158,11,0.14)" />
+        <path d="M117 413.5l8 7v8h-5.5v-5.5h-5v5.5H109v-8z" fill="#F59E0B" />
+        <text x="117" y="436" fontSize="5.5" fontWeight="600" fill="#F59E0B" fontFamily="system-ui,sans-serif" textAnchor="middle">Home</text>
+        {/* Invoices */}
+        <g opacity="0.4">
+          <rect x="149" y="415" width="10" height="14" rx="2" fill="none" stroke="rgba(255,255,255,0.7)" strokeWidth="1" />
+          <line x1="151.5" y1="419" x2="156.5" y2="419" stroke="rgba(255,255,255,0.7)" strokeWidth="1" strokeLinecap="round" />
+          <line x1="151.5" y1="422.5" x2="156.5" y2="422.5" stroke="rgba(255,255,255,0.7)" strokeWidth="1" strokeLinecap="round" />
+          <line x1="151.5" y1="426" x2="155" y2="426" stroke="rgba(255,255,255,0.7)" strokeWidth="1" strokeLinecap="round" />
+          <text x="154" y="436" fontSize="5.5" fill="rgba(255,255,255,0.4)" fontFamily="system-ui,sans-serif" textAnchor="middle">Invoice</text>
+        </g>
+        {/* Chat */}
+        <g opacity="0.4">
+          <path d="M193 414h13c1.1 0 2 .9 2 2v8c0 1.1-.9 2-2 2h-7l-4 3v-3c-1.1 0-2-.9-2-2v-8c0-1.1.9-2 2-2z" fill="none" stroke="rgba(255,255,255,0.7)" strokeWidth="1" />
+          <text x="200" y="436" fontSize="5.5" fill="rgba(255,255,255,0.4)" fontFamily="system-ui,sans-serif" textAnchor="middle">Chat</text>
+        </g>
+        {/* Profile */}
+        <g opacity="0.4">
+          <circle cx="226" cy="419" r="4" fill="none" stroke="rgba(255,255,255,0.7)" strokeWidth="1" />
+          <path d="M219 430c0-3.9 3.1-7 7-7s7 3.1 7 7" fill="none" stroke="rgba(255,255,255,0.7)" strokeWidth="1" strokeLinecap="round" />
+          <text x="226" y="436" fontSize="5.5" fill="rgba(255,255,255,0.4)" fontFamily="system-ui,sans-serif" textAnchor="middle">Me</text>
+        </g>
+        {/* Home indicator */}
+        <rect x="149" y="442" width="42" height="3.5" rx="1.75" fill="rgba(255,255,255,0.11)" />
       </g>
 
-      {/* â”€â”€ Subtle star sparkles â”€â”€ */}
-      <g fill="#F59E0B" opacity="0.6">
-        <circle cx="72" cy="90" r="2" />
-        <circle cx="270" cy="140" r="1.5" />
-        <circle cx="60" cy="340" r="1.5" />
-        <circle cx="285" cy="380" r="2" />
-        <circle cx="78" cy="430" r="1" />
-        <circle cx="262" cy="60" r="1" />
+      {/* Screen glass glare */}
+      <rect x="91" y="50" width="158" height="374" rx="24" fill="url(#screenGlare)" />
+
+      {/* ── Floating toast — Payment Confirmed ── */}
+      <g filter="url(#pillShadow)" transform="translate(-32, 46)">
+        <rect x="14" y="198" width="144" height="46" rx="14" fill="#0d1b36" stroke="rgba(245,158,11,0.32)" strokeWidth="1.2" />
+        <circle cx="41" cy="221" r="13" fill="rgba(34,197,94,0.10)" />
+        <circle cx="41" cy="221" r="9" fill="#22c55e" />
+        <path d="M37 221.5l3 3 5.5-6" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+        <text x="58" y="215" fontSize="8.5" fontWeight="700" fill="#ffffff" fontFamily="system-ui,sans-serif">Payment Confirmed</text>
+        <text x="58" y="227" fontSize="7" fill="rgba(255,255,255,0.48)" fontFamily="system-ui,sans-serif">75,000 XAF in escrow</text>
+        <rect x="108" y="219" width="36" height="13" rx="4.5" fill="rgba(245,158,11,0.16)" />
+        <text x="126" y="229" fontSize="6" fontWeight="700" fill="#F59E0B" fontFamily="system-ui,sans-serif" textAnchor="middle">MTN MoMo</text>
       </g>
-      {/* Star cross shapes */}
-      <g stroke="rgba(245,158,11,0.4)" strokeWidth="1" strokeLinecap="round">
-        <line x1="40" y1="200" x2="40" y2="208" />
-        <line x1="36" y1="204" x2="44" y2="204" />
-        <line x1="295" y1="290" x2="295" y2="298" />
-        <line x1="291" y1="294" x2="299" y2="294" />
+
+      {/* ── Floating badge — Funds Safe ── */}
+      <g filter="url(#pillShadow)" transform="translate(161, -12)">
+        <rect x="14" y="338" width="118" height="46" rx="14" fill="#0d1e3a" stroke="rgba(245,158,11,0.26)" strokeWidth="1.2" />
+        <path d="M33 347l7 3v8c0 5-3.5 7.5-7 9c-3.5-1.5-7-4-7-9v-8z" fill="rgba(245,158,11,0.14)" />
+        <path d="M33 348.5l5.5 2.5v6.5c0 4-2.8 6-5.5 7.3c-2.7-1.3-5.5-3.3-5.5-7.3v-6.5z" fill="#F59E0B" />
+        <path d="M30.5 357l2 2 4-4" stroke="#0f1f3d" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+        <text x="46" y="353" fontSize="8.5" fontWeight="700" fill="#ffffff" fontFamily="system-ui,sans-serif">Funds Safe</text>
+        <text x="46" y="365" fontSize="7" fill="rgba(245,158,11,0.82)" fontFamily="system-ui,sans-serif">in Escrow ✓</text>
+      </g>
+
+      {/* ── Decorative sparkles ── */}
+      <g fill="#F59E0B" opacity="0.52">
+        <circle cx="65"  cy="84"  r="2.2" />
+        <circle cx="276" cy="148" r="1.6" />
+        <circle cx="57"  cy="348" r="1.8" />
+        <circle cx="289" cy="396" r="2"   />
+        <circle cx="72"  cy="450" r="1.2" />
+        <circle cx="272" cy="60"  r="1.2" />
+      </g>
+      <g stroke="rgba(245,158,11,0.36)" strokeWidth="1.2" strokeLinecap="round">
+        <line x1="42"  y1="198" x2="42"  y2="208" /><line x1="37"  y1="203" x2="47"  y2="203" />
+        <line x1="300" y1="296" x2="300" y2="306" /><line x1="295" y1="301" x2="305" y2="301" />
       </g>
     </svg>
   );
 }
+
