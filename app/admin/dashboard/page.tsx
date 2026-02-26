@@ -22,6 +22,8 @@ interface Stats {
   platformRevenue: number;
   totalReferralCommissionsPaid: number;
   activeReferrers: number;
+  escrowBalance: number;
+  pendingReferralBalance: number;
 }
 
 // Represents any primitive value that can appear in a database row.
@@ -592,7 +594,21 @@ export default function AdminDashboard() {
                     large
                   />
                   <StatCard
-                    label={t("dashboard.statReferrals")}
+                    label={t("dashboard.statEscrowBalance")}
+                    value={fmtXAF(stats.escrowBalance)}
+                    color="orange"
+                    icon="🔒"
+                    large
+                  />
+                  <StatCard
+                    label={t("dashboard.statPendingReferrals")}
+                    value={fmtXAF(stats.pendingReferralBalance)}
+                    color="violet"
+                    icon="⏳"
+                    large
+                  />
+                  <StatCard
+                    label={t("dashboard.statReferralsPaid")}
                     value={fmtXAF(stats.totalReferralCommissionsPaid)}
                     color="purple"
                     icon="🤝"
