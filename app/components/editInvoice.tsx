@@ -2,15 +2,23 @@
 import React, { useState } from "react";
 import Axios from "axios";
 import { useTranslations } from "next-intl";
+import { Lock } from "lucide-react";
 
 const API = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
 
 type myEditProps = {
   invoice_number: string;
   onEdit: () => void;
+  canEdit?: boolean;
+  editBlockReason?: string;
 };
 
-export default function EditInvoice({ invoice_number, onEdit }: myEditProps) {
+export default function EditInvoice({
+  invoice_number,
+  onEdit,
+  canEdit = true,
+  editBlockReason,
+}: myEditProps) {
   const t = useTranslations("Invoice");
   const [showEdit, setShowEdit] = useState(false);
   const [editSuccess, setEditSuccess] = useState("");
@@ -53,6 +61,50 @@ export default function EditInvoice({ invoice_number, onEdit }: myEditProps) {
     }
   };
 
+  /* ── Locked state ── */
+  if (!canEdit) {
+    return (
+      <div
+        style={{
+          display: "inline-flex",
+          alignItems: "flex-start",
+          gap: "0.375rem",
+          padding: "0.375rem 0.625rem",
+          borderRadius: "var(--radius-sm)",
+          backgroundColor: "var(--color-mist)",
+          border: "1px solid var(--color-border)",
+          maxWidth: "100%",
+        }}
+        title={editBlockReason}
+      >
+        <Lock
+          size={13}
+          style={{
+            color: "var(--color-text-muted)",
+            flexShrink: 0,
+            marginTop: "0.125rem",
+          }}
+        />
+        <span
+          style={{
+            fontSize: "0.75rem",
+            color: "var(--color-text-muted)",
+            lineHeight: 1.4,
+          }}
+        >
+          <span style={{ fontWeight: 600, display: "block" }}>
+            {t("edit.locked")}
+          </span>
+          {editBlockReason && (
+            <span style={{ display: "block", marginTop: "0.125rem" }}>
+              {editBlockReason}
+            </span>
+          )}
+        </span>
+      </div>
+    );
+  }
+
   return (
     <>
       {/* Toast: success */}
@@ -94,6 +146,7 @@ export default function EditInvoice({ invoice_number, onEdit }: myEditProps) {
         className="btn-ghost"
         style={{ fontSize: "0.8125rem" }}
         onClick={() => setShowEdit(!showEdit)}
+        title={t("edit.eligibleHint")}
       >
         {showEdit ? t("edit.cancel") : t("edit.trigger")}
       </button>

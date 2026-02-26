@@ -75,6 +75,13 @@ export default function GetAllInvoices({
     return undefined;
   }
 
+  function getEditBlockReason(invoice: Invoice): string | undefined {
+    if (invoice.status === "paid") return t("edit.reasonPaid");
+    if (invoice.status === "delivered") return t("edit.reasonDelivered");
+    if (invoice.status === "completed") return t("edit.reasonCompleted");
+    return undefined;
+  }
+
   const [copiedId, setCopiedId] = useState<number | null>(null);
   const [invoices, setInvoices] = useState<Invoice[] | null>(null);
   const [statusFilter, setStatusFilter] = useState("all");
@@ -514,6 +521,8 @@ export default function GetAllInvoices({
               <EditInvoice
                 invoice_number={invoice.invoicenumber}
                 onEdit={getAllInvoices}
+                canEdit={canDeleteInvoice(invoice)}
+                editBlockReason={getEditBlockReason(invoice)}
               />
               <DeleteInvoice
                 invoice_id={invoice.id}
