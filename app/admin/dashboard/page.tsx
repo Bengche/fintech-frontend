@@ -797,7 +797,7 @@ export default function AdminDashboard() {
                     <Td bold>
                       {Number(p.amount).toLocaleString()} {p.currency}
                     </Td>
-                    <Td>{p.method ?? "Mobile Money"}</Td>
+                    <Td>{p.provider ?? "Mobile Money"}</Td>
                     <Td>
                       <span className={statusBadge(p.status)}>{p.status}</span>
                     </Td>
