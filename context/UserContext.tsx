@@ -63,20 +63,26 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         (response) => response,
         (error) => {
           if (error?.response?.status === 401) {
-            // Pages that are publicly accessible — a 401 here just means
-            // "not logged in", which is fine. Do NOT redirect to /login.
-            const publicPaths = [
-              "/login",
-              "/forgot-password",
-              "/reset-password",
-              "/register",
-              "/invoice/",
-              "/chat/",
+            // Only redirect to /login when the user is on a page that
+            // genuinely requires authentication. Public pages (homepage,
+            // marketing pages, invoice view, etc.) should never redirect.
+            const protectedPaths = [
+              "/dashboard",
+              "/purchases",
+              "/settings",
+              "/transactions",
+              "/admin",
+              // /referral is the authenticated referral dashboard;
+              // /referral-programme is the public marketing page.
+              "/referral",
             ];
-            const onPublicPage = publicPaths.some((p) =>
+            const onProtectedPage = protectedPaths.some((p) =>
               window.location.pathname.startsWith(p),
             );
-            if (!onPublicPage) {
+            // Exclude /referral-programme which starts with /referral
+            const onPublicReferralPage =
+              window.location.pathname.startsWith("/referral-programme");
+            if (onProtectedPage && !onPublicReferralPage) {
               setUser_id(null);
               setUsername(null);
               Cookies.remove("authToken");
