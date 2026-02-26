@@ -89,90 +89,89 @@ export default async function LandingPage() {
             >
               <div
                 className="lp-hero-text"
-                style={{ flex: "1 1 300px", maxWidth: "560px" }}
+                style={{ flex: "1 1 300px", maxWidth: "560px", textAlign: "left" }}
               >
-              <p
-                style={{
-                  display: "inline-block",
-                  fontSize: "0.8125rem",
-                  fontWeight: 700,
-                  letterSpacing: "0.1em",
-                  textTransform: "uppercase",
-                  color: "var(--color-accent)",
-                  marginBottom: "1rem",
-                }}
-              >
-                {t("hero.badge")}
-              </p>
-
-              <h1
-                style={{
-                  fontSize: "clamp(2rem, 5vw, 3rem)",
-                  fontWeight: 800,
-                  color: "#ffffff",
-                  lineHeight: 1.15,
-                  marginBottom: "1.25rem",
-                }}
-              >
-                {t("hero.h1Part1")}{" "}
-                <span style={{ color: "var(--color-accent)" }}>
-                  {t("hero.h1Part2")}
-                </span>
-              </h1>
-
-              <p
-                style={{
-                  fontSize: "1.0625rem",
-                  color: "rgba(255,255,255,0.75)",
-                  lineHeight: 1.75,
-                  marginBottom: "2rem",
-                  maxWidth: "480px",
-                  margin: "0 auto 2rem",
-                }}
-              >
-                {t("hero.description")}
-              </p>
-
-              <div
-                className="lp-hero-cta"
-                style={{ display: "flex", gap: "0.875rem", flexWrap: "wrap" }}
-              >
-                <Link
-                  href="/register"
-                  className="btn-accent"
-                  style={{ fontSize: "1rem", padding: "0.75rem 1.75rem" }}
+                <p
+                  style={{
+                    display: "inline-block",
+                    fontSize: "0.8125rem",
+                    fontWeight: 700,
+                    letterSpacing: "0.1em",
+                    textTransform: "uppercase",
+                    color: "var(--color-accent)",
+                    marginBottom: "1rem",
+                  }}
                 >
-                  {t("hero.ctaPrimary")}
-                </Link>
-                <Link
-                  href="/how-it-works"
-                  className="btn-outline-white"
-                  style={{ fontSize: "1rem", padding: "0.75rem 1.75rem" }}
-                >
-                  {t("hero.ctaSecondary")}
-                </Link>
-              </div>
+                  {t("hero.badge")}
+                </p>
 
-              {/* â”€â”€ Selling-point tabs â”€â”€ */}
-              <HeroStatsTabs
-                tabs={[
-                  {
-                    value: t("hero.stats.free.value"),
-                    label: t("hero.stats.free.label"),
-                    detail: t("hero.stats.free.detail"),
-                  },
-                  {
-                    value: t("hero.stats.fee.value"),
-                    label: t("hero.stats.fee.label"),
-                    detail: t("hero.stats.fee.detail"),
-                  },
-                  {
-                    value: t("hero.stats.momo.value"),
-                    label: t("hero.stats.momo.label"),
-                    detail: t("hero.stats.momo.detail"),
-                  },
-                ]}
-              />
+                <h1
+                  style={{
+                    fontSize: "clamp(2rem, 5vw, 3rem)",
+                    fontWeight: 800,
+                    color: "#ffffff",
+                    lineHeight: 1.15,
+                    marginBottom: "1.25rem",
+                  }}
+                >
+                  {t("hero.h1Part1")}{" "}
+                  <span style={{ color: "var(--color-accent)" }}>
+                    {t("hero.h1Part2")}
+                  </span>
+                </h1>
+
+                <p
+                  style={{
+                    fontSize: "1.0625rem",
+                    color: "rgba(255,255,255,0.75)",
+                    lineHeight: 1.75,
+                    marginBottom: "2rem",
+                    maxWidth: "480px",
+                  }}
+                >
+                  {t("hero.description")}
+                </p>
+
+                <div
+                  className="lp-hero-cta"
+                  style={{ display: "flex", gap: "0.875rem", flexWrap: "wrap" }}
+                >
+                  <Link
+                    href="/register"
+                    className="btn-accent"
+                    style={{ fontSize: "1rem", padding: "0.75rem 1.75rem" }}
+                  >
+                    {t("hero.ctaPrimary")}
+                  </Link>
+                  <Link
+                    href="/how-it-works"
+                    className="btn-outline-white"
+                    style={{ fontSize: "1rem", padding: "0.75rem 1.75rem" }}
+                  >
+                    {t("hero.ctaSecondary")}
+                  </Link>
+                </div>
+
+                {/* â”€â”€ Selling-point tabs â”€â”€ */}
+                <HeroStatsTabs
+                  tabs={[
+                    {
+                      value: t("hero.stats.free.value"),
+                      label: t("hero.stats.free.label"),
+                      detail: t("hero.stats.free.detail"),
+                    },
+                    {
+                      value: t("hero.stats.fee.value"),
+                      label: t("hero.stats.fee.label"),
+                      detail: t("hero.stats.fee.detail"),
+                    },
+                    {
+                      value: t("hero.stats.momo.value"),
+                      label: t("hero.stats.momo.label"),
+                      detail: t("hero.stats.momo.detail"),
+                    },
+                  ]}
+                />
               </div>
 
               {/* ── Image ─ desktop/tablet only (hidden on mobile via CSS) ── */}
@@ -216,9 +215,10 @@ export default async function LandingPage() {
                   }}
                 />
               </div>
-
-            </div>{/* end lp-hero-inner */}
-          </div>{/* end page-wrapper */}
+            </div>
+            {/* end lp-hero-inner */}
+          </div>
+          {/* end page-wrapper */}
         </section>
 
         {/* ── HERO IMAGE (mobile only) ────────────────────────────────────── */}
@@ -229,7 +229,6 @@ export default async function LandingPage() {
           style={{
             backgroundColor: "var(--color-primary-light)",
             padding: "3rem 1.5rem 3.5rem",
-            display: "flex",
             justifyContent: "center",
             alignItems: "center",
           }}
