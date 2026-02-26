@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import Axios from "axios";
 import { useAuth } from "@/context/UserContext";
 import { Lock, RefreshCw } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 const API = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
 const FEE = 0.03;
@@ -15,6 +16,7 @@ interface EscrowData {
 
 export default function EscrowBalance() {
   const { user_id } = useAuth();
+  const t = useTranslations("EscrowBalance");
   const [data, setData] = useState<EscrowData | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -103,7 +105,7 @@ export default function EscrowBalance() {
                 : "var(--color-text-muted)",
             }}
           >
-            Pending Escrow Balance
+            {t("label")}
           </p>
 
           {hasBalance ? (
@@ -132,10 +134,9 @@ export default function EscrowBalance() {
                   color: "rgba(255,255,255,0.5)",
                 }}
               >
-                After {(FEE * 100).toFixed(0)}% platform fee &nbsp;·&nbsp;{" "}
+                {t("feeNote", { fee: (FEE * 100).toFixed(0) })} &nbsp;·&nbsp;{" "}
                 {data!.invoiceCount}{" "}
-                {data!.invoiceCount === 1 ? "invoice" : "invoices"} awaiting
-                buyer confirmation
+                {data!.invoiceCount === 1 ? t("invoicesSingular") : t("invoicesPlural")}
               </p>
             </>
           ) : (
@@ -146,7 +147,7 @@ export default function EscrowBalance() {
                 color: "var(--color-text-muted)",
               }}
             >
-              No funds in escrow right now.
+              {t("noFunds")}
             </p>
           )}
         </div>
@@ -185,7 +186,7 @@ export default function EscrowBalance() {
                 whiteSpace: "nowrap",
               }}
             >
-              Gross: {data!.grossAmount.toLocaleString()} XAF
+              {t("gross")}: {data!.grossAmount.toLocaleString()} XAF
             </span>
             <span
               className="db-escrow-badge"
@@ -200,7 +201,7 @@ export default function EscrowBalance() {
                 whiteSpace: "nowrap",
               }}
             >
-              Held securely in escrow
+              {t("held")}
             </span>
           </div>
         )}
@@ -208,7 +209,7 @@ export default function EscrowBalance() {
         <button
           onClick={() => load(true)}
           disabled={refreshing}
-          title="Refresh balance"
+          title={t("refresh")}
           style={{
             background: "none",
             border: hasBalance
