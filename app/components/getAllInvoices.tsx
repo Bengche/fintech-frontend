@@ -174,7 +174,10 @@ export default function GetAllInvoices({
           <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
             <button
               className="btn-primary"
-              onClick={() => { haptic("soft"); getAllInvoices(); }}
+              onClick={() => {
+                haptic("soft");
+                getAllInvoices();
+              }}
               disabled={loading}
             >
               {loading ? t("list.loading") : t("list.refresh")}
@@ -228,7 +231,10 @@ export default function GetAllInvoices({
           {STATUS_TABS.map((tab) => (
             <button
               key={tab}
-              onClick={() => { haptic("soft"); setStatusFilter(tab); }}
+              onClick={() => {
+                haptic("soft");
+                setStatusFilter(tab);
+              }}
               style={{
                 padding: "0.3125rem 0.875rem",
                 borderRadius: "999px",

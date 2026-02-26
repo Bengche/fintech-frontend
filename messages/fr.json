@@ -1234,6 +1234,7 @@
       "tabDisputes": "Litiges",
       "tabReferrals": "Parrainages",
       "tabMessages": "Messages",
+      "tabControls": "Contrôles",
       "statTotalUsers": "Total utilisateurs",
       "statTotalInvoices": "Total factures",
       "statPayments": "Paiements traités",
@@ -1329,6 +1330,12 @@
       "recipientRequired": "Veuillez rechercher et sélectionner un destinataire.",
       "msgSendError": "Échec de l'envoi du message. Veuillez réessayer."
     }
+  },
+  "Maintenance": {
+    "title": "Nous revenons bientôt",
+    "body": "Fonlok est actuellement en maintenance. Nous travaillons pour rétablir le service le plus rapidement possible.",
+    "sub": "Nous nous excusons pour la gêne occasionnée. Veuillez réessayer dans quelques minutes.",
+    "refresh": "Réessayer"
   },
   "EscrowBalance": {
     "label": "Solde en séquestre en attente",

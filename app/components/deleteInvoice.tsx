@@ -135,7 +135,10 @@ export default function DeleteInvoice({
           color: "var(--color-danger)",
           borderColor: "var(--color-danger)",
         }}
-        onClick={() => { haptic("soft"); setShowModal(true); }}
+        onClick={() => {
+          haptic("soft");
+          setShowModal(true);
+        }}
         title={t("delete.eligibleHint")}
       >
         {t("delete.trigger")}

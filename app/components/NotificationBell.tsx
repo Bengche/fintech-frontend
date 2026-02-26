@@ -124,7 +124,10 @@ export default function NotificationBell({
 
       {/* ── Bell button ───────────────────────────────────────────────────── */}
       <button
-        onClick={() => { haptic("soft"); setOpen(true); }}
+        onClick={() => {
+          haptic("soft");
+          setOpen(true);
+        }}
         aria-label={`Notifications${unreadCount > 0 ? ` (${unreadCount} unread)` : ""}`}
         style={{
           position: "relative",
@@ -308,7 +311,10 @@ export default function NotificationBell({
                 >
                   {unreadCount > 0 && (
                     <button
-                      onClick={() => { haptic("medium"); markAllRead(); }}
+                      onClick={() => {
+                        haptic("medium");
+                        markAllRead();
+                      }}
                       style={{
                         background: "none",
                         border: "1.5px solid #F59E0B",

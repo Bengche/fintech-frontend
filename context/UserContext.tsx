@@ -62,6 +62,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       interceptorRef.current = Axios.interceptors.response.use(
         (response) => response,
         (error) => {
+          // ── Maintenance mode: redirect to /maintenance page ────────────
+          if (
+            error?.response?.status === 503 &&
+            error?.response?.data?.maintenanceMode === true
+          ) {
+            if (!window.location.pathname.startsWith("/maintenance")) {
+              window.location.href = "/maintenance";
+            }
+            return Promise.reject(error);
+          }
+
           if (error?.response?.status === 401) {
             // Only redirect to /login when the user is on a page that
             // genuinely requires authentication. Public pages (homepage,

@@ -133,7 +133,10 @@ export default function Dashboard() {
           {tabs.map((t) => (
             <button
               key={t.key}
-              onClick={() => { haptic("soft"); setActiveTab(t.key); }}
+              onClick={() => {
+                haptic("soft");
+                setActiveTab(t.key);
+              }}
               className="db-tab-btn"
               style={{
                 background: "none",

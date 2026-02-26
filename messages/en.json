@@ -1234,6 +1234,7 @@
       "tabDisputes": "Disputes",
       "tabReferrals": "Referrals",
       "tabMessages": "Messages",
+      "tabControls": "Controls",
       "statTotalUsers": "Total Users",
       "statTotalInvoices": "Total Invoices",
       "statPayments": "Payments Processed",
@@ -1329,6 +1330,12 @@
       "recipientRequired": "Please search for and select a recipient.",
       "msgSendError": "Failed to send message. Please try again."
     }
+  },
+  "Maintenance": {
+    "title": "We\'ll be back shortly",
+    "body": "Fonlok is currently undergoing scheduled maintenance. We\'re working hard to restore the service as quickly as possible.",
+    "sub": "We apologise for any inconvenience. Please check back in a few minutes.",
+    "refresh": "Try Again"
   },
   "EscrowBalance": {
     "label": "Pending Escrow Balance",

@@ -25,8 +25,7 @@ export function haptic(style: HapticStyle = "soft"): void {
     heavy: [18, 50, 18],
   };
 
-  const pattern =
-    typeof style === "string" ? patterns[style] : style;
+  const pattern = typeof style === "string" ? patterns[style] : style;
 
   navigator.vibrate(pattern);
 }

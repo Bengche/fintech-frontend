@@ -110,7 +110,8 @@ type TabKey =
   | "referrals"
   | "messages"
   | "stuck"
-  | "verify";
+  | "verify"
+  | "controls";
 
 // ─── Main Component ────────────────────────────────────────────────────────────
 export default function AdminDashboard() {
@@ -128,6 +129,7 @@ export default function AdminDashboard() {
     { key: "referrals", label: t("dashboard.tabReferrals") },
     { key: "messages", label: t("dashboard.tabMessages") },
     { key: "verify", label: "Verify Receipt" },
+    { key: "controls", label: t("dashboard.tabControls") },
   ];
 
   // Auth state: null = checking, true = ok, false = not authed
@@ -146,6 +148,31 @@ export default function AdminDashboard() {
   const [referrals, setReferrals] = useState<SectionState>(initTab());
   const [broadcasts, setBroadcasts] = useState<SectionState>(initTab());
   const [stuck, setStuck] = useState<SectionState>(initTab());
+
+  // ── Platform Controls state ───────────────────────────────────────────────
+  interface PlatformSettings {
+    maintenanceMode: boolean;
+    paymentsBlocked: boolean;
+    payoutsBlocked: boolean;
+  }
+  const [platformSettings, setPlatformSettings] =
+    useState<PlatformSettings | null>(null);
+  const [settingsLoading, setSettingsLoading] = useState(false);
+  const [savingKey, setSavingKey] = useState<string | null>(null);
+
+  // ── Balance adjustment form state ─────────────────────────────────────────
+  const [adjustments, setAdjustments] = useState<SectionState>(initTab());
+  const [adjUserSearch, setAdjUserSearch] = useState("");
+  const [adjUserResults, setAdjUserResults] = useState<UserResult[]>([]);
+  const [adjUserSearching, setAdjUserSearching] = useState(false);
+  const [adjSelectedUser, setAdjSelectedUser] = useState<UserResult | null>(null);
+  const [adjAmount, setAdjAmount] = useState("");
+  const [adjType, setAdjType] = useState<"credit" | "debit">("credit");
+  const [adjReason, setAdjReason] = useState("");
+  const [adjSubmitting, setAdjSubmitting] = useState(false);
+  const [adjSuccess, setAdjSuccess] = useState("");
+  const [adjError, setAdjError] = useState("");
+  const adjSearchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // ── Broadcast compose form state ─────────────────────────────────────────
   const [msgRecipientType, setMsgRecipientType] = useState<"all" | "user">(
@@ -248,7 +275,7 @@ export default function AdminDashboard() {
 
   // ── 4. Load data when switching tabs (only if not already loaded) ────────────
   useEffect(() => {
-    if (!authed || activeTab === "overview" || activeTab === "verify") return;
+    if (!authed || activeTab === "overview" || activeTab === "verify" || activeTab === "controls") return;
     const tabState = {
       users,
       invoices,
@@ -349,6 +376,143 @@ export default function AdminDashboard() {
   const handleLogout = async () => {
     await axios.post(`${API_URL}/admin/logout`, {}, { withCredentials: true });
     router.push("/admin/login");
+  };
+
+  // ── 8. Platform Controls ─────────────────────────────────────────────────────
+  const loadSettings = async () => {
+    setSettingsLoading(true);
+    try {
+      const res = await axios.get(`${API_URL}/admin/settings`, {
+        withCredentials: true,
+      });
+      setPlatformSettings(res.data);
+    } catch {
+      // silently fail — controls will show an error state
+    } finally {
+      setSettingsLoading(false);
+    }
+  };
+
+  const toggleSetting = async (key: string, value: boolean) => {
+    setSavingKey(key);
+    try {
+      await axios.post(
+        `${API_URL}/admin/settings`,
+        { key, value },
+        { withCredentials: true },
+      );
+      setPlatformSettings((prev) => (prev ? { ...prev, [key === "maintenance_mode" ? "maintenanceMode" : key === "payments_blocked" ? "paymentsBlocked" : "payoutsBlocked"]: value } : prev));
+    } catch (err: unknown) {
+      alert(
+        axios.isAxiosError(err) && err.response?.data?.message
+          ? err.response.data.message
+          : "Failed to update setting.",
+      );
+    } finally {
+      setSavingKey(null);
+    }
+  };
+
+  // Load settings + adjustments log when the controls tab is opened
+  useEffect(() => {
+    if (activeTab !== "controls" || !authed) return;
+    if (!platformSettings) loadSettings();
+    if (!adjustments.loaded) {
+      loadAdjustments(false, 0);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab, authed]);
+
+  const loadAdjustments = async (append: boolean, currentPage: number) => {
+    const nextPage = append ? currentPage + 1 : 1;
+    setAdjustments((prev) => ({ ...prev, loading: true, error: "" }));
+    try {
+      const res = await axios.get(
+        `${API_URL}/admin/adjustments?page=${nextPage}&limit=20`,
+        { withCredentials: true },
+      );
+      setAdjustments((prev) => ({
+        ...prev,
+        data: append ? [...prev.data, ...res.data.data] : res.data.data,
+        page: nextPage,
+        hasMore: res.data.hasMore,
+        loading: false,
+        loaded: true,
+        error: "",
+      }));
+    } catch {
+      setAdjustments((prev) => ({
+        ...prev,
+        loading: false,
+        error: "Failed to load adjustment log.",
+      }));
+    }
+  };
+
+  // Debounced user search for the adjustment picker
+  useEffect(() => {
+    if (!adjUserSearch.trim()) {
+      setAdjUserResults([]);
+      return;
+    }
+    if (adjSearchTimerRef.current) clearTimeout(adjSearchTimerRef.current);
+    adjSearchTimerRef.current = setTimeout(async () => {
+      setAdjUserSearching(true);
+      try {
+        const res = await axios.get(
+          `${API_URL}/admin/users/search?q=${encodeURIComponent(adjUserSearch)}`,
+          { withCredentials: true },
+        );
+        setAdjUserResults(res.data.data);
+      } catch {
+        setAdjUserResults([]);
+      } finally {
+        setAdjUserSearching(false);
+      }
+    }, 350);
+    return () => {
+      if (adjSearchTimerRef.current) clearTimeout(adjSearchTimerRef.current);
+    };
+  }, [adjUserSearch]);
+
+  const submitAdjustment = async () => {
+    setAdjSuccess("");
+    setAdjError("");
+    if (!adjSelectedUser) return setAdjError("Please select a user.");
+    const amt = parseFloat(adjAmount);
+    if (isNaN(amt) || amt <= 0) return setAdjError("Enter a valid positive amount.");
+    if (!adjReason.trim() || adjReason.trim().length < 5)
+      return setAdjError("Reason must be at least 5 characters.");
+
+    setAdjSubmitting(true);
+    try {
+      const res = await axios.post(
+        `${API_URL}/admin/adjust-balance`,
+        {
+          userId: adjSelectedUser.id,
+          amount: amt,
+          type: adjType,
+          reason: adjReason.trim(),
+        },
+        { withCredentials: true },
+      );
+      setAdjSuccess(res.data.message);
+      setAdjAmount("");
+      setAdjReason("");
+      setAdjSelectedUser(null);
+      setAdjUserSearch("");
+      // Reload log
+      setAdjustments(initTab());
+      loadAdjustments(false, 0);
+    } catch (err: unknown) {
+      setAdjError(
+        axios.isAxiosError(err) && err.response?.data?.message
+          ? err.response.data.message
+          : "Failed to apply adjustment.",
+      );
+    } finally {
+      setAdjSubmitting(false);
+    }
   };
 
   // ── Showing a loading screen while checking auth ─────────────────────────────
@@ -1626,6 +1790,306 @@ export default function AdminDashboard() {
 
         {/* ─────────────────────── VERIFY RECEIPT TAB ─────────────────────── */}
         {activeTab === "verify" && <AdminVerifyTab />}
+
+        {/* ─────────────────────── CONTROLS TAB ─────────────────────────────── */}
+        {activeTab === "controls" && (
+          <section style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
+            {/* ── Platform Toggles ─── */}
+            <div
+              style={{
+                background: "var(--color-surface, #fff)",
+                borderRadius: "12px",
+                padding: "1.5rem",
+                boxShadow: "0 1px 4px rgba(0,0,0,0.07)",
+              }}
+            >
+              <h2 style={{ margin: "0 0 1.25rem", fontSize: "1.1rem", fontWeight: 700 }}>
+                ⚙️ Platform Toggles
+              </h2>
+              {settingsLoading || !platformSettings ? (
+                <p style={{ color: "var(--color-text-muted)" }}>Loading settings…</p>
+              ) : (
+                <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+                  {(
+                    [
+                      {
+                        key: "maintenance_mode",
+                        label: "🔧 Maintenance Mode",
+                        desc: "Blocks all non-admin traffic with a maintenance page. Admin dashboard stays accessible.",
+                        value: platformSettings.maintenanceMode,
+                      },
+                      {
+                        key: "payments_blocked",
+                        label: "💳 Block Incoming Payments",
+                        desc: "Prevents buyers from initiating new MoMo payment prompts.",
+                        value: platformSettings.paymentsBlocked,
+                      },
+                      {
+                        key: "payouts_blocked",
+                        label: "📤 Block Outgoing Payouts",
+                        desc: "Prevents sellers from releasing escrow funds to their Mobile Money account.",
+                        value: platformSettings.payoutsBlocked,
+                      },
+                    ] as { key: string; label: string; desc: string; value: boolean }[]
+                  ).map(({ key, label, desc, value }) => (
+                    <div
+                      key={key}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        gap: "1rem",
+                        padding: "1rem 1.25rem",
+                        borderRadius: "8px",
+                        background: value
+                          ? "rgba(239,68,68,0.06)"
+                          : "var(--color-bg, #f8fafc)",
+                        border: `1px solid ${value ? "rgba(239,68,68,0.25)" : "var(--color-border, #e2e8f0)"}`,
+                      }}
+                    >
+                      <div>
+                        <div style={{ fontWeight: 600, fontSize: "0.95rem" }}>{label}</div>
+                        <div style={{ fontSize: "0.8rem", color: "var(--color-text-muted)", marginTop: "2px" }}>
+                          {desc}
+                        </div>
+                      </div>
+                      <button
+                        disabled={savingKey === key}
+                        onClick={() => toggleSetting(key, !value)}
+                        style={{
+                          flexShrink: 0,
+                          padding: "0.5rem 1.1rem",
+                          borderRadius: "20px",
+                          fontWeight: 600,
+                          fontSize: "0.85rem",
+                          cursor: savingKey === key ? "not-allowed" : "pointer",
+                          border: "none",
+                          background: value ? "#ef4444" : "#22c55e",
+                          color: "#fff",
+                          opacity: savingKey === key ? 0.6 : 1,
+                          transition: "background 0.2s",
+                        }}
+                      >
+                        {savingKey === key ? "Saving…" : value ? "ON — Click to Disable" : "OFF — Click to Enable"}
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* ── Manual Balance Adjustment ─── */}
+            <div
+              style={{
+                background: "var(--color-surface, #fff)",
+                borderRadius: "12px",
+                padding: "1.5rem",
+                boxShadow: "0 1px 4px rgba(0,0,0,0.07)",
+              }}
+            >
+              <h2 style={{ margin: "0 0 0.25rem", fontSize: "1.1rem", fontWeight: 700 }}>
+                🏦 Manual Balance Adjustment
+              </h2>
+              <p style={{ margin: "0 0 1.25rem", fontSize: "0.85rem", color: "var(--color-text-muted)" }}>
+                Credit or debit a user&apos;s wallet balance when a MoMo transaction fails but the user was charged.
+                A reason note is mandatory and permanently logged.
+              </p>
+
+              {/* User picker */}
+              <div style={{ marginBottom: "0.75rem", position: "relative" }}>
+                <label style={{ display: "block", fontSize: "0.85rem", fontWeight: 600, marginBottom: "4px" }}>
+                  Search User
+                </label>
+                <input
+                  value={adjUserSearch}
+                  onChange={(e) => {
+                    setAdjUserSearch(e.target.value);
+                    setAdjSelectedUser(null);
+                  }}
+                  placeholder="Name, username or email…"
+                  style={{
+                    width: "100%", padding: "0.6rem 0.75rem", borderRadius: "8px",
+                    border: "1px solid var(--color-border, #e2e8f0)", fontSize: "0.9rem",
+                    boxSizing: "border-box",
+                  }}
+                />
+                {adjUserSearching && (
+                  <p style={{ fontSize: "0.8rem", color: "var(--color-text-muted)", marginTop: "4px" }}>Searching…</p>
+                )}
+                {adjUserResults.length > 0 && !adjSelectedUser && (
+                  <ul
+                    style={{
+                      position: "absolute", top: "100%", left: 0, right: 0, zIndex: 50,
+                      background: "#fff", border: "1px solid #e2e8f0", borderRadius: "8px",
+                      listStyle: "none", margin: "4px 0 0", padding: "4px 0",
+                      boxShadow: "0 4px 12px rgba(0,0,0,0.1)", maxHeight: "200px", overflowY: "auto",
+                    }}
+                  >
+                    {adjUserResults.map((u) => (
+                      <li
+                        key={u.id}
+                        onClick={() => { setAdjSelectedUser(u); setAdjUserSearch(u.name); setAdjUserResults([]); }}
+                        style={{ padding: "0.5rem 0.75rem", cursor: "pointer", fontSize: "0.875rem" }}
+                      >
+                        {u.name} <span style={{ color: "#94a3b8" }}>@{u.username} · {u.email}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                {adjSelectedUser && (
+                  <p style={{ fontSize: "0.8rem", color: "#22c55e", marginTop: "4px" }}>
+                    ✓ Selected: {adjSelectedUser.name} ({adjSelectedUser.email})
+                  </p>
+                )}
+              </div>
+
+              {/* Amount + type */}
+              <div style={{ display: "flex", gap: "0.75rem", marginBottom: "0.75rem", flexWrap: "wrap" }}>
+                <div style={{ flex: "1 1 160px" }}>
+                  <label style={{ display: "block", fontSize: "0.85rem", fontWeight: 600, marginBottom: "4px" }}>
+                    Amount (XAF)
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    value={adjAmount}
+                    onChange={(e) => setAdjAmount(e.target.value)}
+                    placeholder="e.g. 5000"
+                    style={{
+                      width: "100%", padding: "0.6rem 0.75rem", borderRadius: "8px",
+                      border: "1px solid var(--color-border, #e2e8f0)", fontSize: "0.9rem",
+                      boxSizing: "border-box",
+                    }}
+                  />
+                </div>
+                <div style={{ flex: "1 1 140px" }}>
+                  <label style={{ display: "block", fontSize: "0.85rem", fontWeight: 600, marginBottom: "4px" }}>
+                    Type
+                  </label>
+                  <select
+                    value={adjType}
+                    onChange={(e) => setAdjType(e.target.value as "credit" | "debit")}
+                    style={{
+                      width: "100%", padding: "0.6rem 0.75rem", borderRadius: "8px",
+                      border: "1px solid var(--color-border, #e2e8f0)", fontSize: "0.9rem",
+                      background: "#fff", boxSizing: "border-box",
+                    }}
+                  >
+                    <option value="credit">✅ Credit (add funds)</option>
+                    <option value="debit">❌ Debit (remove funds)</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Reason */}
+              <div style={{ marginBottom: "1rem" }}>
+                <label style={{ display: "block", fontSize: "0.85rem", fontWeight: 600, marginBottom: "4px" }}>
+                  Reason Note <span style={{ color: "#ef4444" }}>*</span>
+                </label>
+                <textarea
+                  value={adjReason}
+                  onChange={(e) => setAdjReason(e.target.value)}
+                  rows={3}
+                  placeholder="e.g. MoMo transaction ref #ABC123 failed but user was charged. Refunding via wallet credit."
+                  style={{
+                    width: "100%", padding: "0.6rem 0.75rem", borderRadius: "8px",
+                    border: "1px solid var(--color-border, #e2e8f0)", fontSize: "0.875rem",
+                    resize: "vertical", boxSizing: "border-box",
+                  }}
+                />
+              </div>
+
+              {adjError && (
+                <p style={{ fontSize: "0.85rem", color: "#ef4444", marginBottom: "0.75rem" }}>{adjError}</p>
+              )}
+              {adjSuccess && (
+                <p style={{ fontSize: "0.85rem", color: "#22c55e", marginBottom: "0.75rem" }}>✓ {adjSuccess}</p>
+              )}
+
+              <button
+                disabled={adjSubmitting}
+                onClick={submitAdjustment}
+                style={{
+                  padding: "0.65rem 1.5rem", borderRadius: "8px", fontWeight: 700,
+                  background: adjType === "credit" ? "#22c55e" : "#ef4444",
+                  color: "#fff", border: "none", cursor: adjSubmitting ? "not-allowed" : "pointer",
+                  opacity: adjSubmitting ? 0.65 : 1, fontSize: "0.9rem",
+                }}
+              >
+                {adjSubmitting ? "Processing…" : adjType === "credit" ? "Apply Credit" : "Apply Debit"}
+              </button>
+            </div>
+
+            {/* ── Adjustment Audit Log ─── */}
+            <div
+              style={{
+                background: "var(--color-surface, #fff)",
+                borderRadius: "12px",
+                padding: "1.5rem",
+                boxShadow: "0 1px 4px rgba(0,0,0,0.07)",
+              }}
+            >
+              <h2 style={{ margin: "0 0 1rem", fontSize: "1.1rem", fontWeight: 700 }}>
+                📋 Adjustment Audit Log
+              </h2>
+              {adjustments.loading && !adjustments.loaded ? (
+                <p style={{ color: "var(--color-text-muted)" }}>Loading…</p>
+              ) : adjustments.data.length === 0 ? (
+                <p style={{ color: "var(--color-text-muted)" }}>No adjustments yet.</p>
+              ) : (
+                <div style={{ overflowX: "auto" }}>
+                  <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.875rem" }}>
+                    <thead>
+                      <tr style={{ borderBottom: "2px solid var(--color-border, #e2e8f0)" }}>
+                        {["Date", "Admin", "User", "Type", "Amount (XAF)", "Reason"].map((h) => (
+                          <th key={h} style={{ padding: "0.5rem 0.75rem", textAlign: "left", whiteSpace: "nowrap" }}>{h}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {adjustments.data.map((row) => (
+                        <tr key={String(row.id)} style={{ borderBottom: "1px solid var(--color-border, #e2e8f0)" }}>
+                          <td style={{ padding: "0.5rem 0.75rem", whiteSpace: "nowrap" }}>{fmtDate(row.created_at)}</td>
+                          <td style={{ padding: "0.5rem 0.75rem" }}>{String(row.admin_email)}</td>
+                          <td style={{ padding: "0.5rem 0.75rem" }}>
+                            {String(row.user_name)}<br />
+                            <span style={{ fontSize: "0.75rem", color: "var(--color-text-muted)" }}>{String(row.user_email)}</span>
+                          </td>
+                          <td style={{ padding: "0.5rem 0.75rem" }}>
+                            <span style={{
+                              padding: "2px 8px", borderRadius: "12px", fontSize: "0.75rem", fontWeight: 600,
+                              background: row.type === "credit" ? "rgba(34,197,94,0.12)" : "rgba(239,68,68,0.12)",
+                              color: row.type === "credit" ? "#16a34a" : "#dc2626",
+                            }}>
+                              {String(row.type).toUpperCase()}
+                            </span>
+                          </td>
+                          <td style={{ padding: "0.5rem 0.75rem", fontWeight: 600 }}>
+                            {Number(row.amount).toLocaleString()}
+                          </td>
+                          <td style={{ padding: "0.5rem 0.75rem", maxWidth: "260px" }}>{String(row.reason)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  {adjustments.hasMore && (
+                    <button
+                      onClick={() => loadAdjustments(true, adjustments.page)}
+                      disabled={adjustments.loading}
+                      style={{
+                        marginTop: "1rem", padding: "0.5rem 1.25rem", borderRadius: "8px",
+                        background: "var(--color-primary, #0F1F3D)", color: "#fff",
+                        border: "none", cursor: "pointer", fontSize: "0.875rem",
+                      }}
+                    >
+                      {adjustments.loading ? "Loading…" : "Load More"}
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+          </section>
+        )}
       </main>
     </div>
   );

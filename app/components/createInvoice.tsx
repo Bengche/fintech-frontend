@@ -227,7 +227,10 @@ export default function CreateInvoice({
       {/* Trigger button */}
       <button
         className="btn-primary"
-        onClick={() => { haptic("medium"); setOpenModal(true); }}
+        onClick={() => {
+          haptic("medium");
+          setOpenModal(true);
+        }}
         style={{ fontSize: "0.9375rem", padding: "0.625rem 1.5rem" }}
       >
         {t("create.trigger")}

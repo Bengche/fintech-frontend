@@ -147,7 +147,10 @@ export default function EditInvoice({
       <button
         className="btn-ghost"
         style={{ fontSize: "0.8125rem" }}
-        onClick={() => { haptic("soft"); setShowEdit(!showEdit); }}
+        onClick={() => {
+          haptic("soft");
+          setShowEdit(!showEdit);
+        }}
         title={t("edit.eligibleHint")}
       >
         {showEdit ? t("edit.cancel") : t("edit.trigger")}
