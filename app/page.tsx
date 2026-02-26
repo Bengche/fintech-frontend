@@ -498,7 +498,7 @@ export default async function LandingPage() {
                         flexShrink: 0,
                       }}
                     >
-                      âœ“
+                      ✓
                     </span>
                     {item}
                   </li>
