@@ -375,14 +375,14 @@ a:hover {
     padding: 2.75rem 1.25rem 3rem !important;
   }
 
-  /* Phone illustration — shown but scaled down on mobile */
+  /* Hero image — full width, centred on mobile */
   .lp-hero-illo {
     flex: 0 1 100% !important;
     justify-content: center !important;
   }
-  .lp-hero-illo svg {
-    width: 220px !important;
-    height: auto !important;
+  .lp-hero-illo img {
+    max-width: 280px !important;
+    border-radius: 20px !important;
   }
 
   /* Gap between text and illustration */
