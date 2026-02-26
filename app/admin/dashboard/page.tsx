@@ -165,7 +165,9 @@ export default function AdminDashboard() {
   const [adjUserSearch, setAdjUserSearch] = useState("");
   const [adjUserResults, setAdjUserResults] = useState<UserResult[]>([]);
   const [adjUserSearching, setAdjUserSearching] = useState(false);
-  const [adjSelectedUser, setAdjSelectedUser] = useState<UserResult | null>(null);
+  const [adjSelectedUser, setAdjSelectedUser] = useState<UserResult | null>(
+    null,
+  );
   const [adjAmount, setAdjAmount] = useState("");
   const [adjType, setAdjType] = useState<"credit" | "debit">("credit");
   const [adjReason, setAdjReason] = useState("");
@@ -275,7 +277,13 @@ export default function AdminDashboard() {
 
   // ── 4. Load data when switching tabs (only if not already loaded) ────────────
   useEffect(() => {
-    if (!authed || activeTab === "overview" || activeTab === "verify" || activeTab === "controls") return;
+    if (
+      !authed ||
+      activeTab === "overview" ||
+      activeTab === "verify" ||
+      activeTab === "controls"
+    )
+      return;
     const tabState = {
       users,
       invoices,
@@ -401,7 +409,18 @@ export default function AdminDashboard() {
         { key, value },
         { withCredentials: true },
       );
-      setPlatformSettings((prev) => (prev ? { ...prev, [key === "maintenance_mode" ? "maintenanceMode" : key === "payments_blocked" ? "paymentsBlocked" : "payoutsBlocked"]: value } : prev));
+      setPlatformSettings((prev) =>
+        prev
+          ? {
+              ...prev,
+              [key === "maintenance_mode"
+                ? "maintenanceMode"
+                : key === "payments_blocked"
+                  ? "paymentsBlocked"
+                  : "payoutsBlocked"]: value,
+            }
+          : prev,
+      );
     } catch (err: unknown) {
       alert(
         axios.isAxiosError(err) && err.response?.data?.message
@@ -480,7 +499,8 @@ export default function AdminDashboard() {
     setAdjError("");
     if (!adjSelectedUser) return setAdjError("Please select a user.");
     const amt = parseFloat(adjAmount);
-    if (isNaN(amt) || amt <= 0) return setAdjError("Enter a valid positive amount.");
+    if (isNaN(amt) || amt <= 0)
+      return setAdjError("Enter a valid positive amount.");
     if (!adjReason.trim() || adjReason.trim().length < 5)
       return setAdjError("Reason must be at least 5 characters.");
 
@@ -1793,23 +1813,45 @@ export default function AdminDashboard() {
 
         {/* ─────────────────────── CONTROLS TAB ─────────────────────────────── */}
         {activeTab === "controls" && (
-          <section style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
+          <section
+            style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}
+          >
+            {/* Responsive helper styles for Controls tab */}
+            <style>{`
+              .ctrl-card { background: var(--color-surface,#fff); border-radius: 12px; padding: 1.5rem; box-shadow: 0 1px 4px rgba(0,0,0,0.07); }
+              @media (max-width: 600px) { .ctrl-card { padding: 1rem; } }
+              .ctrl-toggle-row { display:flex; align-items:center; justify-content:space-between; gap:0.75rem; padding:1rem 1.25rem; border-radius:8px; flex-wrap:wrap; }
+              @media (max-width:480px) { .ctrl-toggle-row { flex-direction:column; align-items:flex-start; } }
+              .ctrl-toggle-btn { flex-shrink:0; padding:0.45rem 1rem; border-radius:20px; font-weight:600; font-size:0.82rem; cursor:pointer; border:none; color:#fff; transition:background 0.2s; white-space:nowrap; }
+              @media (max-width:480px) { .ctrl-toggle-btn { width:100%; text-align:center; } }
+              .ctrl-fields-row { display:flex; gap:0.75rem; margin-bottom:0.75rem; flex-wrap:wrap; }
+              .ctrl-field { flex:1 1 160px; min-width:120px; }
+              .ctrl-submit-btn { padding:0.65rem 1.5rem; border-radius:8px; font-weight:700; color:#fff; border:none; cursor:pointer; font-size:0.9rem; width:100%; }
+              @media (min-width:480px) { .ctrl-submit-btn { width:auto; } }
+            `}</style>
             {/* ── Platform Toggles ─── */}
-            <div
-              style={{
-                background: "var(--color-surface, #fff)",
-                borderRadius: "12px",
-                padding: "1.5rem",
-                boxShadow: "0 1px 4px rgba(0,0,0,0.07)",
-              }}
-            >
-              <h2 style={{ margin: "0 0 1.25rem", fontSize: "1.1rem", fontWeight: 700 }}>
+            <div className="ctrl-card">
+              <h2
+                style={{
+                  margin: "0 0 1.25rem",
+                  fontSize: "1.1rem",
+                  fontWeight: 700,
+                }}
+              >
                 ⚙️ Platform Toggles
               </h2>
               {settingsLoading || !platformSettings ? (
-                <p style={{ color: "var(--color-text-muted)" }}>Loading settings…</p>
+                <p style={{ color: "var(--color-text-muted)" }}>
+                  Loading settings…
+                </p>
               ) : (
-                <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "1rem",
+                  }}
+                >
                   {(
                     [
                       {
@@ -1830,7 +1872,12 @@ export default function AdminDashboard() {
                         desc: "Prevents sellers from releasing escrow funds to their Mobile Money account.",
                         value: platformSettings.payoutsBlocked,
                       },
-                    ] as { key: string; label: string; desc: string; value: boolean }[]
+                    ] as {
+                      key: string;
+                      label: string;
+                      desc: string;
+                      value: boolean;
+                    }[]
                   ).map(({ key, label, desc, value }) => (
                     <div
                       key={key}
@@ -1848,8 +1895,16 @@ export default function AdminDashboard() {
                       }}
                     >
                       <div>
-                        <div style={{ fontWeight: 600, fontSize: "0.95rem" }}>{label}</div>
-                        <div style={{ fontSize: "0.8rem", color: "var(--color-text-muted)", marginTop: "2px" }}>
+                        <div style={{ fontWeight: 600, fontSize: "0.95rem" }}>
+                          {label}
+                        </div>
+                        <div
+                          style={{
+                            fontSize: "0.8rem",
+                            color: "var(--color-text-muted)",
+                            marginTop: "2px",
+                          }}
+                        >
                           {desc}
                         </div>
                       </div>
@@ -1870,7 +1925,11 @@ export default function AdminDashboard() {
                           transition: "background 0.2s",
                         }}
                       >
-                        {savingKey === key ? "Saving…" : value ? "ON — Click to Disable" : "OFF — Click to Enable"}
+                        {savingKey === key
+                          ? "Saving…"
+                          : value
+                            ? "ON — Click to Disable"
+                            : "OFF — Click to Enable"}
                       </button>
                     </div>
                   ))}
@@ -1879,25 +1938,38 @@ export default function AdminDashboard() {
             </div>
 
             {/* ── Manual Balance Adjustment ─── */}
-            <div
-              style={{
-                background: "var(--color-surface, #fff)",
-                borderRadius: "12px",
-                padding: "1.5rem",
-                boxShadow: "0 1px 4px rgba(0,0,0,0.07)",
-              }}
-            >
-              <h2 style={{ margin: "0 0 0.25rem", fontSize: "1.1rem", fontWeight: 700 }}>
+            <div className="ctrl-card">
+              <h2
+                style={{
+                  margin: "0 0 0.25rem",
+                  fontSize: "1.1rem",
+                  fontWeight: 700,
+                }}
+              >
                 🏦 Manual Balance Adjustment
               </h2>
-              <p style={{ margin: "0 0 1.25rem", fontSize: "0.85rem", color: "var(--color-text-muted)" }}>
-                Credit or debit a user&apos;s wallet balance when a MoMo transaction fails but the user was charged.
-                A reason note is mandatory and permanently logged.
+              <p
+                style={{
+                  margin: "0 0 1.25rem",
+                  fontSize: "0.85rem",
+                  color: "var(--color-text-muted)",
+                }}
+              >
+                Credit or debit a user&apos;s wallet balance when a MoMo
+                transaction fails but the user was charged. A reason note is
+                mandatory and permanently logged.
               </p>
 
               {/* User picker */}
               <div style={{ marginBottom: "0.75rem", position: "relative" }}>
-                <label style={{ display: "block", fontSize: "0.85rem", fontWeight: 600, marginBottom: "4px" }}>
+                <label
+                  style={{
+                    display: "block",
+                    fontSize: "0.85rem",
+                    fontWeight: 600,
+                    marginBottom: "4px",
+                  }}
+                >
                   Search User
                 </label>
                 <input
@@ -1908,45 +1980,90 @@ export default function AdminDashboard() {
                   }}
                   placeholder="Name, username or email…"
                   style={{
-                    width: "100%", padding: "0.6rem 0.75rem", borderRadius: "8px",
-                    border: "1px solid var(--color-border, #e2e8f0)", fontSize: "0.9rem",
+                    width: "100%",
+                    padding: "0.6rem 0.75rem",
+                    borderRadius: "8px",
+                    border: "1px solid var(--color-border, #e2e8f0)",
+                    fontSize: "0.9rem",
                     boxSizing: "border-box",
                   }}
                 />
                 {adjUserSearching && (
-                  <p style={{ fontSize: "0.8rem", color: "var(--color-text-muted)", marginTop: "4px" }}>Searching…</p>
+                  <p
+                    style={{
+                      fontSize: "0.8rem",
+                      color: "var(--color-text-muted)",
+                      marginTop: "4px",
+                    }}
+                  >
+                    Searching…
+                  </p>
                 )}
                 {adjUserResults.length > 0 && !adjSelectedUser && (
                   <ul
                     style={{
-                      position: "absolute", top: "100%", left: 0, right: 0, zIndex: 50,
-                      background: "#fff", border: "1px solid #e2e8f0", borderRadius: "8px",
-                      listStyle: "none", margin: "4px 0 0", padding: "4px 0",
-                      boxShadow: "0 4px 12px rgba(0,0,0,0.1)", maxHeight: "200px", overflowY: "auto",
+                      position: "absolute",
+                      top: "100%",
+                      left: 0,
+                      right: 0,
+                      zIndex: 50,
+                      background: "#fff",
+                      border: "1px solid #e2e8f0",
+                      borderRadius: "8px",
+                      listStyle: "none",
+                      margin: "4px 0 0",
+                      padding: "4px 0",
+                      boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                      maxHeight: "200px",
+                      overflowY: "auto",
                     }}
                   >
                     {adjUserResults.map((u) => (
                       <li
                         key={u.id}
-                        onClick={() => { setAdjSelectedUser(u); setAdjUserSearch(u.name); setAdjUserResults([]); }}
-                        style={{ padding: "0.5rem 0.75rem", cursor: "pointer", fontSize: "0.875rem" }}
+                        onClick={() => {
+                          setAdjSelectedUser(u);
+                          setAdjUserSearch(u.name);
+                          setAdjUserResults([]);
+                        }}
+                        style={{
+                          padding: "0.5rem 0.75rem",
+                          cursor: "pointer",
+                          fontSize: "0.875rem",
+                        }}
                       >
-                        {u.name} <span style={{ color: "#94a3b8" }}>@{u.username} · {u.email}</span>
+                        {u.name}{" "}
+                        <span style={{ color: "#94a3b8" }}>
+                          @{u.username} · {u.email}
+                        </span>
                       </li>
                     ))}
                   </ul>
                 )}
                 {adjSelectedUser && (
-                  <p style={{ fontSize: "0.8rem", color: "#22c55e", marginTop: "4px" }}>
+                  <p
+                    style={{
+                      fontSize: "0.8rem",
+                      color: "#22c55e",
+                      marginTop: "4px",
+                    }}
+                  >
                     ✓ Selected: {adjSelectedUser.name} ({adjSelectedUser.email})
                   </p>
                 )}
               </div>
 
               {/* Amount + type */}
-              <div style={{ display: "flex", gap: "0.75rem", marginBottom: "0.75rem", flexWrap: "wrap" }}>
-                <div style={{ flex: "1 1 160px" }}>
-                  <label style={{ display: "block", fontSize: "0.85rem", fontWeight: 600, marginBottom: "4px" }}>
+              <div className="ctrl-fields-row">
+                <div className="ctrl-field">
+                  <label
+                    style={{
+                      display: "block",
+                      fontSize: "0.85rem",
+                      fontWeight: 600,
+                      marginBottom: "4px",
+                    }}
+                  >
                     Amount (XAF)
                   </label>
                   <input
@@ -1956,23 +2073,39 @@ export default function AdminDashboard() {
                     onChange={(e) => setAdjAmount(e.target.value)}
                     placeholder="e.g. 5000"
                     style={{
-                      width: "100%", padding: "0.6rem 0.75rem", borderRadius: "8px",
-                      border: "1px solid var(--color-border, #e2e8f0)", fontSize: "0.9rem",
+                      width: "100%",
+                      padding: "0.6rem 0.75rem",
+                      borderRadius: "8px",
+                      border: "1px solid var(--color-border, #e2e8f0)",
+                      fontSize: "0.9rem",
                       boxSizing: "border-box",
                     }}
                   />
                 </div>
-                <div style={{ flex: "1 1 140px" }}>
-                  <label style={{ display: "block", fontSize: "0.85rem", fontWeight: 600, marginBottom: "4px" }}>
+                <div className="ctrl-field">
+                  <label
+                    style={{
+                      display: "block",
+                      fontSize: "0.85rem",
+                      fontWeight: 600,
+                      marginBottom: "4px",
+                    }}
+                  >
                     Type
                   </label>
                   <select
                     value={adjType}
-                    onChange={(e) => setAdjType(e.target.value as "credit" | "debit")}
+                    onChange={(e) =>
+                      setAdjType(e.target.value as "credit" | "debit")
+                    }
                     style={{
-                      width: "100%", padding: "0.6rem 0.75rem", borderRadius: "8px",
-                      border: "1px solid var(--color-border, #e2e8f0)", fontSize: "0.9rem",
-                      background: "#fff", boxSizing: "border-box",
+                      width: "100%",
+                      padding: "0.6rem 0.75rem",
+                      borderRadius: "8px",
+                      border: "1px solid var(--color-border, #e2e8f0)",
+                      fontSize: "0.9rem",
+                      background: "#fff",
+                      boxSizing: "border-box",
                     }}
                   >
                     <option value="credit">✅ Credit (add funds)</option>
@@ -1983,7 +2116,14 @@ export default function AdminDashboard() {
 
               {/* Reason */}
               <div style={{ marginBottom: "1rem" }}>
-                <label style={{ display: "block", fontSize: "0.85rem", fontWeight: 600, marginBottom: "4px" }}>
+                <label
+                  style={{
+                    display: "block",
+                    fontSize: "0.85rem",
+                    fontWeight: 600,
+                    marginBottom: "4px",
+                  }}
+                >
                   Reason Note <span style={{ color: "#ef4444" }}>*</span>
                 </label>
                 <textarea
@@ -1992,82 +2132,178 @@ export default function AdminDashboard() {
                   rows={3}
                   placeholder="e.g. MoMo transaction ref #ABC123 failed but user was charged. Refunding via wallet credit."
                   style={{
-                    width: "100%", padding: "0.6rem 0.75rem", borderRadius: "8px",
-                    border: "1px solid var(--color-border, #e2e8f0)", fontSize: "0.875rem",
-                    resize: "vertical", boxSizing: "border-box",
+                    width: "100%",
+                    padding: "0.6rem 0.75rem",
+                    borderRadius: "8px",
+                    border: "1px solid var(--color-border, #e2e8f0)",
+                    fontSize: "0.875rem",
+                    resize: "vertical",
+                    boxSizing: "border-box",
                   }}
                 />
               </div>
 
               {adjError && (
-                <p style={{ fontSize: "0.85rem", color: "#ef4444", marginBottom: "0.75rem" }}>{adjError}</p>
+                <p
+                  style={{
+                    fontSize: "0.85rem",
+                    color: "#ef4444",
+                    marginBottom: "0.75rem",
+                  }}
+                >
+                  {adjError}
+                </p>
               )}
               {adjSuccess && (
-                <p style={{ fontSize: "0.85rem", color: "#22c55e", marginBottom: "0.75rem" }}>✓ {adjSuccess}</p>
+                <p
+                  style={{
+                    fontSize: "0.85rem",
+                    color: "#22c55e",
+                    marginBottom: "0.75rem",
+                  }}
+                >
+                  ✓ {adjSuccess}
+                </p>
               )}
 
               <button
                 disabled={adjSubmitting}
                 onClick={submitAdjustment}
+                className="ctrl-submit-btn"
                 style={{
-                  padding: "0.65rem 1.5rem", borderRadius: "8px", fontWeight: 700,
                   background: adjType === "credit" ? "#22c55e" : "#ef4444",
-                  color: "#fff", border: "none", cursor: adjSubmitting ? "not-allowed" : "pointer",
-                  opacity: adjSubmitting ? 0.65 : 1, fontSize: "0.9rem",
+                  opacity: adjSubmitting ? 0.65 : 1,
+                  cursor: adjSubmitting ? "not-allowed" : "pointer",
                 }}
               >
-                {adjSubmitting ? "Processing…" : adjType === "credit" ? "Apply Credit" : "Apply Debit"}
+                {adjSubmitting
+                  ? "Processing…"
+                  : adjType === "credit"
+                    ? "Apply Credit"
+                    : "Apply Debit"}
               </button>
             </div>
 
             {/* ── Adjustment Audit Log ─── */}
-            <div
-              style={{
-                background: "var(--color-surface, #fff)",
-                borderRadius: "12px",
-                padding: "1.5rem",
-                boxShadow: "0 1px 4px rgba(0,0,0,0.07)",
-              }}
-            >
-              <h2 style={{ margin: "0 0 1rem", fontSize: "1.1rem", fontWeight: 700 }}>
+            <div className="ctrl-card">
+              <h2
+                style={{
+                  margin: "0 0 1rem",
+                  fontSize: "1.1rem",
+                  fontWeight: 700,
+                }}
+              >
                 📋 Adjustment Audit Log
               </h2>
               {adjustments.loading && !adjustments.loaded ? (
                 <p style={{ color: "var(--color-text-muted)" }}>Loading…</p>
               ) : adjustments.data.length === 0 ? (
-                <p style={{ color: "var(--color-text-muted)" }}>No adjustments yet.</p>
+                <p style={{ color: "var(--color-text-muted)" }}>
+                  No adjustments yet.
+                </p>
               ) : (
                 <div style={{ overflowX: "auto" }}>
-                  <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.875rem" }}>
+                  <table
+                    style={{
+                      width: "100%",
+                      borderCollapse: "collapse",
+                      fontSize: "0.875rem",
+                    }}
+                  >
                     <thead>
-                      <tr style={{ borderBottom: "2px solid var(--color-border, #e2e8f0)" }}>
-                        {["Date", "Admin", "User", "Type", "Amount (XAF)", "Reason"].map((h) => (
-                          <th key={h} style={{ padding: "0.5rem 0.75rem", textAlign: "left", whiteSpace: "nowrap" }}>{h}</th>
+                      <tr
+                        style={{
+                          borderBottom:
+                            "2px solid var(--color-border, #e2e8f0)",
+                        }}
+                      >
+                        {[
+                          "Date",
+                          "Admin",
+                          "User",
+                          "Type",
+                          "Amount (XAF)",
+                          "Reason",
+                        ].map((h) => (
+                          <th
+                            key={h}
+                            style={{
+                              padding: "0.5rem 0.75rem",
+                              textAlign: "left",
+                              whiteSpace: "nowrap",
+                            }}
+                          >
+                            {h}
+                          </th>
                         ))}
                       </tr>
                     </thead>
                     <tbody>
                       {adjustments.data.map((row) => (
-                        <tr key={String(row.id)} style={{ borderBottom: "1px solid var(--color-border, #e2e8f0)" }}>
-                          <td style={{ padding: "0.5rem 0.75rem", whiteSpace: "nowrap" }}>{fmtDate(row.created_at)}</td>
-                          <td style={{ padding: "0.5rem 0.75rem" }}>{String(row.admin_email)}</td>
-                          <td style={{ padding: "0.5rem 0.75rem" }}>
-                            {String(row.user_name)}<br />
-                            <span style={{ fontSize: "0.75rem", color: "var(--color-text-muted)" }}>{String(row.user_email)}</span>
+                        <tr
+                          key={String(row.id)}
+                          style={{
+                            borderBottom:
+                              "1px solid var(--color-border, #e2e8f0)",
+                          }}
+                        >
+                          <td
+                            style={{
+                              padding: "0.5rem 0.75rem",
+                              whiteSpace: "nowrap",
+                            }}
+                          >
+                            {fmtDate(row.created_at)}
                           </td>
                           <td style={{ padding: "0.5rem 0.75rem" }}>
-                            <span style={{
-                              padding: "2px 8px", borderRadius: "12px", fontSize: "0.75rem", fontWeight: 600,
-                              background: row.type === "credit" ? "rgba(34,197,94,0.12)" : "rgba(239,68,68,0.12)",
-                              color: row.type === "credit" ? "#16a34a" : "#dc2626",
-                            }}>
+                            {String(row.admin_email)}
+                          </td>
+                          <td style={{ padding: "0.5rem 0.75rem" }}>
+                            {String(row.user_name)}
+                            <br />
+                            <span
+                              style={{
+                                fontSize: "0.75rem",
+                                color: "var(--color-text-muted)",
+                              }}
+                            >
+                              {String(row.user_email)}
+                            </span>
+                          </td>
+                          <td style={{ padding: "0.5rem 0.75rem" }}>
+                            <span
+                              style={{
+                                padding: "2px 8px",
+                                borderRadius: "12px",
+                                fontSize: "0.75rem",
+                                fontWeight: 600,
+                                background:
+                                  row.type === "credit"
+                                    ? "rgba(34,197,94,0.12)"
+                                    : "rgba(239,68,68,0.12)",
+                                color:
+                                  row.type === "credit" ? "#16a34a" : "#dc2626",
+                              }}
+                            >
                               {String(row.type).toUpperCase()}
                             </span>
                           </td>
-                          <td style={{ padding: "0.5rem 0.75rem", fontWeight: 600 }}>
+                          <td
+                            style={{
+                              padding: "0.5rem 0.75rem",
+                              fontWeight: 600,
+                            }}
+                          >
                             {Number(row.amount).toLocaleString()}
                           </td>
-                          <td style={{ padding: "0.5rem 0.75rem", maxWidth: "260px" }}>{String(row.reason)}</td>
+                          <td
+                            style={{
+                              padding: "0.5rem 0.75rem",
+                              maxWidth: "260px",
+                            }}
+                          >
+                            {String(row.reason)}
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -2077,9 +2313,14 @@ export default function AdminDashboard() {
                       onClick={() => loadAdjustments(true, adjustments.page)}
                       disabled={adjustments.loading}
                       style={{
-                        marginTop: "1rem", padding: "0.5rem 1.25rem", borderRadius: "8px",
-                        background: "var(--color-primary, #0F1F3D)", color: "#fff",
-                        border: "none", cursor: "pointer", fontSize: "0.875rem",
+                        marginTop: "1rem",
+                        padding: "0.5rem 1.25rem",
+                        borderRadius: "8px",
+                        background: "var(--color-primary, #0F1F3D)",
+                        color: "#fff",
+                        border: "none",
+                        cursor: "pointer",
+                        fontSize: "0.875rem",
                       }}
                     >
                       {adjustments.loading ? "Loading…" : "Load More"}
