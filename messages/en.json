@@ -777,7 +777,12 @@
       "saveChanges": "Save Changes",
       "saving": "Saving…",
       "success": "Invoice updated successfully.",
-      "errorDefault": "Failed to update invoice. Please try again."
+      "errorDefault": "Failed to update invoice. Please try again.",
+      "locked": "Cannot be edited",
+      "reasonPaid": "The buyer has already paid. The invoice is locked to protect the escrow funds.",
+      "reasonDelivered": "Delivery has been confirmed. The invoice is locked pending buyer release of escrow funds.",
+      "reasonCompleted": "This invoice has been fully settled and can no longer be edited.",
+      "eligibleHint": "This invoice can be edited as no payment has been made yet."
     },
     "delete": {
       "trigger": "Delete",

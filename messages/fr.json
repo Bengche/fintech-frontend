@@ -777,7 +777,12 @@
       "saveChanges": "Enregistrer",
       "saving": "Enregistrement…",
       "success": "Facture mise à jour avec succès.",
-      "errorDefault": "Échec de la mise à jour. Veuillez réessayer."
+      "errorDefault": "Échec de la mise à jour. Veuillez réessayer.",
+      "locked": "Modification impossible",
+      "reasonPaid": "L'acheteur a déjà payé. La facture est verrouillée pour protéger les fonds en séquestre.",
+      "reasonDelivered": "La livraison a été confirmée. La facture est verrouillée en attendant la libération des fonds par l'acheteur.",
+      "reasonCompleted": "Cette facture a été entièrement réglée et ne peut plus être modifiée.",
+      "eligibleHint": "Cette facture peut être modifiée car aucun paiement n'a encore été effectué."
     },
     "delete": {
       "trigger": "Supprimer",
