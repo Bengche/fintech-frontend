@@ -355,6 +355,13 @@ a:hover {
    LANDING PAGE — Premium mobile responsiveness
    All .lp-* classes are namespaced to public landing page only
    ───────────────────────────────────────────────────────────── */
+
+/* Hero image below-hero block: hidden on desktop, revealed on mobile */
+.lp-hero-img-mobile { display: none; }
+
+/* Hero text: left-aligned on desktop (side-by-side with image) */
+.lp-hero-text { text-align: left; }
+
 @media (max-width: 640px) {
   /* ── Hero CTA buttons: force side-by-side row on mobile ─ */
   .lp-hero-cta {
@@ -375,16 +382,20 @@ a:hover {
     padding: 2.75rem 1.25rem 3rem !important;
   }
 
+  /* Hero image — mobile only: show below hero, hide from inside hero */
+  .lp-hero-img-desktop { display: none !important; }
+  .lp-hero-img-mobile  { display: flex !important; }
+
+  /* Hero text: center-align on mobile (stacked single-column) */
+  .lp-hero-text { text-align: center !important; }
+  .lp-hero-cta  { justify-content: center !important; }
+  /* Description paragraph: auto margins so max-width centres correctly */
+  .lp-hero-text > p { margin-left: auto !important; margin-right: auto !important; }
+
   /* Hero image (below-hero section) — constrained on mobile */
   .lp-hero-illo-img {
     max-width: 88vw !important;
     border-radius: 20px !important;
-  }
-
-  /* Hero text takes full width */
-  .lp-hero-text {
-    max-width: 100% !important;
-    flex: 1 1 100% !important;
   }
 
   /* Trust stats: badge cards — tighter gap */

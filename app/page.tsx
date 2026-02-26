@@ -78,9 +78,19 @@ export default async function LandingPage() {
         >
           <div className="page-wrapper">
             <div
-              className="lp-hero-text"
-              style={{ maxWidth: "640px", margin: "0 auto", textAlign: "center" }}
+              className="lp-hero-inner"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: "3rem",
+                flexWrap: "wrap",
+              }}
             >
+              <div
+                className="lp-hero-text"
+                style={{ flex: "1 1 300px", maxWidth: "560px" }}
+              >
               <p
                 style={{
                   display: "inline-block",
@@ -117,6 +127,7 @@ export default async function LandingPage() {
                   lineHeight: 1.75,
                   marginBottom: "2rem",
                   maxWidth: "480px",
+                  margin: "0 auto 2rem",
                 }}
               >
                 {t("hero.description")}
@@ -162,54 +173,94 @@ export default async function LandingPage() {
                   },
                 ]}
               />
-            </div>
-          </div>
+              </div>
+
+              {/* ── Image ─ desktop/tablet only (hidden on mobile via CSS) ── */}
+              <div
+                className="lp-hero-img-desktop"
+                style={{
+                  flex: "0 1 440px",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  position: "relative",
+                }}
+              >
+                <div
+                  aria-hidden="true"
+                  style={{
+                    position: "absolute",
+                    inset: "-12%",
+                    borderRadius: "50%",
+                    background:
+                      "radial-gradient(ellipse at 50% 55%, rgba(245,158,11,0.16) 0%, transparent 68%)",
+                    pointerEvents: "none",
+                  }}
+                />
+                <Image
+                  src="/fonlok_hero_image.png"
+                  alt="Fonlok escrow app — secure payments on mobile"
+                  width={480}
+                  height={480}
+                  priority
+                  sizes="(max-width: 1024px) 44vw, 480px"
+                  style={{
+                    width: "100%",
+                    height: "auto",
+                    maxWidth: "460px",
+                    borderRadius: "28px",
+                    filter:
+                      "drop-shadow(0 32px 56px rgba(0,0,0,0.42)) drop-shadow(0 8px 16px rgba(0,0,0,0.22))",
+                    position: "relative",
+                    zIndex: 1,
+                  }}
+                />
+              </div>
+
+            </div>{/* end lp-hero-inner */}
+          </div>{/* end page-wrapper */}
         </section>
 
-        {/* ── HERO IMAGE ─────────────────────────────────────────────────── */}
+        {/* ── HERO IMAGE (mobile only) ────────────────────────────────────── */}
+        {/* Shown below hero on phones. Background is intentionally different   */}
+        {/* from the dark navy hero so users clearly see it as its own section.  */}
         <div
+          className="lp-hero-img-mobile"
           style={{
-            backgroundColor: "var(--color-primary)",
-            paddingBottom: "4rem",
+            backgroundColor: "var(--color-primary-light)",
+            padding: "3rem 1.5rem 3.5rem",
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
           }}
         >
-          <div
-            style={{
-              position: "relative",
-              display: "inline-flex",
-              justifyContent: "center",
-            }}
-          >
-            {/* Ambient glow */}
+          <div style={{ position: "relative", display: "inline-flex" }}>
             <div
               aria-hidden="true"
               style={{
                 position: "absolute",
-                inset: "-15%",
+                inset: "-12%",
                 borderRadius: "50%",
                 background:
-                  "radial-gradient(ellipse at 50% 55%, rgba(245,158,11,0.16) 0%, transparent 68%)",
+                  "radial-gradient(ellipse at 50% 55%, rgba(15,31,61,0.07) 0%, transparent 68%)",
                 pointerEvents: "none",
               }}
             />
             <Image
               src="/fonlok_hero_image.png"
               alt="Fonlok escrow app — secure payments on mobile"
-              width={580}
-              height={580}
+              width={400}
+              height={400}
               priority
               className="lp-hero-illo-img"
-              sizes="(max-width: 640px) 88vw, (max-width: 1024px) 60vw, 580px"
+              sizes="88vw"
               style={{
-                width: "100%",
+                width: "88vw",
                 height: "auto",
-                maxWidth: "580px",
-                borderRadius: "32px",
+                maxWidth: "360px",
+                borderRadius: "24px",
                 filter:
-                  "drop-shadow(0 40px 70px rgba(0,0,0,0.5)) drop-shadow(0 12px 24px rgba(0,0,0,0.28))",
+                  "drop-shadow(0 20px 36px rgba(15,31,61,0.16)) drop-shadow(0 6px 12px rgba(15,31,61,0.09))",
                 position: "relative",
                 zIndex: 1,
               }}
