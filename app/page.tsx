@@ -76,20 +76,10 @@ export default async function LandingPage() {
             padding: "5rem 1.5rem",
           }}
         >
-          <div
-            className="page-wrapper lp-hero-inner"
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              gap: "3rem",
-              flexWrap: "wrap",
-            }}
-          >
-            {/* Text */}
+          <div className="page-wrapper">
             <div
               className="lp-hero-text"
-              style={{ flex: "1 1 320px", maxWidth: "580px" }}
+              style={{ maxWidth: "640px", margin: "0 auto", textAlign: "center" }}
             >
               <p
                 style={{
@@ -173,51 +163,59 @@ export default async function LandingPage() {
                 ]}
               />
             </div>
-
-            {/* Hero image */}
-            <div
-              className="lp-hero-illo"
-              style={{
-                flex: "0 1 420px",
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                position: "relative",
-              }}
-            >
-              {/* Soft ambient glow behind image */}
-              <div
-                aria-hidden="true"
-                style={{
-                  position: "absolute",
-                  inset: "-10%",
-                  borderRadius: "50%",
-                  background:
-                    "radial-gradient(ellipse at 50% 60%, rgba(245,158,11,0.18) 0%, transparent 70%)",
-                  pointerEvents: "none",
-                }}
-              />
-              <Image
-                src="/fonlok_hero_image.png"
-                alt="Fonlok escrow app — secure payments on mobile"
-                width={480}
-                height={480}
-                priority
-                sizes="(max-width: 640px) 80vw, (max-width: 1024px) 42vw, 460px"
-                style={{
-                  width: "100%",
-                  height: "auto",
-                  maxWidth: "460px",
-                  borderRadius: "28px",
-                  filter:
-                    "drop-shadow(0 32px 56px rgba(0,0,0,0.42)) drop-shadow(0 8px 16px rgba(0,0,0,0.22))",
-                  position: "relative",
-                  zIndex: 1,
-                }}
-              />
-            </div>
           </div>
         </section>
+
+        {/* ── HERO IMAGE ─────────────────────────────────────────────────── */}
+        <div
+          style={{
+            backgroundColor: "var(--color-primary)",
+            paddingBottom: "4rem",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <div
+            style={{
+              position: "relative",
+              display: "inline-flex",
+              justifyContent: "center",
+            }}
+          >
+            {/* Ambient glow */}
+            <div
+              aria-hidden="true"
+              style={{
+                position: "absolute",
+                inset: "-15%",
+                borderRadius: "50%",
+                background:
+                  "radial-gradient(ellipse at 50% 55%, rgba(245,158,11,0.16) 0%, transparent 68%)",
+                pointerEvents: "none",
+              }}
+            />
+            <Image
+              src="/fonlok_hero_image.png"
+              alt="Fonlok escrow app — secure payments on mobile"
+              width={580}
+              height={580}
+              priority
+              className="lp-hero-illo-img"
+              sizes="(max-width: 640px) 88vw, (max-width: 1024px) 60vw, 580px"
+              style={{
+                width: "100%",
+                height: "auto",
+                maxWidth: "580px",
+                borderRadius: "32px",
+                filter:
+                  "drop-shadow(0 40px 70px rgba(0,0,0,0.5)) drop-shadow(0 12px 24px rgba(0,0,0,0.28))",
+                position: "relative",
+                zIndex: 1,
+              }}
+            />
+          </div>
+        </div>
 
         {/* â”€â”€ HOW IT WORKS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         <section

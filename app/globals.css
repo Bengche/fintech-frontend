@@ -375,19 +375,10 @@ a:hover {
     padding: 2.75rem 1.25rem 3rem !important;
   }
 
-  /* Hero image — full width, centred on mobile */
-  .lp-hero-illo {
-    flex: 0 1 100% !important;
-    justify-content: center !important;
-  }
-  .lp-hero-illo img {
-    max-width: 280px !important;
+  /* Hero image (below-hero section) — constrained on mobile */
+  .lp-hero-illo-img {
+    max-width: 88vw !important;
     border-radius: 20px !important;
-  }
-
-  /* Gap between text and illustration */
-  .lp-hero-inner {
-    gap: 2rem !important;
   }
 
   /* Hero text takes full width */
