@@ -146,7 +146,6 @@ export default function SellerProfilePage() {
         >
           <div className="alert alert-danger">{error}</div>
         </div>
-
       </div>
     );
 
@@ -175,7 +174,11 @@ export default function SellerProfilePage() {
           >
             {seller.profilepicture ? (
               <img
-                src={seller.profilepicture.startsWith("http") ? seller.profilepicture : `${API}/uploads/${seller.profilepicture}`}
+                src={
+                  seller.profilepicture.startsWith("http")
+                    ? seller.profilepicture
+                    : `${API}/uploads/${seller.profilepicture}`
+                }
                 alt={seller.name}
                 style={{
                   width: "72px",
@@ -736,7 +739,6 @@ export default function SellerProfilePage() {
           </div>
         )}
       </div>
-
     </div>
   );
 }

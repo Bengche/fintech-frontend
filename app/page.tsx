@@ -89,7 +89,11 @@ export default async function LandingPage() {
             >
               <div
                 className="lp-hero-text"
-                style={{ flex: "1 1 300px", maxWidth: "560px", textAlign: "left" }}
+                style={{
+                  flex: "1 1 300px",
+                  maxWidth: "560px",
+                  textAlign: "left",
+                }}
               >
                 <p
                   style={{

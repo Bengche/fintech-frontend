@@ -105,7 +105,6 @@ export default function PurchasesPage() {
 
   return (
     <div style={{ minHeight: "100vh", backgroundColor: "var(--color-cloud)" }}>
-
       <div
         style={{
           maxWidth: "1040px",
@@ -343,7 +342,11 @@ export default function PurchasesPage() {
                     >
                       {p.seller_avatar ? (
                         <img
-                          src={p.seller_avatar.startsWith("http") ? p.seller_avatar : `${API}/uploads/${p.seller_avatar}`}
+                          src={
+                            p.seller_avatar.startsWith("http")
+                              ? p.seller_avatar
+                              : `${API}/uploads/${p.seller_avatar}`
+                          }
                           alt={p.seller_name}
                           style={{
                             width: "28px",
@@ -467,7 +470,6 @@ export default function PurchasesPage() {
           </div>
         )}
       </div>
-
     </div>
   );
 }

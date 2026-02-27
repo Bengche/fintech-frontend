@@ -382,7 +382,9 @@ function UpdateProfilePictureForm({
   const avatarSrc = preview
     ? preview
     : current
-      ? (current.startsWith("http") ? current : `${API}/uploads/${current}`)
+      ? current.startsWith("http")
+        ? current
+        : `${API}/uploads/${current}`
       : null;
 
   return (
