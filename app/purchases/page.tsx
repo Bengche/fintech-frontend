@@ -343,7 +343,7 @@ export default function PurchasesPage() {
                     >
                       {p.seller_avatar ? (
                         <img
-                          src={`${API}/uploads/${p.seller_avatar}`}
+                          src={p.seller_avatar.startsWith("http") ? p.seller_avatar : `${API}/uploads/${p.seller_avatar}`}
                           alt={p.seller_name}
                           style={{
                             width: "28px",

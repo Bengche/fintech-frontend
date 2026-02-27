@@ -175,7 +175,7 @@ export default function SellerProfilePage() {
           >
             {seller.profilepicture ? (
               <img
-                src={`${API}/uploads/${seller.profilepicture}`}
+                src={seller.profilepicture.startsWith("http") ? seller.profilepicture : `${API}/uploads/${seller.profilepicture}`}
                 alt={seller.name}
                 style={{
                   width: "72px",
