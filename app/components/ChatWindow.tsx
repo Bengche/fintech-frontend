@@ -229,6 +229,7 @@ export default function ChatWindow({ invoice_number }: ChatWindowProps) {
                     display: "flex",
                     flexDirection: "column",
                     maxWidth: "75%",
+                    minWidth: 0,
                     alignSelf: isSeller ? "flex-end" : "flex-start",
                   }}
                 >
@@ -248,6 +249,8 @@ export default function ChatWindow({ invoice_number }: ChatWindowProps) {
                         : "var(--radius-md) var(--radius-md) var(--radius-md) 0",
                       padding: "0.5rem 0.75rem",
                       fontSize: "0.875rem",
+                      wordBreak: "break-word",
+                      overflowWrap: "break-word",
                     }}
                   >
                     <p
@@ -262,7 +265,11 @@ export default function ChatWindow({ invoice_number }: ChatWindowProps) {
                         ? t("youSeller")
                         : `Buyer (${msg.sender_email})`}
                     </p>
-                    {msg.message && <p style={{ margin: 0 }}>{msg.message}</p>}
+                    {msg.message && (
+                      <p style={{ margin: 0, wordBreak: "break-word", overflowWrap: "break-word" }}>
+                        {msg.message}
+                      </p>
+                    )}
                     {msg.file_url && (
                       <a
                         href={msg.file_url}
@@ -361,41 +368,75 @@ export default function ChatWindow({ invoice_number }: ChatWindowProps) {
               {/* Message input */}
               <div
                 style={{
-                  display: "flex",
-                  gap: "0.5rem",
-                  padding: "0.625rem 0.75rem",
                   borderTop: "1px solid var(--color-border)",
+                  padding: "0.625rem 0.75rem 0.375rem",
                 }}
               >
-                <input
-                  type="text"
-                  placeholder={t("messagePlaceholder")}
-                  value={newMessage}
-                  onChange={(e) => setNewMessage(e.target.value)}
-                  onKeyDown={(e) =>
-                    e.key === "Enter" && !isSending && sendMessage()
-                  }
-                  className="input"
-                  style={{
-                    flex: 1,
-                    paddingTop: "0.5rem",
-                    paddingBottom: "0.5rem",
-                  }}
-                />
-                <button
-                  onClick={sendMessage}
-                  disabled={isSending}
-                  className="btn-primary"
-                  style={{
-                    padding: "0.5rem 0.875rem",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "0.25rem",
-                  }}
-                >
-                  <Send size={14} />
-                  {isSending ? "" : t("send")}
-                </button>
+                <div style={{ display: "flex", gap: "0.5rem", alignItems: "flex-end" }}>
+                  <textarea
+                    placeholder={t("messagePlaceholder")}
+                    value={newMessage}
+                    maxLength={1500}
+                    rows={2}
+                    onChange={(e) => setNewMessage(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && !e.shiftKey) {
+                        e.preventDefault();
+                        if (!isSending) sendMessage();
+                      }
+                    }}
+                    className="input"
+                    style={{
+                      flex: 1,
+                      resize: "none",
+                      paddingTop: "0.5rem",
+                      paddingBottom: "0.5rem",
+                      lineHeight: "1.4",
+                    }}
+                  />
+                  <button
+                    onClick={sendMessage}
+                    disabled={isSending}
+                    className="btn-primary"
+                    style={{
+                      padding: "0.5rem 0.875rem",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "0.25rem",
+                      flexShrink: 0,
+                    }}
+                  >
+                    <Send size={14} />
+                    {isSending ? "" : t("send")}
+                  </button>
+                </div>
+                {/* Character counter */}
+                {newMessage.length >= 1500 ? (
+                  <p
+                    style={{
+                      fontSize: "0.6875rem",
+                      marginTop: "0.25rem",
+                      color: "#dc2626",
+                      fontWeight: 600,
+                    }}
+                  >
+                    {t("charLimitReached")}
+                  </p>
+                ) : (
+                  <p
+                    style={{
+                      fontSize: "0.6875rem",
+                      marginTop: "0.25rem",
+                      textAlign: "right",
+                      color:
+                        newMessage.length >= 1200
+                          ? "#d97706"
+                          : "var(--color-text-muted)",
+                    }}
+                  >
+                    {newMessage.length} / 1,500
+                  </p>
+                )}
               </div>
             </>
           )}

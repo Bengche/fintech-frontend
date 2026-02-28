@@ -873,7 +873,8 @@
     "messagePlaceholder": "Tapez un message…",
     "send": "Envoyer",
     "errorSend": "Échec de l'envoi du message. Veuillez réessayer.",
-    "errorUpload": "Échec du téléversement du fichier. Veuillez réessayer."
+    "errorUpload": "Échec du téléversement du fichier. Veuillez réessayer.",
+    "charLimitReached": "Limite de caractères atteinte — 1 500 caractères maximum par message."
   },
   "BuyerChat": {
     "accessDeniedTitle": "Accès refusé",
@@ -889,7 +890,8 @@
     "uploadBtn": "Télécharger",
     "messagePlaceholder": "Tapez un message...",
     "send": "Envoyer",
-    "haveAProblem": "Un problème avec votre commande ?"
+    "haveAProblem": "Un problème avec votre commande ?",
+    "charLimitReached": "Limite de caractères atteinte — 1 500 caractères maximum par message."
   },
   "Dashboard": {
     "title": "Tableau de bord",

@@ -873,7 +873,8 @@
     "messagePlaceholder": "Type a message…",
     "send": "Send",
     "errorSend": "Failed to send message. Please try again.",
-    "errorUpload": "Failed to upload file. Please try again."
+    "errorUpload": "Failed to upload file. Please try again.",
+    "charLimitReached": "Character limit reached — max 1,500 characters per message."
   },
   "BuyerChat": {
     "accessDeniedTitle": "Access Denied",
@@ -889,7 +890,8 @@
     "uploadBtn": "Upload",
     "messagePlaceholder": "Type a message...",
     "send": "Send",
-    "haveAProblem": "Have a problem with your order?"
+    "haveAProblem": "Have a problem with your order?",
+    "charLimitReached": "Character limit reached — max 1,500 characters per message."
   },
   "Dashboard": {
     "title": "Dashboard",
