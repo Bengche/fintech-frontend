@@ -896,6 +896,10 @@
   "Dashboard": {
     "title": "Tableau de bord",
     "subtitle": "Gérez vos factures et suivez vos gains",
+    "notice": {
+      "title": "Avis important",
+      "body": "Fonlok est en cours d'immatriculation officielle au Cameroun. Pour garantir la sécurité juridique totale de vos fonds, les paiements sont temporairement désactivés. Nous vous enverrons un e-mail dès que ce problème est résolu et que les paiements sont disponibles !"
+    },
     "transactions": "Transactions",
     "myProfile": "Mon profil",
     "referrals": "Parrainages",

@@ -896,6 +896,10 @@
   "Dashboard": {
     "title": "Dashboard",
     "subtitle": "Manage your invoices and track your earnings",
+    "notice": {
+      "title": "Important Notice",
+      "body": "Fonlok is currently finalizing official business registration in Cameroon. To ensure 100% legal security for your money, payments are temporarily disabled. We will email you the moment this is resolved and payments go live!"
+    },
     "transactions": "Transactions",
     "myProfile": "My Profile",
     "referrals": "Referrals",
