@@ -139,6 +139,7 @@ export default function CreateInvoice({
 
       const response = await Axios.post(`${API}/invoice/create`, payload, {
         headers: { "Content-Type": "application/json" },
+        withCredentials: true,
       });
       console.log(response.data);
       setInvoiceSuccess(t("create.successToast"));

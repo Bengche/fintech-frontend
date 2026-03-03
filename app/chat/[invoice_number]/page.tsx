@@ -16,6 +16,15 @@ type Message = {
   created_at: string;
 };
 
+type Milestone = {
+  id: number;
+  milestone_number: number;
+  label: string;
+  amount: number;
+  deadline?: string;
+  status: "pending" | "completed" | "released" | "disputed";
+};
+
 export default function BuyerChatPage() {
   const { invoice_number } = useParams<{ invoice_number: string }>();
   const t = useTranslations("BuyerChat");
@@ -31,6 +40,13 @@ export default function BuyerChatPage() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [errorMessage, setErrorMessage] = useState("");
   const [isAccessDenied, setIsAccessDenied] = useState(false);
+
+  // Milestone release state
+  const [milestones, setMilestones] = useState<Milestone[]>([]);
+  const [releaseConfirmId, setReleaseConfirmId] = useState<number | null>(null);
+  const [releaseLoading, setReleaseLoading] = useState<number | null>(null);
+  const [releaseError, setReleaseError] = useState("");
+  const [releaseSuccessId, setReleaseSuccessId] = useState<number | null>(null);
   const bottomOfChat = useRef<HTMLDivElement>(null);
   const prevMsgCount = useRef(0);
 
@@ -73,6 +89,40 @@ export default function BuyerChatPage() {
 
     return () => clearInterval(interval);
   }, []);
+
+  // Fetch milestone data for this invoice (visible to buyer)
+  useEffect(() => {
+    if (!token || !invoice_number) return;
+    Axios.get(`${API}/invoice/milestones/${invoice_number}`)
+      .then((res) => setMilestones(res.data.milestones || []))
+      .catch(() => {}); // non-fatal — not all invoices have milestones
+  }, [invoice_number, token]);
+
+  // Release a specific milestone via the buyer's chat token
+  const releaseMilestone = async (milestoneId: number) => {
+    setReleaseLoading(milestoneId);
+    setReleaseError("");
+    try {
+      await Axios.post(`${API}/api/release-milestone/confirm`, {
+        invoice_number,
+        buyer_token: token,
+        milestone_id: milestoneId,
+      });
+      setReleaseConfirmId(null);
+      setReleaseSuccessId(milestoneId);
+      // Refresh the milestone list to show updated statuses
+      const msRes = await Axios.get(`${API}/invoice/milestones/${invoice_number}`);
+      setMilestones(msRes.data.milestones || []);
+      setTimeout(() => setReleaseSuccessId(null), 8000);
+    } catch (err: any) {
+      setReleaseError(
+        err.response?.data?.message ??
+          t("releaseErrorDefault"),
+      );
+    } finally {
+      setReleaseLoading(null);
+    }
+  };
 
   // Send a text message
   const sendMessage = async () => {
@@ -130,6 +180,158 @@ export default function BuyerChatPage() {
         {t("invoiceLabel")} {invoice_number}
       </p>
 
+      {/* ── Milestone payment release panel (installment invoices only) ─── */}
+      {milestones.length > 0 && (
+        <div className="w-full max-w-xl mb-5 border border-gray-200 rounded-lg bg-white shadow-sm overflow-hidden">
+          {/* Header */}
+          <div className="px-4 py-3 bg-slate-50 border-b border-gray-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="font-bold text-slate-800 text-sm">
+                  {t("milestoneSection")}
+                </h3>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  {t("milestonesProgress", {
+                    done: milestones.filter((m) => m.status === "released").length,
+                    total: milestones.length,
+                  })}
+                </p>
+              </div>
+              <span className="text-xs text-slate-400 hidden sm:block">
+                {t("milestoneHint")}
+              </span>
+            </div>
+          </div>
+
+          {/* Milestone rows */}
+          <div className="divide-y divide-gray-100">
+            {milestones.map((m, i) => (
+              <div key={m.id} className="px-4 py-3">
+                <div className="flex items-start justify-between gap-3">
+                  {/* Left: number + info */}
+                  <div className="flex items-start gap-3 flex-1 min-w-0">
+                    <span
+                      className={`flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold mt-0.5 ${
+                        m.status === "released"
+                          ? "bg-green-100 text-green-700"
+                          : m.status === "completed"
+                            ? "bg-amber-100 text-amber-700"
+                            : "bg-gray-100 text-gray-400"
+                      }`}
+                    >
+                      {i + 1}
+                    </span>
+                    <div className="min-w-0">
+                      <p className="font-semibold text-slate-800 text-sm leading-snug">
+                        {m.label}
+                      </p>
+                      <p className="text-sm text-slate-600 mt-0.5">
+                        {Number(m.amount).toLocaleString()} XAF
+                      </p>
+                      {m.deadline && (
+                        <p className="text-xs text-slate-400 mt-0.5">
+                          {t("milestoneDue")}{" "}
+                          {new Date(m.deadline).toLocaleDateString("en-GB", {
+                            day: "2-digit",
+                            month: "short",
+                            year: "numeric",
+                          })}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Right: status badge + action */}
+                  <div className="flex flex-col items-end gap-2 shrink-0">
+                    <span
+                      className={`text-xs px-2.5 py-0.5 rounded-full font-semibold ${
+                        m.status === "released"
+                          ? "bg-green-100 text-green-700"
+                          : m.status === "completed"
+                            ? "bg-amber-100 text-amber-700"
+                            : m.status === "disputed"
+                              ? "bg-red-100 text-red-700"
+                              : "bg-gray-100 text-gray-500"
+                      }`}
+                    >
+                      {m.status === "released"
+                        ? `✓ ${t("milestoneStatusReleased")}`
+                        : m.status === "completed"
+                          ? t("milestoneStatusCompleted")
+                          : m.status === "disputed"
+                            ? t("milestoneStatusDisputed")
+                            : t("milestoneStatusPending")}
+                    </span>
+
+                    {m.status === "completed" && (
+                      <button
+                        onClick={() => {
+                          setReleaseConfirmId(m.id);
+                          setReleaseError("");
+                        }}
+                        disabled={releaseLoading === m.id}
+                        className="text-xs bg-green-600 hover:bg-green-700 active:bg-green-800 text-white px-3 py-1.5 rounded-md font-semibold disabled:opacity-60 transition-colors"
+                      >
+                        {releaseLoading === m.id
+                          ? t("releasing")
+                          : t("releasePayment")}
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Inline confirmation dialog */}
+                {releaseConfirmId === m.id && (
+                  <div className="mt-3 p-3 bg-amber-50 border border-amber-200 rounded-md">
+                    <p className="text-sm font-bold text-amber-800 mb-1">
+                      {t("releaseConfirmTitle")}
+                    </p>
+                    <p className="text-xs text-amber-700 leading-relaxed mb-3">
+                      {t("releaseConfirmBody", {
+                        amount: Number(m.amount).toLocaleString(),
+                        label: m.label,
+                      })}
+                    </p>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => releaseMilestone(m.id)}
+                        disabled={releaseLoading === m.id}
+                        className="text-xs bg-green-600 hover:bg-green-700 text-white px-4 py-1.5 rounded-md font-bold disabled:opacity-60 transition-colors"
+                      >
+                        {releaseLoading === m.id ? t("releasing") : t("releaseConfirm")}
+                      </button>
+                      <button
+                        onClick={() => {
+                          setReleaseConfirmId(null);
+                          setReleaseError("");
+                        }}
+                        className="text-xs bg-white border border-gray-300 text-gray-600 px-3 py-1.5 rounded-md hover:bg-gray-50 transition-colors"
+                      >
+                        {t("releaseCancel")}
+                      </button>
+                    </div>
+                    {releaseError && (
+                      <p className="text-xs text-red-600 mt-2 font-medium">
+                        {releaseError}
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                {/* Success confirmation */}
+                {releaseSuccessId === m.id && (
+                  <div className="mt-2 px-3 py-2 bg-green-50 border border-green-200 rounded-md">
+                    <p className="text-xs text-green-700 font-semibold">
+                      ✓ {t("releaseSuccess")}
+                    </p>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Messages area */}
       <div className="w-full max-w-xl border border-gray-300 rounded-md bg-white">
         <div className="h-96 overflow-y-auto overflow-x-hidden p-3 flex flex-col gap-2">
@@ -147,23 +349,24 @@ export default function BuyerChatPage() {
                 alignSelf:
                   msg.sender_type === "buyer"
                     ? "flex-end"
-                    : msg.sender_type === "system" || msg.sender_type === "moderator"
-                    ? "center"
-                    : "flex-start",
+                    : msg.sender_type === "system" ||
+                        msg.sender_type === "moderator"
+                      ? "center"
+                      : "flex-start",
                 backgroundColor:
                   msg.sender_type === "buyer"
                     ? "#dbeafe"
                     : msg.sender_type === "system"
-                    ? "#fef3c7"
-                    : msg.sender_type === "moderator"
-                    ? "#eff6ff"
-                    : "#f3f4f6",
+                      ? "#fef3c7"
+                      : msg.sender_type === "moderator"
+                        ? "#eff6ff"
+                        : "#f3f4f6",
                 border:
                   msg.sender_type === "system"
                     ? "1px solid #f59e0b"
                     : msg.sender_type === "moderator"
-                    ? "1px solid #93c5fd"
-                    : undefined,
+                      ? "1px solid #93c5fd"
+                      : undefined,
                 textAlign: msg.sender_type === "buyer" ? "right" : "left",
                 wordBreak: "break-word",
                 overflowWrap: "break-word",
@@ -175,10 +378,10 @@ export default function BuyerChatPage() {
                 {msg.sender_type === "buyer"
                   ? t("youBuyer")
                   : msg.sender_type === "system"
-                  ? "⚠️ System"
-                  : msg.sender_type === "moderator"
-                  ? "🛡️ Moderator"
-                  : t("seller")}
+                    ? "⚠️ System"
+                    : msg.sender_type === "moderator"
+                      ? "🛡️ Moderator"
+                      : t("seller")}
               </span>
 
               {/* Text message */}
