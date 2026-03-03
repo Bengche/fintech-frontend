@@ -189,6 +189,7 @@ export default function ChatWindow({ invoice_number }: ChatWindowProps) {
             style={{
               height: "16rem",
               overflowY: "auto",
+              overflowX: "hidden",
               padding: "0.75rem",
               display: "flex",
               flexDirection: "column",
@@ -266,7 +267,13 @@ export default function ChatWindow({ invoice_number }: ChatWindowProps) {
                         : `Buyer (${msg.sender_email})`}
                     </p>
                     {msg.message && (
-                      <p style={{ margin: 0, wordBreak: "break-word", overflowWrap: "break-word" }}>
+                      <p
+                        style={{
+                          margin: 0,
+                          wordBreak: "break-word",
+                          overflowWrap: "break-word",
+                        }}
+                      >
                         {msg.message}
                       </p>
                     )}
@@ -372,7 +379,13 @@ export default function ChatWindow({ invoice_number }: ChatWindowProps) {
                   padding: "0.625rem 0.75rem 0.375rem",
                 }}
               >
-                <div style={{ display: "flex", gap: "0.5rem", alignItems: "flex-end" }}>
+                <div
+                  style={{
+                    display: "flex",
+                    gap: "0.5rem",
+                    alignItems: "flex-end",
+                  }}
+                >
                   <textarea
                     placeholder={t("messagePlaceholder")}
                     value={newMessage}

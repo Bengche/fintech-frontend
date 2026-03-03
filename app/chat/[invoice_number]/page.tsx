@@ -132,7 +132,7 @@ export default function BuyerChatPage() {
 
       {/* Messages area */}
       <div className="w-full max-w-xl border border-gray-300 rounded-md bg-white">
-        <div className="h-96 overflow-y-auto p-3 flex flex-col gap-2">
+        <div className="h-96 overflow-y-auto overflow-x-hidden p-3 flex flex-col gap-2">
           {messages.length === 0 && (
             <p className="text-gray-400 text-sm text-center mt-4">
               {t("empty")}
@@ -161,7 +161,13 @@ export default function BuyerChatPage() {
 
               {/* Text message */}
               {msg.message && (
-                <p style={{ margin: 0, wordBreak: "break-word", overflowWrap: "break-word" }}>
+                <p
+                  style={{
+                    margin: 0,
+                    wordBreak: "break-word",
+                    overflowWrap: "break-word",
+                  }}
+                >
                   {msg.message}
                 </p>
               )}
