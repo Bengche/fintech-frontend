@@ -102,6 +102,43 @@ export default function Dashboard() {
         }}
       >
         {/* â”€â”€ Escrow balance â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+        {/* Notice banner */}
+        <div
+          style={{
+            backgroundColor: "#fffbeb",
+            border: "1px solid #f59e0b",
+            borderLeft: "4px solid #f59e0b",
+            borderRadius: "0.5rem",
+            padding: "1rem 1.25rem",
+            marginBottom: "1.25rem",
+            display: "flex",
+            gap: "0.75rem",
+            alignItems: "flex-start",
+          }}
+        >
+          <span style={{ fontSize: "1.25rem", flexShrink: 0 }}>⚠️</span>
+          <div style={{ minWidth: 0 }}>
+            <p
+              style={{
+                fontWeight: 700,
+                marginBottom: "0.25rem",
+                color: "#92400e",
+              }}
+            >
+              {t("notice.title")}
+            </p>
+            <p
+              style={{
+                fontSize: "0.875rem",
+                color: "#78350f",
+                lineHeight: 1.5,
+              }}
+            >
+              {t("notice.body")}
+            </p>
+          </div>
+        </div>
+
         <div style={{ marginTop: "1.75rem" }}>
           <EscrowBalance />
         </div>
