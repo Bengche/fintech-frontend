@@ -223,31 +223,44 @@ export default function ChatWindow({ invoice_number }: ChatWindowProps) {
 
             {messages.map((msg) => {
               const isSeller = msg.sender_type === "seller";
+              const isSystem = msg.sender_type === "system";
+              const isModerator = msg.sender_type === "moderator";
               return (
                 <div
                   key={msg.id}
                   style={{
                     display: "flex",
                     flexDirection: "column",
-                    maxWidth: "75%",
+                    maxWidth: isSystem || isModerator ? "90%" : "75%",
                     minWidth: 0,
-                    alignSelf: isSeller ? "flex-end" : "flex-start",
+                    alignSelf:
+                      isSystem || isModerator
+                        ? "center"
+                        : isSeller
+                        ? "flex-end"
+                        : "flex-start",
                   }}
                 >
                   <div
                     style={{
-                      backgroundColor: isSeller
+                      backgroundColor: isSystem
+                        ? "#fef3c7"
+                        : isModerator
+                        ? "#eff6ff"
+                        : isSeller
                         ? "var(--color-primary)"
                         : "var(--color-white)",
                       color: isSeller
                         ? "var(--color-white)"
                         : "var(--color-text-body)",
-                      border: isSeller
+                      border: isSystem
+                        ? "1px solid #f59e0b"
+                        : isModerator
+                        ? "1px solid #93c5fd"
+                        : isSeller
                         ? "none"
                         : "1px solid var(--color-border)",
-                      borderRadius: isSeller
-                        ? "var(--radius-md) var(--radius-md) 0 var(--radius-md)"
-                        : "var(--radius-md) var(--radius-md) var(--radius-md) 0",
+                      borderRadius: "var(--radius-md)",
                       padding: "0.5rem 0.75rem",
                       fontSize: "0.875rem",
                       wordBreak: "break-word",
@@ -262,7 +275,11 @@ export default function ChatWindow({ invoice_number }: ChatWindowProps) {
                         fontWeight: 600,
                       }}
                     >
-                      {isSeller
+                      {isSystem
+                        ? "⚠️ System"
+                        : isModerator
+                        ? "🛡️ Moderator"
+                        : isSeller
                         ? t("youSeller")
                         : `Buyer (${msg.sender_email})`}
                     </p>

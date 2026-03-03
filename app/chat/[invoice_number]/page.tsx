@@ -145,9 +145,25 @@ export default function BuyerChatPage() {
               className={`flex flex-col max-w-xs rounded-md p-2 text-sm`}
               style={{
                 alignSelf:
-                  msg.sender_type === "buyer" ? "flex-end" : "flex-start",
+                  msg.sender_type === "buyer"
+                    ? "flex-end"
+                    : msg.sender_type === "system" || msg.sender_type === "moderator"
+                    ? "center"
+                    : "flex-start",
                 backgroundColor:
-                  msg.sender_type === "buyer" ? "#dbeafe" : "#f3f4f6",
+                  msg.sender_type === "buyer"
+                    ? "#dbeafe"
+                    : msg.sender_type === "system"
+                    ? "#fef3c7"
+                    : msg.sender_type === "moderator"
+                    ? "#eff6ff"
+                    : "#f3f4f6",
+                border:
+                  msg.sender_type === "system"
+                    ? "1px solid #f59e0b"
+                    : msg.sender_type === "moderator"
+                    ? "1px solid #93c5fd"
+                    : undefined,
                 textAlign: msg.sender_type === "buyer" ? "right" : "left",
                 wordBreak: "break-word",
                 overflowWrap: "break-word",
@@ -156,7 +172,13 @@ export default function BuyerChatPage() {
             >
               {/* Who sent it */}
               <span className="text-xs text-gray-500 mb-1">
-                {msg.sender_type === "buyer" ? t("youBuyer") : t("seller")}
+                {msg.sender_type === "buyer"
+                  ? t("youBuyer")
+                  : msg.sender_type === "system"
+                  ? "⚠️ System"
+                  : msg.sender_type === "moderator"
+                  ? "🛡️ Moderator"
+                  : t("seller")}
               </span>
 
               {/* Text message */}
