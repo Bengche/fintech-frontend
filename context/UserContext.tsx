@@ -82,7 +82,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               "/purchases",
               "/settings",
               "/transactions",
-              "/admin",
               // /referral is the authenticated referral dashboard;
               // /referral-programme is the public marketing page.
               "/referral",
@@ -94,13 +93,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             const onPublicReferralPage = window.location.pathname.startsWith(
               "/referral-programme",
             );
-            if (onProtectedPage && !onPublicReferralPage) {
-              // Admin pages manage their own sessions — send to admin login,
-              // not the user login page, to avoid confusing the admin.
-              if (window.location.pathname.startsWith("/admin")) {
-                window.location.href = "/admin/login";
-                return Promise.reject(error);
-              }
+            // Admin pages manage their own session entirely — the admin
+            // dashboard's own useEffect calls /admin/verify and redirects
+            // to /admin/login on failure. We must NOT interfere here or
+            // the reloadUser call on every mount (including /admin/login)
+            // will trigger an infinite redirect loop.
+            const onAdminPage = window.location.pathname.startsWith("/admin");
+            if (onProtectedPage && !onPublicReferralPage && !onAdminPage) {
               setUser_id(null);
               setUsername(null);
               Cookies.remove("authToken");
