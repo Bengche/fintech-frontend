@@ -95,6 +95,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               "/referral-programme",
             );
             if (onProtectedPage && !onPublicReferralPage) {
+              // Admin pages manage their own sessions — send to admin login,
+              // not the user login page, to avoid confusing the admin.
+              if (window.location.pathname.startsWith("/admin")) {
+                window.location.href = "/admin/login";
+                return Promise.reject(error);
+              }
               setUser_id(null);
               setUsername(null);
               Cookies.remove("authToken");

@@ -343,16 +343,6 @@ export default function CreateInvoice({
               style={{ padding: "1.5rem" }}
             >
               <form onSubmit={handleCreation} id="create-invoice-form">
-                {/* Inline error */}
-                {invoiceError && (
-                  <div
-                    className="alert alert-danger"
-                    style={{ marginBottom: "1rem" }}
-                  >
-                    {invoiceError}
-                  </div>
-                )}
-
                 {/* Template picker */}
                 <InvoiceTemplates onLoadTemplate={handleLoadTemplate} />
 
@@ -855,6 +845,16 @@ export default function CreateInvoice({
                 </div>
 
                 {/* Footer actions */}
+                {/* Error shown just above the submit button */}
+                {invoiceError && (
+                  <div
+                    className="alert alert-danger"
+                    style={{ marginBottom: "1rem" }}
+                  >
+                    {invoiceError}
+                  </div>
+                )}
+
                 <div
                   style={{
                     display: "flex",
