@@ -93,7 +93,6 @@ export default function Dashboard() {
 
   return (
     <div style={{ minHeight: "100vh", backgroundColor: "var(--color-cloud)" }}>
-
       <div
         className="db-container"
         style={{
@@ -103,52 +102,6 @@ export default function Dashboard() {
         }}
       >
         {/* â”€â”€ Escrow balance â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
-        {/* ── Payments-disabled notice ───────────────────────────────────── */}
-        <div
-          style={{
-            marginTop: "1.75rem",
-            backgroundColor: "#fffbeb",
-            border: "1px solid #f59e0b",
-            borderLeft: "4px solid #f59e0b",
-            borderRadius: "var(--radius-md)",
-            padding: "1rem 1.25rem",
-            display: "flex",
-            gap: "0.875rem",
-            alignItems: "flex-start",
-          }}
-        >
-          <span
-            style={{ fontSize: "1.25rem", lineHeight: 1, flexShrink: 0, marginTop: "0.1rem" }}
-            aria-hidden="true"
-          >
-            ⚠️
-          </span>
-          <div style={{ minWidth: 0 }}>
-            <p
-              style={{
-                margin: 0,
-                fontWeight: 700,
-                fontSize: "0.9375rem",
-                color: "#92400e",
-                marginBottom: "0.3rem",
-              }}
-            >
-              {t("notice.title")}
-            </p>
-            <p
-              style={{
-                margin: 0,
-                fontSize: "0.875rem",
-                color: "#78350f",
-                lineHeight: 1.65,
-              }}
-            >
-              {t("notice.body")}
-            </p>
-          </div>
-        </div>
-
-        {/* ── Escrow balance ─────────────────────────────────────────────────── */}
         <div style={{ marginTop: "1.75rem" }}>
           <EscrowBalance />
         </div>
@@ -271,9 +224,6 @@ export default function Dashboard() {
             </div>
           )}
 
-          {/* Search & Filter */}
-          {activeTab === "filter" && <FilterInvoice />}
-
           {/* Revenue & Stats */}
           {activeTab === "stats" && (
             <div>
@@ -394,9 +344,11 @@ export default function Dashboard() {
               </button>
             </div>
           )}
+
+          {/* Search & Filter */}
+          {activeTab === "filter" && <FilterInvoice />}
         </div>
       </div>
-
     </div>
   );
 }

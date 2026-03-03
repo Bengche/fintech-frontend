@@ -278,7 +278,14 @@ export default function SellerChatPage() {
                         : `Buyer (${msg.sender_email})`}
                     </p>
                     {msg.message && (
-                      <p style={{ margin: 0, lineHeight: 1.5, wordBreak: "break-word", overflowWrap: "break-word" }}>
+                      <p
+                        style={{
+                          margin: 0,
+                          lineHeight: 1.5,
+                          wordBreak: "break-word",
+                          overflowWrap: "break-word",
+                        }}
+                      >
                         {msg.message}
                       </p>
                     )}
@@ -381,13 +388,21 @@ export default function SellerChatPage() {
                   padding: "0.75rem 0.875rem 0.4rem",
                 }}
               >
-                <div style={{ display: "flex", gap: "0.5rem", alignItems: "flex-end" }}>
+                <div
+                  style={{
+                    display: "flex",
+                    gap: "0.5rem",
+                    alignItems: "flex-end",
+                  }}
+                >
                   <textarea
                     placeholder={t("messagePlaceholder")}
                     value={newMessage}
                     maxLength={1500}
                     rows={2}
-                    onChange={(e) => setNewMessage(e.target.value.slice(0, 1500))}
+                    onChange={(e) =>
+                      setNewMessage(e.target.value.slice(0, 1500))
+                    }
                     onKeyDown={(e) => {
                       if (e.key === "Enter" && !e.shiftKey) {
                         e.preventDefault();
@@ -437,7 +452,10 @@ export default function SellerChatPage() {
                       fontSize: "0.6875rem",
                       marginTop: "0.25rem",
                       textAlign: "right",
-                      color: newMessage.length >= 1200 ? "#d97706" : "var(--color-text-muted)",
+                      color:
+                        newMessage.length >= 1200
+                          ? "#d97706"
+                          : "var(--color-text-muted)",
                     }}
                   >
                     {newMessage.length} / 1,500
