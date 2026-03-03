@@ -231,33 +231,46 @@ export default function SellerChatPage() {
 
             {messages.map((msg) => {
               const isSeller = msg.sender_type === "seller";
+              const isSystem = msg.sender_type === "system";
+              const isModerator = msg.sender_type === "moderator";
               return (
                 <div
                   key={msg.id}
                   style={{
                     display: "flex",
                     flexDirection: "column",
-                    maxWidth: "72%",
+                    maxWidth: isSystem || isModerator ? "90%" : "72%",
                     minWidth: 0,
-                    alignSelf: isSeller ? "flex-end" : "flex-start",
+                    alignSelf:
+                      isSystem || isModerator
+                        ? "center"
+                        : isSeller
+                          ? "flex-end"
+                          : "flex-start",
                     wordBreak: "break-word",
                     overflowWrap: "break-word",
                   }}
                 >
                   <div
                     style={{
-                      backgroundColor: isSeller
-                        ? "var(--color-primary)"
-                        : "var(--color-white)",
+                      backgroundColor: isSystem
+                        ? "#fef3c7"
+                        : isModerator
+                          ? "#eff6ff"
+                          : isSeller
+                            ? "var(--color-primary)"
+                            : "var(--color-white)",
                       color: isSeller
                         ? "var(--color-white)"
                         : "var(--color-text-body)",
-                      border: isSeller
-                        ? "none"
-                        : "1px solid var(--color-border)",
-                      borderRadius: isSeller
-                        ? "var(--radius-md) var(--radius-md) 0 var(--radius-md)"
-                        : "var(--radius-md) var(--radius-md) var(--radius-md) 0",
+                      border: isSystem
+                        ? "1px solid #f59e0b"
+                        : isModerator
+                          ? "1px solid #93c5fd"
+                          : isSeller
+                            ? "none"
+                            : "1px solid var(--color-border)",
+                      borderRadius: "var(--radius-md)",
                       padding: "0.625rem 0.875rem",
                       fontSize: "0.9rem",
                       wordBreak: "break-word",
@@ -273,9 +286,13 @@ export default function SellerChatPage() {
                         margin: "0 0 0.25rem",
                       }}
                     >
-                      {isSeller
-                        ? t("youSeller")
-                        : `Buyer (${msg.sender_email})`}
+                      {isSystem
+                        ? "⚠️ System"
+                        : isModerator
+                          ? "🛡️ Moderator"
+                          : isSeller
+                            ? t("youSeller")
+                            : `Buyer (${msg.sender_email})`}
                     </p>
                     {msg.message && (
                       <p
