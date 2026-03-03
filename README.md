@@ -1260,4 +1260,970 @@ backend logs detailed pool errors via Winston to `logs/` on startup.
 
 ---
 
-*Documentation written for Fonlok v1 — March 2026.*
+
+---
+
+## 24. Hooks Reference
+
+### `frontend/hooks/useHaptic.ts`
+
+Provides haptic (vibration) feedback on mobile devices. Uses the browser
+Vibration API — silently ignored on iOS Safari and desktop browsers.
+
+```typescript
+import { haptic } from "@/hooks/useHaptic";
+
+haptic();           // 6 ms — gentle tap (default, for most buttons/tabs)
+haptic("soft");     // 6 ms — very subtle (toggles, tab switches)
+haptic("medium");   // 12 ms — noticeable (primary actions, form submit)
+haptic("heavy");    // [18,50,18] ms — strong pulse (destructive: delete/cancel)
+haptic(20);         // custom millisecond number
+haptic([10,30,10]); // custom pattern array
+```
+
+**Where it's used:** Every interactive element — buttons, tab switches, form
+submissions, destructive actions. Call it at the start of any `onClick` handler.
+
+---
+
+### `frontend/hooks/useNotifications.ts`
+
+Manages in-app notifications and Web Push subscriptions.
+
+**Returns:**
+
+| Property         | Type                   | Description                              |
+|------------------|------------------------|------------------------------------------|
+| `notifications`  | `AppNotification[]`    | All notifications for the logged-in user |
+| `unreadCount`    | `number`               | Count of unread notifications            |
+| `loading`        | `boolean`              | True while the first fetch is in progress|
+| `markRead(id)`   | `(id: number) => void` | Mark a single notification as read       |
+| `markAllRead()`  | `() => void`           | Mark all notifications as read           |
+
+**`AppNotification` shape:**
+
+```typescript
+interface AppNotification {
+  id: number;
+  type: string;        // e.g. "invoice_paid", "new_message"
+  title: string;       // Short heading
+  body: string;        // Full description
+  data: Record<string, unknown>; // e.g. { invoiceNumber, amount }
+  is_read: boolean;
+  created_at: string;  // ISO timestamp
+}
+```
+
+**Behaviour:**
+- Fetches notifications from `GET /notifications` on mount
+- Polls again every **30 seconds**
+- On first load also registers the Service Worker and subscribes to Web Push
+  (requests browser permission if not yet granted)
+
+---
+
+## 25. Logging (`backend/src/utils/logger.js`)
+
+Winston structured logger. All backend code should use this instead of
+`console.log` so logs are searchable and structured.
+
+```javascript
+import logger from "../utils/logger.js";
+
+logger.info("Payment confirmed", { invoiceNumber: "INV-001", amount: 5000 });
+logger.warn("Cloudinary upload slow", { durationMs: 4200 });
+logger.error("DB query failed", { error: err.message, stack: err.stack });
+logger.debug("Webhook payload", { body: req.body }); // dev only
+```
+
+### Log output
+
+| Environment   | Format        | Destination                              |
+|---------------|---------------|------------------------------------------|
+| Development   | Human-readable colourised | Console only                 |
+| Production    | JSON          | Console + rotating files in `logs/`      |
+
+### Log files (production only)
+
+| File                       | Contents          | Retention |
+|----------------------------|-------------------|-----------|
+| `logs/combined-YYYY-MM-DD.log` | All levels    | 14 days   |
+| `logs/error-YYYY-MM-DD.log`    | Errors only   | 14 days   |
+| `logs/pm2-out.log`             | PM2 stdout    | PM2 managed |
+| `logs/pm2-error.log`           | PM2 stderr    | PM2 managed |
+
+> Log files rotate daily and are compressed (`.gz`) after rotation.
+> The `logs/` directory is gitignored.
+
+---
+
+## 26. Platform Settings Utility (`backend/src/utils/platformSettings.js`)
+
+Provides cached read/write access to the `platform_settings` database table.
+Results are cached in-process for **10 seconds** to avoid a DB hit on every
+request.
+
+### Functions
+
+| Function                  | Purpose                                            |
+|---------------------------|----------------------------------------------------|
+| `getSettings()`           | Returns all settings as `{ key: "true"/"false" }`. Uses cache if fresh. |
+| `setSetting(key, value)`  | Upserts a setting and immediately busts the cache  |
+| `invalidateCache()`       | Forces the next `getSettings()` to re-query the DB |
+| `bool(settings, key)`     | Maps the stored string `"true"`/`"false"` to a real boolean |
+
+### Settings keys
+
+| Key                  | Default  | Effect when `true`                      |
+|----------------------|----------|-----------------------------------------|
+| `maintenance_mode`   | `false`  | Blocks all non-admin API routes (503)   |
+| `payments_blocked`   | `false`  | Blocks `POST /api/requestPayment` (503) |
+| `payouts_blocked`    | `false`  | Blocks `POST /api/release-funds` (503)  |
+
+All three can be toggled in real time from the admin panel without redeploying.
+
+---
+
+## 27. Notification System Deep Dive
+
+### `backend/src/middleware/notificationHelper.js`
+
+The single function `notifyUser()` handles both in-app notifications (stored in
+DB, shown in the bell) and browser push notifications simultaneously.
+
+```javascript
+import { notifyUser } from "../middleware/notificationHelper.js";
+
+await notifyUser(
+  userId,          // number — the recipient's user ID
+  "invoice_paid",  // string — notification type (see table below)
+  "Payment received!",  // title (shown in bell + push)
+  "John paid XAF 25,000 for Invoice INV-001", // body
+  { invoiceNumber: "INV-001", amount: 25000 } // extra data (optional)
+);
+```
+
+**It never throws** — a notification failure will never crash the calling route.
+
+### Notification types
+
+| Type                  | Triggered when                                    |
+|-----------------------|---------------------------------------------------|
+| `invoice_paid`        | Campay webhook confirms a buyer payment           |
+| `payout_sent`         | Escrow successfully released to seller's MoMo     |
+| `dispute_opened`      | A buyer opens a dispute                           |
+| `milestone_complete`  | Seller marks a milestone as complete              |
+| `milestone_released`  | A milestone payout is sent                        |
+| `new_message`         | A chat message is sent on an invoice              |
+| `delivered_marked`    | Seller marks the invoice as delivered             |
+| `referral_earned`     | A user earns a referral commission                |
+
+### Push subscription lifecycle
+
+1. `useNotifications` hook requests browser permission
+2. Browser generates a `PushSubscription` object
+3. Frontend calls `POST /notifications/subscribe` — subscription stored in
+   `push_subscriptions` table
+4. Backend uses `web-push` library to send pushes via `notifyUser()`
+5. If a push returns **410 Gone** or **404** (subscription expired), the backend
+   automatically deletes the stale subscription from the DB
+6. Service Worker (`sw.js`) receives the push event and displays the
+   system notification
+
+---
+
+## 28. PDF Receipt Generator (`backend/src/utils/generateReceipt.js`)
+
+Generates a branded Fonlok PDF receipt using `pdf-lib`.
+
+```javascript
+import { generateReceiptPdf } from "../utils/generateReceipt.js";
+
+const pdfBuffer = await generateReceiptPdf("INV-001");
+// Returns a Buffer — send as attachment or HTTP response
+```
+
+### PDF contents
+
+- Fonlok logo and branding (navy + amber)
+- Invoice number and unique receipt hash (SHA-256 of invoice number)
+- Seller name, username, country, phone
+- Buyer name (if registered), email, MoMo phone
+- Invoice description and amount breakdown
+- Fonlok platform fee (2%)
+- Milestone table (if `payment_type = "installment"`)
+- Date issued and cryptographic verification note
+
+### Where it's called
+
+| Route                              | Usage                                  |
+|------------------------------------|----------------------------------------|
+| `GET /invoice/receipt/:invoice_number` | Download receipt (authenticated)  |
+| Payout confirmation email          | Attached to seller payout email        |
+| Payment webhook confirmation       | Attached to buyer payment confirm email|
+
+---
+
+## 29. AI Chat (`backend/src/routes/aiChat.js`)
+
+Provides the floating AI assistant widget with **Gemini 2.0 Flash** as primary
+and **Groq (llama-3.3-70b-versatile)** as automatic fallback.
+
+### Rate limiting
+
+- **30 AI messages per IP per hour** (independent of other rate limiters)
+
+### Key rotation
+
+To maximise free-tier quotas, both providers support multiple API keys:
+
+```env
+# Gemini (Google) — up to 5 keys, 1,500 req/day each = 7,500 req/day total
+GEMINI_API_KEY=AIzaSy...
+GEMINI_API_KEY_2=AIzaSy...
+GEMINI_API_KEY_3=AIzaSy...
+GEMINI_API_KEY_4=AIzaSy...
+GEMINI_API_KEY_5=AIzaSy...
+
+# Groq — up to 5 keys, 14,400 req/day each = 72,000 req/day total
+GROQ_API_KEY=gsk_...
+GROQ_API_KEY_2=gsk_...
+GROQ_API_KEY_3=gsk_...
+GROQ_API_KEY_4=gsk_...
+GROQ_API_KEY_5=gsk_...
+```
+
+### Routing logic
+
+```
+Request arrives at POST /api/ai-chat
+  │
+  ├─ Try Gemini keys one by one
+  │    If key returns 429 (quota exceeded) → try next key
+  │    If key returns success → return response ✓
+  │    If all keys exhausted → fall through to Groq
+  │
+  └─ Try Groq keys one by one
+       If all exhausted → return 503 "AI temporarily unavailable"
+```
+
+### System prompt
+
+The AI is given a system prompt that makes it an expert on Fonlok specifically —
+it knows the fee structure, how escrow works, how to create invoices, and how
+to contact support. This prevents it from giving irrelevant general answers.
+
+---
+
+## 30. Process Management — PM2 (`backend/ecosystem.config.cjs`)
+
+PM2 is used in production to keep the backend alive, auto-restart on crash, and
+utilise all CPU cores.
+
+### Commands
+
+```bash
+# Start in production mode
+npm run start:prod
+# equivalent to: pm2 start ecosystem.config.cjs --env production
+
+# View live logs
+npm run logs
+# equivalent to: pm2 logs fonlok-backend
+
+# Stop gracefully (waits 10 s for in-flight requests)
+npm run stop
+# equivalent to: pm2 stop fonlok-backend
+
+# Restart (rolling — zero downtime in cluster mode)
+pm2 restart fonlok-backend
+
+# Live CPU/memory dashboard
+pm2 monit
+
+# Persist PM2 config so it survives a server reboot
+pm2 save
+pm2 startup  # generates the system startup command — run the outputted command
+```
+
+### Key configuration
+
+| Setting              | Value         | Explanation                                   |
+|----------------------|---------------|-----------------------------------------------|
+| `instances`          | `"max"`       | One worker per CPU core (cluster mode)        |
+| `exec_mode`          | `"cluster"`   | Load-balanced across workers                  |
+| `max_memory_restart` | `512M`        | Restart worker if it uses more than 512 MB    |
+| `kill_timeout`       | `10000 ms`    | Wait 10 s for in-flight requests before SIGKILL |
+| `max_restarts`       | `10`          | Stop retrying after 10 consecutive crashes    |
+| `min_uptime`         | `5s`          | Crash within 5 s counts as a failed start     |
+| `autorestart`        | `true`        | Automatically restart on any crash            |
+
+> **Note:** `instances: "max"` means multiple processes share the same port via
+> Node.js cluster. If you ever add in-memory state (e.g. WebSocket rooms),
+> switch to `instances: 1` or add a Redis adapter.
+
+---
+
+## 31. Service Worker (`frontend/public/sw.js`)
+
+The Service Worker enables PWA offline support and handles push notifications.
+
+### Caching strategy
+
+- **App shell** (HTML, CSS, JS bundles) → Cache First with network fallback
+- **API calls** → Network First (never serves stale API data from cache)
+- **Images** → Cache First with 7-day expiry
+- **Offline fallback** → If the network fails and the page isn't cached,
+  the SW serves `/offline`
+
+### Push notification handling
+
+When the backend sends a push via `notifyUser()`, the SW:
+1. Receives the `push` event
+2. Parses the JSON payload `{ title, body, type, data }`
+3. Displays a system notification with the Fonlok icon
+4. On notification click → opens/focuses the app and navigates to the
+   relevant page (e.g. the invoice that was just paid)
+
+### Updating the Service Worker
+
+When you deploy a new version:
+1. The browser checks `/sw.js` on every page load (no-cache header is set)
+2. If changed, the new SW installs in the background
+3. On next browser close/reopen, the new SW activates and takes control
+4. Old caches are cleaned up automatically
+
+---
+
+## 32. i18n Routing Details (`frontend/i18n/`)
+
+### `i18n/request.ts` — Locale detection
+
+On every server request, the locale is determined in this priority order:
+
+1. **Cookie** — `NEXT_LOCALE` cookie set when the user clicks the language
+   switcher in the Navbar. Persists across sessions.
+2. **`Accept-Language` header** — Browser's preferred language. French (`fr`)
+   is preferred if the header starts with `fr`. Otherwise defaults to English.
+
+### `i18n/routing.ts` — Route config
+
+```typescript
+{
+  locales: ["en", "fr"],
+  defaultLocale: "en",
+  localePrefix: "as-needed"
+  // "as-needed" means:
+  //   /dashboard         → English (default, no prefix)
+  //   /fr/dashboard      → French
+}
+```
+
+### Switching language
+
+The Navbar has a globe icon button. Clicking it:
+1. Sets the `NEXT_LOCALE` cookie to `"fr"` or `"en"`
+2. Reloads the page → `request.ts` reads the cookie → serves the new locale
+
+---
+
+## 33. Backend Brand Configuration (`backend/src/config/brand.js`)
+
+The backend has its own brand config that mirrors the frontend's. Used in emails,
+logs, and API responses.
+
+```javascript
+import { BRAND } from "../config/brand.js";
+
+// In email templates:
+sgMail.send({
+  from: BRAND.supportEmail,  // "support@fonlok.com"
+  subject: `Your ${BRAND.name} receipt`,
+});
+```
+
+### Key difference from frontend brand config
+
+The backend `BRAND.siteUrl` is driven by the `FRONTEND_URL` environment variable:
+
+```env
+FRONTEND_URL=https://fonlok.com
+```
+
+This means all email links (invoice links, receipt links, password reset links)
+automatically point to the correct URL in every environment — no hardcoded URLs
+in email templates. Add this to your backend `.env`.
+
+---
+
+## 34. Complete Environment Variables Reference
+
+### Backend `.env` — Updated complete list
+
+```env
+# ── Server ────────────────────────────────────────────────────────────
+NODE_ENV=development
+PORT=5000
+
+# ── Frontend URL (used in email links and backend brand config) ───────
+FRONTEND_URL=https://fonlok.com
+
+# ── CORS ─────────────────────────────────────────────────────────────
+ALLOWED_ORIGINS=http://localhost:3000
+
+# ── PostgreSQL ────────────────────────────────────────────────────────
+DB_USER=postgres
+DB_PASSWORD=your_db_password
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=fonlok
+
+# ── JWT ───────────────────────────────────────────────────────────────
+JWT_SECRET=your_long_random_jwt_secret
+ADMIN_JWT_SECRET=your_long_random_admin_jwt_secret
+
+# ── Admin accounts ────────────────────────────────────────────────────
+ADMIN_EMAILS=admin@example.com,another@example.com
+
+# ── Cloudinary ────────────────────────────────────────────────────────
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
+
+# ── SendGrid ──────────────────────────────────────────────────────────
+SENDGRID_API_KEY=SG.xxxxxxxx
+SENDGRID_FROM_EMAIL=noreply@fonlok.com
+
+# ── Campay (Mobile Money) ─────────────────────────────────────────────
+CAMPAY_USERNAME=your_username
+CAMPAY_PASSWORD=your_password
+CAMPAY_BASE_URL=https://demo.campay.net/api   # demo
+# CAMPAY_BASE_URL=https://campay.net/api      # production
+
+# ── Web Push VAPID ────────────────────────────────────────────────────
+# Generate once: node backend/generate-vapid-keys.mjs
+VAPID_PUBLIC_KEY=your_vapid_public_key
+VAPID_PRIVATE_KEY=your_vapid_private_key
+VAPID_EMAIL=support@fonlok.com   # contact email shown in VAPID header
+
+# ── Gemini AI (primary AI provider) ──────────────────────────────────
+# Up to 5 keys from different Google Cloud projects (1,500 req/day each)
+GEMINI_API_KEY=AIzaSy...
+GEMINI_API_KEY_2=AIzaSy...
+GEMINI_API_KEY_3=AIzaSy...
+GEMINI_API_KEY_4=AIzaSy...
+GEMINI_API_KEY_5=AIzaSy...
+
+# ── Groq AI (fallback AI provider) ───────────────────────────────────
+# Up to 5 keys (14,400 req/day each)
+GROQ_API_KEY=gsk_...
+GROQ_API_KEY_2=gsk_...
+GROQ_API_KEY_3=gsk_...
+GROQ_API_KEY_4=gsk_...
+GROQ_API_KEY_5=gsk_...
+```
+
+---
+
+## 35. Component Deep Dive
+
+### `Navbar.tsx`
+
+The top navigation bar. Handles:
+- Authenticated state (shows dashboard/logout links when logged in, login/register when not)
+- Mobile hamburger menu with animated slide-in drawer
+- Glass morphism scroll effect (subtle blur + opacity change on scroll)
+- Language switcher (EN/FR) using `next-intl` + cookie
+- Haptic feedback on all interactive elements
+- Active route highlighting
+- Notification bell (uses `useNotifications` hook)
+
+**State managed:** `menuOpen`, `scrolled`
+
+**Auth source:** `useAuth()` hook from `UserContext.tsx`
+
+---
+
+### `EscrowBalance.tsx`
+
+Displays the seller's total pending escrow balance — the sum of all their `paid`
+invoices that haven't been released yet.
+
+Fetches from the backend on mount. Shown at the top of the seller dashboard.
+
+---
+
+### `CreateInvoice.tsx`
+
+The invoice creation form. Supports:
+- Basic invoice (single payment): name, description, amount, currency, client email, expiry
+- Milestone/installment invoice: add multiple milestones each with their own
+  label and amount
+- Invoice templates: save/load from previously saved templates
+- `onCreated` callback prop — called after successful creation so the dashboard
+  can refresh the invoice list and switch to the invoices tab
+
+---
+
+### `GetAllInvoices.tsx`
+
+Renders the seller's invoice list with:
+- Status badges (`pending`, `paid`, `delivered`, `completed`, `expired`, `disputed`)
+- Action buttons per invoice (edit, delete, mark delivered, download receipt, open chat)
+- Registers a `setRefreshCallback` so the parent dashboard can trigger a refresh
+  after creating a new invoice
+- Accepts a `onRefreshStart` / `onRefreshEnd` to show the dashboard's loading spinner
+
+---
+
+### `FilterInvoice.tsx`
+
+Search and filter the invoice list by:
+- Status (all, pending, paid, delivered, completed, expired)
+- Date range (from / to)
+- Free-text keyword (matches invoice name, number, client email)
+
+---
+
+### `RevenueStats.tsx`
+
+Shows aggregate revenue metrics for the seller:
+- Total earned (sum of completed payouts)
+- Pending escrow (sum of paid-but-not-released invoices)
+- Total invoices created
+- Completion rate
+
+---
+
+### `ChatWindow.tsx`
+
+Inline seller chat widget embedded within invoice management pages. Features:
+- 16rem scrollable message area with `overflowX: hidden`
+- Word-break and overflow-wrap on message bubbles (prevents long URLs stretching layout)
+- `<textarea>` input with `maxLength={1500}` and live character counter
+  (counter turns amber at 1,200, red at 1,500)
+- Image/file attachment button (uploads to Cloudinary `fonlok/chat`)
+- Messages poll every 5 seconds
+
+---
+
+### `AiChatWidget.tsx` + `AiChatWidgetWrapper.tsx`
+
+Floating AI assistant available on all authenticated pages. `AiChatWidget.tsx`
+contains the full chat logic. `AiChatWidgetWrapper.tsx` is a thin client-only
+wrapper (`"use client"`) that prevents server-side hydration errors since the
+widget uses browser APIs.
+
+Features:
+- Collapsed bubble (bottom-right corner) / expanded chat panel
+- Calls `POST /api/ai-chat`
+- Markdown-like message rendering
+- Rate-limited (30 messages/hour per IP)
+
+---
+
+### `NotificationBell.tsx`
+
+Bell icon in the Navbar with:
+- Red badge showing unread count
+- Dropdown panel with notification list
+- Click notification → marks it read + navigates to relevant page
+- "Mark all as read" button
+
+Uses `useNotifications()` hook internally.
+
+---
+
+### `clientPay.tsx`
+
+The buyer-facing payment form on the invoice page. Collects:
+- Buyer's MoMo phone number (Cameroonian format)
+- Buyer's email address (for receipt + chat token)
+
+On submit → calls `POST /api/requestPayment` → Campay initiates USSD push →
+buyer confirms on their phone → webhook fires.
+
+---
+
+### `DisputeButton.tsx`
+
+Shown on paid invoices. Allows the buyer to open a formal dispute if the seller
+has not delivered. Calls `POST /dispute/open/:invoice_number`.
+
+---
+
+### `BenefitsSlider.tsx`
+
+Auto-scrolling carousel on the homepage showing Fonlok's key selling points
+(security, mobile money, zero buyer account needed, etc.).
+
+---
+
+### `CookieConsent.tsx`
+
+GDPR-compliant cookie consent banner. Shown on first visit. Accepts/declines
+cookies. Decision stored in `localStorage`. Does not block any functionality —
+Fonlok does not use tracking cookies.
+
+---
+
+### `LayoutShell.tsx`
+
+Wraps every page. Renders the `<Navbar>` at the top and the `<Footer>` at the
+bottom. Also conditionally renders the `<AiChatWidgetWrapper>`.
+
+Import chain:
+```
+layout.tsx → AuthProvider + LayoutShell → Navbar + (page content) + Footer
+```
+
+---
+
+### `Spinner.tsx`
+
+Exports `<InlineSpinner />` — a small animated spinner used inside buttons and
+loading states throughout the app.
+
+---
+
+### `FonlokLogo.tsx`
+
+SVG logo component. Renders the Fonlok icon (navy rectangle with amber + white
+geometric shapes). Used in the Navbar and email templates.
+
+---
+
+### `PwaRegister.tsx`
+
+Calls `navigator.serviceWorker.register('/sw.js')` on mount. A very small
+client-side component that must be rendered in the root layout.
+
+---
+
+### `PwaInstallBanner.tsx`
+
+Listens for the `beforeinstallprompt` browser event and shows a custom
+"Add to Home Screen" banner (matching the brand design) instead of the browser's
+default prompt.
+
+---
+
+## 36. All Frontend Pages — Detailed Reference
+
+### Admin pages (`/admin/*`)
+
+#### `/admin/login`
+Separate login form for admin accounts. Uses `ADMIN_JWT_SECRET`. Only accounts
+whose email is in the `ADMIN_EMAILS` env var can log in. The admin JWT is stored
+separately from the user JWT.
+
+#### `/admin/dashboard`
+The admin control panel. Sections:
+- **Overview** — Platform-wide stats (total users, invoices, revenue)
+- **Platform controls** — Toggle maintenance mode, payments, payouts in real time
+- **Users** — Search and view any user account, adjust wallet balance
+- **Invoices** — View and override status of any invoice
+- **Disputes** — List all open disputes, mark as resolved
+- **Broadcast** — Send email to all users or a specific user
+- **Balance adjustments** — Manually credit/debit a user's wallet with reason + audit trail
+
+---
+
+### Seller pages (require login)
+
+#### `/dashboard`
+Main seller workspace. Contains:
+- Amber ⚠️ notice banner (shown when payments are suspended — toggleable via admin)
+- `EscrowBalance` — live pending escrow total
+- `CreateInvoice` — invoice creation form
+- Four-tab workspace: Invoices / Filter / Payment / Stats
+- Profile navigation button (top-right, loads `/profile/:username`)
+
+#### `/dashboard/chat/[invoice_number]`
+Full-page chat for a specific invoice. Seller-only. Features:
+- Full-height message history with overflow protection
+- Textarea input (max 1,500 chars) with character counter
+- File/image attachment (Cloudinary)
+- Auto-scroll to latest message
+
+#### `/transactions`
+Table of all completed/paid invoices with amounts, buyer info, timestamps, and
+PDF receipt download links.
+
+#### `/purchases`
+Shows invoices where the logged-in user's email was on the `guests` table —
+i.e., past purchases they made as a buyer.
+
+#### `/referral`
+Shows the seller's:
+- Unique referral code (e.g. `X7K2MN`)
+- Shareable referral link (`https://fonlok.com/register?ref=X7K2MN`)
+- Number of people referred
+- Total commission earned (percentage of each referred user's transaction fee)
+- QR code for the referral link
+
+#### `/settings`
+Account self-management. Sections:
+- Change name
+- Change email
+- Change MoMo/payout phone number
+- Change password (requires entering current password)
+- Upload new profile picture (→ Cloudinary)
+- Delete account (permanently removes all data — requires password confirmation)
+
+---
+
+### Public seller pages
+
+#### `/profile/[username]`
+Public seller profile. Shows:
+- Profile picture, name, username, country
+- Member since date
+- Completed transactions count
+- Average star rating (1–5 from buyer reviews)
+- All reviews with reviewer name, rating, comment, date
+- Recent completed invoices (name, amount, delivery date)
+
+Useful for buyers to vet a seller before making a payment.
+
+---
+
+### Buyer pages (no account needed)
+
+#### `/invoice/[invoice_number]`
+The buyer's entry point. Shows:
+- Invoice name, description, amount
+- Seller info (profile picture, name, username, rating)
+- Itemised amount breakdown with Fonlok 2% fee
+- Milestone table if `payment_type = "installment"`
+- Payment form (`clientPay.tsx`): phone + email
+- Dispute button (shown if invoice is `paid` and not yet `delivered`)
+
+#### `/chat/[invoice_number]?token=<token>&invoice=<number>`
+Buyer chat. After paying, the buyer receives an email link containing a unique
+`chat_token`. This page validates the token against the `guests` table and loads
+the conversation. No Fonlok account required.
+
+#### `/payment-pending`
+Post-payment waiting screen. Shown after the buyer submits their phone number.
+Polls `GET /invoice/:invoice_number` every few seconds. When the status
+changes from `pending` to `paid`, it shows a success message.
+
+---
+
+### Utility pages
+
+#### `/maintenance`
+Shown when `maintenance_mode = true` in `platform_settings`. The `UserContext`
+global Axios interceptor detects any HTTP 503 response with `maintenanceMode: true`
+and redirects to this page automatically.
+
+#### `/offline`
+PWA offline fallback. Served by the Service Worker when the user is offline and
+tries to navigate to a page that isn't in the cache.
+
+#### `/verify`
+Handles the email verification link. Token is passed as a URL query parameter.
+
+#### `/forgot-password`
+Single email input form. Calls `POST /auth/forgot-password`. Sends a SendGrid
+email with a password reset link valid for a limited time window.
+
+#### `/reset-password`
+Form for entering a new password. The reset token is in the URL. Calls
+`POST /auth/reset-password`.
+
+---
+
+## 37. Database Tables — Full Reference
+
+### `users`
+| Column           | Type           | Constraints              | Notes                     |
+|------------------|----------------|--------------------------|---------------------------|
+| id               | SERIAL         | PRIMARY KEY              |                           |
+| name             | TEXT           | NOT NULL                 | Full display name         |
+| email            | TEXT           | UNIQUE, NOT NULL         | Lowercase, normalised     |
+| username         | TEXT           | UNIQUE, NOT NULL         | Alphanumeric + underscore |
+| phone            | TEXT           | NOT NULL                 | `237XXXXXXXXX` format     |
+| password         | TEXT           | NOT NULL                 | bcrypt hash               |
+| dob              | DATE           |                          | Must be 18+               |
+| country          | TEXT           |                          |                           |
+| profilepicture   | TEXT           |                          | Full Cloudinary HTTPS URL |
+| referral_code    | VARCHAR(12)    | UNIQUE                   | Auto-generated 6-char     |
+| referred_by      | INTEGER        | FK → users.id            | Referrer's user ID        |
+| wallet_balance   | NUMERIC(12,2)  | DEFAULT 0                | Admin-credited MoMo refunds |
+| createdat        | TIMESTAMPTZ    | DEFAULT NOW()            |                           |
+
+### `invoices`
+| Column          | Type          | Notes                                         |
+|-----------------|---------------|-----------------------------------------------|
+| id              | SERIAL PK     |                                               |
+| userid          | INTEGER       | FK → users.id (seller)                        |
+| invoicenumber   | TEXT          | Unique human-readable ID (e.g. INV-00123)     |
+| invoicename     | TEXT          | Invoice title                                 |
+| description     | TEXT          | What the seller is selling                    |
+| amount          | NUMERIC       | In XAF (CFA francs)                           |
+| currency        | TEXT          | Always XAF for now                            |
+| clientemail     | TEXT          | Buyer's email                                 |
+| status          | TEXT          | pending → paid → delivered → completed / expired / disputed |
+| payment_type    | TEXT          | `single` or `installment`                     |
+| expiry_date     | TIMESTAMPTZ   | Invoice expiry (buyer must pay before this)   |
+| createdat       | TIMESTAMPTZ   | DEFAULT NOW()                                 |
+| delivered_at    | TIMESTAMPTZ   | When seller marked as delivered               |
+
+### `guests`
+Buyers do not need a Fonlok account. Each payment attempt creates a `guests` row.
+
+| Column          | Type     | Notes                                             |
+|-----------------|----------|---------------------------------------------------|
+| id              | SERIAL PK|                                                   |
+| invoicenumber   | TEXT     | FK-like reference to invoices.invoicenumber       |
+| email           | TEXT     | Buyer's email                                     |
+| momo_number     | TEXT     | Buyer's phone (used for MoMo payment)             |
+| chat_token      | TEXT     | Unique token for buyer chat access                |
+| payment_uuid    | TEXT     | Campay payment UUID                               |
+| user_id         | INTEGER  | FK → users.id (if buyer has a Fonlok account)     |
+| registered_userid| INTEGER | Set when a guest later registers an account       |
+| created_at      | TIMESTAMPTZ | DEFAULT NOW()                                  |
+
+### `chat_messages`
+| Column          | Type     | Notes                                             |
+|-----------------|----------|---------------------------------------------------|
+| id              | SERIAL PK|                                                   |
+| invoicenumber   | TEXT     | Which invoice this message belongs to              |
+| sender_type     | TEXT     | `seller` or `buyer`                               |
+| message         | TEXT     | Text content (may be null if attachment-only)     |
+| attachment_url  | TEXT     | Cloudinary URL of attached image/file             |
+| attachment_name | TEXT     | Original filename of attachment                   |
+| created_at      | TIMESTAMPTZ | DEFAULT NOW()                                  |
+
+### `reviews`
+| Column          | Type     | Notes                                             |
+|-----------------|----------|---------------------------------------------------|
+| id              | SERIAL PK|                                                   |
+| reviewer_userid | INTEGER  | FK → users.id                                     |
+| seller_userid   | INTEGER  | FK → users.id                                     |
+| invoice_number  | TEXT     | The invoice the review is for                     |
+| rating          | INTEGER  | 1–5                                               |
+| comment         | TEXT     | Optional free-text (max 1,000 chars)              |
+| created_at      | TIMESTAMPTZ | DEFAULT NOW()                                  |
+
+### `payouts`
+| Column          | Type          | Notes                                         |
+|-----------------|---------------|-----------------------------------------------|
+| id              | SERIAL PK     |                                               |
+| userid          | INTEGER       | FK → users.id (recipient seller)              |
+| amount          | NUMERIC(12,2) | Net amount paid out (after 2% fee)            |
+| phone           | TEXT          | MoMo number funds were sent to                |
+| reference       | TEXT          | Campay payout reference                       |
+| invoice_id      | INTEGER       | FK → invoices.id                              |
+| invoice_number  | TEXT          | Human-readable invoice number                 |
+| created_at      | TIMESTAMPTZ   | DEFAULT NOW()                                 |
+
+### `referral_earnings`
+| Column          | Type          | Notes                                         |
+|-----------------|---------------|-----------------------------------------------|
+| id              | SERIAL PK     |                                               |
+| referrer_id     | INTEGER       | FK → users.id (who gets the commission)       |
+| referred_id     | INTEGER       | FK → users.id (who was referred)              |
+| invoice_number  | TEXT          | UNIQUE — prevents double-crediting            |
+| amount          | NUMERIC       | Commission amount                             |
+| created_at      | TIMESTAMPTZ   | DEFAULT NOW()                                 |
+
+### `platform_settings`
+| Column    | Type          | Notes                                              |
+|-----------|---------------|----------------------------------------------------|
+| key       | VARCHAR(100)  | PRIMARY KEY                                        |
+| value     | TEXT          | `'true'` or `'false'`                              |
+| updated_at| TIMESTAMPTZ   | DEFAULT NOW()                                      |
+
+### `processed_payments`
+| Column        | Type        | Notes                                            |
+|---------------|-------------|--------------------------------------------------|
+| payment_uuid  | TEXT        | PRIMARY KEY — ensures webhook idempotency        |
+| processed_at  | TIMESTAMPTZ | DEFAULT NOW()                                    |
+
+### `notifications`
+| Column   | Type        | Notes                                               |
+|----------|-------------|-----------------------------------------------------|
+| id       | SERIAL PK   |                                                     |
+| userid   | INTEGER     | FK → users.id (recipient)                           |
+| type     | TEXT        | Notification type (see Section 27)                  |
+| title    | TEXT        |                                                     |
+| body     | TEXT        |                                                     |
+| data     | JSONB       | Extra context (invoiceNumber, amount, etc.)         |
+| is_read  | BOOLEAN     | DEFAULT false                                       |
+| created_at | TIMESTAMPTZ | DEFAULT NOW()                                    |
+
+### `push_subscriptions`
+| Column       | Type    | Notes                                              |
+|--------------|---------|----------------------------------------------------|
+| id           | SERIAL PK|                                                   |
+| userid       | INTEGER | FK → users.id                                      |
+| subscription | JSONB   | Full browser PushSubscription object               |
+| created_at   | TIMESTAMPTZ | DEFAULT NOW()                                  |
+
+### `invoice_milestones`
+| Column           | Type         | Notes                                     |
+|------------------|--------------|-------------------------------------------|
+| id               | SERIAL PK    |                                           |
+| invoice_id       | INTEGER      | FK → invoices.id                          |
+| milestone_number | INTEGER      | Order within the invoice (1, 2, 3...)     |
+| label            | TEXT         | Description of this milestone             |
+| amount           | NUMERIC      | Amount released when this milestone is done|
+| status           | TEXT         | `pending` → `completed` → `released`     |
+| release_token    | TEXT         | UNIQUE token for the release email link   |
+
+### `invoice_templates`
+| Column      | Type        | Notes                                            |
+|-------------|-------------|--------------------------------------------------|
+| id          | SERIAL PK   |                                                  |
+| userid      | INTEGER     | FK → users.id                                    |
+| name        | TEXT        | Template display name                            |
+| data        | JSONB       | Invoice fields saved as JSON                     |
+| created_at  | TIMESTAMPTZ | DEFAULT NOW()                                    |
+
+### `invoice_reminders` (scheduled jobs tracking)
+| Column          | Type        | Notes                                        |
+|-----------------|-------------|----------------------------------------------|
+| id              | SERIAL PK   |                                              |
+| invoicenumber   | TEXT        |                                              |
+| reminder_level  | INTEGER     | 1, 2, or 3 (24h, 48h, 72h)                  |
+| sent_at         | TIMESTAMPTZ | DEFAULT NOW()                                |
+| UNIQUE          |             | (invoicenumber, reminder_level)              |
+
+### `dispute_escalations` (scheduled jobs tracking)
+| Column        | Type        | Notes                                          |
+|---------------|-------------|------------------------------------------------|
+| id            | SERIAL PK   |                                                |
+| invoicenumber | TEXT        |                                                |
+| level         | INTEGER     | 1 = 72h warning, 2 = 7-day escalation          |
+| sent_at       | TIMESTAMPTZ | DEFAULT NOW()                                  |
+| UNIQUE        |             | (invoicenumber, level)                         |
+
+### `admin_broadcasts`
+| Column            | Type       | Notes                                       |
+|-------------------|------------|---------------------------------------------|
+| id                | SERIAL PK  |                                             |
+| recipient_type    | VARCHAR(10)| `all` or `single`                           |
+| recipient_user_id | INTEGER    | FK → users.id (nullable for broadcast-all)  |
+| recipient_email   | TEXT       |                                             |
+| subject           | TEXT       |                                             |
+| body              | TEXT       |                                             |
+| recipients_count  | INTEGER    |                                             |
+| sent_at           | TIMESTAMPTZ| DEFAULT NOW()                               |
+
+### `balance_adjustments`
+| Column      | Type         | Notes                                          |
+|-------------|--------------|------------------------------------------------|
+| id          | SERIAL PK    |                                                |
+| admin_email | VARCHAR(255) | Which admin performed the adjustment           |
+| user_id     | INTEGER      | FK → users.id (affected user)                  |
+| amount      | NUMERIC(12,2)|                                                |
+| type        | VARCHAR(10)  | `credit` or `debit`                            |
+| reason      | TEXT         | Required explanation for audit trail           |
+| created_at  | TIMESTAMPTZ  | DEFAULT NOW()                                  |
+
+---
+
+*Documentation last updated: March 2026. Covers Fonlok v1 complete codebase.*
