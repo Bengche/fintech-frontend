@@ -2227,3 +2227,212 @@ Buyers do not need a Fonlok account. Each payment attempt creates a `guests` row
 ---
 
 *Documentation last updated: March 2026. Covers Fonlok v1 complete codebase.*
+
+
+---
+
+## 38. Development & Maintenance Utility Scripts
+
+These scripts exist in the project root and were used (and may be reused) during active development to perform one-off surgical fixes. They are **not part of the production build** but are committed to the repo for audit and reproducibility.
+
+| File | Language | Purpose |
+|---|---|---|
+| `fix_banner.py` | Python | Byte-level restore of the amber ⚠️ notice banner above `EscrowBalance` in `dashboard/page.tsx` after an accidental VS Code overwrite. Uses raw byte replacement to avoid UTF-8 encoding corruption in that file. |
+| `fix_encoding.py` | Python | Replaces non-ASCII typographic characters (en-dashes `–`, em-dashes `—`) with ASCII-safe equivalents in backend email/notification strings. Applied to `payout.js` and others. |
+| `fix_glass.py` | Python | Diagnostic script — reads `NotificationBell.tsx` and prints lines containing `panelWidth`, `rightEdge`, or `On narrow` to locate glass-effect positioning code. No writes. |
+| `fix_navbar.js` | JavaScript (Node) | One-off patch script for `Navbar.tsx`: adjusts glass-scroll opacity/blur values, makes the inner container `position: relative`, removes `NotificationBell` from right mobile cluster, and re-inserts a centred bell using absolute positioning. |
+| `fix_notif.mjs` | ESM JavaScript (Node) | Patches lines 186–195 of `NotificationBell.tsx` to add mobile-first panel overflow protection: panels on screens ≤640 px use `left: 8px; right: 8px; width: auto`; wider screens use the bell-aligned right-offset calculation. |
+| `nav_fix.py` | Python | Python port of `fix_navbar.js` — applies the same glass opacity/blur/border and `position: relative` fixes to `Navbar.tsx` via string replacement. |
+| `nav_fix2.py` | Python | Follow-up to `nav_fix.py` — removes a duplicated `position: relative` attribute, removes the bell from the right mobile controls cluster if still present, and inserts a centred mobile bell using absolute positioning before the desktop links block. |
+| `strip_nav.ps1` | PowerShell | Bulk removes `import Navbar`, `import SiteFooter`, `<Navbar />`, and `<SiteFooter />` lines from 17 page files when the layout was refactored to render those components via `LayoutShell` instead. Uses a regex pattern and `[System.IO.File]::WriteAllLines` with UTF-8-no-BOM encoding. |
+| `swap_hero.py` | Python | Replaces the `HeroIllustration` function in `app/page.tsx` with a new premium SVG phone mockup (321 lines). Removes old placeholder, injects new `<svg>` with gradients, shadow glows, and a status-bar UI. |
+| `test_gemini.mjs` | ESM JavaScript (Node) | Manual connectivity test for the Gemini AI API — sends a single "hello" message using `GEMINI_API_KEY_1` and logs the response. Used to verify API key validity. |
+| `write_readme.py` | Python | Generator script that originally wrote the initial `README.md` content. Now superseded; kept for history. |
+| `Navbar_backup.tsx` | TypeScript/TSX | Backup snapshot of `Navbar.tsx` taken before refactoring. Used as a restoration reference if the live file is corrupted or truncated. |
+| `audit_readme.py` | Python | Scans `README.md` for mentions of all known source files and reports any that are missing. Used to verify documentation completeness. |
+
+> **Note:** These scripts should not be deleted — they document the history of surgical fixes and can be re-run if the same issue recurs.
+
+---
+
+## 39. Backend Utility & Migration Scripts
+
+### `backend/migrate_milestones.js`
+
+**Run command:** `node migrate_milestones.js` (from `backend/` directory)  
+**Safe:** Yes — uses `IF NOT EXISTS` / `ON CONFLICT DO NOTHING` throughout; idempotent.
+
+Adds installment/milestone payment support to the database schema. Operations performed:
+
+1. **`invoices.payment_type`** — `ALTER TABLE invoices ADD COLUMN IF NOT EXISTS payment_type VARCHAR(20) NOT NULL DEFAULT 'full'`  
+   Values: `'full'` (standard lump-sum) | `'milestone'` (split into phases)
+
+2. **`milestones` table** — creates it if not present:
+   ```sql
+   CREATE TABLE IF NOT EXISTS milestones (
+     id            SERIAL PRIMARY KEY,
+     invoice_id    INTEGER REFERENCES invoices(id) ON DELETE CASCADE,
+     title         TEXT    NOT NULL,
+     amount        NUMERIC(12,2) NOT NULL,
+     status        VARCHAR(20) NOT NULL DEFAULT 'pending',
+     due_date      DATE,
+     paid_at       TIMESTAMPTZ,
+     created_at    TIMESTAMPTZ DEFAULT NOW()
+   )
+   ```
+
+3. Inserts any default platform settings rows (via `ON CONFLICT DO NOTHING`) to ensure `platform_settings` table is pre-populated.
+
+**When to re-run:** After a fresh DB creation or when deploying to a new Railway environment.
+
+---
+
+### `backend/test-groq.mjs`
+
+Manual integration test for the Groq AI fallback. Reads `GROQ_API_KEY` from `.env`, sends "hi" to `llama-3.3-70b-versatile`, and prints the HTTP status + response text or error object. Use this to verify a Groq key is active before adding it to `GROQ_API_KEY_1` through `GROQ_API_KEY_5`.
+
+---
+
+## 40. TypeScript & Linting Configuration
+
+### `frontend/tsconfig.json`
+
+| Option | Value | Notes |
+|---|---|---|
+| `target` | `ES2017` | Compiled JS target |
+| `strict` | `true` | Full strict mode — no implicit `any`, no non-null skips |
+| `noEmit` | `true` | Type-checking only; Next.js handles actual compilation |
+| `module` / `moduleResolution` | `esnext` / `bundler` | Modern ESM + Turbopack-compatible resolution |
+| `paths` | `@/*` → `./*` | Workspace-root alias — `@/app/...` resolves from `frontend/` |
+| `incremental` | `true` | Caches type-check state in `.next/` for faster rebuilds |
+| `plugins` | `["next"]` | Enables Next.js-specific TS diagnostics (Server/Client component rules) |
+| `include` | `next-env.d.ts`, all `.ts`/`.tsx`/`.mts`, `.next/types/**` | |
+| `exclude` | `node_modules` | |
+
+### `frontend/eslint.config.mjs`
+
+Uses ESLint flat config format (ESLint v9+). Extends two Next.js presets:
+- `eslint-config-next/core-web-vitals` — Core Web Vitals rules (image optimisation, `<Link>` correctness, etc.)
+- `eslint-config-next/typescript` — TypeScript-aware rules
+
+Default ignores (`.next/`, `out/`, `build/`, `next-env.d.ts`) are preserved.  
+Run: `npx eslint .` from `frontend/`.
+
+### `frontend/next-env.d.ts`
+
+Auto-generated by Next.js. Adds global TypeScript types for:
+- `*.module.css` imports
+- `next/image` and `next/link` overloads
+- App Router specific types (`PageProps`, `LayoutProps`, etc.)
+
+**Do not edit this file manually** — it is regenerated every `next dev`/`next build`.
+
+---
+
+## 41. Admin Section — Full Detail
+
+### `frontend/app/admin/layout.tsx`
+
+Sets `robots: { index: false, follow: false }` for the entire `/admin/*` subtree so search engines never index admin pages. Renders children with no additional wrapper HTML.
+
+### `frontend/app/admin/login/page.tsx`
+
+Simple PIN-based admin login page. Submits a hashed PIN to `POST /admin/login`. On success, stores the `admin_token` (a short-lived JWT with `role: "admin"`) in `localStorage` and redirects to `/admin/dashboard`.
+
+### `frontend/app/admin/dashboard/page.tsx`
+
+Full admin control panel. Authenticated via `admin_token` from localStorage, sent as `Authorization: Bearer <token>`. Features:
+
+- **User management** — list all users, suspend/unsuspend accounts, view user details
+- **Transaction overview** — list all escrow transactions with status filters
+- **Platform toggles** — enable/disable registration, enable/disable payments, maintenance mode (calls `PATCH /admin/settings`)
+- **Statistics** — total users, active invoices, revenue summaries
+
+### `frontend/app/admin/dispute/[admin_token]/page.tsx`
+
+682-line dispute resolution page. The `[admin_token]` segment is the JWT embedded directly in the dispute-resolution link that is emailed to the admin. This means no separate admin login is required to resolve a dispute — the link is self-authenticating (token expires after 24 hours).
+
+Features:
+- Fetches dispute details by token from `GET /dispute/admin/:admin_token`
+- Displays: invoice details, buyer username, seller username, dispute reason, evidence files, timestamps
+- Action buttons: **Release to Seller** (`POST /dispute/resolve/seller`) | **Refund Buyer** (`POST /dispute/resolve/buyer`)
+- Each action sends the `admin_token` in the request body and updates the invoice status to `released` or `refunded`
+- Uses `useTranslations("AdminDispute")` for i18n strings
+
+---
+
+## 42. Dashboard Sub-Files
+
+### `frontend/app/dashboard/layout.tsx`
+
+Sets `robots: { index: false, follow: false }` for the entire `/dashboard/*` subtree. Renders children with no additional wrapper.
+
+### `frontend/app/dashboard/loading.tsx`
+
+Next.js loading UI shown while `dashboard/page.tsx` is being streamed. Renders `<PageLoader message="Loading dashboard…" />` (the full-screen spinner from `Spinner.tsx`).
+
+### `frontend/app/dashboard/chat/[invoice_number]/page.tsx`
+
+Dashboard-namespaced chat route — renders the same `<ChatWindow />` component as the public `chat/[invoice_number]` route but within the authenticated dashboard layout. Exists so deep-links from the dashboard stay within the dashboard URL tree (`/dashboard/chat/INV-xxxx`).
+
+---
+
+## 43. Additional Components — Full Detail
+
+### `HeroStatsTabs` (`frontend/app/components/HeroStatsTabs.tsx`)
+
+**Props:** `{ tabs: StatTab[] }` where `StatTab = { value: string; label: string; detail: string }`
+
+Renders a horizontal tab bar on the hero section of the landing page displaying live platform statistics (e.g. "XAF 12M+ secured", "4 200+ transactions"). Clicking a tab activates it with a primary-colour underline and swaps the visible detail text below. Uses inline styles + `var(--color-primary)` for theming.
+
+Used in: `frontend/app/page.tsx` (landing page hero).
+
+### `InvoiceTemplates` (`frontend/app/components/InvoiceTemplates.tsx`)
+
+**Props:** `{ onLoadTemplate: (t: { invoicename, currency, amount, description }) => void }`
+
+Allows sellers to save and reuse invoice configurations. Toggle button shows/hides the template list. On open, fetches templates from `GET /templates/:user_id`. Each template row shows name, amount, currency, and a **Load** button that calls `onLoadTemplate` to pre-fill the invoice creation form. Templates can be deleted via `DELETE /templates/:id`.
+
+State: `templates`, `showTemplates`, `loading`, `error`, `deleteSuccess`
+
+Used in: `frontend/app/components/createInvoice.tsx`.
+
+### `SiteHeader` (`frontend/app/components/SiteHeader.tsx`)
+
+383-line public-facing navigation bar used on all marketing/static pages (`/`, `/pricing`, `/faq`, `/how-it-works`, `/contact`, `/privacy`, `/terms`). Adapts based on auth state — shows **Login / Register** buttons for guests and a **Dashboard →** button for authenticated users. Handles mobile menu open/close. Distinct from `Navbar.tsx` which is used inside authenticated app pages.
+
+### `SiteFooter` (`frontend/app/components/SiteFooter.tsx`)
+
+263-line footer rendered on all public-facing pages via `LayoutShell`. Contains:
+- Logo + tagline
+- Navigation columns: Product, Company, Legal
+- Social icons (Twitter/X, LinkedIn)
+- Copyright line with current year
+- Language switcher (EN ↔ FR) using next-intl locale routing
+
+Started with a UTF-8 BOM (`\ufeff`) — handle with `encoding='utf-8-sig'` if reading in Python.
+
+### `markDelivered` (`frontend/app/components/markDelivered.tsx`)
+
+**Props:** `{ invoice_id: number; onDelivered: () => void }`
+
+"Mark as Delivered" confirmation flow for sellers. Shows a modal asking for confirmation before calling `PATCH /invoice/mark-delivered/:invoice_id`. On success, calls `onDelivered()` to trigger a list refresh and shows a success toast for 6 seconds. On error, shows an error toast. Uses `useTranslations("MarkDelivered")`.
+
+Used in: invoice detail pages where `seller_id === user_id`.
+
+### `ContactForm` (`frontend/app/contact/ContactForm.tsx`)
+
+Client-side contact form with three fields: name, email, message. On submit:
+1. Attempts `POST /contact` to backend
+2. If the backend call fails or endpoint is unavailable, falls back to `mailto:support@fonlok.com` with pre-filled subject/body
+3. On success, renders a success alert (from `useTranslations("Contact.form")`)
+
+Used by: `frontend/app/contact/page.tsx`.
+
+### `FAQAccordion` (`frontend/app/faq/FAQAccordion.tsx`)
+
+**Props:** `{ items: FAQItem[] }` where `FAQItem = { q: string; a: string }`
+
+Accessible accordion component for the FAQ page. Only one item can be open at a time (`openIndex` state). Open items have a primary-colour border; closed items have the default `--color-border`. Uses `aria-expanded` on buttons and smooth height transitions. Renders items from i18n-translated strings passed by `faq/page.tsx`.
+
+---
