@@ -44,6 +44,12 @@ export default function InvoicePage() {
   const [milestoneActionMsg, setMilestoneActionMsg] = useState("");
   const [milestoneActionError, setMilestoneActionError] = useState("");
 
+  // Buyer-side milestone release (for logged-in buyers)
+  const [releaseConfirmId, setReleaseConfirmId] = useState<number | null>(null);
+  const [releaseLoading, setReleaseLoading] = useState(false);
+  const [releaseError, setReleaseError] = useState("");
+  const [releaseSuccessId, setReleaseSuccessId] = useState<number | null>(null);
+
   const [invoiceStats, setInvoiceStats] = useState<InvoiceStats>({
     id: 0,
     amount: 0,
@@ -115,6 +121,32 @@ export default function InvoicePage() {
       );
     } finally {
       setMilestoneLoading(false);
+    }
+  };
+
+  const releaseMilestoneAsUser = async (milestoneId: number) => {
+    setReleaseLoading(true);
+    setReleaseError("");
+    try {
+      await Axios.post(
+        `${BASE_API_URL}/api/release-milestone/by-user`,
+        { milestone_id: milestoneId },
+        { withCredentials: true },
+      );
+      setReleaseSuccessId(milestoneId);
+      setReleaseConfirmId(null);
+      const msRes = await Axios.get(
+        `${BASE_API_URL}/invoice/milestones/${invoice_number}`,
+      );
+      setMilestones(msRes.data.milestones || []);
+    } catch (err: unknown) {
+      setReleaseError(
+        (err as { response?: { data?: { message?: string } } })?.response?.data
+          ?.message || t("releaseError"),
+      );
+      setReleaseConfirmId(null);
+    } finally {
+      setReleaseLoading(false);
     }
   };
 
@@ -356,6 +388,22 @@ export default function InvoicePage() {
                   {milestoneActionError}
                 </div>
               )}
+              {releaseSuccessId && (
+                <div
+                  className="alert alert-success"
+                  style={{ marginBottom: "1rem" }}
+                >
+                  {t("releaseSuccess")}
+                </div>
+              )}
+              {releaseError && (
+                <div
+                  className="alert alert-danger"
+                  style={{ marginBottom: "1rem" }}
+                >
+                  {releaseError}
+                </div>
+              )}
 
               <div
                 style={{
@@ -487,14 +535,73 @@ export default function InvoicePage() {
                           </button>
                         )}
                         {m.status === "completed" && !isSeller && (
-                          <span
-                            style={{
-                              fontSize: "0.75rem",
-                              color: "var(--color-text-muted)",
-                            }}
-                          >
-                            {t("checkEmailRelease")}
-                          </span>
+                          currentUserId ? (
+                            releaseConfirmId === m.id ? (
+                              <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+                                <button
+                                  onClick={() => releaseMilestoneAsUser(m.id)}
+                                  disabled={releaseLoading}
+                                  style={{
+                                    padding: "0.35rem 0.875rem",
+                                    borderRadius: "var(--radius-sm)",
+                                    border: "2px solid #16a34a",
+                                    backgroundColor: "#16a34a",
+                                    color: "#fff",
+                                    fontWeight: 600,
+                                    fontSize: "0.8125rem",
+                                    cursor: releaseLoading ? "not-allowed" : "pointer",
+                                    opacity: releaseLoading ? 0.6 : 1,
+                                  }}
+                                >
+                                  {releaseLoading ? (
+                                    <InlineSpinner size="xs" />
+                                  ) : (
+                                    t("releaseConfirm")
+                                  )}
+                                </button>
+                                <button
+                                  onClick={() => setReleaseConfirmId(null)}
+                                  style={{
+                                    padding: "0.35rem 0.875rem",
+                                    borderRadius: "var(--radius-sm)",
+                                    border: "1px solid var(--color-border)",
+                                    backgroundColor: "transparent",
+                                    color: "var(--color-text-muted)",
+                                    fontWeight: 600,
+                                    fontSize: "0.8125rem",
+                                    cursor: "pointer",
+                                  }}
+                                >
+                                  {t("releaseCancel")}
+                                </button>
+                              </div>
+                            ) : (
+                              <button
+                                onClick={() => setReleaseConfirmId(m.id)}
+                                style={{
+                                  padding: "0.35rem 0.875rem",
+                                  borderRadius: "var(--radius-sm)",
+                                  border: "2px solid #16a34a",
+                                  backgroundColor: "#16a34a",
+                                  color: "#fff",
+                                  fontWeight: 600,
+                                  fontSize: "0.8125rem",
+                                  cursor: "pointer",
+                                }}
+                              >
+                                {t("releasePayment")}
+                              </button>
+                            )
+                          ) : (
+                            <span
+                              style={{
+                                fontSize: "0.75rem",
+                                color: "var(--color-text-muted)",
+                              }}
+                            >
+                              {t("checkEmailRelease")}
+                            </span>
+                          )
                         )}
                       </div>
                     </div>

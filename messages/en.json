@@ -1185,6 +1185,11 @@
     "resendError": "Failed to resend email. Please try again.",
     "milestoneMarkedComplete": "Milestone marked complete! The buyer has been notified by email.",
     "milestoneMarkError": "Failed to mark milestone complete.",
+    "releasePayment": "Release Funds",
+    "releaseConfirm": "Yes, Release Funds",
+    "releaseCancel": "Cancel",
+    "releaseSuccess": "Funds released successfully. The seller has been notified.",
+    "releaseError": "Failed to release funds. Please try again.",
     "receiptFailedGenerate": "Failed to generate receipt.",
     "receiptFailedDownload": "Failed to download receipt. Please try again."
   },

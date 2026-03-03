@@ -1185,6 +1185,11 @@
     "resendError": "Échec du renvoi de l'e-mail. Veuillez réessayer.",
     "milestoneMarkedComplete": "Étape marquée comme terminée ! L'acheteur a été notifié par e-mail.",
     "milestoneMarkError": "Impossible de marquer l'étape comme terminée.",
+    "releasePayment": "Libérer les fonds",
+    "releaseConfirm": "Oui, libérer les fonds",
+    "releaseCancel": "Annuler",
+    "releaseSuccess": "Fonds libérés avec succès. Le vendeur a été notifié.",
+    "releaseError": "Échec de la libération des fonds. Veuillez réessayer.",
     "receiptFailedGenerate": "Impossible de générer le reçu.",
     "receiptFailedDownload": "Impossible de télécharger le reçu. Veuillez réessayer."
   },
