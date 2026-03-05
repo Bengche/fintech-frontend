@@ -587,7 +587,7 @@ export default function GetAllInvoices({
                   {t("list.milestoneActionBody")}
                 </p>
                 <Link
-                  href={`/invoice/${invoice.invoicenumber}`}
+                  href={`/invoice/${invoice.invoicenumber}#milestones`}
                   style={{
                     display: "inline-block",
                     padding: "0.35rem 0.875rem",

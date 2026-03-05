@@ -346,32 +346,48 @@ export default function InvoicePage() {
         {/* ── Milestone progress (installment invoices) ────────────── */}
         {invoiceStats.payment_type === "installment" &&
           milestones.length > 0 && (
-            <div className="card" style={{ marginBottom: "1.25rem" }}>
-              <h2
+            <div id="milestones" className="card" style={{ marginBottom: "1.25rem" }}>
+              {/* Header */}
+              <div
                 style={{
-                  fontSize: "1.0625rem",
-                  fontWeight: 700,
-                  color: "var(--color-text-heading)",
-                  margin: "0 0 0.25rem",
+                  display: "flex",
+                  alignItems: "flex-start",
+                  justifyContent: "space-between",
+                  flexWrap: "wrap",
+                  gap: "0.5rem",
+                  marginBottom: "0.25rem",
                 }}
               >
-                {t("milestoneTitle")}
-              </h2>
-              <p
-                style={{
-                  fontSize: "0.8125rem",
-                  color: "var(--color-text-muted)",
-                  margin: "0 0 1.25rem",
-                }}
-              >
-                {t("milestonesReleased", {
-                  done: milestones.filter((m) => m.status === "released")
-                    .length,
-                  total: milestones.length,
-                })}
-              </p>
+                <h2
+                  style={{
+                    fontSize: "1.0625rem",
+                    fontWeight: 700,
+                    color: "var(--color-text-heading)",
+                    margin: 0,
+                  }}
+                >
+                  {t("milestoneTitle")}
+                </h2>
+                {/* Progress pill */}
+                <span
+                  style={{
+                    fontSize: "0.75rem",
+                    fontWeight: 600,
+                    padding: "0.2rem 0.65rem",
+                    borderRadius: "999px",
+                    backgroundColor: "#dbeafe",
+                    color: "#1e40af",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {t("milestonesReleased", {
+                    done: milestones.filter((m) => m.status === "released").length,
+                    total: milestones.length,
+                  })}
+                </span>
+              </div>
 
-              {/* Seller action callout: shown when this is the seller's own invoice and there are milestones to action */}
+              {/* Seller action callout */}
               {Number(currentUserId) === Number(invoiceStats.userid) &&
                 milestones.some(
                   (m, idx) =>
@@ -384,60 +400,60 @@ export default function InvoicePage() {
                       backgroundColor: "#fffbeb",
                       border: "1.5px solid #f59e0b",
                       borderRadius: "var(--radius-sm)",
+                      marginTop: "0.875rem",
                       marginBottom: "1rem",
                     }}
                   >
-                    <p style={{ margin: 0, fontSize: "0.8125rem", fontWeight: 700, color: "#92400e" }}>
+                    <p
+                      style={{
+                        margin: 0,
+                        fontSize: "0.8125rem",
+                        fontWeight: 700,
+                        color: "#92400e",
+                      }}
+                    >
                       {t("milestoneSellerActionTitle")}
                     </p>
-                    <p style={{ margin: "0.25rem 0 0", fontSize: "0.8rem", color: "#78350f", lineHeight: 1.5 }}>
+                    <p
+                      style={{
+                        margin: "0.25rem 0 0",
+                        fontSize: "0.8rem",
+                        color: "#78350f",
+                        lineHeight: 1.5,
+                      }}
+                    >
                       {t("milestoneSellerActionBody")}
                     </p>
                   </div>
                 )}
 
+              {/* Alerts */}
               {milestoneActionMsg && (
-                <div
-                  className="alert alert-success"
-                  style={{ marginBottom: "1rem" }}
-                >
+                <div className="alert alert-success" style={{ marginBottom: "1rem" }}>
                   {milestoneActionMsg}
                 </div>
               )}
               {milestoneActionError && (
-                <div
-                  className="alert alert-danger"
-                  style={{ marginBottom: "1rem" }}
-                >
+                <div className="alert alert-danger" style={{ marginBottom: "1rem" }}>
                   {milestoneActionError}
                 </div>
               )}
               {releaseSuccessId && (
-                <div
-                  className="alert alert-success"
-                  style={{ marginBottom: "1rem" }}
-                >
+                <div className="alert alert-success" style={{ marginBottom: "1rem" }}>
                   {t("releaseSuccess")}
                 </div>
               )}
               {releaseError && (
-                <div
-                  className="alert alert-danger"
-                  style={{ marginBottom: "1rem" }}
-                >
+                <div className="alert alert-danger" style={{ marginBottom: "1rem" }}>
                   {releaseError}
                 </div>
               )}
 
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "0.75rem",
-                }}
-              >
+              {/* Milestone list */}
+              <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem", marginTop: "0.875rem" }}>
                 {milestones.map((m, i) => {
-                  const isSeller = currentUserId === invoiceStats.userid;
+                  const isSeller =
+                    Number(currentUserId) === Number(invoiceStats.userid);
                   const prevReleased =
                     i === 0 || milestones[i - 1].status === "released";
                   const canMarkComplete =
@@ -446,196 +462,270 @@ export default function InvoicePage() {
                     prevReleased &&
                     invoiceStats.status === "paid";
 
-                  const badgeStyle: React.CSSProperties = {
-                    fontSize: "0.75rem",
-                    fontWeight: 600,
-                    padding: "0.2rem 0.6rem",
-                    borderRadius: "999px",
-                    backgroundColor:
-                      m.status === "released"
-                        ? "#d1fae5"
-                        : m.status === "completed"
-                          ? "#fef3c7"
-                          : m.status === "disputed"
-                            ? "#fee2e2"
-                            : "#e5e7eb",
-                    color:
-                      m.status === "released"
-                        ? "#065f46"
-                        : m.status === "completed"
-                          ? "#92400e"
-                          : m.status === "disputed"
-                            ? "#991b1b"
-                            : "#374151",
-                  };
+                  /* Status badge colours */
+                  const statusColour =
+                    m.status === "released"
+                      ? { bg: "#d1fae5", text: "#065f46" }
+                      : m.status === "completed"
+                        ? { bg: "#fef3c7", text: "#92400e" }
+                        : m.status === "disputed"
+                          ? { bg: "#fee2e2", text: "#991b1b" }
+                          : { bg: "#e5e7eb", text: "#374151" };
+
+                  const statusLabel = {
+                    released: "✓ Released",
+                    completed: "Awaiting your release",
+                    disputed: "Disputed",
+                    pending: "Pending",
+                  }[m.status] ?? m.status;
 
                   return (
                     <div
                       key={m.id}
                       style={{
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                        gap: "1rem",
                         padding: "0.875rem 1rem",
-                        border: "1px solid var(--color-border)",
+                        border:
+                          m.status === "completed" && !isSeller
+                            ? "1.5px solid #f59e0b"
+                            : canMarkComplete
+                              ? "1.5px solid var(--color-primary)"
+                              : "1px solid var(--color-border)",
                         borderRadius: "var(--radius-sm)",
                         backgroundColor:
                           m.status === "released"
                             ? "var(--color-mist)"
                             : "var(--color-white)",
-                        flexWrap: "wrap",
                       }}
                     >
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <p
-                          style={{
-                            margin: 0,
-                            fontWeight: 600,
-                            color: "var(--color-text-heading)",
-                            fontSize: "0.9375rem",
-                          }}
-                        >
-                          {i + 1}. {m.label}
-                        </p>
-                        <p
-                          style={{
-                            margin: "0.15rem 0 0",
-                            fontSize: "0.8125rem",
-                            color: "var(--color-text-muted)",
-                          }}
-                        >
-                          {m.amount.toLocaleString()} {invoiceStats.currency}
-                          {m.deadline && (
-                            <>
-                              {" "}
-                              &middot; {t("due")}{" "}
-                              {new Date(m.deadline).toLocaleDateString(
-                                "en-GB",
-                                {
-                                  day: "2-digit",
-                                  month: "short",
-                                  year: "numeric",
-                                },
-                              )}
-                            </>
-                          )}
-                        </p>
-                      </div>
+                      {/* Row 1: step number + label + status badge */}
                       <div
                         style={{
                           display: "flex",
-                          alignItems: "center",
-                          gap: "0.75rem",
-                          flexShrink: 0,
+                          alignItems: "flex-start",
+                          justifyContent: "space-between",
+                          gap: "0.5rem",
+                          flexWrap: "wrap",
                         }}
                       >
-                        <span style={badgeStyle}>
-                          {m.status.charAt(0).toUpperCase() + m.status.slice(1)}
-                        </span>
-                        {canMarkComplete && (
-                          <button
-                            onClick={() => markMilestoneComplete(m.id)}
-                            disabled={milestoneLoadingId !== null}
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "flex-start",
+                            gap: "0.625rem",
+                            flex: 1,
+                            minWidth: 0,
+                          }}
+                        >
+                          {/* Numbered circle */}
+                          <span
                             style={{
-                              padding: "0.35rem 0.875rem",
-                              borderRadius: "var(--radius-sm)",
-                              border: "2px solid var(--color-primary)",
-                              backgroundColor: "var(--color-primary)",
+                              flexShrink: 0,
+                              width: "1.625rem",
+                              height: "1.625rem",
+                              borderRadius: "50%",
+                              backgroundColor:
+                                m.status === "released"
+                                  ? "#16a34a"
+                                  : m.status === "completed"
+                                    ? "#f59e0b"
+                                    : "var(--color-border-strong, #94a3b8)",
                               color: "#fff",
-                              fontWeight: 600,
-                              fontSize: "0.8125rem",
-                              cursor: milestoneLoadingId !== null
-                                ? "not-allowed"
-                                : "pointer",
-                              opacity: milestoneLoadingId !== null ? 0.6 : 1,
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              fontSize: "0.75rem",
+                              fontWeight: 700,
+                              marginTop: "0.1rem",
                             }}
                           >
-                            {milestoneLoadingId === m.id ? (
-                              <InlineSpinner size="xs" />
-                            ) : (
-                              t("markComplete")
-                            )}
-                          </button>
+                            {m.status === "released" ? "✓" : i + 1}
+                          </span>
+                          <p
+                            style={{
+                              margin: 0,
+                              fontWeight: 600,
+                              color: "var(--color-text-heading)",
+                              fontSize: "0.9375rem",
+                              lineHeight: 1.4,
+                              wordBreak: "break-word",
+                            }}
+                          >
+                            {m.label}
+                          </p>
+                        </div>
+                        {/* Status badge */}
+                        <span
+                          style={{
+                            flexShrink: 0,
+                            fontSize: "0.72rem",
+                            fontWeight: 600,
+                            padding: "0.2rem 0.6rem",
+                            borderRadius: "999px",
+                            backgroundColor: statusColour.bg,
+                            color: statusColour.text,
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          {statusLabel}
+                        </span>
+                      </div>
+
+                      {/* Row 2: amount + deadline */}
+                      <p
+                        style={{
+                          margin: "0.375rem 0 0 2.25rem",
+                          fontSize: "0.8125rem",
+                          color: "var(--color-text-muted)",
+                          lineHeight: 1.5,
+                        }}
+                      >
+                        <strong style={{ color: "var(--color-text-body)" }}>
+                          {m.amount.toLocaleString()} {invoiceStats.currency}
+                        </strong>
+                        {m.deadline && (
+                          <>
+                            {" "}&middot;{" "}{t("due")}{" "}
+                            {new Date(m.deadline).toLocaleDateString("en-GB", {
+                              day: "2-digit",
+                              month: "short",
+                              year: "numeric",
+                            })}
+                          </>
                         )}
-                        {m.status === "completed" &&
-                          !isSeller &&
-                          (currentUserId ? (
-                            releaseConfirmId === m.id ? (
-                              <div
-                                style={{
-                                  display: "flex",
-                                  gap: "0.5rem",
-                                  alignItems: "center",
-                                }}
-                              >
+                      </p>
+
+                      {/* Row 3: action button(s) — full width on mobile */}
+                      {(canMarkComplete ||
+                        (m.status === "completed" && !isSeller)) && (
+                        <div
+                          style={{
+                            marginTop: "0.75rem",
+                            display: "flex",
+                            flexWrap: "wrap",
+                            gap: "0.5rem",
+                          }}
+                        >
+                          {canMarkComplete && (
+                            <button
+                              onClick={() => markMilestoneComplete(m.id)}
+                              disabled={milestoneLoadingId !== null}
+                              style={{
+                                flex: "1 1 auto",
+                                minHeight: "2.5rem",
+                                padding: "0.5rem 1rem",
+                                borderRadius: "var(--radius-sm)",
+                                border: "2px solid var(--color-primary)",
+                                backgroundColor: "var(--color-primary)",
+                                color: "#fff",
+                                fontWeight: 700,
+                                fontSize: "0.875rem",
+                                cursor:
+                                  milestoneLoadingId !== null
+                                    ? "not-allowed"
+                                    : "pointer",
+                                opacity: milestoneLoadingId !== null ? 0.6 : 1,
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                gap: "0.375rem",
+                              }}
+                            >
+                              {milestoneLoadingId === m.id ? (
+                                <InlineSpinner size="xs" />
+                              ) : (
+                                t("markComplete")
+                              )}
+                            </button>
+                          )}
+
+                          {m.status === "completed" && !isSeller && (
+                            currentUserId ? (
+                              releaseConfirmId === m.id ? (
+                                <>
+                                  <button
+                                    onClick={() => releaseMilestoneAsUser(m.id)}
+                                    disabled={releaseLoading}
+                                    style={{
+                                      flex: "1 1 auto",
+                                      minHeight: "2.5rem",
+                                      padding: "0.5rem 1rem",
+                                      borderRadius: "var(--radius-sm)",
+                                      border: "2px solid #16a34a",
+                                      backgroundColor: "#16a34a",
+                                      color: "#fff",
+                                      fontWeight: 700,
+                                      fontSize: "0.875rem",
+                                      cursor: releaseLoading ? "not-allowed" : "pointer",
+                                      opacity: releaseLoading ? 0.6 : 1,
+                                      display: "flex",
+                                      alignItems: "center",
+                                      justifyContent: "center",
+                                      gap: "0.375rem",
+                                    }}
+                                  >
+                                    {releaseLoading ? (
+                                      <InlineSpinner size="xs" />
+                                    ) : (
+                                      t("releaseConfirm")
+                                    )}
+                                  </button>
+                                  <button
+                                    onClick={() => setReleaseConfirmId(null)}
+                                    style={{
+                                      flex: "1 1 auto",
+                                      minHeight: "2.5rem",
+                                      padding: "0.5rem 1rem",
+                                      borderRadius: "var(--radius-sm)",
+                                      border: "1px solid var(--color-border)",
+                                      backgroundColor: "transparent",
+                                      color: "var(--color-text-muted)",
+                                      fontWeight: 600,
+                                      fontSize: "0.875rem",
+                                      cursor: "pointer",
+                                    }}
+                                  >
+                                    {t("releaseCancel")}
+                                  </button>
+                                </>
+                              ) : (
                                 <button
-                                  onClick={() => releaseMilestoneAsUser(m.id)}
-                                  disabled={releaseLoading}
+                                  onClick={() => setReleaseConfirmId(m.id)}
                                   style={{
-                                    padding: "0.35rem 0.875rem",
+                                    flex: "1 1 auto",
+                                    minHeight: "2.5rem",
+                                    padding: "0.5rem 1rem",
                                     borderRadius: "var(--radius-sm)",
                                     border: "2px solid #16a34a",
                                     backgroundColor: "#16a34a",
                                     color: "#fff",
-                                    fontWeight: 600,
-                                    fontSize: "0.8125rem",
-                                    cursor: releaseLoading
-                                      ? "not-allowed"
-                                      : "pointer",
-                                    opacity: releaseLoading ? 0.6 : 1,
-                                  }}
-                                >
-                                  {releaseLoading ? (
-                                    <InlineSpinner size="xs" />
-                                  ) : (
-                                    t("releaseConfirm")
-                                  )}
-                                </button>
-                                <button
-                                  onClick={() => setReleaseConfirmId(null)}
-                                  style={{
-                                    padding: "0.35rem 0.875rem",
-                                    borderRadius: "var(--radius-sm)",
-                                    border: "1px solid var(--color-border)",
-                                    backgroundColor: "transparent",
-                                    color: "var(--color-text-muted)",
-                                    fontWeight: 600,
-                                    fontSize: "0.8125rem",
+                                    fontWeight: 700,
+                                    fontSize: "0.875rem",
                                     cursor: "pointer",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
                                   }}
                                 >
-                                  {t("releaseCancel")}
+                                  {t("releasePayment")}
                                 </button>
-                              </div>
+                              )
                             ) : (
-                              <button
-                                onClick={() => setReleaseConfirmId(m.id)}
+                              <p
                                 style={{
-                                  padding: "0.35rem 0.875rem",
-                                  borderRadius: "var(--radius-sm)",
-                                  border: "2px solid #16a34a",
-                                  backgroundColor: "#16a34a",
-                                  color: "#fff",
-                                  fontWeight: 600,
-                                  fontSize: "0.8125rem",
-                                  cursor: "pointer",
+                                  margin: 0,
+                                  fontSize: "0.8rem",
+                                  color: "#92400e",
+                                  fontWeight: 500,
+                                  padding: "0.4rem 0",
+                                  lineHeight: 1.5,
                                 }}
                               >
-                                {t("releasePayment")}
-                              </button>
+                                {t("checkEmailRelease")}
+                              </p>
                             )
-                          ) : (
-                            <span
-                              style={{
-                                fontSize: "0.75rem",
-                                color: "var(--color-text-muted)",
-                              }}
-                            >
-                              {t("checkEmailRelease")}
-                            </span>
-                          ))}
-                      </div>
+                          )}
+                        </div>
+                      )}
                     </div>
                   );
                 })}
