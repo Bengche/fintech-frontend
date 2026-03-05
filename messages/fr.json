@@ -851,7 +851,11 @@
     "submitting": "Envoi…",
     "cancel": "Annuler",
     "successMsg": "Litige soumis. Notre administrateur a été notifié et examinera votre dossier.",
-    "errorDefault": "Échec de l'ouverture du litige. Veuillez réessayer."
+    "errorDefault": "Échec de l'ouverture du litige. Veuillez réessayer.",
+    "scopeLabel": "Sur quoi porte ce litige ?",
+    "scopeFull": "Facture complète — tous les jalons non encore libérés",
+    "scopeMilestone": "Jalons spécifiques — choisissez lesquels",
+    "milestonesLabel": "Sélectionnez les jalons à contester :"
   },
   "MarkDelivered": {
     "trigger": "Marquer comme livré",

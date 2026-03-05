@@ -28,6 +28,7 @@ export default function SellerChatPage() {
   const [errorMessage, setErrorMessage] = useState("");
   const [isSending, setIsSending] = useState(false);
   const [chatExists, setChatExists] = useState<boolean | null>(null);
+  const [invoicePaymentType, setInvoicePaymentType] = useState<string | undefined>(undefined);
   const bottomOfChat = useRef<HTMLDivElement>(null);
   const prevMsgCount = useRef(0);
 
@@ -51,6 +52,16 @@ export default function SellerChatPage() {
     const interval = setInterval(fetchMessages, 5000);
     return () => clearInterval(interval);
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [invoice_number]);
+
+  // Detect milestone invoices to enable the multi-step dispute flow
+  useEffect(() => {
+    Axios.get(`${API}/invoice/milestones/${invoice_number}`, { withCredentials: true })
+      .then((res) => {
+        const ms = res.data.milestones || res.data || [];
+        if (ms.length > 0) setInvoicePaymentType("installment");
+      })
+      .catch(() => {}); // non-fatal
   }, [invoice_number]);
 
   // Only scroll to bottom when the message count actually increases
@@ -507,6 +518,7 @@ export default function SellerChatPage() {
             <DisputeButton
               invoice_number={invoice_number}
               sender_type="seller"
+              paymentType={invoicePaymentType}
             />
           </div>
         )}

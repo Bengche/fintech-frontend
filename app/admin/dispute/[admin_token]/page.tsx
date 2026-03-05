@@ -17,11 +17,23 @@ type Message = {
   created_at: string;
 };
 
+type Milestone = {
+  id: number;
+  milestone_number: number;
+  milestone_label: string;
+  amount: number;
+  status: string;
+  dispute_resolution: string | null;
+};
+
 interface DisputeData {
   status: string;
   reason?: string;
   opened_by?: string;
   created_at?: string;
+  dispute_scope?: string;
+  disputed_milestone_ids?: number[];
+  disputed_amount?: number;
   [key: string]: unknown;
 }
 
@@ -31,6 +43,7 @@ interface InvoiceData {
   amount?: number;
   currency?: string;
   status?: string;
+  payment_type?: string;
   [key: string]: unknown;
 }
 
@@ -52,6 +65,9 @@ export default function AdminDisputePage() {
   const [buyer, setBuyer] = useState<UserData | null>(null);
   const [seller, setSeller] = useState<UserData | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
+  const [milestones, setMilestones] = useState<Milestone[]>([]);
+  const [disputedMilestones, setDisputedMilestones] = useState<Milestone[]>([]);
+  const [effectiveEscrowAmount, setEffectiveEscrowAmount] = useState<number | null>(null);
   const [adminMessage, setAdminMessage] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
@@ -66,8 +82,15 @@ export default function AdminDisputePage() {
       setBuyer(response.data.buyer);
       setSeller(response.data.seller);
       setMessages(response.data.messages);
-      if (response.data.dispute?.status !== "open") {
+      setMilestones(response.data.milestones || []);
+      setDisputedMilestones(response.data.disputedMilestones || []);
+      setEffectiveEscrowAmount(response.data.effectiveEscrowAmount ?? null);
+      const dStatus = response.data.dispute?.status || "";
+      // Fully resolved = neither 'open' nor 'partially_resolved_*'
+      if (dStatus !== "open" && !dStatus.startsWith("partially_resolved")) {
         setIsResolved(true);
+      } else {
+        setIsResolved(false);
       }
     } catch (error: unknown) {
       const err = error as { response?: { data?: { message?: string } } };
@@ -97,7 +120,10 @@ export default function AdminDisputePage() {
     }
   };
 
-  const resolveDispute = async (decision: "seller" | "buyer") => {
+  const resolveDispute = async (
+    decision: "seller" | "buyer",
+    milestoneIds?: number[],
+  ) => {
     const confirmText =
       decision === "seller"
         ? t("dispute.releaseToSeller")
@@ -106,13 +132,15 @@ export default function AdminDisputePage() {
     try {
       await Axios.post(`${API}/dispute/admin/${admin_token}/resolve`, {
         decision,
+        ...(milestoneIds && milestoneIds.length > 0 ? { milestone_ids: milestoneIds } : {}),
       });
       setSuccessMessage(
         decision === "seller"
           ? t("dispute.releasedSeller")
           : t("dispute.refundedBuyer"),
       );
-      setIsResolved(true);
+      // Don't force isResolved=true — let the next poll decide (may be partially resolved)
+      await loadDisputeData();
     } catch (error: unknown) {
       const err = error as { response?: { data?: { message?: string } } };
       setErrorMessage(err.response?.data?.message || t("dispute.errorDefault"));
@@ -454,6 +482,201 @@ export default function AdminDisputePage() {
           </div>
         </div>
 
+        {/* ── Milestone Breakdown (milestone invoices only) ──────────────── */}
+        {invoice?.payment_type === "installment" && disputedMilestones.length > 0 && (
+          <div className="card">
+            <h2
+              style={{
+                margin: "0 0 0.75rem",
+                fontSize: "1rem",
+                fontWeight: 700,
+                color: "var(--color-text-heading)",
+              }}
+            >
+              Dispute Scope &amp; Milestones
+            </h2>
+
+            {/* Scope info row */}
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                gap: "0.625rem",
+                marginBottom: "0.75rem",
+              }}
+            >
+              <span
+                style={{
+                  fontSize: "0.8125rem",
+                  padding: "0.25rem 0.625rem",
+                  borderRadius: "999px",
+                  background: "var(--color-primary-subtle, #eff6ff)",
+                  color: "var(--color-primary)",
+                  fontWeight: 600,
+                }}
+              >
+                Scope: {String(dispute?.dispute_scope ?? "full").toUpperCase()}
+              </span>
+              <span
+                style={{
+                  fontSize: "0.8125rem",
+                  padding: "0.25rem 0.625rem",
+                  borderRadius: "999px",
+                  background: "var(--color-mist)",
+                  color: "var(--color-text-heading)",
+                  fontWeight: 600,
+                }}
+              >
+                Effective Escrow:{" "}
+                {effectiveEscrowAmount != null
+                  ? `${Number(effectiveEscrowAmount).toLocaleString()} XAF`
+                  : "—"}
+              </span>
+            </div>
+
+            {/* Warning if amount shrank since dispute was opened */}
+            {effectiveEscrowAmount != null &&
+              dispute?.disputed_amount != null &&
+              effectiveEscrowAmount < Number(dispute.disputed_amount) && (
+                <div
+                  className="alert alert-warning"
+                  style={{ fontSize: "0.8125rem", marginBottom: "0.75rem" }}
+                >
+                  ⚠ Some milestones were released after this dispute was opened. The
+                  effective amount ({Number(effectiveEscrowAmount).toLocaleString()} XAF) is
+                  less than the original disputed amount (
+                  {Number(dispute.disputed_amount).toLocaleString()} XAF). Only the
+                  current escrow balance will be disbursed.
+                </div>
+              )}
+
+            {/* Milestone table */}
+            <div style={{ overflowX: "auto" }}>
+              <table
+                style={{
+                  width: "100%",
+                  borderCollapse: "collapse",
+                  fontSize: "0.875rem",
+                }}
+              >
+                <thead>
+                  <tr style={{ background: "var(--color-mist)" }}>
+                    {["Milestone", "Amount", "Status", "Resolution", "Actions"].map(
+                      (h) => (
+                        <th
+                          key={h}
+                          style={{
+                            padding: "0.5rem 0.75rem",
+                            textAlign: "left",
+                            fontSize: "0.75rem",
+                            fontWeight: 700,
+                            textTransform: "uppercase",
+                            letterSpacing: "0.04em",
+                            color: "var(--color-text-muted)",
+                            borderBottom: "1px solid var(--color-border)",
+                          }}
+                        >
+                          {h}
+                        </th>
+                      ),
+                    )}
+                  </tr>
+                </thead>
+                <tbody>
+                  {disputedMilestones.map((m) => {
+                    const isReleased = m.status === "released";
+                    const isDrSeller = m.dispute_resolution === "seller";
+                    const isDrBuyer = m.dispute_resolution === "buyer";
+                    const statusColor = isReleased
+                      ? isDrBuyer
+                        ? "var(--color-info)"
+                        : "var(--color-success, #16a34a)"
+                      : "var(--color-warning, #d97706)";
+                    return (
+                      <tr
+                        key={m.id}
+                        style={{
+                          borderBottom: "1px solid var(--color-border)",
+                          opacity: isReleased ? 0.75 : 1,
+                        }}
+                      >
+                        <td style={{ padding: "0.625rem 0.75rem", fontWeight: 600 }}>
+                          {m.milestone_label || `Milestone ${m.milestone_number}`}
+                        </td>
+                        <td style={{ padding: "0.625rem 0.75rem" }}>
+                          {Number(m.amount).toLocaleString()} XAF
+                        </td>
+                        <td style={{ padding: "0.625rem 0.75rem" }}>
+                          <span
+                            style={{
+                              fontWeight: 600,
+                              color: statusColor,
+                              textTransform: "capitalize",
+                            }}
+                          >
+                            {m.status}
+                          </span>
+                        </td>
+                        <td style={{ padding: "0.625rem 0.75rem" }}>
+                          {isDrSeller ? (
+                            <span style={{ color: "var(--color-success, #16a34a)", fontWeight: 600 }}>
+                              Paid to Seller
+                            </span>
+                          ) : isDrBuyer ? (
+                            <span style={{ color: "var(--color-info)", fontWeight: 600 }}>
+                              Refunded to Buyer
+                            </span>
+                          ) : isReleased ? (
+                            <span style={{ color: "var(--color-text-muted)" }}>Released before dispute</span>
+                          ) : (
+                            <span style={{ color: "var(--color-text-muted)" }}>Pending</span>
+                          )}
+                        </td>
+                        <td style={{ padding: "0.625rem 0.75rem" }}>
+                          {!isReleased && !isResolved && (
+                            <div style={{ display: "flex", gap: "0.375rem" }}>
+                              <button
+                                onClick={() => resolveDispute("seller", [m.id])}
+                                style={{
+                                  fontSize: "0.75rem",
+                                  padding: "0.25rem 0.625rem",
+                                  borderRadius: "var(--radius-sm)",
+                                  background: "var(--color-primary)",
+                                  color: "#fff",
+                                  border: "none",
+                                  cursor: "pointer",
+                                  fontWeight: 600,
+                                }}
+                              >
+                                Pay Seller
+                              </button>
+                              <button
+                                onClick={() => resolveDispute("buyer", [m.id])}
+                                style={{
+                                  fontSize: "0.75rem",
+                                  padding: "0.25rem 0.625rem",
+                                  borderRadius: "var(--radius-sm)",
+                                  background: "var(--color-danger)",
+                                  color: "#fff",
+                                  border: "none",
+                                  cursor: "pointer",
+                                  fontWeight: 600,
+                                }}
+                              >
+                                Refund Buyer
+                              </button>
+                            </div>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
         {/* ── Chat History ──────────────────────────────────────────────────── */}
         <div className="card" style={{ padding: 0, overflow: "hidden" }}>
           <div
@@ -643,7 +866,28 @@ export default function AdminDisputePage() {
               }}
             >
               {t("dispute.makeDecisionBody")}
+              {effectiveEscrowAmount != null && (
+                <span style={{ fontWeight: 600 }}>
+                  {" "}Effective amount in escrow:{" "}
+                  <span style={{ color: "var(--color-text-heading)" }}>
+                    {Number(effectiveEscrowAmount).toLocaleString()} XAF
+                  </span>
+                </span>
+              )}
             </p>
+
+            {dispute?.status?.startsWith("partially_resolved") && (
+              <div
+                className="alert alert-info"
+                style={{ fontSize: "0.8125rem", marginBottom: "1rem" }}
+              >
+                ⚠ This dispute is partially resolved. Some milestones still require a
+                decision. Use the milestone table above to resolve individual milestones,
+                or use the global buttons below to resolve all remaining milestones at
+                once.
+              </div>
+            )}
+
             <div
               style={{
                 display: "grid",
@@ -656,7 +900,7 @@ export default function AdminDisputePage() {
                 className="btn-primary"
                 style={{ padding: "0.875rem", fontSize: "0.9375rem" }}
               >
-                {t("dispute.releaseFunds")}
+                {t("dispute.releaseFunds")}{effectiveEscrowAmount != null ? ` (${Number(effectiveEscrowAmount).toLocaleString()} XAF)` : ""}
               </button>
               <button
                 onClick={() => resolveDispute("buyer")}
@@ -671,7 +915,7 @@ export default function AdminDisputePage() {
                   cursor: "pointer",
                 }}
               >
-                {t("dispute.refundBtn")}
+                {t("dispute.refundBtn")}{effectiveEscrowAmount != null ? ` (${Number(effectiveEscrowAmount).toLocaleString()} XAF)` : ""}
               </button>
             </div>
           </div>

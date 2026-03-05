@@ -851,7 +851,11 @@
     "submitting": "Submitting…",
     "cancel": "Cancel",
     "successMsg": "Dispute submitted. Our admin has been notified and will review your case shortly.",
-    "errorDefault": "Failed to open dispute. Please try again."
+    "errorDefault": "Failed to open dispute. Please try again.",
+    "scopeLabel": "What is this dispute about?",
+    "scopeFull": "Full Invoice — all remaining unreleased milestones",
+    "scopeMilestone": "Specific Milestones — choose which ones",
+    "milestonesLabel": "Select the milestones you want to dispute:"
   },
   "MarkDelivered": {
     "trigger": "Mark as Delivered",

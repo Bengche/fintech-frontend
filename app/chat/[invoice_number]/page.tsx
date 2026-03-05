@@ -111,14 +111,13 @@ export default function BuyerChatPage() {
       setReleaseConfirmId(null);
       setReleaseSuccessId(milestoneId);
       // Refresh the milestone list to show updated statuses
-      const msRes = await Axios.get(`${API}/invoice/milestones/${invoice_number}`);
+      const msRes = await Axios.get(
+        `${API}/invoice/milestones/${invoice_number}`,
+      );
       setMilestones(msRes.data.milestones || []);
       setTimeout(() => setReleaseSuccessId(null), 8000);
     } catch (err: any) {
-      setReleaseError(
-        err.response?.data?.message ??
-          t("releaseErrorDefault"),
-      );
+      setReleaseError(err.response?.data?.message ?? t("releaseErrorDefault"));
     } finally {
       setReleaseLoading(null);
     }
@@ -192,7 +191,8 @@ export default function BuyerChatPage() {
                 </h3>
                 <p className="text-xs text-slate-500 mt-0.5">
                   {t("milestonesProgress", {
-                    done: milestones.filter((m) => m.status === "released").length,
+                    done: milestones.filter((m) => m.status === "released")
+                      .length,
                     total: milestones.length,
                   })}
                 </p>
@@ -298,7 +298,9 @@ export default function BuyerChatPage() {
                         disabled={releaseLoading === m.id}
                         className="text-xs bg-green-600 hover:bg-green-700 text-white px-4 py-1.5 rounded-md font-bold disabled:opacity-60 transition-colors"
                       >
-                        {releaseLoading === m.id ? t("releasing") : t("releaseConfirm")}
+                        {releaseLoading === m.id
+                          ? t("releasing")
+                          : t("releaseConfirm")}
                       </button>
                       <button
                         onClick={() => {
@@ -490,6 +492,7 @@ export default function BuyerChatPage() {
           sender_type="buyer"
           buyer_token={token || ""}
           autoOpen={openDisputeDirectly}
+          paymentType={milestones.length > 0 ? "installment" : undefined}
         />
       </div>
     </div>
