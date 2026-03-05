@@ -29,6 +29,7 @@ interface Invoice {
   invoicelink: string;
   createdat: string;
   expires_at?: string | null;
+  payment_type?: string;
   [key: string]: unknown;
 }
 
@@ -546,13 +547,62 @@ export default function GetAllInvoices({
                 canDelete={canDeleteInvoice(invoice)}
                 deleteBlockReason={getDeleteBlockReason(invoice)}
               />
-              {invoice.status === "paid" && (
+              {invoice.status === "paid" && invoice.payment_type !== "installment" && (
                 <MarkDelivered
                   invoice_id={invoice.id}
                   onDelivered={getAllInvoices}
                 />
               )}
             </div>
+
+            {/* Milestone action strip — only for paid installment invoices */}
+            {invoice.status === "paid" && invoice.payment_type === "installment" && (
+              <div
+                style={{
+                  marginTop: "0.75rem",
+                  padding: "0.875rem 1rem",
+                  backgroundColor: "#fffbeb",
+                  border: "1.5px solid #f59e0b",
+                  borderRadius: "var(--radius-sm)",
+                }}
+              >
+                <p
+                  style={{
+                    margin: "0 0 0.5rem",
+                    fontSize: "0.8125rem",
+                    fontWeight: 700,
+                    color: "#92400e",
+                  }}
+                >
+                  {t("list.milestoneActionTitle")}
+                </p>
+                <p
+                  style={{
+                    margin: "0 0 0.75rem",
+                    fontSize: "0.8rem",
+                    color: "#78350f",
+                    lineHeight: 1.5,
+                  }}
+                >
+                  {t("list.milestoneActionBody")}
+                </p>
+                <Link
+                  href={`/invoice/${invoice.invoicenumber}`}
+                  style={{
+                    display: "inline-block",
+                    padding: "0.35rem 0.875rem",
+                    backgroundColor: "#f59e0b",
+                    color: "#fff",
+                    borderRadius: "var(--radius-sm)",
+                    fontWeight: 700,
+                    fontSize: "0.8125rem",
+                    textDecoration: "none",
+                  }}
+                >
+                  {t("list.manageMilestones")}
+                </Link>
+              </div>
+            )}
 
             {/* Chat & Dispute */}
             {(invoice.status === "paid" ||

@@ -40,7 +40,7 @@ export default function InvoicePage() {
   const router = useRouter();
 
   const [milestones, setMilestones] = useState<Milestone[]>([]);
-  const [milestoneLoading, setMilestoneLoading] = useState(false);
+  const [milestoneLoadingId, setMilestoneLoadingId] = useState<number | null>(null);
   const [milestoneActionMsg, setMilestoneActionMsg] = useState("");
   const [milestoneActionError, setMilestoneActionError] = useState("");
 
@@ -99,7 +99,7 @@ export default function InvoicePage() {
   }, [invoice_number, BASE_API_URL]);
 
   const markMilestoneComplete = async (milestoneId: number) => {
-    setMilestoneLoading(true);
+    setMilestoneLoadingId(milestoneId);
     setMilestoneActionMsg("");
     setMilestoneActionError("");
     try {
@@ -120,7 +120,7 @@ export default function InvoicePage() {
           ?.message || t("milestoneMarkError"),
       );
     } finally {
-      setMilestoneLoading(false);
+      setMilestoneLoadingId(null);
     }
   };
 
@@ -194,7 +194,6 @@ export default function InvoicePage() {
 
   return (
     <div style={{ minHeight: "100vh", backgroundColor: "var(--color-cloud)" }}>
-
       <div
         style={{
           maxWidth: "700px",
@@ -372,6 +371,31 @@ export default function InvoicePage() {
                 })}
               </p>
 
+              {/* Seller action callout: shown when this is the seller's own invoice and there are milestones to action */}
+              {Number(currentUserId) === Number(invoiceStats.userid) &&
+                milestones.some(
+                  (m, idx) =>
+                    m.status === "pending" &&
+                    (idx === 0 || milestones[idx - 1].status === "released"),
+                ) && (
+                  <div
+                    style={{
+                      padding: "0.75rem 1rem",
+                      backgroundColor: "#fffbeb",
+                      border: "1.5px solid #f59e0b",
+                      borderRadius: "var(--radius-sm)",
+                      marginBottom: "1rem",
+                    }}
+                  >
+                    <p style={{ margin: 0, fontSize: "0.8125rem", fontWeight: 700, color: "#92400e" }}>
+                      {t("milestoneSellerActionTitle")}
+                    </p>
+                    <p style={{ margin: "0.25rem 0 0", fontSize: "0.8rem", color: "#78350f", lineHeight: 1.5 }}>
+                      {t("milestoneSellerActionBody")}
+                    </p>
+                  </div>
+                )}
+
               {milestoneActionMsg && (
                 <div
                   className="alert alert-success"
@@ -512,7 +536,7 @@ export default function InvoicePage() {
                         {canMarkComplete && (
                           <button
                             onClick={() => markMilestoneComplete(m.id)}
-                            disabled={milestoneLoading}
+                            disabled={milestoneLoadingId !== null}
                             style={{
                               padding: "0.35rem 0.875rem",
                               borderRadius: "var(--radius-sm)",
@@ -521,23 +545,30 @@ export default function InvoicePage() {
                               color: "#fff",
                               fontWeight: 600,
                               fontSize: "0.8125rem",
-                              cursor: milestoneLoading
+                              cursor: milestoneLoadingId !== null
                                 ? "not-allowed"
                                 : "pointer",
-                              opacity: milestoneLoading ? 0.6 : 1,
+                              opacity: milestoneLoadingId !== null ? 0.6 : 1,
                             }}
                           >
-                            {milestoneLoading ? (
+                            {milestoneLoadingId === m.id ? (
                               <InlineSpinner size="xs" />
                             ) : (
                               t("markComplete")
                             )}
                           </button>
                         )}
-                        {m.status === "completed" && !isSeller && (
-                          currentUserId ? (
+                        {m.status === "completed" &&
+                          !isSeller &&
+                          (currentUserId ? (
                             releaseConfirmId === m.id ? (
-                              <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+                              <div
+                                style={{
+                                  display: "flex",
+                                  gap: "0.5rem",
+                                  alignItems: "center",
+                                }}
+                              >
                                 <button
                                   onClick={() => releaseMilestoneAsUser(m.id)}
                                   disabled={releaseLoading}
@@ -549,7 +580,9 @@ export default function InvoicePage() {
                                     color: "#fff",
                                     fontWeight: 600,
                                     fontSize: "0.8125rem",
-                                    cursor: releaseLoading ? "not-allowed" : "pointer",
+                                    cursor: releaseLoading
+                                      ? "not-allowed"
+                                      : "pointer",
                                     opacity: releaseLoading ? 0.6 : 1,
                                   }}
                                 >
@@ -601,8 +634,7 @@ export default function InvoicePage() {
                             >
                               {t("checkEmailRelease")}
                             </span>
-                          )
-                        )}
+                          ))}
                       </div>
                     </div>
                   );
@@ -1130,7 +1162,6 @@ export default function InvoicePage() {
             </button>
           </div>
         )}
-
     </div>
   );
 }

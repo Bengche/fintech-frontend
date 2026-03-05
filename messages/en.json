@@ -832,7 +832,10 @@
       "qrHint": "Buyer scans this to open the payment page.",
       "fieldAmount": "Amount",
       "fieldCreated": "Created",
-      "fieldExpires": "Expires"
+      "fieldExpires": "Expires",
+      "milestoneActionTitle": "Action required — Milestone Invoice",
+      "milestoneActionBody": "The buyer has paid. Mark each milestone as done when you complete that stage of the work. The buyer will receive an email with a secure payment release link for each milestone you complete.",
+      "manageMilestones": "Manage Milestones →"
     }
   },
   "Dispute": {
@@ -1185,6 +1188,8 @@
     "resendError": "Failed to resend email. Please try again.",
     "milestoneMarkedComplete": "Milestone marked complete! The buyer has been notified by email.",
     "milestoneMarkError": "Failed to mark milestone complete.",
+    "milestoneSellerActionTitle": "Your next action",
+    "milestoneSellerActionBody": "Click \"Mark as Done\" on a milestone once you have completed that stage of the work. The buyer will immediately receive an email with a one-click link to release your payment for that milestone.",
     "releasePayment": "Release Funds",
     "releaseConfirm": "Yes, Release Funds",
     "releaseCancel": "Cancel",

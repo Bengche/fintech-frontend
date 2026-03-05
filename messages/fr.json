@@ -832,7 +832,10 @@
       "qrHint": "L'acheteur scanne ce code pour ouvrir la page de paiement.",
       "fieldAmount": "Montant",
       "fieldCreated": "Créée",
-      "fieldExpires": "Expire"
+      "fieldExpires": "Expire",
+      "milestoneActionTitle": "Action requise — Facture par étapes",
+      "milestoneActionBody": "L'acheteur a payé. Marquez chaque étape comme terminée lorsque vous avez accompli cette partie du travail. L'acheteur recevra un e-mail avec un lien sécurisé pour libérer le paiement.",
+      "manageMilestones": "Gérer les étapes →"
     }
   },
   "Dispute": {
@@ -1185,6 +1188,8 @@
     "resendError": "Échec du renvoi de l'e-mail. Veuillez réessayer.",
     "milestoneMarkedComplete": "Étape marquée comme terminée ! L'acheteur a été notifié par e-mail.",
     "milestoneMarkError": "Impossible de marquer l'étape comme terminée.",
+    "milestoneSellerActionTitle": "Votre prochaine action",
+    "milestoneSellerActionBody": "Cliquez sur \"Marquer comme fait\" dès que vous avez terminé cette étape. L'acheteur recevra immédiatement un e-mail avec un lien pour libérer votre paiement pour cette étape.",
     "releasePayment": "Libérer les fonds",
     "releaseConfirm": "Oui, libérer les fonds",
     "releaseCancel": "Annuler",
