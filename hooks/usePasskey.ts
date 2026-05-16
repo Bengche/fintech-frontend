@@ -15,6 +15,11 @@ import axios from "axios";
 
 const API = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
 
+function authHeaders() {
+  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  return token ? { Authorization: `Bearer ${token}` } : undefined;
+}
+
 // ── Base64URL utilities ───────────────────────────────────────────────────────
 
 function bufToB64url(buf: ArrayBuffer): string {
@@ -209,7 +214,7 @@ export function usePasskey(): UsePasskeyReturn {
       const { data: options } = await axios.post(
         `${API}/passkey/register-challenge`,
         {},
-        { withCredentials: true },
+        { withCredentials: true, headers: authHeaders() },
       );
 
       // Step 2: Browser biometric prompt
@@ -228,7 +233,7 @@ export function usePasskey(): UsePasskeyReturn {
           ...serializeRegistration(credential as PublicKeyCredential),
           deviceName: deviceName || guessDeviceName(),
         },
-        { withCredentials: true },
+        { withCredentials: true, headers: authHeaders() },
       );
 
       setRegisterSuccess(true);
@@ -309,6 +314,7 @@ export function usePasskey(): UsePasskeyReturn {
     try {
       const { data } = await axios.get(`${API}/passkey/list`, {
         withCredentials: true,
+        headers: authHeaders(),
       });
       setPasskeys(data.passkeys ?? []);
     } catch {
@@ -322,9 +328,13 @@ export function usePasskey(): UsePasskeyReturn {
   const removePasskey = useCallback(async (id: number) => {
     setRemoveLoading(id);
     try {
-      await axios.delete(`${API}/passkey/${id}`, { withCredentials: true });
+      await axios.delete(`${API}/passkey/${id}`, {
+        withCredentials: true,
+        headers: authHeaders(),
+      });
+      
       setPasskeys((prev) => prev.filter((p) => p.id !== id));
-      if ((await axios.get(`${API}/passkey/list`, { withCredentials: true })).data.passkeys.length === 0) {
+      if ((await axios.get(`${API}/passkey/list`, { withCredentials: true, headers: authHeaders() })).data.passkeys.length === 0) {
         localStorage.removeItem("fonlok_has_passkey");
       }
     } finally {
