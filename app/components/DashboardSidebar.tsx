@@ -268,7 +268,11 @@ export default function DashboardSidebar() {
         >
           <Link
             href="/dashboard"
-            style={{ textDecoration: "none", display: "flex", alignItems: "center" }}
+            style={{
+              textDecoration: "none",
+              display: "flex",
+              alignItems: "center",
+            }}
             aria-label="Fonlok home"
           >
             <FonlokLogo variant="light" iconSize={28} />
@@ -314,8 +318,7 @@ export default function DashboardSidebar() {
                   width: "2rem",
                   height: "2rem",
                   borderRadius: "50%",
-                  background:
-                    "linear-gradient(135deg,#f59e0b 0%,#d97706 100%)",
+                  background: "linear-gradient(135deg,#f59e0b 0%,#d97706 100%)",
                   color: "#0f1f3d",
                   display: "flex",
                   alignItems: "center",
@@ -427,7 +430,11 @@ export default function DashboardSidebar() {
             style={{ marginBottom: "0.125rem" }}
           >
             <span className="sidebar-icon">
-              <Globe size={17} strokeWidth={1.8} color="rgba(255,255,255,0.6)" />
+              <Globe
+                size={17}
+                strokeWidth={1.8}
+                color="rgba(255,255,255,0.6)"
+              />
             </span>
             {locale === "en" ? "English / Français" : "Français / English"}
           </button>

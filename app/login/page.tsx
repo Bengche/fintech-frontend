@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { haptic } from "@/hooks/useHaptic";
+import BiometricButton from "@/app/components/BiometricButton";
 Axios.defaults.withCredentials = true;
 
 const API = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
@@ -174,6 +175,8 @@ export default function Login() {
               </a>
             </p>
           </form>
+
+          <BiometricButton />
 
           <p
             style={{

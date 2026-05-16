@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
@@ -6,6 +6,8 @@ import Axios from "axios";
 import SiteHeader from "../components/SiteHeader";
 import { useAuth } from "@/context/UserContext";
 import { useTranslations } from "next-intl";
+import { usePasskey } from "@/hooks/usePasskey";
+import { Fingerprint, Loader2, Trash2, Plus } from "lucide-react";
 
 const API = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
 
@@ -172,6 +174,7 @@ export default function SettingsPage() {
             onSaved={(phone) => setProfile((p) => (p ? { ...p, phone } : p))}
           />
           <ChangePasswordForm />
+          <PasskeySection />
           <DeleteAccountSection />
         </div>
       </main>
@@ -694,6 +697,148 @@ function ChangePasswordForm() {
 }
 
 // â”€â”€ 6. Delete account â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+// ── Biometrics & Passkeys ────────────────────────────────────────────────────
+function PasskeySection() {
+  const {
+    isAvailable,
+    checkingAvailability,
+    registerPasskey,
+    registerLoading,
+    registerError,
+    passkeys,
+    listLoading,
+    refreshPasskeys,
+    removePasskey,
+    removeLoading,
+  } = usePasskey();
+
+  const [deviceName, setDeviceName] = useState("");
+  const [showInput, setShowInput] = useState(false);
+
+  useEffect(() => { refreshPasskeys(); }, [refreshPasskeys]);
+
+  if (checkingAvailability) return null;
+  if (!isAvailable) return null;
+
+  return (
+    <Section
+      title="Biometrics & Passkeys"
+      subtitle="Sign in with your device biometrics — fingerprint, Face ID, or Windows Hello. No password required."
+    >
+      {listLoading ? (
+        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", color: "var(--color-text-muted)", fontSize: "0.875rem" }}>
+          <Loader2 size={15} style={{ animation: "spin 1s linear infinite" }} />
+          Loading\u2026
+        </div>
+      ) : passkeys.length === 0 ? (
+        <p style={{ fontSize: "0.875rem", color: "var(--color-text-muted)", marginBottom: "1rem" }}>
+          No passkeys registered yet on this account.
+        </p>
+      ) : (
+        <ul style={{ listStyle: "none", padding: 0, margin: "0 0 1.25rem" }}>
+          {passkeys.map((pk) => (
+            <li
+              key={pk.id}
+              style={{
+                display: "flex", alignItems: "center", justifyContent: "space-between",
+                padding: "0.75rem 1rem", borderRadius: "0.5rem",
+                background: "var(--color-cloud, #f8fafc)", marginBottom: "0.625rem",
+                border: "1px solid var(--color-border, #e2e8f0)",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: "0.625rem" }}>
+                <Fingerprint size={18} color="var(--color-primary)" />
+                <div>
+                  <p style={{ margin: 0, fontWeight: 600, fontSize: "0.9375rem", color: "var(--color-text-heading)" }}>
+                    {pk.device_name ?? "Unnamed device"}
+                  </p>
+                  <p style={{ margin: 0, fontSize: "0.8125rem", color: "var(--color-text-muted)" }}>
+                    Added {new Date(pk.created_at).toLocaleDateString()}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => removePasskey(pk.id)}
+                disabled={removeLoading === pk.id}
+                style={{
+                  background: "none", border: "none",
+                  cursor: removeLoading === pk.id ? "default" : "pointer",
+                  color: "var(--color-danger, #dc2626)",
+                  padding: "0.375rem", borderRadius: "0.375rem",
+                  opacity: removeLoading === pk.id ? 0.5 : 1,
+                }}
+              >
+                {removeLoading === pk.id
+                  ? <Loader2 size={16} style={{ animation: "spin 1s linear infinite" }} />
+                  : <Trash2 size={16} />}
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {registerError && (
+        <div className="alert alert-danger" style={{ marginBottom: "1rem" }}>
+          {registerError}
+        </div>
+      )}
+
+      {showInput ? (
+        <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+          <input
+            className="input"
+            placeholder="Device name (optional, e.g. My iPhone)"
+            value={deviceName}
+            onChange={(e) => setDeviceName(e.target.value)}
+            maxLength={60}
+          />
+          <div style={{ display: "flex", gap: "0.75rem" }}>
+            <button
+              type="button"
+              className="btn-primary"
+              onClick={async () => {
+                const ok = await registerPasskey(deviceName.trim() || undefined);
+                if (ok === true) { await refreshPasskeys(); setShowInput(false); setDeviceName(""); }
+              }}
+              disabled={registerLoading}
+              style={{ flex: 1, justifyContent: "center", padding: "0.6875rem" }}
+            >
+              {registerLoading ? "Registering\u2026" : "Register this device"}
+            </button>
+            <button
+              type="button"
+              onClick={() => { setShowInput(false); setDeviceName(""); }}
+              style={{
+                padding: "0.6875rem 1rem", borderRadius: "var(--radius-btn, 0.5rem)",
+                border: "1.5px solid var(--color-border, #e2e8f0)", background: "none",
+                cursor: "pointer", fontSize: "0.875rem", fontWeight: 500,
+              }}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      ) : (
+        <button
+          type="button"
+          onClick={() => setShowInput(true)}
+          style={{
+            display: "inline-flex", alignItems: "center", gap: "0.5rem",
+            padding: "0.625rem 1.125rem", borderRadius: "var(--radius-btn, 0.5rem)",
+            border: "1.5px solid var(--color-primary)", background: "none",
+            color: "var(--color-primary)", fontWeight: 600, fontSize: "0.9375rem", cursor: "pointer",
+          }}
+        >
+          <Plus size={16} />
+          Add biometric
+        </button>
+      )}
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+    </Section>
+  );
+}
+
 function DeleteAccountSection() {
   const router = useRouter();
   const [showModal, setShowModal] = useState(false);

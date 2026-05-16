@@ -53,7 +53,14 @@ export default function LayoutShell({
         <DashboardSidebar />
 
         {/* Main content column */}
-        <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column" }}>
+        <div
+          style={{
+            flex: 1,
+            minWidth: 0,
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
           {/* Top navbar — visible only on mobile/tablet (lg: hidden) */}
           <div className="lg:hidden">
             <Navbar />

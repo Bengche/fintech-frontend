@@ -22,12 +22,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  FilePlus,
-  ArrowLeftRight,
-  BarChart2,
-  Settings,
-} from "lucide-react";
+import { FilePlus, ArrowLeftRight, BarChart2, Settings } from "lucide-react";
 import { haptic } from "@/hooks/useHaptic";
 
 interface NavItem {

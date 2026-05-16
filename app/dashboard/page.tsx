@@ -43,7 +43,6 @@ export default function Dashboard() {
   const [payError, setPayError] = useState("");
   const [payLoading, setPayLoading] = useState(false);
 
-
   const handleReleaseFunds = async () => {
     haptic("medium");
     if (!code || !invoiceNumber) return;
@@ -224,7 +223,13 @@ export default function Dashboard() {
                 </div>
 
                 {/* Right-side action row — search icon + refresh */}
-                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.5rem",
+                  }}
+                >
                   {/* Search / filter toggle */}
                   <button
                     onClick={() => {
@@ -251,21 +256,24 @@ export default function Dashboard() {
                         ? "var(--color-primary)"
                         : "var(--color-text-muted)",
                       cursor: "pointer",
-                      transition: "border-color 0.15s, background 0.15s, color 0.15s",
+                      transition:
+                        "border-color 0.15s, background 0.15s, color 0.15s",
                       flexShrink: 0,
                     }}
                     onMouseEnter={(e) => {
                       if (!showFilter) {
-                        (e.currentTarget as HTMLButtonElement).style.borderColor =
-                          "var(--color-primary)";
+                        (
+                          e.currentTarget as HTMLButtonElement
+                        ).style.borderColor = "var(--color-primary)";
                         (e.currentTarget as HTMLButtonElement).style.color =
                           "var(--color-primary)";
                       }
                     }}
                     onMouseLeave={(e) => {
                       if (!showFilter) {
-                        (e.currentTarget as HTMLButtonElement).style.borderColor =
-                          "var(--color-border)";
+                        (
+                          e.currentTarget as HTMLButtonElement
+                        ).style.borderColor = "var(--color-border)";
                         (e.currentTarget as HTMLButtonElement).style.color =
                           "var(--color-text-muted)";
                       }
@@ -316,7 +324,11 @@ export default function Dashboard() {
                       gap: "0.5rem",
                     }}
                   >
-                    <Search size={14} strokeWidth={2} color="var(--color-text-muted)" />
+                    <Search
+                      size={14}
+                      strokeWidth={2}
+                      color="var(--color-text-muted)"
+                    />
                     <span
                       style={{
                         fontSize: "0.8125rem",
