@@ -83,6 +83,20 @@ const STYLES = `
   .kila-chip:hover  { background: #FEF3C7 !important; border-color: #F59E0B !important; color: #92400E !important; }
   .kila-btn-close:hover { background: rgba(255,255,255,0.15) !important; }
   .kila-fab:hover   { transform: scale(1.07); box-shadow: 0 8px 28px rgba(245,158,11,0.5) !important; }
+
+  /*
+   * Bottom-nav clearance (screens below lg = 1024px).
+   * The mobile bottom nav is ~3.5rem (56px) + safe-area-inset-bottom.
+   * Raise the FAB and proactive bubble to sit visually above it.
+   */
+  @media (max-width: 1023px) {
+    .kila-fab {
+      bottom: calc(3.5rem + env(safe-area-inset-bottom, 0px) + 1rem) !important;
+    }
+    .kila-proactive-bubble {
+      bottom: calc(3.5rem + env(safe-area-inset-bottom, 0px) + 5.5rem) !important;
+    }
+  }
 `;
 
 // ── Simple markdown renderer (bold + line breaks only) ───────────────────────
@@ -600,6 +614,7 @@ export default function AiChatWidget() {
       {/* ── Proactive bubble ───────────────────────────────────────────────── */}
       {proactive && !open && (
         <div
+          className="kila-proactive-bubble"
           style={{
             position: "fixed",
             bottom: 112,

@@ -237,8 +237,8 @@ export default function ChatWindow({ invoice_number }: ChatWindowProps) {
                       isSystem || isModerator
                         ? "center"
                         : isSeller
-                        ? "flex-end"
-                        : "flex-start",
+                          ? "flex-end"
+                          : "flex-start",
                   }}
                 >
                   <div
@@ -246,20 +246,20 @@ export default function ChatWindow({ invoice_number }: ChatWindowProps) {
                       backgroundColor: isSystem
                         ? "#fef3c7"
                         : isModerator
-                        ? "#eff6ff"
-                        : isSeller
-                        ? "var(--color-primary)"
-                        : "var(--color-white)",
+                          ? "#eff6ff"
+                          : isSeller
+                            ? "var(--color-primary)"
+                            : "var(--color-white)",
                       color: isSeller
                         ? "var(--color-white)"
                         : "var(--color-text-body)",
                       border: isSystem
                         ? "1px solid #f59e0b"
                         : isModerator
-                        ? "1px solid #93c5fd"
-                        : isSeller
-                        ? "none"
-                        : "1px solid var(--color-border)",
+                          ? "1px solid #93c5fd"
+                          : isSeller
+                            ? "none"
+                            : "1px solid var(--color-border)",
                       borderRadius: "var(--radius-md)",
                       padding: "0.5rem 0.75rem",
                       fontSize: "0.875rem",
@@ -278,10 +278,10 @@ export default function ChatWindow({ invoice_number }: ChatWindowProps) {
                       {isSystem
                         ? "⚠️ System"
                         : isModerator
-                        ? "🛡️ Moderator"
-                        : isSeller
-                        ? t("youSeller")
-                        : `Buyer (${msg.sender_email})`}
+                          ? "🛡️ Moderator"
+                          : isSeller
+                            ? t("youSeller")
+                            : `Buyer (${msg.sender_email})`}
                     </p>
                     {msg.message && (
                       <p

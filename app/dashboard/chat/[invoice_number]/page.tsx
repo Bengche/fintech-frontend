@@ -28,7 +28,9 @@ export default function SellerChatPage() {
   const [errorMessage, setErrorMessage] = useState("");
   const [isSending, setIsSending] = useState(false);
   const [chatExists, setChatExists] = useState<boolean | null>(null);
-  const [invoicePaymentType, setInvoicePaymentType] = useState<string | undefined>(undefined);
+  const [invoicePaymentType, setInvoicePaymentType] = useState<
+    string | undefined
+  >(undefined);
   const bottomOfChat = useRef<HTMLDivElement>(null);
   const prevMsgCount = useRef(0);
 
@@ -56,7 +58,9 @@ export default function SellerChatPage() {
 
   // Detect milestone invoices to enable the multi-step dispute flow
   useEffect(() => {
-    Axios.get(`${API}/invoice/milestones/${invoice_number}`, { withCredentials: true })
+    Axios.get(`${API}/invoice/milestones/${invoice_number}`, {
+      withCredentials: true,
+    })
       .then((res) => {
         const ms = res.data.milestones || res.data || [];
         if (ms.length > 0) setInvoicePaymentType("installment");

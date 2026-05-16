@@ -9,9 +9,16 @@ const API = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
 
 export default function CreateInvoice({
   onCreated,
-}: { onCreated?: () => void } = {}) {
+  autoOpen = false,
+}: { onCreated?: () => void; autoOpen?: boolean } = {}) {
   const t = useTranslations("Invoice");
   const [openModal, setOpenModal] = useState(false);
+
+  // When rendered with autoOpen (e.g. from sidebar / bottom-nav link with
+  // ?action=create), open the modal immediately on mount.
+  useEffect(() => {
+    if (autoOpen) setOpenModal(true);
+  }, [autoOpen]);
   const [invoiceSuccess, setInvoiceSuccess] = useState("");
   const [invoiceError, setInvoiceError] = useState("");
   const [saveTemplateSuccess, setSaveTemplateSuccess] = useState("");
@@ -225,17 +232,19 @@ export default function CreateInvoice({
 
   return (
     <>
-      {/* Trigger button */}
-      <button
-        className="btn-primary"
-        onClick={() => {
-          haptic("medium");
-          setOpenModal(true);
-        }}
-        style={{ fontSize: "0.9375rem", padding: "0.625rem 1.5rem" }}
-      >
-        {t("create.trigger")}
-      </button>
+      {/* Trigger button — hidden when parent controls the modal via autoOpen */}
+      {!autoOpen && (
+        <button
+          className="btn-primary"
+          onClick={() => {
+            haptic("medium");
+            setOpenModal(true);
+          }}
+          style={{ fontSize: "0.9375rem", padding: "0.625rem 1.5rem" }}
+        >
+          {t("create.trigger")}
+        </button>
+      )}
 
       {/* Toast: success (outside modal so it persists after close) */}
       {invoiceSuccess && (

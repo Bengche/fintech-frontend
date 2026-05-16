@@ -40,7 +40,9 @@ export default function InvoicePage() {
   const router = useRouter();
 
   const [milestones, setMilestones] = useState<Milestone[]>([]);
-  const [milestoneLoadingId, setMilestoneLoadingId] = useState<number | null>(null);
+  const [milestoneLoadingId, setMilestoneLoadingId] = useState<number | null>(
+    null,
+  );
   const [milestoneActionMsg, setMilestoneActionMsg] = useState("");
   const [milestoneActionError, setMilestoneActionError] = useState("");
 
@@ -346,7 +348,11 @@ export default function InvoicePage() {
         {/* ── Milestone progress (installment invoices) ────────────── */}
         {invoiceStats.payment_type === "installment" &&
           milestones.length > 0 && (
-            <div id="milestones" className="card" style={{ marginBottom: "1.25rem" }}>
+            <div
+              id="milestones"
+              className="card"
+              style={{ marginBottom: "1.25rem" }}
+            >
               {/* Header */}
               <div
                 style={{
@@ -381,7 +387,8 @@ export default function InvoicePage() {
                   }}
                 >
                   {t("milestonesReleased", {
-                    done: milestones.filter((m) => m.status === "released").length,
+                    done: milestones.filter((m) => m.status === "released")
+                      .length,
                     total: milestones.length,
                   })}
                 </span>
@@ -429,28 +436,47 @@ export default function InvoicePage() {
 
               {/* Alerts */}
               {milestoneActionMsg && (
-                <div className="alert alert-success" style={{ marginBottom: "1rem" }}>
+                <div
+                  className="alert alert-success"
+                  style={{ marginBottom: "1rem" }}
+                >
                   {milestoneActionMsg}
                 </div>
               )}
               {milestoneActionError && (
-                <div className="alert alert-danger" style={{ marginBottom: "1rem" }}>
+                <div
+                  className="alert alert-danger"
+                  style={{ marginBottom: "1rem" }}
+                >
                   {milestoneActionError}
                 </div>
               )}
               {releaseSuccessId && (
-                <div className="alert alert-success" style={{ marginBottom: "1rem" }}>
+                <div
+                  className="alert alert-success"
+                  style={{ marginBottom: "1rem" }}
+                >
                   {t("releaseSuccess")}
                 </div>
               )}
               {releaseError && (
-                <div className="alert alert-danger" style={{ marginBottom: "1rem" }}>
+                <div
+                  className="alert alert-danger"
+                  style={{ marginBottom: "1rem" }}
+                >
                   {releaseError}
                 </div>
               )}
 
               {/* Milestone list */}
-              <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem", marginTop: "0.875rem" }}>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "0.75rem",
+                  marginTop: "0.875rem",
+                }}
+              >
                 {milestones.map((m, i) => {
                   const isSeller =
                     Number(currentUserId) === Number(invoiceStats.userid);
@@ -472,12 +498,13 @@ export default function InvoicePage() {
                           ? { bg: "#fee2e2", text: "#991b1b" }
                           : { bg: "#e5e7eb", text: "#374151" };
 
-                  const statusLabel = {
-                    released: "✓ Released",
-                    completed: "Awaiting your release",
-                    disputed: "Disputed",
-                    pending: "Pending",
-                  }[m.status] ?? m.status;
+                  const statusLabel =
+                    {
+                      released: "✓ Released",
+                      completed: "Awaiting your release",
+                      disputed: "Disputed",
+                      pending: "Pending",
+                    }[m.status] ?? m.status;
 
                   return (
                     <div
@@ -584,7 +611,8 @@ export default function InvoicePage() {
                         </strong>
                         {m.deadline && (
                           <>
-                            {" "}&middot;{" "}{t("due")}{" "}
+                            {" "}
+                            &middot; {t("due")}{" "}
                             {new Date(m.deadline).toLocaleDateString("en-GB", {
                               day: "2-digit",
                               month: "short",
@@ -638,8 +666,9 @@ export default function InvoicePage() {
                             </button>
                           )}
 
-                          {m.status === "completed" && !isSeller && (
-                            currentUserId ? (
+                          {m.status === "completed" &&
+                            !isSeller &&
+                            (currentUserId ? (
                               releaseConfirmId === m.id ? (
                                 <>
                                   <button
@@ -655,7 +684,9 @@ export default function InvoicePage() {
                                       color: "#fff",
                                       fontWeight: 700,
                                       fontSize: "0.875rem",
-                                      cursor: releaseLoading ? "not-allowed" : "pointer",
+                                      cursor: releaseLoading
+                                        ? "not-allowed"
+                                        : "pointer",
                                       opacity: releaseLoading ? 0.6 : 1,
                                       display: "flex",
                                       alignItems: "center",
@@ -722,8 +753,7 @@ export default function InvoicePage() {
                               >
                                 {t("checkEmailRelease")}
                               </p>
-                            )
-                          )}
+                            ))}
                         </div>
                       )}
                     </div>

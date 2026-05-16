@@ -51,7 +51,9 @@ export default function Navbar() {
   // Lock body scroll when drawer is open
   useEffect(() => {
     document.body.style.overflow = menuOpen ? "hidden" : "";
-    return () => { document.body.style.overflow = ""; };
+    return () => {
+      document.body.style.overflow = "";
+    };
   }, [menuOpen]);
 
   const locale = useLocale();
@@ -67,7 +69,9 @@ export default function Navbar() {
     setMenuOpen(false);
     try {
       await axios.post(`${API_URL}/auth/logout`, {}, { withCredentials: true });
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
     setUser_id(null);
     setUsername(null);
     localStorage.removeItem("token");
@@ -75,9 +79,18 @@ export default function Navbar() {
   };
 
   const GlobeSVG = (
-    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24"
-      fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"
-      strokeLinejoin="round" style={{ flexShrink: 0 }}>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="13"
+      height="13"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      style={{ flexShrink: 0 }}
+    >
       <circle cx="12" cy="12" r="10" />
       <line x1="2" y1="12" x2="22" y2="12" />
       <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
@@ -138,37 +151,76 @@ export default function Navbar() {
 
       <nav
         style={{
-          position: "fixed", top: 0, left: 0, right: 0, zIndex: 50,
-          transition: "background-color 0.38s ease, box-shadow 0.38s ease, border-color 0.38s ease",
-          backgroundColor: scrolled ? "rgba(10,20,50,0.72)" : "var(--color-primary)",
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          zIndex: 50,
+          transition:
+            "background-color 0.38s ease, box-shadow 0.38s ease, border-color 0.38s ease",
+          backgroundColor: scrolled
+            ? "rgba(10,20,50,0.72)"
+            : "var(--color-primary)",
           backdropFilter: scrolled ? "blur(10px) saturate(1.6)" : "none",
           WebkitBackdropFilter: scrolled ? "blur(10px) saturate(1.6)" : "none",
           boxShadow: scrolled ? "0 1px 0 rgba(255,255,255,0.08)" : "none",
-          borderBottom: scrolled ? "1px solid rgba(255,255,255,0.12)" : "1px solid rgba(255,255,255,0.07)",
+          borderBottom: scrolled
+            ? "1px solid rgba(255,255,255,0.12)"
+            : "1px solid rgba(255,255,255,0.07)",
         }}
       >
-        <div style={{
-          maxWidth: "1200px", margin: "0 auto", padding: "0 1.25rem",
-          display: "flex", alignItems: "center", justifyContent: "space-between", height: "62px", position: "relative",
-        }}>
+        <div
+          style={{
+            maxWidth: "1200px",
+            margin: "0 auto",
+            padding: "0 1.25rem",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            height: "62px",
+            position: "relative",
+          }}
+        >
           {/* Logo */}
-          <Link href="/" style={{ display: "flex", alignItems: "center", textDecoration: "none" }} aria-label="Fonlok home">
+          <Link
+            href="/"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              textDecoration: "none",
+            }}
+            aria-label="Fonlok home"
+          >
             <FonlokLogo variant="light" iconSize={30} />
           </Link>
 
           {/* Mobile-only centred notification bell */}
           {user_id && (
-            <div className="flex md:hidden" style={{
-              position: "absolute", left: "50%", top: "50%",
-              transform: "translate(-50%, -50%)", pointerEvents: "auto", zIndex: 1,
-            }}>
-              <NotificationBell notifications={notifData.notifications} unreadCount={notifData.unreadCount}
-                markRead={notifData.markRead} markAllRead={notifData.markAllRead} />
+            <div
+              className="flex md:hidden"
+              style={{
+                position: "absolute",
+                left: "50%",
+                top: "50%",
+                transform: "translate(-50%, -50%)",
+                pointerEvents: "auto",
+                zIndex: 1,
+              }}
+            >
+              <NotificationBell
+                notifications={notifData.notifications}
+                unreadCount={notifData.unreadCount}
+                markRead={notifData.markRead}
+                markAllRead={notifData.markAllRead}
+              />
             </div>
           )}
 
           {/* ── Desktop links ──────────────────────────────── */}
-          <div style={{ alignItems: "center", gap: "0.25rem" }} className="hidden md:flex">
+          <div
+            style={{ alignItems: "center", gap: "0.25rem" }}
+            className="hidden md:flex"
+          >
             {user_id ? (
               <>
                 <NavLink href="/dashboard">{t("dashboard")}</NavLink>
@@ -176,41 +228,100 @@ export default function Navbar() {
                 <NavLink href="/purchases">{t("myPurchases")}</NavLink>
                 <NavLink href="/referral">{t("referral")}</NavLink>
                 <NavLink href="/verify">Verify Receipt</NavLink>
-                {username && <NavLink href={`/profile/${username}`}>{t("profile")}</NavLink>}
+                {username && (
+                  <NavLink href={`/profile/${username}`}>
+                    {t("profile")}
+                  </NavLink>
+                )}
                 <NavLink href="/settings">{t("settings")}</NavLink>
-                <NotificationBell notifications={notifData.notifications} unreadCount={notifData.unreadCount}
-                  markRead={notifData.markRead} markAllRead={notifData.markAllRead} />
-                <button onClick={switchLocale}
+                <NotificationBell
+                  notifications={notifData.notifications}
+                  unreadCount={notifData.unreadCount}
+                  markRead={notifData.markRead}
+                  markAllRead={notifData.markAllRead}
+                />
+                <button
+                  onClick={switchLocale}
                   aria-label={`Switch language – currently ${locale.toUpperCase()}`}
-                  title={locale === "en" ? "Passer en français" : "Switch to English"}
-                  style={{ display:"flex",alignItems:"center",gap:"0.35rem",padding:"0.32rem 0.75rem",
-                    borderRadius:"999px",border:"1.5px solid rgba(255,255,255,0.22)",
-                    background:"rgba(255,255,255,0.07)",color:"rgba(255,255,255,0.9)",
-                    fontWeight:700,fontSize:"0.78rem",letterSpacing:"0.07em",cursor:"pointer",
-                    transition:"border-color 0.15s,background 0.15s",whiteSpace:"nowrap" }}
-                  onMouseEnter={(e)=>{ const b=e.currentTarget as HTMLButtonElement;
-                    b.style.borderColor="rgba(255,255,255,0.55)";b.style.background="rgba(255,255,255,0.14)"; }}
-                  onMouseLeave={(e)=>{ const b=e.currentTarget as HTMLButtonElement;
-                    b.style.borderColor="rgba(255,255,255,0.22)";b.style.background="rgba(255,255,255,0.07)"; }}
-                >{GlobeSVG}{locale === "en" ? "Français" : "English"}</button>
-                <button onClick={handleLogout}
-                  style={{ marginLeft:"0.75rem",padding:"0.45rem 1.1rem",borderRadius:"var(--radius-md)",
-                    border:"1.5px solid rgba(255,255,255,0.25)",background:"transparent",
-                    color:"rgba(255,255,255,0.8)",fontWeight:600,fontSize:"0.875rem",cursor:"pointer",
-                    transition:"border-color 0.15s,color 0.15s" }}
-                  onMouseEnter={(e)=>{ (e.currentTarget as HTMLButtonElement).style.borderColor="rgba(255,255,255,0.6)";
-                    (e.currentTarget as HTMLButtonElement).style.color="#fff"; }}
-                  onMouseLeave={(e)=>{ (e.currentTarget as HTMLButtonElement).style.borderColor="rgba(255,255,255,0.25)";
-                    (e.currentTarget as HTMLButtonElement).style.color="rgba(255,255,255,0.8)"; }}
-                >{t("logOut")}</button>
+                  title={
+                    locale === "en" ? "Passer en français" : "Switch to English"
+                  }
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.35rem",
+                    padding: "0.32rem 0.75rem",
+                    borderRadius: "999px",
+                    border: "1.5px solid rgba(255,255,255,0.22)",
+                    background: "rgba(255,255,255,0.07)",
+                    color: "rgba(255,255,255,0.9)",
+                    fontWeight: 700,
+                    fontSize: "0.78rem",
+                    letterSpacing: "0.07em",
+                    cursor: "pointer",
+                    transition: "border-color 0.15s,background 0.15s",
+                    whiteSpace: "nowrap",
+                  }}
+                  onMouseEnter={(e) => {
+                    const b = e.currentTarget as HTMLButtonElement;
+                    b.style.borderColor = "rgba(255,255,255,0.55)";
+                    b.style.background = "rgba(255,255,255,0.14)";
+                  }}
+                  onMouseLeave={(e) => {
+                    const b = e.currentTarget as HTMLButtonElement;
+                    b.style.borderColor = "rgba(255,255,255,0.22)";
+                    b.style.background = "rgba(255,255,255,0.07)";
+                  }}
+                >
+                  {GlobeSVG}
+                  {locale === "en" ? "Français" : "English"}
+                </button>
+                <button
+                  onClick={handleLogout}
+                  style={{
+                    marginLeft: "0.75rem",
+                    padding: "0.45rem 1.1rem",
+                    borderRadius: "var(--radius-md)",
+                    border: "1.5px solid rgba(255,255,255,0.25)",
+                    background: "transparent",
+                    color: "rgba(255,255,255,0.8)",
+                    fontWeight: 600,
+                    fontSize: "0.875rem",
+                    cursor: "pointer",
+                    transition: "border-color 0.15s,color 0.15s",
+                  }}
+                  onMouseEnter={(e) => {
+                    (e.currentTarget as HTMLButtonElement).style.borderColor =
+                      "rgba(255,255,255,0.6)";
+                    (e.currentTarget as HTMLButtonElement).style.color = "#fff";
+                  }}
+                  onMouseLeave={(e) => {
+                    (e.currentTarget as HTMLButtonElement).style.borderColor =
+                      "rgba(255,255,255,0.25)";
+                    (e.currentTarget as HTMLButtonElement).style.color =
+                      "rgba(255,255,255,0.8)";
+                  }}
+                >
+                  {t("logOut")}
+                </button>
               </>
             ) : (
               <>
                 <NavLink href="/verify">Verify Receipt</NavLink>
                 <NavLink href="/login">{t("signIn")}</NavLink>
-                <Link href="/register" style={{ marginLeft:"0.5rem",padding:"0.45rem 1.25rem",
-                  borderRadius:"var(--radius-md)",background:"var(--color-accent)",
-                  color:"var(--color-primary)",fontWeight:700,fontSize:"0.875rem",textDecoration:"none" }}>
+                <Link
+                  href="/register"
+                  style={{
+                    marginLeft: "0.5rem",
+                    padding: "0.45rem 1.25rem",
+                    borderRadius: "var(--radius-md)",
+                    background: "var(--color-accent)",
+                    color: "var(--color-primary)",
+                    fontWeight: 700,
+                    fontSize: "0.875rem",
+                    textDecoration: "none",
+                  }}
+                >
                   {t("getStarted")}
                 </Link>
               </>
@@ -218,27 +329,67 @@ export default function Navbar() {
           </div>
 
           {/* ── Mobile right controls ──────────────────────── */}
-          <div className="flex md:hidden" style={{ alignItems:"center",gap:"0.25rem" }}>
+          <div
+            className="flex md:hidden"
+            style={{ alignItems: "center", gap: "0.25rem" }}
+          >
             {/* Hamburger / X */}
             <button
-              onClick={() => { haptic("soft"); setMenuOpen((v) => !v); }}
+              onClick={() => {
+                haptic("soft");
+                setMenuOpen((v) => !v);
+              }}
               aria-label={menuOpen ? "Close menu" : "Open menu"}
               aria-expanded={menuOpen}
-              style={{ background: menuOpen ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.07)",
-                border:"1.5px solid rgba(255,255,255,0.18)",borderRadius:"9px",cursor:"pointer",
-                padding:"0.45rem",display:"flex",alignItems:"center",justifyContent:"center",
-                transition:"background 0.18s",width:"38px",height:"38px" }}
+              style={{
+                background: menuOpen
+                  ? "rgba(255,255,255,0.12)"
+                  : "rgba(255,255,255,0.07)",
+                border: "1.5px solid rgba(255,255,255,0.18)",
+                borderRadius: "9px",
+                cursor: "pointer",
+                padding: "0.45rem",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                transition: "background 0.18s",
+                width: "38px",
+                height: "38px",
+              }}
             >
-              {menuOpen
-                ? <X size={18} color="rgba(255,255,255,0.9)" strokeWidth={2.2} />
-                : (
-                  <svg width="18" height="14" viewBox="0 0 18 14" fill="none" aria-hidden="true">
-                    <rect y="0" width="18" height="2" rx="1" fill="rgba(255,255,255,0.85)" />
-                    <rect y="6" width="13" height="2" rx="1" fill="rgba(255,255,255,0.85)" />
-                    <rect y="12" width="18" height="2" rx="1" fill="rgba(255,255,255,0.85)" />
-                  </svg>
-                )
-              }
+              {menuOpen ? (
+                <X size={18} color="rgba(255,255,255,0.9)" strokeWidth={2.2} />
+              ) : (
+                <svg
+                  width="18"
+                  height="14"
+                  viewBox="0 0 18 14"
+                  fill="none"
+                  aria-hidden="true"
+                >
+                  <rect
+                    y="0"
+                    width="18"
+                    height="2"
+                    rx="1"
+                    fill="rgba(255,255,255,0.85)"
+                  />
+                  <rect
+                    y="6"
+                    width="13"
+                    height="2"
+                    rx="1"
+                    fill="rgba(255,255,255,0.85)"
+                  />
+                  <rect
+                    y="12"
+                    width="18"
+                    height="2"
+                    rx="1"
+                    fill="rgba(255,255,255,0.85)"
+                  />
+                </svg>
+              )}
             </button>
           </div>
         </div>
@@ -246,99 +397,260 @@ export default function Navbar() {
 
       {/* ── Mobile slide-in drawer ─────────────────────────────────────────── */}
       {menuOpen && (
-        <div className="md:hidden" style={{ position:"fixed",inset:0,zIndex:49 }}>
+        <div
+          className="md:hidden"
+          style={{ position: "fixed", inset: 0, zIndex: 49 }}
+        >
           {/* Backdrop */}
           <div
             className="nav-backdrop-overlay"
             onClick={() => setMenuOpen(false)}
-            style={{ position:"absolute",inset:0,background:"rgba(4,10,25,0.65)",
-              backdropFilter:"blur(3px)", WebkitBackdropFilter:"blur(3px)" } as React.CSSProperties}
+            style={
+              {
+                position: "absolute",
+                inset: 0,
+                background: "rgba(4,10,25,0.65)",
+                backdropFilter: "blur(3px)",
+                WebkitBackdropFilter: "blur(3px)",
+              } as React.CSSProperties
+            }
           />
 
           {/* Panel */}
           <div
             ref={drawerRef}
             className="nav-drawer-panel"
-            style={{ position:"absolute",top:0,right:0,bottom:0,
-              width:"min(82vw,320px)",
-              background:"linear-gradient(168deg,#0d1e42 0%,#091526 100%)",
-              boxShadow:"-8px 0 40px rgba(0,0,0,0.5)",
-              display:"flex",flexDirection:"column",overflowY:"auto",overflowX:"hidden" }}
+            style={{
+              position: "absolute",
+              top: 0,
+              right: 0,
+              bottom: 0,
+              width: "min(82vw,320px)",
+              background: "linear-gradient(168deg,#0d1e42 0%,#091526 100%)",
+              boxShadow: "-8px 0 40px rgba(0,0,0,0.5)",
+              display: "flex",
+              flexDirection: "column",
+              overflowY: "auto",
+              overflowX: "hidden",
+            }}
           >
             {/* Panel header */}
-            <div style={{ display:"flex",alignItems:"center",justifyContent:"space-between",
-              padding:"1rem 1.125rem",borderBottom:"1px solid rgba(255,255,255,0.09)",flexShrink:0 }}>
-              <Link href="/" onClick={() => setMenuOpen(false)} style={{ textDecoration:"none" }}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                padding: "1rem 1.125rem",
+                borderBottom: "1px solid rgba(255,255,255,0.09)",
+                flexShrink: 0,
+              }}
+            >
+              <Link
+                href="/"
+                onClick={() => setMenuOpen(false)}
+                style={{ textDecoration: "none" }}
+              >
                 <FonlokLogo variant="light" iconSize={26} />
               </Link>
-
             </div>
 
             {/* Links */}
-            <div style={{ flex:1,padding:"0.625rem 0.875rem" }}>
+            <div style={{ flex: 1, padding: "0.625rem 0.875rem" }}>
               {user_id ? (
                 <>
                   {/* User identity */}
                   {username && (
-                    <div style={{ display:"flex",alignItems:"center",gap:"0.75rem",
-                      padding:"0.75rem 0.875rem",marginBottom:"0.25rem",
-                      borderRadius:"10px",background:"rgba(255,255,255,0.06)" }}>
-                      <div style={{ width:"2.25rem",height:"2.25rem",borderRadius:"50%",
-                        background:"linear-gradient(135deg,var(--color-accent) 0%,#f59e0b 100%)",
-                        color:"var(--color-primary)",display:"flex",alignItems:"center",
-                        justifyContent:"center",fontWeight:800,fontSize:"1rem",flexShrink:0 }}>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "0.75rem",
+                        padding: "0.75rem 0.875rem",
+                        marginBottom: "0.25rem",
+                        borderRadius: "10px",
+                        background: "rgba(255,255,255,0.06)",
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: "2.25rem",
+                          height: "2.25rem",
+                          borderRadius: "50%",
+                          background:
+                            "linear-gradient(135deg,var(--color-accent) 0%,#f59e0b 100%)",
+                          color: "var(--color-primary)",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          fontWeight: 800,
+                          fontSize: "1rem",
+                          flexShrink: 0,
+                        }}
+                      >
                         {username.charAt(0).toUpperCase()}
                       </div>
-                      <div style={{ minWidth:0 }}>
-                        <p style={{ margin:0,fontWeight:700,fontSize:"0.875rem",color:"#fff",
-                          overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap" }}>{username}</p>
-                        <p style={{ margin:0,fontSize:"0.72rem",color:"rgba(255,255,255,0.4)" }}>@{username}</p>
+                      <div style={{ minWidth: 0 }}>
+                        <p
+                          style={{
+                            margin: 0,
+                            fontWeight: 700,
+                            fontSize: "0.875rem",
+                            color: "#fff",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          {username}
+                        </p>
+                        <p
+                          style={{
+                            margin: 0,
+                            fontSize: "0.72rem",
+                            color: "rgba(255,255,255,0.4)",
+                          }}
+                        >
+                          @{username}
+                        </p>
                       </div>
                     </div>
                   )}
 
                   <div className="nav-mob-divider" />
 
-                  <MobItem href="/dashboard" icon={<LayoutDashboard size={15} strokeWidth={2} />}>{t("dashboard")}</MobItem>
-                  <MobItem href="/transactions" icon={<ArrowLeftRight size={15} strokeWidth={2} />}>{t("transactions")}</MobItem>
-                  <MobItem href="/purchases" icon={<ShoppingBag size={15} strokeWidth={2} />}>{t("myPurchases")}</MobItem>
-                  <MobItem href="/referral" icon={<Gift size={15} strokeWidth={2} />}>{t("referral")}</MobItem>
-                  <MobItem href="/verify" icon={<BadgeCheck size={15} strokeWidth={2} />}>Verify Receipt</MobItem>
-                  {username && <MobItem href={`/profile/${username}`} icon={<User size={15} strokeWidth={2} />}>{t("profile")}</MobItem>}
-                  <MobItem href="/settings" icon={<Settings size={15} strokeWidth={2} />}>{t("settings")}</MobItem>
+                  <MobItem
+                    href="/dashboard"
+                    icon={<LayoutDashboard size={15} strokeWidth={2} />}
+                  >
+                    {t("dashboard")}
+                  </MobItem>
+                  <MobItem
+                    href="/transactions"
+                    icon={<ArrowLeftRight size={15} strokeWidth={2} />}
+                  >
+                    {t("transactions")}
+                  </MobItem>
+                  <MobItem
+                    href="/purchases"
+                    icon={<ShoppingBag size={15} strokeWidth={2} />}
+                  >
+                    {t("myPurchases")}
+                  </MobItem>
+                  <MobItem
+                    href="/referral"
+                    icon={<Gift size={15} strokeWidth={2} />}
+                  >
+                    {t("referral")}
+                  </MobItem>
+                  <MobItem
+                    href="/verify"
+                    icon={<BadgeCheck size={15} strokeWidth={2} />}
+                  >
+                    Verify Receipt
+                  </MobItem>
+                  {username && (
+                    <MobItem
+                      href={`/profile/${username}`}
+                      icon={<User size={15} strokeWidth={2} />}
+                    >
+                      {t("profile")}
+                    </MobItem>
+                  )}
+                  <MobItem
+                    href="/settings"
+                    icon={<Settings size={15} strokeWidth={2} />}
+                  >
+                    {t("settings")}
+                  </MobItem>
 
                   <div className="nav-mob-divider" />
 
                   {/* Language */}
-                  <button className="nav-mob-link"
-                    onClick={() => { switchLocale(); setMenuOpen(false); }}>
-                    <span className="nav-mob-icon"><Globe size={15} strokeWidth={2} color="rgba(255,255,255,0.8)" /></span>
-                    {locale === "en" ? "English → Français" : "Français → English"}
+                  <button
+                    className="nav-mob-link"
+                    onClick={() => {
+                      switchLocale();
+                      setMenuOpen(false);
+                    }}
+                  >
+                    <span className="nav-mob-icon">
+                      <Globe
+                        size={15}
+                        strokeWidth={2}
+                        color="rgba(255,255,255,0.8)"
+                      />
+                    </span>
+                    {locale === "en"
+                      ? "English → Français"
+                      : "Français → English"}
                   </button>
 
                   {/* Logout */}
-                  <button className="nav-mob-link" onClick={handleLogout}
-                    style={{ color:"rgba(255,110,110,0.9)" } as React.CSSProperties}>
-                    <span className="nav-mob-icon" style={{ background:"rgba(255,80,80,0.13)" }}>
-                      <LogOut size={15} strokeWidth={2} color="rgba(255,110,110,0.9)" />
+                  <button
+                    className="nav-mob-link"
+                    onClick={handleLogout}
+                    style={
+                      { color: "rgba(255,110,110,0.9)" } as React.CSSProperties
+                    }
+                  >
+                    <span
+                      className="nav-mob-icon"
+                      style={{ background: "rgba(255,80,80,0.13)" }}
+                    >
+                      <LogOut
+                        size={15}
+                        strokeWidth={2}
+                        color="rgba(255,110,110,0.9)"
+                      />
                     </span>
                     {t("logOut")}
                   </button>
                 </>
               ) : (
                 <>
-                  <MobItem href="/verify" icon={<BadgeCheck size={15} strokeWidth={2} />}>Verify Receipt</MobItem>
+                  <MobItem
+                    href="/verify"
+                    icon={<BadgeCheck size={15} strokeWidth={2} />}
+                  >
+                    Verify Receipt
+                  </MobItem>
                   <div className="nav-mob-divider" />
-                  <MobItem href="/login" icon={<LogIn size={15} strokeWidth={2} />}>{t("signIn")}</MobItem>
+                  <MobItem
+                    href="/login"
+                    icon={<LogIn size={15} strokeWidth={2} />}
+                  >
+                    {t("signIn")}
+                  </MobItem>
                   {/* Get Started CTA */}
-                  <Link href="/register" onClick={() => setMenuOpen(false)}
-                    style={{ display:"flex",alignItems:"center",gap:"0.875rem",
-                      padding:"0.7rem 0.875rem",borderRadius:"10px",
-                      background:"var(--color-accent)",color:"var(--color-primary)",
-                      fontSize:"0.9375rem",fontWeight:700,textDecoration:"none",marginTop:"0.25rem" }}>
-                    <span style={{ display:"flex",alignItems:"center",justifyContent:"center",
-                      width:"1.9rem",height:"1.9rem",borderRadius:"8px",
-                      background:"rgba(255,255,255,0.25)",flexShrink:0 }}>
+                  <Link
+                    href="/register"
+                    onClick={() => setMenuOpen(false)}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "0.875rem",
+                      padding: "0.7rem 0.875rem",
+                      borderRadius: "10px",
+                      background: "var(--color-accent)",
+                      color: "var(--color-primary)",
+                      fontSize: "0.9375rem",
+                      fontWeight: 700,
+                      textDecoration: "none",
+                      marginTop: "0.25rem",
+                    }}
+                  >
+                    <span
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        width: "1.9rem",
+                        height: "1.9rem",
+                        borderRadius: "8px",
+                        background: "rgba(255,255,255,0.25)",
+                        flexShrink: 0,
+                      }}
+                    >
                       <UserPlus size={15} strokeWidth={2} />
                     </span>
                     {t("getStarted")}
@@ -348,9 +660,22 @@ export default function Navbar() {
             </div>
 
             {/* Panel footer */}
-            <div style={{ padding:"0.875rem 1.125rem",borderTop:"1px solid rgba(255,255,255,0.07)",flexShrink:0 }}>
-              <p style={{ margin:0,fontSize:"0.68rem",color:"rgba(255,255,255,0.22)",
-                textAlign:"center",letterSpacing:"0.04em" }}>
+            <div
+              style={{
+                padding: "0.875rem 1.125rem",
+                borderTop: "1px solid rgba(255,255,255,0.07)",
+                flexShrink: 0,
+              }}
+            >
+              <p
+                style={{
+                  margin: 0,
+                  fontSize: "0.68rem",
+                  color: "rgba(255,255,255,0.22)",
+                  textAlign: "center",
+                  letterSpacing: "0.04em",
+                }}
+              >
                 © {new Date().getFullYear()} Fonlok · Secure Escrow
               </p>
             </div>
@@ -362,26 +687,52 @@ export default function Navbar() {
 }
 
 // ── Desktop NavLink ──────────────────────────────────────────────────────────
-function NavLink({ href, children }: { href: string; children: React.ReactNode }) {
+function NavLink({
+  href,
+  children,
+}: {
+  href: string;
+  children: React.ReactNode;
+}) {
   return (
-    <Link href={href}
-      style={{ padding:"0.4rem 0.85rem",borderRadius:"var(--radius-sm)",
-        color:"rgba(255,255,255,0.75)",fontWeight:500,fontSize:"0.9rem",
-        textDecoration:"none",transition:"color 0.15s,background-color 0.15s" }}
+    <Link
+      href={href}
+      style={{
+        padding: "0.4rem 0.85rem",
+        borderRadius: "var(--radius-sm)",
+        color: "rgba(255,255,255,0.75)",
+        fontWeight: 500,
+        fontSize: "0.9rem",
+        textDecoration: "none",
+        transition: "color 0.15s,background-color 0.15s",
+      }}
       onMouseEnter={(e) => {
         (e.currentTarget as HTMLAnchorElement).style.color = "#fff";
-        (e.currentTarget as HTMLAnchorElement).style.backgroundColor = "rgba(255,255,255,0.08)";
+        (e.currentTarget as HTMLAnchorElement).style.backgroundColor =
+          "rgba(255,255,255,0.08)";
       }}
       onMouseLeave={(e) => {
-        (e.currentTarget as HTMLAnchorElement).style.color = "rgba(255,255,255,0.75)";
-        (e.currentTarget as HTMLAnchorElement).style.backgroundColor = "transparent";
+        (e.currentTarget as HTMLAnchorElement).style.color =
+          "rgba(255,255,255,0.75)";
+        (e.currentTarget as HTMLAnchorElement).style.backgroundColor =
+          "transparent";
       }}
-    >{children}</Link>
+    >
+      {children}
+    </Link>
   );
 }
 
 // ── Mobile drawer item ───────────────────────────────────────────────────────
-function MobItem({ href, icon, children }: { href: string; icon: React.ReactNode; children: React.ReactNode }) {
+function MobItem({
+  href,
+  icon,
+  children,
+}: {
+  href: string;
+  icon: React.ReactNode;
+  children: React.ReactNode;
+}) {
   return (
     <Link href={href} className="nav-mob-link">
       <span className="nav-mob-icon">{icon}</span>

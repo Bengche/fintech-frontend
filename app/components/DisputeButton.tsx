@@ -36,9 +36,13 @@ export default function DisputeButton({
   const [modalStep, setModalStep] = useState<"scope" | "milestones" | "reason">(
     isMilestone ? "scope" : "reason",
   );
-  const [disputeScope, setDisputeScope] = useState<"full" | "milestone">("full");
+  const [disputeScope, setDisputeScope] = useState<"full" | "milestone">(
+    "full",
+  );
   const [milestones, setMilestones] = useState<Milestone[]>([]);
-  const [selectedMilestoneIds, setSelectedMilestoneIds] = useState<Set<number>>(new Set());
+  const [selectedMilestoneIds, setSelectedMilestoneIds] = useState<Set<number>>(
+    new Set(),
+  );
   const [loadingMilestones, setLoadingMilestones] = useState(false);
   const [reason, setReason] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
@@ -56,7 +60,9 @@ export default function DisputeButton({
     }
   }, [showModal, isMilestone, invoice_number, milestones.length]);
 
-  const unreleasedMilestones = milestones.filter((m) => m.status !== "released");
+  const unreleasedMilestones = milestones.filter(
+    (m) => m.status !== "released",
+  );
   const releasedMilestones = milestones.filter((m) => m.status === "released");
 
   const close = () => {
@@ -81,7 +87,9 @@ export default function DisputeButton({
       setModalStep("reason");
     } else {
       if (unreleasedMilestones.length === 0) {
-        setErrorMessage("All milestones have been paid out. Nothing left to dispute.");
+        setErrorMessage(
+          "All milestones have been paid out. Nothing left to dispute.",
+        );
         return;
       }
       setModalStep("milestones");
@@ -170,7 +178,10 @@ export default function DisputeButton({
           <ChevronLeft size={18} />
         </button>
       )}
-      <AlertTriangle size={20} style={{ color: "var(--color-danger)", flexShrink: 0 }} />
+      <AlertTriangle
+        size={20}
+        style={{ color: "var(--color-danger)", flexShrink: 0 }}
+      />
       <h3
         style={{
           fontSize: "1.0625rem",
@@ -194,11 +205,24 @@ export default function DisputeButton({
         </p>
       ) : (
         <>
-          <p style={{ fontSize: "0.875rem", color: "var(--color-text-body)", marginBottom: "1rem" }}>
+          <p
+            style={{
+              fontSize: "0.875rem",
+              color: "var(--color-text-body)",
+              marginBottom: "1rem",
+            }}
+          >
             {t("scopeLabel", { defaultMessage: "What is this dispute about?" })}
           </p>
 
-          <div style={{ display: "flex", flexDirection: "column", gap: "0.625rem", marginBottom: "1rem" }}>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "0.625rem",
+              marginBottom: "1rem",
+            }}
+          >
             <label
               style={{
                 display: "flex",
@@ -208,7 +232,10 @@ export default function DisputeButton({
                 padding: "0.625rem",
                 borderRadius: "var(--radius-sm)",
                 border: `1.5px solid ${disputeScope === "full" ? "var(--color-primary)" : "var(--color-border)"}`,
-                background: disputeScope === "full" ? "var(--color-primary-subtle, #eff6ff)" : "transparent",
+                background:
+                  disputeScope === "full"
+                    ? "var(--color-primary-subtle, #eff6ff)"
+                    : "transparent",
               }}
             >
               <input
@@ -223,7 +250,12 @@ export default function DisputeButton({
                 <div style={{ fontWeight: 600, fontSize: "0.875rem" }}>
                   {t("scopeFull", { defaultMessage: "Full Invoice" })}
                 </div>
-                <div style={{ fontSize: "0.8125rem", color: "var(--color-text-muted)" }}>
+                <div
+                  style={{
+                    fontSize: "0.8125rem",
+                    color: "var(--color-text-muted)",
+                  }}
+                >
                   Dispute all remaining unreleased milestones
                 </div>
                 {releasedMilestones.length > 0 && (
@@ -237,7 +269,8 @@ export default function DisputeButton({
                       borderRadius: "4px",
                     }}
                   >
-                    ⚠ {releasedMilestones.length} milestone(s) already paid — cannot be included
+                    ⚠ {releasedMilestones.length} milestone(s) already paid —
+                    cannot be included
                   </div>
                 )}
               </div>
@@ -252,7 +285,10 @@ export default function DisputeButton({
                 padding: "0.625rem",
                 borderRadius: "var(--radius-sm)",
                 border: `1.5px solid ${disputeScope === "milestone" ? "var(--color-primary)" : "var(--color-border)"}`,
-                background: disputeScope === "milestone" ? "var(--color-primary-subtle, #eff6ff)" : "transparent",
+                background:
+                  disputeScope === "milestone"
+                    ? "var(--color-primary-subtle, #eff6ff)"
+                    : "transparent",
               }}
             >
               <input
@@ -265,9 +301,16 @@ export default function DisputeButton({
               />
               <div>
                 <div style={{ fontWeight: 600, fontSize: "0.875rem" }}>
-                  {t("scopeMilestone", { defaultMessage: "Specific Milestones" })}
+                  {t("scopeMilestone", {
+                    defaultMessage: "Specific Milestones",
+                  })}
                 </div>
-                <div style={{ fontSize: "0.8125rem", color: "var(--color-text-muted)" }}>
+                <div
+                  style={{
+                    fontSize: "0.8125rem",
+                    color: "var(--color-text-muted)",
+                  }}
+                >
                   Choose only the milestones you want to dispute
                 </div>
               </div>
@@ -312,13 +355,31 @@ export default function DisputeButton({
   // ── Step 2: Milestone checkboxes ──────────────────────────────────────────
   const renderMilestonesStep = () => (
     <>
-      {renderStepHeader(() => { setModalStep("scope"); setErrorMessage(""); })}
+      {renderStepHeader(() => {
+        setModalStep("scope");
+        setErrorMessage("");
+      })}
 
-      <p style={{ fontSize: "0.875rem", color: "var(--color-text-body)", marginBottom: "0.75rem" }}>
-        {t("milestonesLabel", { defaultMessage: "Select the milestones to dispute:" })}
+      <p
+        style={{
+          fontSize: "0.875rem",
+          color: "var(--color-text-body)",
+          marginBottom: "0.75rem",
+        }}
+      >
+        {t("milestonesLabel", {
+          defaultMessage: "Select the milestones to dispute:",
+        })}
       </p>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem", marginBottom: "1rem" }}>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: "0.5rem",
+          marginBottom: "1rem",
+        }}
+      >
         {milestones.map((m) => {
           const isReleased = m.status === "released";
           const isSelected = selectedMilestoneIds.has(m.id);
@@ -335,8 +396,8 @@ export default function DisputeButton({
                 background: isReleased
                   ? "var(--color-surface-muted, #f8fafc)"
                   : isSelected
-                  ? "var(--color-primary-subtle, #eff6ff)"
-                  : "transparent",
+                    ? "var(--color-primary-subtle, #eff6ff)"
+                    : "transparent",
                 cursor: isReleased ? "not-allowed" : "pointer",
                 opacity: isReleased ? 0.6 : 1,
               }}
@@ -413,7 +474,10 @@ export default function DisputeButton({
   // ── Step 3: Reason (and final submit) ─────────────────────────────────────
   const renderReasonStep = () => {
     const onBack = isMilestone
-      ? () => { setModalStep(disputeScope === "milestone" ? "milestones" : "scope"); setErrorMessage(""); }
+      ? () => {
+          setModalStep(disputeScope === "milestone" ? "milestones" : "scope");
+          setErrorMessage("");
+        }
       : undefined;
     return (
       <>

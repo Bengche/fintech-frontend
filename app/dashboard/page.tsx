@@ -6,23 +6,29 @@ import RevenueStats from "../components/RevenueStats";
 import EscrowBalance from "../components/EscrowBalance";
 import { useState } from "react";
 import axios from "axios";
-import { useAuth } from "@/context/UserContext";
-import { useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { InlineSpinner } from "@/app/components/Spinner";
 import { useTranslations } from "next-intl";
 import { haptic } from "@/hooks/useHaptic";
+import { Search } from "lucide-react";
 
 const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
 
-type Tab = "invoices" | "filter" | "payment" | "stats";
+type Tab = "invoices" | "payment" | "stats";
 
 export default function Dashboard() {
-  const { user_id } = useAuth();
-  const router = useRouter();
+  const searchParams = useSearchParams();
   const t = useTranslations("Dashboard");
 
-  // Tab state
+  // When arriving via ?action=create (sidebar / bottom-nav shortcut),
+  // the CreateInvoice modal opens automatically.
+  const autoCreate = searchParams.get("action") === "create";
+
+  // Tab state — filter is no longer a tab, it lives inline
   const [activeTab, setActiveTab] = useState<Tab>("invoices");
+
+  // Controls the inline filter / search panel inside the invoices tab
+  const [showFilter, setShowFilter] = useState(false);
 
   // Holds the refresh function registered by <GetAllInvoices>
   const [triggerRefresh, setTriggerRefresh] = useState<(() => void) | null>(
@@ -37,24 +43,6 @@ export default function Dashboard() {
   const [payError, setPayError] = useState("");
   const [payLoading, setPayLoading] = useState(false);
 
-  // Profile navigation
-  const [profileLoading, setProfileLoading] = useState(false);
-
-  const goToMyProfile = async () => {
-    if (profileLoading) return;
-    setProfileLoading(true);
-    try {
-      const response = await axios.get(
-        `${API_URL}/profile/user-info/${user_id}`,
-        { withCredentials: true },
-      );
-      router.push(`/profile/${response.data.username}`);
-    } catch (err) {
-      console.log("Could not load profile:", err);
-    } finally {
-      setProfileLoading(false);
-    }
-  };
 
   const handleReleaseFunds = async () => {
     haptic("medium");
@@ -86,7 +74,6 @@ export default function Dashboard() {
 
   const tabs: { key: Tab; label: string }[] = [
     { key: "invoices", label: t("tabs.invoices") },
-    { key: "filter", label: t("tabs.filter") },
     { key: "payment", label: t("tabs.payment") },
     { key: "stats", label: t("tabs.stats") },
   ];
@@ -143,15 +130,15 @@ export default function Dashboard() {
           <EscrowBalance />
         </div>
 
-        {/* â”€â”€ Create invoice â€” primary CTA â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
-        <div style={{ marginTop: "1.25rem" }}>
-          <CreateInvoice
-            onCreated={() => {
-              setActiveTab("invoices");
-              triggerRefresh?.();
-            }}
-          />
-        </div>
+        {/* CreateInvoice modal — no button rendered here. Opens automatically  */}
+        {/* when arriving via ?action=create (sidebar or bottom-nav shortcut).  */}
+        <CreateInvoice
+          autoOpen={autoCreate}
+          onCreated={() => {
+            setActiveTab("invoices");
+            triggerRefresh?.();
+          }}
+        />
 
         {/* â”€â”€ Tab bar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         <div
@@ -201,7 +188,7 @@ export default function Dashboard() {
           {/* My Invoices */}
           {activeTab === "invoices" && (
             <div>
-              {/* Tab panel header */}
+              {/* Panel header */}
               <div
                 style={{
                   display: "flex",
@@ -209,7 +196,7 @@ export default function Dashboard() {
                   justifyContent: "space-between",
                   flexWrap: "wrap",
                   gap: "0.75rem",
-                  marginBottom: "1.25rem",
+                  marginBottom: showFilter ? "0.875rem" : "1.25rem",
                 }}
               >
                 <div>
@@ -233,25 +220,116 @@ export default function Dashboard() {
                     {t("invoicesTab.subtitle")}
                   </p>
                 </div>
-                <button
-                  className="btn-primary"
-                  disabled={refreshLoading}
-                  onClick={() => {
-                    if (triggerRefresh) {
-                      setRefreshLoading(true);
-                      triggerRefresh();
-                      setTimeout(() => setRefreshLoading(false), 1200);
-                    }
-                  }}
-                  style={{ fontSize: "0.875rem", padding: "0.45rem 1.1rem" }}
-                >
-                  {refreshLoading ? (
-                    <InlineSpinner size="xs" />
-                  ) : (
-                    t("invoicesTab.refresh")
-                  )}
-                </button>
+
+                {/* Right-side action row — search icon + refresh */}
+                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                  {/* Search / filter toggle */}
+                  <button
+                    onClick={() => {
+                      haptic("soft");
+                      setShowFilter((v) => !v);
+                    }}
+                    aria-label={showFilter ? "Close search" : "Search invoices"}
+                    aria-expanded={showFilter}
+                    title="Search & filter invoices"
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      width: "2.25rem",
+                      height: "2.25rem",
+                      borderRadius: "0.625rem",
+                      border: showFilter
+                        ? "1.5px solid var(--color-primary)"
+                        : "1.5px solid var(--color-border)",
+                      background: showFilter
+                        ? "var(--color-primary-light)"
+                        : "var(--color-white)",
+                      color: showFilter
+                        ? "var(--color-primary)"
+                        : "var(--color-text-muted)",
+                      cursor: "pointer",
+                      transition: "border-color 0.15s, background 0.15s, color 0.15s",
+                      flexShrink: 0,
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!showFilter) {
+                        (e.currentTarget as HTMLButtonElement).style.borderColor =
+                          "var(--color-primary)";
+                        (e.currentTarget as HTMLButtonElement).style.color =
+                          "var(--color-primary)";
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!showFilter) {
+                        (e.currentTarget as HTMLButtonElement).style.borderColor =
+                          "var(--color-border)";
+                        (e.currentTarget as HTMLButtonElement).style.color =
+                          "var(--color-text-muted)";
+                      }
+                    }}
+                  >
+                    <Search size={15} strokeWidth={2.1} />
+                  </button>
+
+                  {/* Refresh */}
+                  <button
+                    className="btn-primary"
+                    disabled={refreshLoading}
+                    onClick={() => {
+                      if (triggerRefresh) {
+                        setRefreshLoading(true);
+                        triggerRefresh();
+                        setTimeout(() => setRefreshLoading(false), 1200);
+                      }
+                    }}
+                    style={{ fontSize: "0.875rem", padding: "0.45rem 1.1rem" }}
+                  >
+                    {refreshLoading ? (
+                      <InlineSpinner size="xs" />
+                    ) : (
+                      t("invoicesTab.refresh")
+                    )}
+                  </button>
+                </div>
               </div>
+
+              {/* Inline filter panel — slides in below header */}
+              {showFilter && (
+                <div
+                  style={{
+                    borderRadius: "0.75rem",
+                    border: "1px solid var(--color-border)",
+                    background: "var(--color-white)",
+                    marginBottom: "1.25rem",
+                    overflow: "hidden",
+                  }}
+                >
+                  <div
+                    style={{
+                      padding: "0.625rem 1rem",
+                      borderBottom: "1px solid var(--color-border)",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "0.5rem",
+                    }}
+                  >
+                    <Search size={14} strokeWidth={2} color="var(--color-text-muted)" />
+                    <span
+                      style={{
+                        fontSize: "0.8125rem",
+                        fontWeight: 600,
+                        color: "var(--color-text-heading)",
+                      }}
+                    >
+                      Search & Filter
+                    </span>
+                  </div>
+                  <div style={{ padding: "0 1rem" }}>
+                    <FilterInvoice />
+                  </div>
+                </div>
+              )}
 
               <GetAllInvoices
                 link=""
@@ -381,9 +459,6 @@ export default function Dashboard() {
               </button>
             </div>
           )}
-
-          {/* Search & Filter */}
-          {activeTab === "filter" && <FilterInvoice />}
         </div>
       </div>
     </div>
