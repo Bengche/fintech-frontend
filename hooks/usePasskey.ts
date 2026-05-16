@@ -66,9 +66,9 @@ function parseRegistrationOptions(
       id: b64urlToUint8(opts.user.id),
     },
     excludeCredentials: (opts.excludeCredentials ?? []).map((c) => ({
-      ...c,
       id: b64urlToUint8(c.id),
       type: "public-key" as PublicKeyCredentialType,
+      ...(c.transports ? { transports: c.transports as AuthenticatorTransport[] } : {}),
     })),
   };
 }
@@ -80,9 +80,9 @@ function parseAuthOptions(
     ...(opts as unknown as PublicKeyCredentialRequestOptions),
     challenge: b64urlToUint8(opts.challenge),
     allowCredentials: (opts.allowCredentials ?? []).map((c) => ({
-      ...c,
       id: b64urlToUint8(c.id),
       type: "public-key" as PublicKeyCredentialType,
+      ...(c.transports ? { transports: c.transports as AuthenticatorTransport[] } : {}),
     })),
   };
 }
