@@ -7,6 +7,7 @@ import SiteHeader from "../components/SiteHeader";
 import { useAuth } from "@/context/UserContext";
 import { useTranslations } from "next-intl";
 import { usePasskey } from "@/hooks/usePasskey";
+import EmailLanguageForm from "./EmailLanguageForm";
 import {
   Fingerprint,
   Loader2,
@@ -17,6 +18,10 @@ import {
   Clock3,
   MonitorSmartphone,
   LogOut,
+  Copy,
+  Check,
+  ExternalLink,
+  MessageCircle,
 } from "lucide-react";
 import { BadgeCheck, ShieldAlert, Clock } from "lucide-react";
 import Link from "next/link";
@@ -31,6 +36,7 @@ type UserProfile = {
   username: string;
   profilepicture: string | null;
   country: string | null;
+  preferred_email_language?: "en" | "fr";
 };
 
 type UserSession = {
@@ -180,6 +186,8 @@ export default function SettingsPage() {
             {t("subtitle")}
           </p>
 
+          {profile?.username && <PublicProfileLinkSection username={profile.username} />}
+
           <UpdateNameForm
             current={profile?.name ?? ""}
             onSaved={(name) => setProfile((p) => (p ? { ...p, name } : p))}
@@ -198,6 +206,14 @@ export default function SettingsPage() {
             current={profile?.phone ?? ""}
             onSaved={(phone) => setProfile((p) => (p ? { ...p, phone } : p))}
           />
+          <EmailLanguageForm
+            current={profile?.preferred_email_language ?? "en"}
+            onSaved={(preferred_email_language) =>
+              setProfile((p) =>
+                p ? { ...p, preferred_email_language } : p,
+              )
+            }
+          />
           <ChangePasswordForm />
           <KycStatusSection />
           <SessionManagerSection />
@@ -206,6 +222,107 @@ export default function SettingsPage() {
         </div>
       </main>
     </>
+  );
+}
+
+function PublicProfileLinkSection({ username }: { username: string }) {
+  const t = useTranslations("Settings");
+  const [copied, setCopied] = useState(false);
+
+  const profilePath = `/seller/${username}`;
+  const profileUrl =
+    typeof window === "undefined"
+      ? `https://fonlok.com${profilePath}`
+      : `${window.location.origin}${profilePath}`;
+  const whatsappHref = `https://wa.me/?text=${encodeURIComponent(
+    t("publicProfile.whatsappText", { url: profileUrl }),
+  )}`;
+
+  const handleCopy = async () => {
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(profileUrl);
+      } else {
+        const area = document.createElement("textarea");
+        area.value = profileUrl;
+        area.style.position = "fixed";
+        area.style.opacity = "0";
+        document.body.appendChild(area);
+        area.focus();
+        area.select();
+        document.execCommand("copy");
+        document.body.removeChild(area);
+      }
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1800);
+    } catch {
+      // ignore clipboard failures quietly
+    }
+  };
+
+  return (
+    <Section
+      title={t("publicProfile.sectionTitle")}
+      subtitle={t("publicProfile.sectionSubtitle")}
+    >
+      <div
+        style={{
+          display: "flex",
+          gap: "0.75rem",
+          flexWrap: "wrap",
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: "0.875rem 1rem",
+          border: "1px solid var(--color-border)",
+          borderRadius: "var(--radius-md)",
+          background: "var(--color-white)",
+          marginBottom: "0.875rem",
+        }}
+      >
+        <p
+          style={{
+            margin: 0,
+            fontFamily: "monospace",
+            color: "var(--color-text-heading)",
+            fontSize: "0.825rem",
+            wordBreak: "break-all",
+          }}
+        >
+          {profileUrl}
+        </p>
+        <button className="btn-ghost" type="button" onClick={handleCopy}>
+          {copied ? <Check size={15} /> : <Copy size={15} />}
+          {copied ? t("publicProfile.copied") : t("publicProfile.copy")}
+        </button>
+      </div>
+
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "flex-end",
+          gap: "0.625rem",
+          flexWrap: "wrap",
+        }}
+      >
+        <a
+          href={whatsappHref}
+          target="_blank"
+          rel="noreferrer noopener"
+          style={{ textDecoration: "none" }}
+        >
+          <button className="btn-accent" type="button">
+            <MessageCircle size={15} />
+            {t("publicProfile.whatsapp")}
+          </button>
+        </a>
+        <Link href={profilePath} target="_blank" rel="noreferrer noopener">
+          <button className="btn-primary" type="button">
+            <ExternalLink size={15} />
+            {t("publicProfile.open")}
+          </button>
+        </Link>
+      </div>
+    </Section>
   );
 }
 

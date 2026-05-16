@@ -6,6 +6,7 @@ import { useAuth } from "@/context/UserContext";
 import axios from "axios";
 import NotificationBell from "./NotificationBell";
 import FonlokLogo from "./FonlokLogo";
+import RequestFeatureButton from "./RequestFeatureButton";
 import { useNotifications } from "@/hooks/useNotifications";
 import { useTranslations, useLocale } from "next-intl";
 import { haptic } from "@/hooks/useHaptic";
@@ -228,8 +229,9 @@ export default function Navbar() {
                 <NavLink href="/purchases">{t("myPurchases")}</NavLink>
                 <NavLink href="/referral">{t("referral")}</NavLink>
                 <NavLink href="/verify">Verify Receipt</NavLink>
+                <RequestFeatureButton variant="nav" />
                 {username && (
-                  <NavLink href={`/profile/${username}`}>
+                  <NavLink href={`/seller/${username}`}>
                     {t("profile")}
                   </NavLink>
                 )}
@@ -308,6 +310,7 @@ export default function Navbar() {
             ) : (
               <>
                 <NavLink href="/verify">Verify Receipt</NavLink>
+                <RequestFeatureButton variant="nav" />
                 <NavLink href="/login">{t("signIn")}</NavLink>
                 <Link
                   href="/register"
@@ -550,7 +553,7 @@ export default function Navbar() {
                   </MobItem>
                   {username && (
                     <MobItem
-                      href={`/profile/${username}`}
+                      href={`/seller/${username}`}
                       icon={<User size={15} strokeWidth={2} />}
                     >
                       {t("profile")}
@@ -562,6 +565,8 @@ export default function Navbar() {
                   >
                     {t("settings")}
                   </MobItem>
+
+                  <RequestFeatureButton variant="mobile" />
 
                   <div className="nav-mob-divider" />
 
@@ -614,6 +619,7 @@ export default function Navbar() {
                   >
                     Verify Receipt
                   </MobItem>
+                  <RequestFeatureButton variant="mobile" />
                   <div className="nav-mob-divider" />
                   <MobItem
                     href="/login"

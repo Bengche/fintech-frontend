@@ -76,6 +76,7 @@ export default function InvoicePage() {
   const [payError, setPayError] = useState("");
   const [showEmailConfirm, setShowEmailConfirm] = useState(false);
   const [pdfLoading, setPdfLoading] = useState(false);
+  const [receiptLanguage, setReceiptLanguage] = useState("en");
   const [resendLoading, setResendLoading] = useState(false);
   const [resendMsg, setResendMsg] = useState("");
   const [resendError, setResendError] = useState("");
@@ -1577,7 +1578,7 @@ export default function InvoicePage() {
               setPdfLoading(true);
               try {
                 const res = await fetch(
-                  `${BASE_API_URL}/invoice/receipt/${invoice_number}`,
+                  `${BASE_API_URL}/invoice/receipt/${invoice_number}?lang=${receiptLanguage}`,
                   { credentials: "include" },
                 );
                 if (!res.ok) {
@@ -1639,6 +1640,28 @@ export default function InvoicePage() {
                   fontSize: "0.9375rem",
                 }}
               >
+            <div style={{ marginBottom: "1rem", textAlign: "left" }}>
+              <label
+                style={{
+                  display: "block",
+                  fontSize: "0.8rem",
+                  fontWeight: 600,
+                  color: "var(--color-text-muted)",
+                  marginBottom: "0.375rem",
+                }}
+              >
+                {t("receiptLanguage")}
+              </label>
+              <select
+                className="input"
+                value={receiptLanguage}
+                onChange={(e) => setReceiptLanguage(e.target.value)}
+                style={{ maxWidth: "180px" }}
+              >
+                <option value="en">English</option>
+                <option value="fr">Français</option>
+              </select>
+            </div>
                 {t("resendTitle")}
               </p>
               <p

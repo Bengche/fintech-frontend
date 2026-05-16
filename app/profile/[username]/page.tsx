@@ -1,10 +1,11 @@
 "use client";
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import Axios from "axios";
 import { useParams } from "next/navigation";
-import { useAuth } from "@/context/UserContext";
 import { useTranslations } from "next-intl";
-import { BadgeCheck, ShieldAlert } from "lucide-react";
+import { BadgeCheck, Send, Share2, ShieldAlert, Star } from "lucide-react";
+import { useAuth } from "@/context/UserContext";
 
 const API = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
 
@@ -34,8 +35,8 @@ type CompletedInvoice = {
 
 export default function SellerProfilePage() {
   const { username } = useParams<{ username: string }>();
-  const { user_id } = useAuth();
   const t = useTranslations("Profile");
+  const { username: authUsername } = useAuth();
   const [seller, setSeller] = useState<Seller | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [completedInvoices, setCompletedInvoices] = useState<
@@ -43,19 +44,18 @@ export default function SellerProfilePage() {
   >([]);
   const [averageRating, setAverageRating] = useState(0);
   const [completedCount, setCompletedCount] = useState(0);
+  const [totalSecured, setTotalSecured] = useState(0);
+  const [disputeCount, setDisputeCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [showReviewForm, setShowReviewForm] = useState(false);
-  const [reviewInvoiceNumber, setReviewInvoiceNumber] = useState("");
-  const [reviewRating, setReviewRating] = useState(5);
-  const [reviewComment, setReviewComment] = useState("");
-  const [reviewSuccess, setReviewSuccess] = useState("");
-  const [reviewError, setReviewError] = useState("");
-  const [editingPhone, setEditingPhone] = useState(false);
-  const [phoneInput, setPhoneInput] = useState("");
-  const [phoneSaving, setPhoneSaving] = useState(false);
-  const [phoneError, setPhoneError] = useState("");
-  const [phoneSuccess, setPhoneSuccess] = useState("");
+  const [copied, setCopied] = useState(false);
+
+  const [requestName, setRequestName] = useState("");
+  const [requestEmail, setRequestEmail] = useState("");
+  const [requestMessage, setRequestMessage] = useState("");
+  const [requestLoading, setRequestLoading] = useState(false);
+  const [requestSuccess, setRequestSuccess] = useState("");
+  const [requestError, setRequestError] = useState("");
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -66,6 +66,8 @@ export default function SellerProfilePage() {
         setCompletedInvoices(response.data.completedInvoices);
         setAverageRating(response.data.averageRating);
         setCompletedCount(response.data.completedCount);
+        setTotalSecured(response.data.totalSecured || 0);
+        setDisputeCount(response.data.disputeCount || 0);
       } catch (err: unknown) {
         setError(
           (err as { response?: { status?: number } })?.response?.status === 404
@@ -79,31 +81,56 @@ export default function SellerProfilePage() {
     fetchProfile();
   }, [username, t]);
 
-  const submitReview = async (e: React.FormEvent) => {
+  const handleShare = async () => {
+    if (typeof window === "undefined") return;
+
+    try {
+      const url = window.location.href;
+      if (navigator.share) {
+        await navigator.share({
+          title: `${seller?.name || "Seller"} - Fonlok`,
+          text: t("shareText"),
+          url,
+        });
+        return;
+      }
+
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2200);
+    } catch {
+      // user cancelled share or clipboard was denied
+    }
+  };
+
+  const submitDealRequest = async (e: React.FormEvent) => {
     e.preventDefault();
-    setReviewError("");
-    setReviewSuccess("");
+    setRequestError("");
+    setRequestSuccess("");
+    setRequestLoading(true);
+
     try {
       await Axios.post(
-        `${API}/profile/review`,
+        `${API}/profile/deal-request`,
         {
           seller_username: username,
-          invoice_number: reviewInvoiceNumber,
-          rating: reviewRating,
-          comment: reviewComment,
+          sender_name: requestName,
+          sender_email: requestEmail,
+          message: requestMessage,
         },
         { withCredentials: true },
       );
-      setReviewSuccess(t("reviewSuccess"));
-      setShowReviewForm(false);
-      const updated = await Axios.get(`${API}/profile/${username}`);
-      setReviews(updated.data.reviews);
-      setAverageRating(updated.data.averageRating);
+      setRequestSuccess(t("dealRequestSuccess"));
+      setRequestName("");
+      setRequestEmail("");
+      setRequestMessage("");
     } catch (err: unknown) {
-      setReviewError(
+      setRequestError(
         (err as { response?: { data?: { message?: string } } })?.response?.data
-          ?.message || t("reviewError"),
+          ?.message || t("dealRequestError"),
       );
+    } finally {
+      setRequestLoading(false);
     }
   };
 
@@ -116,17 +143,21 @@ export default function SellerProfilePage() {
 
   const renderStars = (rating: number) =>
     Array.from({ length: 5 }, (_, i) => (
-      <span
+      <Star
         key={i}
-        style={{
-          color:
-            i < rating ? "var(--color-accent)" : "var(--color-border-strong)",
-          fontSize: "1.1rem",
-        }}
-      >
-        ?
-      </span>
+        size={16}
+        fill={
+          i < Math.round(rating) ? "var(--color-accent)" : "transparent"
+        }
+        stroke={
+          i < Math.round(rating)
+            ? "var(--color-accent)"
+            : "var(--color-border-strong)"
+        }
+      />
     ));
+
+  const trustLine = `${completedCount.toLocaleString()} ${t("dealsClosedInline")} · ${Math.round(totalSecured).toLocaleString()} XAF ${t("securedInline")} · ${disputeCount.toLocaleString()} ${t("disputesInline")}`;
 
   if (loading)
     return (
@@ -160,7 +191,38 @@ export default function SellerProfilePage() {
 
   if (!seller) return null;
 
-  const isOwnProfile = !!user_id && user_id === seller.id;
+  const isOwnProfile = Boolean(authUsername && authUsername === seller.username);
+  const needsKycAction = isOwnProfile && seller.kyc_status !== "approved";
+  const kycPanelTitle =
+    seller.kyc_status === "pending"
+      ? t("kycPromptPendingTitle")
+      : seller.kyc_status === "rejected"
+        ? t("kycPromptRejectedTitle")
+        : t("kycPromptTitle");
+  const kycPanelBody =
+    seller.kyc_status === "pending"
+      ? t("kycPromptPendingBody")
+      : seller.kyc_status === "rejected"
+        ? t("kycPromptRejectedBody")
+        : t("kycPromptBody");
+  const kycButtonLabel =
+    seller.kyc_status === "pending"
+      ? t("kycViewStatus")
+      : seller.kyc_status === "rejected"
+        ? t("kycResubmit")
+        : t("kycGetVerified");
+  const kycPanelBackground =
+    seller.kyc_status === "pending"
+      ? "linear-gradient(135deg, rgba(245,158,11,0.07), rgba(15,31,61,0.04))"
+      : seller.kyc_status === "rejected"
+        ? "linear-gradient(135deg, rgba(239,68,68,0.08), rgba(15,31,61,0.04))"
+        : "linear-gradient(135deg, rgba(15,31,61,0.04), rgba(245,158,11,0.08))";
+  const kycPanelBorder =
+    seller.kyc_status === "pending"
+      ? "1px solid rgba(245,158,11,0.22)"
+      : seller.kyc_status === "rejected"
+        ? "1px solid rgba(239,68,68,0.2)"
+        : "1px solid rgba(15,31,61,0.08)";
 
   return (
     <div style={{ minHeight: "100vh", backgroundColor: "var(--color-cloud)" }}>
@@ -171,8 +233,36 @@ export default function SellerProfilePage() {
           padding: "2rem 1.25rem 4rem",
         }}
       >
-        {/* Seller info card */}
+        {/* Seller hero card */}
         <div className="card" style={{ marginBottom: "1.5rem" }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              marginBottom: "1rem",
+              gap: "0.75rem",
+              flexWrap: "wrap",
+            }}
+          >
+            <p
+              style={{
+                margin: 0,
+                fontSize: "0.75rem",
+                letterSpacing: "0.08em",
+                textTransform: "uppercase",
+                color: "var(--color-text-muted)",
+                fontWeight: 700,
+              }}
+            >
+              {t("publicProfile")}
+            </p>
+            <button className="btn-ghost" onClick={handleShare}>
+              <Share2 size={16} />
+              {copied ? t("linkCopied") : t("shareProfile")}
+            </button>
+          </div>
+
           <div
             style={{
               display: "flex",
@@ -182,6 +272,7 @@ export default function SellerProfilePage() {
             }}
           >
             {seller.profilepicture ? (
+              // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={
                   seller.profilepicture.startsWith("http")
@@ -236,6 +327,15 @@ export default function SellerProfilePage() {
                 }}
               >
                 @{seller.username}
+              </p>
+              <p
+                style={{
+                  margin: "0 0 0.5rem",
+                  color: "var(--color-text-body)",
+                  fontSize: "0.875rem",
+                }}
+              >
+                {trustLine}
               </p>
               {seller.country && (
                 <p
@@ -299,225 +399,65 @@ export default function SellerProfilePage() {
                   </div>
                 )}
               </p>
-
-              {/* MoMo phone number */}
-              {(seller.phone || isOwnProfile) && (
-                <div style={{ marginTop: "0.625rem" }}>
-                  {!editingPhone ? (
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "0.625rem",
-                        flexWrap: "wrap",
-                      }}
-                    >
-                      <p
-                        style={{
-                          margin: 0,
-                          fontSize: "0.875rem",
-                          color: "var(--color-text-body)",
-                        }}
-                      >
-                        {" "}
-                        {seller.phone ? (
-                          `+${seller.phone}`
-                        ) : (
-                          <span
-                            style={{
-                              color: "var(--color-text-muted)",
-                              fontStyle: "italic",
-                            }}
-                          >
-                            {t("noMoMo")}
-                          </span>
-                        )}
-                      </p>
-                      {isOwnProfile && (
-                        <button
-                          onClick={() => {
-                            setPhoneInput(seller.phone || "");
-                            setPhoneError("");
-                            setPhoneSuccess("");
-                            setEditingPhone(true);
-                          }}
-                          style={{
-                            background: "none",
-                            border: "none",
-                            cursor: "pointer",
-                            fontSize: "0.8rem",
-                            color: "var(--color-primary)",
-                            padding: "0.125rem 0.375rem",
-                            borderRadius: "4px",
-                            textDecoration: "underline",
-                          }}
-                        >
-                          📝 {t("editPhone")}
-                        </button>
-                      )}
-                    </div>
-                  ) : (
-                    <div
-                      style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: "0.5rem",
-                        marginTop: "0.25rem",
-                      }}
-                    >
-                      <label
-                        style={{
-                          fontSize: "0.8rem",
-                          fontWeight: 600,
-                          color: "var(--color-text-muted)",
-                        }}
-                      >
-                        {t("phoneLabel")}
-                      </label>
-                      <div
-                        style={{
-                          display: "flex",
-                          gap: "0.5rem",
-                          alignItems: "center",
-                          flexWrap: "wrap",
-                        }}
-                      >
-                        <div
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            border: "1px solid var(--color-border)",
-                            borderRadius: "var(--radius-sm)",
-                            overflow: "hidden",
-                            background: "var(--color-white)",
-                          }}
-                        >
-                          <span
-                            style={{
-                              padding: "0.5rem 0.625rem",
-                              background: "var(--color-cloud)",
-                              fontSize: "0.875rem",
-                              color: "var(--color-text-muted)",
-                              borderRight: "1px solid var(--color-border)",
-                            }}
-                          >
-                            +237
-                          </span>
-                          <input
-                            style={{
-                              border: "none",
-                              outline: "none",
-                              padding: "0.5rem 0.625rem",
-                              fontSize: "0.875rem",
-                              width: "140px",
-                            }}
-                            type="tel"
-                            placeholder="6XXXXXXXX"
-                            maxLength={9}
-                            value={
-                              phoneInput.startsWith("237")
-                                ? phoneInput.slice(3)
-                                : phoneInput
-                            }
-                            onChange={(e) =>
-                              setPhoneInput(
-                                "237" + e.target.value.replace(/\D/g, ""),
-                              )
-                            }
-                          />
-                        </div>
-                        <button
-                          className="btn-primary"
-                          disabled={phoneSaving}
-                          style={{
-                            padding: "0.5rem 0.875rem",
-                            fontSize: "0.875rem",
-                          }}
-                          onClick={async () => {
-                            setPhoneError("");
-                            setPhoneSuccess("");
-                            setPhoneSaving(true);
-                            try {
-                              const res = await Axios.patch(
-                                `${API}/profile/update-phone`,
-                                { phone: phoneInput },
-                                { withCredentials: true },
-                              );
-                              setSeller((prev) =>
-                                prev
-                                  ? { ...prev, phone: res.data.phone }
-                                  : prev,
-                              );
-                              setPhoneSuccess(t("phoneSuccess"));
-                              setEditingPhone(false);
-                            } catch (err: unknown) {
-                              setPhoneError(
-                                (
-                                  err as {
-                                    response?: { data?: { message?: string } };
-                                  }
-                                )?.response?.data?.message || t("phoneError"),
-                              );
-                            } finally {
-                              setPhoneSaving(false);
-                            }
-                          }}
-                        >
-                          {phoneSaving ? t("savingPhone") : t("savePhone")}
-                        </button>
-                        <button
-                          onClick={() => {
-                            setEditingPhone(false);
-                            setPhoneError("");
-                          }}
-                          style={{
-                            background: "none",
-                            border: "none",
-                            cursor: "pointer",
-                            fontSize: "0.875rem",
-                            color: "var(--color-text-muted)",
-                          }}
-                        >
-                          {t("cancelPhone")}
-                        </button>
-                      </div>
-                      <p
-                        style={{
-                          fontSize: "0.8rem",
-                          color: "var(--color-text-muted)",
-                          margin: 0,
-                        }}
-                      >
-                        {t("phoneHint")}
-                      </p>
-                      {phoneError && (
-                        <p
-                          style={{
-                            color: "var(--color-danger)",
-                            fontSize: "0.8rem",
-                            margin: 0,
-                          }}
-                        >
-                          {phoneError}
-                        </p>
-                      )}
-                    </div>
-                  )}
-                  {phoneSuccess && (
-                    <p
-                      style={{
-                        color: "var(--color-success)",
-                        fontSize: "0.8rem",
-                        margin: "0.25rem 0 0",
-                      }}
-                    >
-                      {phoneSuccess}
-                    </p>
-                  )}
-                </div>
-              )}
             </div>
           </div>
+
+          {needsKycAction && (
+            <div
+              style={{
+                marginTop: "1rem",
+                padding: "1rem 1.05rem",
+                borderRadius: "1rem",
+                background: kycPanelBackground,
+                border: kycPanelBorder,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: "1rem",
+                flexWrap: "wrap",
+              }}
+            >
+              <div style={{ flex: 1, minWidth: "220px" }}>
+                <p
+                  style={{
+                    margin: "0 0 0.25rem",
+                    fontSize: "0.95rem",
+                    fontWeight: 800,
+                    color: "var(--color-text-heading)",
+                  }}
+                >
+                  {kycPanelTitle}
+                </p>
+                <p
+                  style={{
+                    margin: 0,
+                    fontSize: "0.86rem",
+                    lineHeight: 1.65,
+                    color: "var(--color-text-muted)",
+                    maxWidth: "42rem",
+                  }}
+                >
+                  {kycPanelBody}
+                </p>
+              </div>
+              <Link
+                href="/kyc"
+                className="btn-primary"
+                style={{
+                  textDecoration: "none",
+                  flexShrink: 0,
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "0.45rem",
+                  width: "min(100%, 220px)",
+                }}
+              >
+                <ShieldAlert size={16} />
+                {kycButtonLabel}
+              </Link>
+            </div>
+          )}
 
           {/* Stats row */}
           <div
@@ -532,20 +472,83 @@ export default function SellerProfilePage() {
           >
             <StatBox
               value={completedCount}
-              label={t("completedOrders")}
+              label={t("dealsClosed")}
               color="var(--color-success)"
             />
             <StatBox
-              value={averageRating}
-              label={t("averageRating")}
+              value={Math.round(totalSecured)}
+              label={t("securedXaf")}
+              suffix=" XAF"
               color="var(--color-accent)"
             />
             <StatBox
-              value={reviews.length}
-              label={t("reviewsTitle")}
+              value={disputeCount}
+              label={t("disputes")}
               color="var(--color-primary)"
             />
           </div>
+        </div>
+
+        {/* Contact CTA */}
+        <div className="card" style={{ marginBottom: "1.5rem" }}>
+          <h2
+            style={{
+              fontSize: "1.0625rem",
+              fontWeight: 700,
+              color: "var(--color-text-heading)",
+              margin: "0 0 0.375rem",
+            }}
+          >
+            {t("ctaTitle")}
+          </h2>
+          <p
+            style={{
+              color: "var(--color-text-muted)",
+              margin: "0 0 1rem",
+              fontSize: "0.875rem",
+            }}
+          >
+            {t("ctaBody")}
+          </p>
+          <form
+            onSubmit={submitDealRequest}
+            style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}
+          >
+            <input
+              className="input"
+              placeholder={t("yourName")}
+              value={requestName}
+              onChange={(e) => setRequestName(e.target.value)}
+              required
+              maxLength={100}
+            />
+            <input
+              className="input"
+              placeholder={t("yourEmail")}
+              value={requestEmail}
+              onChange={(e) => setRequestEmail(e.target.value)}
+              required
+              type="email"
+            />
+            <textarea
+              className="input"
+              placeholder={t("dealMessage")}
+              value={requestMessage}
+              onChange={(e) => setRequestMessage(e.target.value)}
+              required
+              minLength={10}
+              maxLength={1000}
+              style={{ minHeight: "96px", resize: "vertical" }}
+            />
+            {requestError && <div className="alert alert-danger">{requestError}</div>}
+            {requestSuccess && (
+              <div className="alert alert-success">{requestSuccess}</div>
+            )}
+            <button className="btn-primary" type="submit" disabled={requestLoading}>
+              <Send size={16} />
+              {requestLoading ? t("sending") : t("sendDealRequest")}
+            </button>
+          </form>
         </div>
 
         {/* Completed Orders */}
@@ -629,106 +632,19 @@ export default function SellerProfilePage() {
           >
             {t("reviewsTitle")}
           </h2>
-          {user_id && (
-            <button
-              onClick={() => setShowReviewForm(!showReviewForm)}
-              className={showReviewForm ? "btn-ghost" : "btn-primary"}
-              style={{ fontSize: "0.875rem", padding: "0.5rem 1rem" }}
-            >
-              {showReviewForm ? t("cancelReview") : t("leaveReview")}
-            </button>
-          )}
-        </div>
-
-        {reviewSuccess && (
-          <div className="alert alert-success" style={{ marginBottom: "1rem" }}>
-            {reviewSuccess}
-          </div>
-        )}
-
-        {/* Review form */}
-        {showReviewForm && (
-          <div className="card" style={{ marginBottom: "1.25rem" }}>
-            <h3
+          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+            {renderStars(averageRating)}
+            <span
               style={{
-                margin: "0 0 1rem",
-                fontSize: "1rem",
+                fontSize: "0.875rem",
                 fontWeight: 700,
                 color: "var(--color-text-heading)",
               }}
             >
-              {t("writeReview")}
-            </h3>
-            <p
-              style={{
-                fontSize: "0.8125rem",
-                color: "var(--color-text-muted)",
-                margin: "0 0 0.75rem",
-                background: "var(--color-cloud)",
-                borderLeft: "3px solid var(--color-accent)",
-                padding: "0.5rem 0.75rem",
-                borderRadius: "0 4px 4px 0",
-              }}
-            >
-              {t("reviewNote")}
-            </p>
-            <form
-              onSubmit={submitReview}
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: "0.875rem",
-              }}
-            >
-              <div>
-                <label className="label">{t("reviewInvoiceLabel")}</label>
-                <input
-                  className="input"
-                  type="text"
-                  placeholder={t("reviewInvoicePlaceholder")}
-                  value={reviewInvoiceNumber}
-                  onChange={(e) => setReviewInvoiceNumber(e.target.value)}
-                  required
-                />
-              </div>
-              <div>
-                <label className="label">{t("reviewRatingLabel")}</label>
-                <select
-                  className="input"
-                  value={reviewRating}
-                  onChange={(e) => setReviewRating(Number(e.target.value))}
-                >
-                  {[5, 4, 3, 2, 1].map((r) => (
-                    <option key={r} value={r}>
-                      {r} {r > 1 ? t("stars") : t("star")}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="label">{t("reviewCommentLabel")}</label>
-                <textarea
-                  className="input"
-                  placeholder={t("reviewCommentPlaceholder")}
-                  value={reviewComment}
-                  onChange={(e) => setReviewComment(e.target.value)}
-                  required
-                  style={{ resize: "vertical", minHeight: "80px" }}
-                />
-              </div>
-              {reviewError && (
-                <div className="alert alert-danger">{reviewError}</div>
-              )}
-              <button
-                type="submit"
-                className="btn-accent"
-                style={{ alignSelf: "flex-start" }}
-              >
-                {t("submitReview")}
-              </button>
-            </form>
+              {averageRating || 0}
+            </span>
           </div>
-        )}
+        </div>
 
         {/* Reviews list */}
         {reviews.length === 0 ? (
@@ -802,10 +718,12 @@ function StatBox({
   value,
   label,
   color,
+  suffix = "",
 }: {
   value: number;
   label: string;
   color: string;
+  suffix?: string;
 }) {
   return (
     <div style={{ textAlign: "center" }}>
@@ -817,7 +735,8 @@ function StatBox({
           margin: "0 0 0.2rem",
         }}
       >
-        {value}
+          {value.toLocaleString()}
+          {suffix}
       </p>
       <p
         style={{

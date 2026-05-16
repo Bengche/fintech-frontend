@@ -19,7 +19,7 @@
  *   - Revenue & Stats    /dashboard?tab=stats
  *   - Referral           /referral
  *   - Verify Receipt     /verify
- *   - Profile            /profile/[username]
+ *   - Profile            /seller/[username]
  *   - Settings           /settings
  *
  * Design principles:
@@ -48,6 +48,7 @@ import {
 } from "lucide-react";
 import FonlokLogo from "./FonlokLogo";
 import NotificationBell from "./NotificationBell";
+import RequestFeatureButton from "./RequestFeatureButton";
 import { useAuth } from "@/context/UserContext";
 import { useNotifications } from "@/hooks/useNotifications";
 import { useTranslations, useLocale } from "next-intl";
@@ -288,7 +289,7 @@ export default function DashboardSidebar() {
         {/* User identity chip */}
         {username && (
           <Link
-            href={`/profile/${username}`}
+            href={`/seller/${username}`}
             style={{ textDecoration: "none" }}
           >
             <div
@@ -399,6 +400,8 @@ export default function DashboardSidebar() {
               </Link>
             );
           })}
+
+          <RequestFeatureButton variant="sidebar" />
 
           <div className="sidebar-divider" />
           <p className="sidebar-section-label">Account</p>

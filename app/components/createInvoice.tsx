@@ -163,7 +163,8 @@ export default function CreateInvoice({
       payload.append("amount", formData.amount);
       payload.append("description", formData.description);
       payload.append("payment_type", paymentType);
-      if (formData.expires_at) payload.append("expires_at", formData.expires_at);
+      if (formData.expires_at)
+        payload.append("expires_at", formData.expires_at);
       if (paymentType === "installment") {
         payload.append("milestones", JSON.stringify(milestones));
       }
@@ -579,8 +580,14 @@ export default function CreateInvoice({
                     id="seller_logo"
                     type="file"
                     accept="image/png,image/jpeg,image/webp,image/gif"
-                    onChange={(e) => handleLogoChange(e.target.files?.[0] || null)}
-                    style={{ display: "block", width: "100%", marginBottom: "0.625rem" }}
+                    onChange={(e) =>
+                      handleLogoChange(e.target.files?.[0] || null)
+                    }
+                    style={{
+                      display: "block",
+                      width: "100%",
+                      marginBottom: "0.625rem",
+                    }}
                   />
                   {sellerLogoPreview && (
                     <div
@@ -598,9 +605,19 @@ export default function CreateInvoice({
                       <img
                         src={sellerLogoPreview}
                         alt="Seller logo preview"
-                        style={{ width: "28px", height: "28px", borderRadius: "999px", objectFit: "cover" }}
+                        style={{
+                          width: "28px",
+                          height: "28px",
+                          borderRadius: "999px",
+                          objectFit: "cover",
+                        }}
                       />
-                      <span style={{ fontSize: "0.78rem", color: "var(--color-text-body)" }}>
+                      <span
+                        style={{
+                          fontSize: "0.78rem",
+                          color: "var(--color-text-body)",
+                        }}
+                      >
                         {sellerLogo?.name}
                       </span>
                     </div>

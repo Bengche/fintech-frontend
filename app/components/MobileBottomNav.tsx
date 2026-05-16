@@ -8,8 +8,8 @@
  *
  * Shows four shortcut tabs for authenticated users:
  *   1. Create Invoice  — /dashboard (anchored to invoice creation)
- *   2. Transactions    — /transactions
- *   3. Revenue & Stats — /dashboard (stats tab)
+ *   2. Dashboard       — /dashboard
+ *   3. Transactions    — /transactions
  *   4. Settings        — /settings
  *
  * Design principles:
@@ -21,8 +21,13 @@
  */
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { FilePlus, ArrowLeftRight, BarChart2, Settings } from "lucide-react";
+import { usePathname, useSearchParams } from "next/navigation";
+import {
+  FilePlus,
+  LayoutDashboard,
+  ArrowLeftRight,
+  Settings,
+} from "lucide-react";
 import { haptic } from "@/hooks/useHaptic";
 
 interface NavItem {
@@ -40,16 +45,16 @@ const NAV_ITEMS: NavItem[] = [
     matchPaths: [],
   },
   {
+    label: "Dashboard",
+    href: "/dashboard",
+    icon: <LayoutDashboard size={22} strokeWidth={1.8} />,
+    matchPaths: [],
+  },
+  {
     label: "Transactions",
     href: "/transactions",
     icon: <ArrowLeftRight size={22} strokeWidth={1.8} />,
     matchPaths: ["/transactions"],
-  },
-  {
-    label: "Revenue",
-    href: "/dashboard?tab=stats",
-    icon: <BarChart2 size={22} strokeWidth={1.8} />,
-    matchPaths: [],
   },
   {
     label: "Settings",
@@ -70,6 +75,7 @@ function isActive(item: NavItem, pathname: string): boolean {
 
 export default function MobileBottomNav() {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   return (
     <>
@@ -172,7 +178,12 @@ export default function MobileBottomNav() {
         }}
       >
         {NAV_ITEMS.map((item) => {
-          const active = isActive(item, pathname);
+          const active =
+            item.href === "/dashboard?action=create"
+                ? pathname === "/dashboard" && searchParams.get("action") === "create"
+              : item.href === "/dashboard"
+                ? pathname === "/dashboard" && searchParams.get("action") !== "create"
+                : isActive(item, pathname);
           return (
             <Link
               key={item.href}

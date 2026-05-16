@@ -10,7 +10,7 @@ import { useSearchParams } from "next/navigation";
 import { InlineSpinner } from "@/app/components/Spinner";
 import { useTranslations } from "next-intl";
 import { haptic } from "@/hooks/useHaptic";
-import { Search } from "lucide-react";
+import { Search, X } from "lucide-react";
 
 const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
 
@@ -22,6 +22,15 @@ type OnboardingStep = {
   href: string;
 };
 
+function getTabFromSearchParams(
+  searchParams: ReturnType<typeof useSearchParams>,
+): Tab {
+  const requestedTab = searchParams.get("tab");
+  return requestedTab === "stats" || requestedTab === "payment"
+    ? requestedTab
+    : "invoices";
+}
+
 export default function Dashboard() {
   const searchParams = useSearchParams();
   const t = useTranslations("Dashboard");
@@ -31,7 +40,9 @@ export default function Dashboard() {
   const autoCreate = searchParams.get("action") === "create";
 
   // Tab state — filter is no longer a tab, it lives inline
-  const [activeTab, setActiveTab] = useState<Tab>("invoices");
+  const [activeTab, setActiveTab] = useState<Tab>(() =>
+    getTabFromSearchParams(searchParams),
+  );
 
   // Controls the inline filter / search panel inside the invoices tab
   const [showFilter, setShowFilter] = useState(false);
@@ -44,6 +55,7 @@ export default function Dashboard() {
   const [onboardingLoading, setOnboardingLoading] = useState(true);
   const [onboardingDismissLoading, setOnboardingDismissLoading] =
     useState(false);
+  const [onboardingVisible, setOnboardingVisible] = useState(true);
   const [onboardingData, setOnboardingData] = useState<{
     steps: OnboardingStep[];
     completedCount: number;
@@ -74,6 +86,34 @@ export default function Dashboard() {
     };
     loadOnboarding();
   }, []);
+
+  useEffect(() => {
+    setActiveTab(getTabFromSearchParams(searchParams));
+  }, [searchParams]);
+
+  useEffect(() => {
+    setOnboardingVisible(true);
+  }, [onboardingData?.dismissed]);
+
+  const dismissOnboarding = async () => {
+    if (onboardingDismissLoading) return;
+    setOnboardingDismissLoading(true);
+    try {
+      await axios.post(
+        `${API_URL}/user/onboarding-checklist/dismiss`,
+        {},
+        { withCredentials: true },
+      );
+      setOnboardingVisible(false);
+      setOnboardingData((prev) =>
+        prev ? { ...prev, dismissed: true } : prev,
+      );
+    } catch {
+      // keep visible on failure
+    } finally {
+      setOnboardingDismissLoading(false);
+    }
+  };
 
   const handleReleaseFunds = async () => {
     haptic("medium");
@@ -163,167 +203,211 @@ export default function Dashboard() {
 
         {!onboardingLoading &&
           onboardingData &&
-          !onboardingData.dismissed && (
-            <div
-              className="card"
+          !onboardingData.dismissed &&
+          onboardingVisible && (
+          <div
+            className="card"
+            onTouchStart={(event) => {
+              const touch = event.changedTouches[0];
+              if (!touch) return;
+              (
+                event.currentTarget as HTMLDivElement
+              ).dataset.touchX = String(touch.clientX);
+              (
+                event.currentTarget as HTMLDivElement
+              ).dataset.touchY = String(touch.clientY);
+            }}
+            onTouchEnd={(event) => {
+              const touch = event.changedTouches[0];
+              const el = event.currentTarget as HTMLDivElement;
+              if (!touch || !el.dataset.touchX || !el.dataset.touchY) return;
+              const deltaX = touch.clientX - Number(el.dataset.touchX);
+              const deltaY = touch.clientY - Number(el.dataset.touchY);
+              if (Math.abs(deltaX) > 84 && Math.abs(deltaX) > Math.abs(deltaY)) {
+                dismissOnboarding();
+              }
+              delete el.dataset.touchX;
+              delete el.dataset.touchY;
+            }}
+            style={{
+              marginTop: "1rem",
+              marginBottom: "1rem",
+              borderLeft: "4px solid var(--color-primary)",
+              position: "relative",
+              overflow: "hidden",
+            }}
+          >
+            <button
+              type="button"
+              onClick={dismissOnboarding}
+              disabled={onboardingDismissLoading}
+              aria-label={t("onboarding.dismiss")}
+              title={t("onboarding.dismiss")}
               style={{
-                marginTop: "1rem",
-                marginBottom: "1rem",
-                borderLeft: "4px solid var(--color-primary)",
+                position: "absolute",
+                top: "0.8rem",
+                right: "0.8rem",
+                width: "2rem",
+                height: "2rem",
+                borderRadius: "999px",
+                border: "1px solid var(--color-border)",
+                background: "var(--color-white)",
+                color: "var(--color-text-muted)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: onboardingDismissLoading ? "wait" : "pointer",
+                transition: "border-color 0.15s, color 0.15s, background 0.15s",
+              }}
+            >
+              <X size={15} strokeWidth={2.2} />
+            </button>
+
+            <div
+              style={{
+                display: "flex",
+                alignItems: "flex-start",
+                justifyContent: "space-between",
+                gap: "1rem",
+                flexWrap: "wrap",
+                paddingRight: "2.75rem",
+              }}
+            >
+              <div style={{ flex: 1, minWidth: "240px" }}>
+                <h3
+                  style={{
+                    margin: "0 0 0.25rem",
+                    fontSize: "1rem",
+                    fontWeight: 700,
+                    color: "var(--color-text-heading)",
+                  }}
+                >
+                  {t("onboarding.title")}
+                </h3>
+                <p
+                  style={{
+                    margin: 0,
+                    fontSize: "0.85rem",
+                    color: "var(--color-text-muted)",
+                    lineHeight: 1.6,
+                  }}
+                >
+                  {t("onboarding.subtitle")}
+                </p>
+                <p
+                  style={{
+                    margin: "0.45rem 0 0",
+                    fontSize: "0.75rem",
+                    color: "var(--color-text-muted)",
+                    lineHeight: 1.5,
+                  }}
+                >
+                  {t("onboarding.helper")}
+                </p>
+              </div>
+              <span className="badge badge-info">
+                {t("onboarding.progress", {
+                  done: onboardingData.completedCount,
+                  total: onboardingData.totalCount,
+                })}
+              </span>
+            </div>
+
+            <div
+              style={{
+                marginTop: "0.85rem",
+                height: "8px",
+                borderRadius: "999px",
+                background: "var(--color-mist)",
+                overflow: "hidden",
               }}
             >
               <div
                 style={{
-                  display: "flex",
-                  alignItems: "flex-start",
-                  justifyContent: "space-between",
-                  gap: "1rem",
-                  flexWrap: "wrap",
+                  width: `${(onboardingData.completedCount / onboardingData.totalCount) * 100}%`,
+                  height: "100%",
+                  background:
+                    "linear-gradient(90deg, var(--color-primary), var(--color-accent))",
                 }}
-              >
-                <div style={{ flex: 1, minWidth: "240px" }}>
-                  <h3
+              />
+            </div>
+
+            <div
+              style={{
+                marginTop: "1rem",
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+                gap: "0.625rem",
+              }}
+            >
+              {onboardingData.steps.map((step) => (
+                <a
+                  key={step.key}
+                  href={step.href}
+                  style={{
+                    textDecoration: "none",
+                    border: "1px solid var(--color-border)",
+                    borderRadius: "0.75rem",
+                    padding: "0.7rem 0.8rem",
+                    background: step.completed
+                      ? "rgba(22,163,74,0.08)"
+                      : "var(--color-white)",
+                    color: "inherit",
+                    display: "block",
+                  }}
+                >
+                  <p
                     style={{
-                      margin: "0 0 0.25rem",
-                      fontSize: "1rem",
+                      margin: "0 0 0.15rem",
                       fontWeight: 700,
+                      fontSize: "0.84rem",
                       color: "var(--color-text-heading)",
                     }}
                   >
-                    {t("onboarding.title")}
-                  </h3>
+                    {t(`onboarding.steps.${step.key}.title`)}
+                  </p>
                   <p
                     style={{
                       margin: 0,
-                      fontSize: "0.85rem",
+                      fontSize: "0.78rem",
                       color: "var(--color-text-muted)",
-                      lineHeight: 1.6,
+                      lineHeight: 1.45,
                     }}
                   >
-                    {t("onboarding.subtitle")}
+                    {t(`onboarding.steps.${step.key}.hint`)}
                   </p>
-                </div>
-                <span className="badge badge-info">
-                  {t("onboarding.progress", {
-                    done: onboardingData.completedCount,
-                    total: onboardingData.totalCount,
-                  })}
-                </span>
-              </div>
-
-              <div
-                style={{
-                  marginTop: "0.85rem",
-                  height: "8px",
-                  borderRadius: "999px",
-                  background: "var(--color-mist)",
-                  overflow: "hidden",
-                }}
-              >
-                <div
-                  style={{
-                    width: `${(onboardingData.completedCount / onboardingData.totalCount) * 100}%`,
-                    height: "100%",
-                    background:
-                      "linear-gradient(90deg, var(--color-primary), var(--color-accent))",
-                  }}
-                />
-              </div>
-
-              <div
-                style={{
-                  marginTop: "1rem",
-                  display: "grid",
-                  gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-                  gap: "0.625rem",
-                }}
-              >
-                {onboardingData.steps.map((step) => (
-                  <a
-                    key={step.key}
-                    href={step.href}
+                  <p
                     style={{
-                      textDecoration: "none",
-                      border: "1px solid var(--color-border)",
-                      borderRadius: "0.75rem",
-                      padding: "0.7rem 0.8rem",
-                      background: step.completed
-                        ? "rgba(22,163,74,0.08)"
-                        : "var(--color-white)",
-                      color: "inherit",
-                      display: "block",
+                      margin: "0.4rem 0 0",
+                      fontSize: "0.76rem",
+                      fontWeight: 700,
+                      color: step.completed
+                        ? "var(--color-success)"
+                        : "var(--color-primary)",
                     }}
                   >
-                    <p
-                      style={{
-                        margin: "0 0 0.15rem",
-                        fontWeight: 700,
-                        fontSize: "0.84rem",
-                        color: "var(--color-text-heading)",
-                      }}
-                    >
-                      {t(`onboarding.steps.${step.key}.title`)}
-                    </p>
-                    <p
-                      style={{
-                        margin: 0,
-                        fontSize: "0.78rem",
-                        color: "var(--color-text-muted)",
-                        lineHeight: 1.45,
-                      }}
-                    >
-                      {t(`onboarding.steps.${step.key}.hint`)}
-                    </p>
-                    <p
-                      style={{
-                        margin: "0.4rem 0 0",
-                        fontSize: "0.76rem",
-                        fontWeight: 700,
-                        color: step.completed
-                          ? "var(--color-success)"
-                          : "var(--color-primary)",
-                      }}
-                    >
-                      {step.completed
-                        ? t("onboarding.done")
-                        : t("onboarding.start")}
-                    </p>
-                  </a>
-                ))}
-              </div>
-
-              {onboardingData.allCompleted && (
-                <div style={{ marginTop: "0.85rem", textAlign: "right" }}>
-                  <button
-                    className="btn-ghost"
-                    disabled={onboardingDismissLoading}
-                    onClick={async () => {
-                      setOnboardingDismissLoading(true);
-                      try {
-                        await axios.post(
-                          `${API_URL}/user/onboarding-checklist/dismiss`,
-                          {},
-                          { withCredentials: true },
-                        );
-                        setOnboardingData((prev) =>
-                          prev ? { ...prev, dismissed: true } : prev,
-                        );
-                      } catch {
-                        // keep visible on failure
-                      } finally {
-                        setOnboardingDismissLoading(false);
-                      }
-                    }}
-                    style={{ fontSize: "0.85rem" }}
-                  >
-                    {onboardingDismissLoading
-                      ? t("onboarding.dismissing")
-                      : t("onboarding.dismiss")}
-                  </button>
-                </div>
-              )}
+                    {step.completed
+                      ? t("onboarding.done")
+                      : t("onboarding.start")}
+                  </p>
+                </a>
+              ))}
             </div>
-          )}
+
+            <div style={{ marginTop: "0.85rem", textAlign: "right" }}>
+              <button
+                className="btn-ghost"
+                disabled={onboardingDismissLoading}
+                onClick={dismissOnboarding}
+                style={{ fontSize: "0.85rem" }}
+              >
+                {onboardingDismissLoading
+                  ? t("onboarding.dismissing")
+                  : t("onboarding.dismiss")}
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* CreateInvoice modal — button permanently hidden on the dashboard.   */}
         {/* Access via sidebar "Create Invoice" link or mobile bottom-nav tab,  */}

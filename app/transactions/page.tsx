@@ -31,6 +31,7 @@ export default function TransactionsPage() {
   const [activeTab, setActiveTab] = useState<"received" | "spent">("received");
   const [statementStartDate, setStatementStartDate] = useState("");
   const [statementEndDate, setStatementEndDate] = useState("");
+  const [statementLanguage, setStatementLanguage] = useState("en");
   const [statementLoading, setStatementLoading] = useState(false);
   const [statementError, setStatementError] = useState("");
 
@@ -100,7 +101,7 @@ export default function TransactionsPage() {
       end.setHours(23, 59, 59, 999);
 
       const res = await fetch(
-        `${API}/transactions/statement?start_date=${start.toISOString()}&end_date=${end.toISOString()}`,
+        `${API}/transactions/statement?start_date=${start.toISOString()}&end_date=${end.toISOString()}&lang=${statementLanguage}`,
         { credentials: "include" },
       );
       if (!res.ok) {
@@ -326,6 +327,28 @@ export default function TransactionsPage() {
                   }}
                   style={{ minWidth: "140px" }}
                 />
+              </div>
+              <div>
+                <label
+                  style={{
+                    display: "block",
+                    fontSize: "0.8rem",
+                    fontWeight: 600,
+                    color: "var(--color-text-muted)",
+                    marginBottom: "0.375rem",
+                  }}
+                >
+                  {t("language")}
+                </label>
+                <select
+                  className="input"
+                  value={statementLanguage}
+                  onChange={(e) => setStatementLanguage(e.target.value)}
+                  style={{ minWidth: "140px" }}
+                >
+                  <option value="en">English</option>
+                  <option value="fr">Français</option>
+                </select>
               </div>
               <button
                 onClick={downloadStatement}
