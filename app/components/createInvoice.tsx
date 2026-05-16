@@ -10,7 +10,8 @@ const API = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
 export default function CreateInvoice({
   onCreated,
   autoOpen = false,
-}: { onCreated?: () => void; autoOpen?: boolean } = {}) {
+  hideTrigger = false,
+}: { onCreated?: () => void; autoOpen?: boolean; hideTrigger?: boolean } = {}) {
   const t = useTranslations("Invoice");
   const [openModal, setOpenModal] = useState(false);
 
@@ -232,8 +233,8 @@ export default function CreateInvoice({
 
   return (
     <>
-      {/* Trigger button — hidden when parent controls the modal via autoOpen */}
-      {!autoOpen && (
+      {/* Trigger button — suppressed when autoOpen or hideTrigger is set */}
+      {!autoOpen && !hideTrigger && (
         <button
           className="btn-primary"
           onClick={() => {

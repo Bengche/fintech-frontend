@@ -130,10 +130,12 @@ export default function Dashboard() {
           <EscrowBalance />
         </div>
 
-        {/* CreateInvoice modal — no button rendered here. Opens automatically  */}
-        {/* when arriving via ?action=create (sidebar or bottom-nav shortcut).  */}
+        {/* CreateInvoice modal — button permanently hidden on the dashboard.   */}
+        {/* Access via sidebar "Create Invoice" link or mobile bottom-nav tab,  */}
+        {/* both of which navigate to /dashboard?action=create.                 */}
         <CreateInvoice
           autoOpen={autoCreate}
+          hideTrigger
           onCreated={() => {
             setActiveTab("invoices");
             triggerRefresh?.();
