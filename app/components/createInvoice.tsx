@@ -35,6 +35,14 @@ export default function CreateInvoice({
   const [showSaveTemplate, setShowSaveTemplate] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSavingTemplate, setIsSavingTemplate] = useState(false);
+  const [sellerLogo, setSellerLogo] = useState<File | null>(null);
+  const [sellerLogoPreview, setSellerLogoPreview] = useState<string>("");
+
+  useEffect(() => {
+    return () => {
+      if (sellerLogoPreview) URL.revokeObjectURL(sellerLogoPreview);
+    };
+  }, [sellerLogoPreview]);
 
   // --- Email ownership check ---
   const [myEmail, setMyEmail] = useState<string | null>(null);
@@ -96,6 +104,8 @@ export default function CreateInvoice({
     setShowSaveTemplate(false);
     setTemplateName("");
     setSaveTemplateSuccess("");
+    setSellerLogo(null);
+    setSellerLogoPreview("");
   };
 
   const closeModal = () => {
@@ -105,6 +115,18 @@ export default function CreateInvoice({
     setMyEmail(null);
     setShowSaveTemplate(false);
     setTemplateName("");
+    setSellerLogo(null);
+    setSellerLogoPreview("");
+  };
+
+  const handleLogoChange = (file: File | null) => {
+    setSellerLogo(file);
+    if (!file) {
+      setSellerLogoPreview("");
+      return;
+    }
+    const previewUrl = URL.createObjectURL(file);
+    setSellerLogoPreview(previewUrl);
   };
 
   const handleCreation = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -134,19 +156,21 @@ export default function CreateInvoice({
     }
 
     try {
-      const payload: Record<string, unknown> = {
-        invoicename: formData.invoicename,
-        email: formData.email,
-        currency: formData.currency || "XAF",
-        amount: formData.amount,
-        description: formData.description,
-        payment_type: paymentType,
-      };
-      if (formData.expires_at) payload.expires_at = formData.expires_at;
-      if (paymentType === "installment") payload.milestones = milestones;
+      const payload = new FormData();
+      payload.append("invoicename", formData.invoicename);
+      payload.append("email", formData.email);
+      payload.append("currency", formData.currency || "XAF");
+      payload.append("amount", formData.amount);
+      payload.append("description", formData.description);
+      payload.append("payment_type", paymentType);
+      if (formData.expires_at) payload.append("expires_at", formData.expires_at);
+      if (paymentType === "installment") {
+        payload.append("milestones", JSON.stringify(milestones));
+      }
+      if (sellerLogo) payload.append("seller_logo", sellerLogo);
 
       const response = await Axios.post(`${API}/invoice/create`, payload, {
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "multipart/form-data" },
         withCredentials: true,
       });
       console.log(response.data);
@@ -526,6 +550,61 @@ export default function CreateInvoice({
                     required
                     style={{ minHeight: "90px", resize: "vertical" }}
                   />
+                </div>
+
+                {/* Optional seller logo */}
+                <div
+                  style={{
+                    marginBottom: "1.25rem",
+                    padding: "0.9rem 1rem",
+                    border: "1px dashed var(--color-border)",
+                    borderRadius: "var(--radius-md)",
+                    backgroundColor: "var(--color-cloud)",
+                  }}
+                >
+                  <label className="label" htmlFor="seller_logo">
+                    {t("create.brandingTitle")}
+                  </label>
+                  <p
+                    style={{
+                      fontSize: "0.78rem",
+                      color: "var(--color-text-muted)",
+                      margin: "0 0 0.5rem",
+                      lineHeight: 1.5,
+                    }}
+                  >
+                    {t("create.brandingHint")}
+                  </p>
+                  <input
+                    id="seller_logo"
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp,image/gif"
+                    onChange={(e) => handleLogoChange(e.target.files?.[0] || null)}
+                    style={{ display: "block", width: "100%", marginBottom: "0.625rem" }}
+                  />
+                  {sellerLogoPreview && (
+                    <div
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "0.625rem",
+                        background: "var(--color-white)",
+                        border: "1px solid var(--color-border)",
+                        borderRadius: "999px",
+                        padding: "0.3rem 0.7rem 0.3rem 0.35rem",
+                      }}
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={sellerLogoPreview}
+                        alt="Seller logo preview"
+                        style={{ width: "28px", height: "28px", borderRadius: "999px", objectFit: "cover" }}
+                      />
+                      <span style={{ fontSize: "0.78rem", color: "var(--color-text-body)" }}>
+                        {sellerLogo?.name}
+                      </span>
+                    </div>
+                  )}
                 </div>
 
                 {/* Expiry date */}

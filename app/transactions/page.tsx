@@ -129,7 +129,6 @@ export default function TransactionsPage() {
 
   return (
     <div style={{ minHeight: "100vh", backgroundColor: "var(--color-cloud)" }}>
-
       <div
         style={{ maxWidth: "860px", margin: "0 auto", padding: "2rem 1.25rem" }}
       >
@@ -338,7 +337,9 @@ export default function TransactionsPage() {
                   whiteSpace: "nowrap",
                 }}
               >
-                {statementLoading ? `${t("generating")}...` : `📄 ${t("downloadBtn")}`}
+                {statementLoading
+                  ? `${t("generating")}...`
+                  : `📄 ${t("downloadBtn")}`}
               </button>
             </div>
           </div>
@@ -506,7 +507,6 @@ export default function TransactionsPage() {
           </>
         )}
       </div>
-
     </div>
   );
 }

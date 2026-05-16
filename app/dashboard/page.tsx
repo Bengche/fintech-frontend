@@ -4,7 +4,7 @@ import GetAllInvoices from "../components/getAllInvoices";
 import FilterInvoice from "../components/filterInvoice";
 import RevenueStats from "../components/RevenueStats";
 import EscrowBalance from "../components/EscrowBalance";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { useSearchParams } from "next/navigation";
 import { InlineSpinner } from "@/app/components/Spinner";
@@ -15,6 +15,12 @@ import { Search } from "lucide-react";
 const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
 
 type Tab = "invoices" | "payment" | "stats";
+
+type OnboardingStep = {
+  key: "photo" | "invoice" | "invite" | "kyc";
+  completed: boolean;
+  href: string;
+};
 
 export default function Dashboard() {
   const searchParams = useSearchParams();
@@ -35,6 +41,16 @@ export default function Dashboard() {
     null,
   );
   const [refreshLoading, setRefreshLoading] = useState(false);
+  const [onboardingLoading, setOnboardingLoading] = useState(true);
+  const [onboardingDismissLoading, setOnboardingDismissLoading] =
+    useState(false);
+  const [onboardingData, setOnboardingData] = useState<{
+    steps: OnboardingStep[];
+    completedCount: number;
+    totalCount: number;
+    allCompleted: boolean;
+    dismissed: boolean;
+  } | null>(null);
 
   // Request payment state
   const [code, setCode] = useState("");
@@ -42,6 +58,22 @@ export default function Dashboard() {
   const [paySuccess, setPaySuccess] = useState("");
   const [payError, setPayError] = useState("");
   const [payLoading, setPayLoading] = useState(false);
+
+  useEffect(() => {
+    const loadOnboarding = async () => {
+      try {
+        const res = await axios.get(`${API_URL}/user/onboarding-checklist`, {
+          withCredentials: true,
+        });
+        setOnboardingData(res.data);
+      } catch {
+        setOnboardingData(null);
+      } finally {
+        setOnboardingLoading(false);
+      }
+    };
+    loadOnboarding();
+  }, []);
 
   const handleReleaseFunds = async () => {
     haptic("medium");
@@ -128,6 +160,170 @@ export default function Dashboard() {
         <div style={{ marginTop: "1.75rem" }}>
           <EscrowBalance />
         </div>
+
+        {!onboardingLoading &&
+          onboardingData &&
+          !onboardingData.dismissed && (
+            <div
+              className="card"
+              style={{
+                marginTop: "1rem",
+                marginBottom: "1rem",
+                borderLeft: "4px solid var(--color-primary)",
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "flex-start",
+                  justifyContent: "space-between",
+                  gap: "1rem",
+                  flexWrap: "wrap",
+                }}
+              >
+                <div style={{ flex: 1, minWidth: "240px" }}>
+                  <h3
+                    style={{
+                      margin: "0 0 0.25rem",
+                      fontSize: "1rem",
+                      fontWeight: 700,
+                      color: "var(--color-text-heading)",
+                    }}
+                  >
+                    {t("onboarding.title")}
+                  </h3>
+                  <p
+                    style={{
+                      margin: 0,
+                      fontSize: "0.85rem",
+                      color: "var(--color-text-muted)",
+                      lineHeight: 1.6,
+                    }}
+                  >
+                    {t("onboarding.subtitle")}
+                  </p>
+                </div>
+                <span className="badge badge-info">
+                  {t("onboarding.progress", {
+                    done: onboardingData.completedCount,
+                    total: onboardingData.totalCount,
+                  })}
+                </span>
+              </div>
+
+              <div
+                style={{
+                  marginTop: "0.85rem",
+                  height: "8px",
+                  borderRadius: "999px",
+                  background: "var(--color-mist)",
+                  overflow: "hidden",
+                }}
+              >
+                <div
+                  style={{
+                    width: `${(onboardingData.completedCount / onboardingData.totalCount) * 100}%`,
+                    height: "100%",
+                    background:
+                      "linear-gradient(90deg, var(--color-primary), var(--color-accent))",
+                  }}
+                />
+              </div>
+
+              <div
+                style={{
+                  marginTop: "1rem",
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+                  gap: "0.625rem",
+                }}
+              >
+                {onboardingData.steps.map((step) => (
+                  <a
+                    key={step.key}
+                    href={step.href}
+                    style={{
+                      textDecoration: "none",
+                      border: "1px solid var(--color-border)",
+                      borderRadius: "0.75rem",
+                      padding: "0.7rem 0.8rem",
+                      background: step.completed
+                        ? "rgba(22,163,74,0.08)"
+                        : "var(--color-white)",
+                      color: "inherit",
+                      display: "block",
+                    }}
+                  >
+                    <p
+                      style={{
+                        margin: "0 0 0.15rem",
+                        fontWeight: 700,
+                        fontSize: "0.84rem",
+                        color: "var(--color-text-heading)",
+                      }}
+                    >
+                      {t(`onboarding.steps.${step.key}.title`)}
+                    </p>
+                    <p
+                      style={{
+                        margin: 0,
+                        fontSize: "0.78rem",
+                        color: "var(--color-text-muted)",
+                        lineHeight: 1.45,
+                      }}
+                    >
+                      {t(`onboarding.steps.${step.key}.hint`)}
+                    </p>
+                    <p
+                      style={{
+                        margin: "0.4rem 0 0",
+                        fontSize: "0.76rem",
+                        fontWeight: 700,
+                        color: step.completed
+                          ? "var(--color-success)"
+                          : "var(--color-primary)",
+                      }}
+                    >
+                      {step.completed
+                        ? t("onboarding.done")
+                        : t("onboarding.start")}
+                    </p>
+                  </a>
+                ))}
+              </div>
+
+              {onboardingData.allCompleted && (
+                <div style={{ marginTop: "0.85rem", textAlign: "right" }}>
+                  <button
+                    className="btn-ghost"
+                    disabled={onboardingDismissLoading}
+                    onClick={async () => {
+                      setOnboardingDismissLoading(true);
+                      try {
+                        await axios.post(
+                          `${API_URL}/user/onboarding-checklist/dismiss`,
+                          {},
+                          { withCredentials: true },
+                        );
+                        setOnboardingData((prev) =>
+                          prev ? { ...prev, dismissed: true } : prev,
+                        );
+                      } catch {
+                        // keep visible on failure
+                      } finally {
+                        setOnboardingDismissLoading(false);
+                      }
+                    }}
+                    style={{ fontSize: "0.85rem" }}
+                  >
+                    {onboardingDismissLoading
+                      ? t("onboarding.dismissing")
+                      : t("onboarding.dismiss")}
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
 
         {/* CreateInvoice modal — button permanently hidden on the dashboard.   */}
         {/* Access via sidebar "Create Invoice" link or mobile bottom-nav tab,  */}

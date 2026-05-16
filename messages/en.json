@@ -738,6 +738,8 @@
       "description": "Description",
       "descriptionHint": "Be specific — list all deliverables, specs, and conditions. Clear descriptions reduce disputes.",
       "descriptionPlaceholder": "Describe exactly what you are delivering…",
+      "brandingTitle": "Payment page branding (optional)",
+      "brandingHint": "Upload your logo to show alongside Fonlok branding on your client payment page.",
       "expiryDate": "Expiry date",
       "expiryOptional": "(optional)",
       "expiryHint": "After this date the buyer will no longer be able to pay.",
@@ -936,6 +938,33 @@
       "title": "Your Invoices",
       "subtitle": "All invoices you have created",
       "refresh": "Refresh Invoices"
+    },
+    "onboarding": {
+      "title": "Complete your profile",
+      "subtitle": "Finish these steps to build trust and unlock a smoother seller experience.",
+      "progress": "{done}/{total} complete",
+      "done": "Completed",
+      "start": "Start step",
+      "dismiss": "Dismiss checklist",
+      "dismissing": "Dismissing…",
+      "steps": {
+        "photo": {
+          "title": "Add profile photo",
+          "hint": "A clear profile photo increases buyer confidence."
+        },
+        "invoice": {
+          "title": "Create first invoice",
+          "hint": "Generate your first payment link in under a minute."
+        },
+        "invite": {
+          "title": "Invite a client",
+          "hint": "Share your invoice link and get your first client view."
+        },
+        "kyc": {
+          "title": "Complete KYC verification",
+          "hint": "Unlock your verified badge and stronger buyer trust."
+        }
+      }
     },
     "statsTab": {
       "title": "Revenue & Stats",
@@ -1286,6 +1315,7 @@
     "payPageEyebrow": "Protected payment link",
     "guaranteeBadge": "Escrow protected",
     "sellerBadge": "Seller identity linked",
+    "sellerBrandLabel": "Seller brand",
     "sellerLabel": "Seller",
     "verifiedBadge": "Verified",
     "trustBody": "Fonlok only releases funds after the buyer confirms delivery or the case is resolved through dispute review.",

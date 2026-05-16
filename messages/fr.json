@@ -738,6 +738,8 @@
       "description": "Description",
       "descriptionHint": "Soyez précis — listez tous les livrables, spécifications et conditions. Des descriptions claires réduisent les litiges.",
       "descriptionPlaceholder": "Décrivez exactement ce que vous livrez…",
+      "brandingTitle": "Personnalisation de la page de paiement (facultatif)",
+      "brandingHint": "Importez votre logo pour l'afficher à côté de la marque Fonlok sur la page de paiement du client.",
       "expiryDate": "Date d'expiration",
       "expiryOptional": "(facultatif)",
       "expiryHint": "Après cette date, l'acheteur ne pourra plus payer.",
@@ -936,6 +938,33 @@
       "title": "Vos factures",
       "subtitle": "Toutes les factures que vous avez créées",
       "refresh": "Actualiser les factures"
+    },
+    "onboarding": {
+      "title": "Complétez votre profil",
+      "subtitle": "Terminez ces étapes pour renforcer la confiance et fluidifier votre expérience vendeur.",
+      "progress": "{done}/{total} terminées",
+      "done": "Terminé",
+      "start": "Commencer",
+      "dismiss": "Masquer la checklist",
+      "dismissing": "Masquage…",
+      "steps": {
+        "photo": {
+          "title": "Ajouter une photo de profil",
+          "hint": "Une photo claire augmente la confiance des acheteurs."
+        },
+        "invoice": {
+          "title": "Créer votre première facture",
+          "hint": "Générez votre premier lien de paiement en moins d'une minute."
+        },
+        "invite": {
+          "title": "Inviter un client",
+          "hint": "Partagez votre lien de facture et obtenez votre première vue client."
+        },
+        "kyc": {
+          "title": "Finaliser la vérification KYC",
+          "hint": "Débloquez votre badge vérifié et une confiance renforcée."
+        }
+      }
     },
     "statsTab": {
       "title": "Revenus & Stats",
@@ -1286,6 +1315,7 @@
     "payPageEyebrow": "Lien de paiement protégé",
     "guaranteeBadge": "Séquestre protégé",
     "sellerBadge": "Identité du vendeur liée",
+    "sellerBrandLabel": "Marque vendeur",
     "sellerLabel": "Vendeur",
     "verifiedBadge": "Vérifié",
     "trustBody": "Fonlok ne libère les fonds qu'après confirmation de livraison par l'acheteur ou résolution du litige.",

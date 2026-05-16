@@ -27,6 +27,7 @@ type InvoiceStats = {
   seller_profilepicture?: string;
   seller_phone?: string;
   seller_kyc_status?: string;
+  seller_logo_url?: string;
 };
 
 type Milestone = {
@@ -363,6 +364,76 @@ export default function InvoicePage() {
                 border: "1px solid rgba(255,255,255,0.12)",
               }}
             >
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.5rem",
+                  marginBottom: "0.65rem",
+                  flexWrap: "wrap",
+                }}
+              >
+                <span
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "0.35rem",
+                    borderRadius: "999px",
+                    padding: "0.2rem 0.5rem",
+                    fontSize: "0.7rem",
+                    fontWeight: 700,
+                    background: "rgba(255,255,255,0.14)",
+                    border: "1px solid rgba(255,255,255,0.2)",
+                  }}
+                >
+                  <span
+                    style={{
+                      width: "18px",
+                      height: "18px",
+                      borderRadius: "999px",
+                      background: "#F59E0B",
+                      color: "#0F1F3D",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontWeight: 900,
+                      fontSize: "0.65rem",
+                    }}
+                  >
+                    F
+                  </span>
+                  Fonlok
+                </span>
+
+                {invoiceStats.seller_logo_url && (
+                  <span
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "0.35rem",
+                      borderRadius: "999px",
+                      padding: "0.2rem 0.5rem 0.2rem 0.25rem",
+                      fontSize: "0.7rem",
+                      fontWeight: 700,
+                      background: "rgba(255,255,255,0.14)",
+                      border: "1px solid rgba(255,255,255,0.2)",
+                    }}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={invoiceStats.seller_logo_url}
+                      alt="Seller brand logo"
+                      style={{
+                        width: "18px",
+                        height: "18px",
+                        borderRadius: "999px",
+                        objectFit: "cover",
+                      }}
+                    />
+                    {t("sellerBrandLabel")}
+                  </span>
+                )}
+              </div>
               <p
                 style={{
                   margin: "0 0 0.35rem",
