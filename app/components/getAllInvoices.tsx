@@ -69,9 +69,7 @@ function canDeleteInvoice(invoice: Invoice): boolean {
 /** Returns a human-readable (i18n) reason why deletion is blocked, or undefined when deletion is allowed. */
 // Implemented inside component to access the `t` translator from useTranslations.
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default function GetAllInvoices({
-  link: _link,
   hideHeader = false,
   onRegisterRefresh,
 }: GetAllProps) {

@@ -57,11 +57,12 @@ export default function BuyerChatPage() {
         `${API}/chat/messages/${invoice_number}?token=${token}`,
       );
       setMessages(response.data.messages);
-    } catch (error: any) {
-      if (error.response?.status === 401) {
+    } catch (error: unknown) {
+      const e = error as { response?: { status?: number }; message?: string };
+      if (e.response?.status === 401) {
         setIsAccessDenied(true);
       } else {
-        console.log("Could not load messages:", error.message);
+        console.log("Could not load messages:", e.message);
       }
     }
   };
@@ -116,8 +117,8 @@ export default function BuyerChatPage() {
       );
       setMilestones(msRes.data.milestones || []);
       setTimeout(() => setReleaseSuccessId(null), 8000);
-    } catch (err: any) {
-      setReleaseError(err.response?.data?.message ?? t("releaseErrorDefault"));
+    } catch (err: unknown) {
+      setReleaseError((err as { response?: { data?: { message?: string } } })?.response?.data?.message ?? t("releaseErrorDefault"));
     } finally {
       setReleaseLoading(null);
     }
@@ -135,7 +136,7 @@ export default function BuyerChatPage() {
       });
       setNewMessage("");
       fetchMessages();
-    } catch (error: any) {
+    } catch {
       setErrorMessage(t("errorSend"));
     }
   };
@@ -155,7 +156,7 @@ export default function BuyerChatPage() {
       });
       setSelectedFile(null);
       fetchMessages();
-    } catch (error: any) {
+    } catch {
       setErrorMessage(t("errorUpload"));
     }
   };

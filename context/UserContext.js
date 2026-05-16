@@ -7,9 +7,9 @@ Axios.defaults.withCredentials = true;
 
 const AuthContext = createContext({
   user_id: null,
-  setUser_id: (_val) => {},
+  setUser_id: () => {},
   username: null,
-  setUsername: (_val) => {},
+  setUsername: () => {},
   authLoading: true,
 });
 

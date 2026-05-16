@@ -64,8 +64,8 @@ export default function SellerProfilePage() {
         setCompletedInvoices(response.data.completedInvoices);
         setAverageRating(response.data.averageRating);
         setCompletedCount(response.data.completedCount);
-      } catch (err: any) {
-        setError(err.response?.status === 404 ? t("notFound") : t("loadError"));
+      } catch (err: unknown) {
+        setError((err as { response?: { status?: number } })?.response?.status === 404 ? t("notFound") : t("loadError"));
       } finally {
         setLoading(false);
       }
@@ -73,7 +73,7 @@ export default function SellerProfilePage() {
     fetchProfile();
   }, [username]);
 
-  const submitReview = async (e: any) => {
+  const submitReview = async (e: React.FormEvent) => {
     e.preventDefault();
     setReviewError("");
     setReviewSuccess("");
@@ -93,8 +93,8 @@ export default function SellerProfilePage() {
       const updated = await Axios.get(`${API}/profile/${username}`);
       setReviews(updated.data.reviews);
       setAverageRating(updated.data.averageRating);
-    } catch (err: any) {
-      setReviewError(err.response?.data?.message || t("reviewError"));
+    } catch (err: unknown) {
+      setReviewError((err as { response?: { data?: { message?: string } } })?.response?.data?.message || t("reviewError"));
     }
   };
 
@@ -399,9 +399,9 @@ export default function SellerProfilePage() {
                               );
                               setPhoneSuccess(t("phoneSuccess"));
                               setEditingPhone(false);
-                            } catch (err: any) {
+                            } catch (err: unknown) {
                               setPhoneError(
-                                err.response?.data?.message || t("phoneError"),
+                                (err as { response?: { data?: { message?: string } } })?.response?.data?.message || t("phoneError"),
                               );
                             } finally {
                               setPhoneSaving(false);

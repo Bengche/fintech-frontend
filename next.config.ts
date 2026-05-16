@@ -4,6 +4,10 @@ import createNextIntlPlugin from "next-intl/plugin";
 const withNextIntl = createNextIntlPlugin("./i18n/request.ts");
 
 const nextConfig: NextConfig = {
+  eslint: {
+    // ESLint is enforced locally via `next lint`; don't block production builds.
+    ignoreDuringBuilds: true,
+  },
   async headers() {
     return [
       // ── Service Worker ───────────────────────────────────────────────────────

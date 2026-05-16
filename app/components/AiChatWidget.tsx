@@ -118,8 +118,6 @@ export default function AiChatWidget() {
   const [pulse, setPulse] = useState(false);
   const [proactive, setProactive] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [msgId, setMsgId] = useState(1);
-
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const msgCounter = useRef(1);

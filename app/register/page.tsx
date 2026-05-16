@@ -36,7 +36,7 @@ function RegisterForm() {
     }
   }, [searchParams]);
 
-  const handleRegister = async (e: any) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     haptic("medium");
     setLoading(true);
@@ -61,8 +61,8 @@ function RegisterForm() {
       await Axios.post(`${API}/auth/register`, newFormData);
       setRegisterMessageSuccess(t("success"));
       setTimeout(() => setRegisterMessageSuccess(""), 6000);
-    } catch (error: any) {
-      const message = error.response?.data?.message || t("errors.generic");
+    } catch (error: unknown) {
+      const message = (error as { response?: { data?: { message?: string } } })?.response?.data?.message || t("errors.generic");
       setRegisterMessageError(message);
       setTimeout(() => setRegisterMessageError(""), 6000);
     } finally {
@@ -70,12 +70,12 @@ function RegisterForm() {
     }
   };
 
-  const handleChange = (e: any) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleImageChange = (e: any) => {
-    const file = e.target.files[0];
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
     if (file) setImage(file);
   };
 

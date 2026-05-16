@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState, useRef } from "react";
-import { useParams, useSearchParams, useRouter } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import Axios from "axios";
 import Link from "next/link";
 
@@ -44,7 +44,6 @@ function makeParticles(n: number): Particle[] {
 export default function PaymentPendingPage() {
   const { invoice_number } = useParams<{ invoice_number: string }>();
   const searchParams = useSearchParams();
-  const router = useRouter();
   const buyerEmail = searchParams.get("email") || "";
 
   const [status, setStatus] = useState<"pending" | "paid">("pending");

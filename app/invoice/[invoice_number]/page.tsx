@@ -66,7 +66,6 @@ export default function InvoicePage() {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [payerEmail, setPayerEmail] = useState("");
   const [payLoading, setPayLoading] = useState(false);
-  const [paySuccess, setPaySuccess] = useState("");
   const [payError, setPayError] = useState("");
   const [showEmailConfirm, setShowEmailConfirm] = useState(false);
   const [pdfLoading, setPdfLoading] = useState(false);
@@ -155,7 +154,6 @@ export default function InvoicePage() {
   const makePayment = async () => {
     setPayLoading(true);
     setPayError("");
-    setPaySuccess("");
     try {
       await Axios.post(`${BASE_API_URL}/api/requestPayment`, {
         amount: invoiceStats.amount,
@@ -166,7 +164,6 @@ export default function InvoicePage() {
         email: payerEmail,
         userid: currentUserId ?? null,
       });
-      setPaySuccess(t("paySuccess"));
       // Redirect to the payment-pending page so the buyer sees the
       // confirmation animation while we wait for the MoMo webhook.
       router.push(

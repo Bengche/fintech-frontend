@@ -65,7 +65,6 @@ export default function AdminDisputePage() {
   const [buyer, setBuyer] = useState<UserData | null>(null);
   const [seller, setSeller] = useState<UserData | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [milestones, setMilestones] = useState<Milestone[]>([]);
   const [disputedMilestones, setDisputedMilestones] = useState<Milestone[]>([]);
   const [effectiveEscrowAmount, setEffectiveEscrowAmount] = useState<
     number | null
@@ -84,7 +83,6 @@ export default function AdminDisputePage() {
       setBuyer(response.data.buyer);
       setSeller(response.data.seller);
       setMessages(response.data.messages);
-      setMilestones(response.data.milestones || []);
       setDisputedMilestones(response.data.disputedMilestones || []);
       setEffectiveEscrowAmount(response.data.effectiveEscrowAmount ?? null);
       const dStatus = response.data.dispute?.status || "";

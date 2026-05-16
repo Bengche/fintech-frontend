@@ -42,8 +42,8 @@ export default function SellerChatPage() {
       const msgs = res.data.messages ?? [];
       setMessages(msgs);
       setChatExists(true);
-    } catch (err: any) {
-      if (err.response?.status === 404) {
+    } catch (err: unknown) {
+      if ((err as { response?: { status?: number } })?.response?.status === 404) {
         setChatExists(false);
       }
     }
