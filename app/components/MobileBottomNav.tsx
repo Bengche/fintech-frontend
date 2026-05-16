@@ -145,11 +145,21 @@ export default function MobileBottomNav() {
           background: var(--color-accent);
           transform-origin: center;
         }
+
+        /* Visible only below lg (1024px). Using media query here instead of
+           Tailwind lg:hidden so inline styles cannot override the rule. */
+        .mbn-nav, .mbn-spacer {
+          display: none;
+        }
+        @media (max-width: 1023px) {
+          .mbn-nav    { display: flex; }
+          .mbn-spacer { display: block; }
+        }
       `}</style>
 
-      {/* Bottom bar — hidden on lg+ */}
+      {/* Bottom bar — hidden on lg+ via .mbn-nav CSS class */}
       <nav
-        className="lg:hidden"
+        className="mbn-nav"
         aria-label="Mobile quick navigation"
         style={{
           position: "fixed",
@@ -163,7 +173,6 @@ export default function MobileBottomNav() {
           borderTop: "1px solid rgba(255,255,255,0.08)",
           boxShadow: "0 -4px 24px rgba(0,0,0,0.28)",
           paddingBottom: "env(safe-area-inset-bottom, 0px)",
-          display: "flex",
           alignItems: "stretch",
         }}
       >
@@ -198,7 +207,7 @@ export default function MobileBottomNav() {
 
       {/* Spacer so page content is not obscured by the bar */}
       <div
-        className="lg:hidden"
+        className="mbn-spacer"
         aria-hidden="true"
         style={{
           height: "calc(3.5rem + env(safe-area-inset-bottom, 0px))",
