@@ -26,6 +26,7 @@ type InvoiceStats = {
   seller_username?: string;
   seller_profilepicture?: string;
   seller_phone?: string;
+  seller_kyc_status?: string;
 };
 
 type Milestone = {
@@ -370,9 +371,45 @@ export default function InvoicePage() {
               >
                 {t("sellerLabel")}
               </p>
-              <p style={{ margin: 0, fontWeight: 700, fontSize: "1.05rem" }}>
-                {sellerName}
-              </p>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.75rem",
+                  marginTop: "0.25rem",
+                  flexWrap: "wrap",
+                }}
+              >
+                <p style={{ margin: 0, fontWeight: 700, fontSize: "1.05rem" }}>
+                  {sellerName}
+                </p>
+                {invoiceStats.seller_kyc_status === "approved" && (
+                  <div
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "0.35rem",
+                      padding: "0.25rem 0.6rem",
+                      borderRadius: "999px",
+                      background: "rgba(34,197,94,0.15)",
+                      border: "1px solid rgba(34,197,94,0.3)",
+                    }}
+                  >
+                    <BadgeCheck size={14} color="#22c55e" />
+                    <span
+                      style={{
+                        fontSize: "0.7rem",
+                        fontWeight: 700,
+                        color: "#22c55e",
+                        letterSpacing: "0.03em",
+                        textTransform: "uppercase",
+                      }}
+                    >
+                      {t("verifiedBadge")}
+                    </span>
+                  </div>
+                )}
+              </div>
               <p
                 style={{
                   margin: "0.5rem 0 0",
@@ -445,7 +482,7 @@ export default function InvoicePage() {
                 style={{
                   fontSize: "1.375rem",
                   fontWeight: 700,
-                  color: "var(--color-text-heading)",
+                  color: "var(--color-primary)",
                   margin: 0,
                 }}
               >

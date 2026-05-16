@@ -85,7 +85,10 @@ function ImageUploadBox({
   const [preview, setPreview] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!file) { setPreview(null); return; }
+    if (!file) {
+      setPreview(null);
+      return;
+    }
     const url = URL.createObjectURL(file);
     setPreview(url);
     return () => URL.revokeObjectURL(url);
@@ -110,10 +113,19 @@ function ImageUploadBox({
         }}
       >
         {label}
-        {required && <span style={{ color: "#dc2626", marginLeft: "3px" }}>*</span>}
+        {required && (
+          <span style={{ color: "#dc2626", marginLeft: "3px" }}>*</span>
+        )}
       </label>
       {hint && (
-        <p style={{ margin: 0, fontSize: "0.78rem", color: "var(--color-text-muted)", lineHeight: 1.5 }}>
+        <p
+          style={{
+            margin: 0,
+            fontSize: "0.78rem",
+            color: "var(--color-text-muted)",
+            lineHeight: 1.5,
+          }}
+        >
           {hint}
         </p>
       )}
@@ -125,7 +137,9 @@ function ImageUploadBox({
           handleFile(e.dataTransfer.files[0] ?? null);
         }}
         style={{
-          border: preview ? "2px solid rgba(15,31,61,0.25)" : "2px dashed var(--color-border)",
+          border: preview
+            ? "2px solid rgba(15,31,61,0.25)"
+            : "2px dashed var(--color-border)",
           borderRadius: "1rem",
           minHeight: "140px",
           display: "flex",
@@ -164,11 +178,30 @@ function ImageUploadBox({
           </>
         ) : (
           <div style={{ textAlign: "center", padding: "1.5rem 1rem" }}>
-            <Upload size={28} style={{ color: "var(--color-text-muted)", marginBottom: "0.5rem" }} />
-            <p style={{ margin: 0, fontSize: "0.875rem", color: "var(--color-text-muted)", fontWeight: 600 }}>
+            <Upload
+              size={28}
+              style={{
+                color: "var(--color-text-muted)",
+                marginBottom: "0.5rem",
+              }}
+            />
+            <p
+              style={{
+                margin: 0,
+                fontSize: "0.875rem",
+                color: "var(--color-text-muted)",
+                fontWeight: 600,
+              }}
+            >
               Tap to upload or drag & drop
             </p>
-            <p style={{ margin: "4px 0 0", fontSize: "0.75rem", color: "var(--color-text-muted)" }}>
+            <p
+              style={{
+                margin: "4px 0 0",
+                fontSize: "0.75rem",
+                color: "var(--color-text-muted)",
+              }}
+            >
               JPEG, PNG, WebP · Max 8 MB
             </p>
           </div>
@@ -188,7 +221,12 @@ function ImageUploadBox({
 // ── Step Progress Bar ─────────────────────────────────────────────────────────
 function StepBar({ step, total }: { step: number; total: number }) {
   const t = useTranslations("Kyc");
-  const labels = [t("stepPersonal"), t("stepDocument"), t("stepSelfie"), t("stepReview")];
+  const labels = [
+    t("stepPersonal"),
+    t("stepDocument"),
+    t("stepSelfie"),
+    t("stepReview"),
+  ];
   return (
     <div style={{ marginBottom: "2rem" }}>
       <div
@@ -224,14 +262,14 @@ function StepBar({ step, total }: { step: number; total: number }) {
                   i < step
                     ? "var(--color-primary)"
                     : i === step
-                    ? "var(--color-accent, #F59E0B)"
-                    : "var(--color-border)",
+                      ? "var(--color-accent, #F59E0B)"
+                      : "var(--color-border)",
                 color:
                   i < step
                     ? "#fff"
                     : i === step
-                    ? "var(--color-primary)"
-                    : "var(--color-text-muted)",
+                      ? "var(--color-primary)"
+                      : "var(--color-text-muted)",
                 transition: "background 0.3s",
               }}
             >
@@ -267,28 +305,51 @@ function StepBar({ step, total }: { step: number; total: number }) {
 }
 
 // ── KYC Status Banner ─────────────────────────────────────────────────────────
-function StatusBanner({ status, application }: { status: KycStatus; application: KycApplication | null }) {
+function StatusBanner({
+  status,
+  application,
+}: {
+  status: KycStatus;
+  application: KycApplication | null;
+}) {
   const t = useTranslations("Kyc");
 
   if (status === "unverified") return null;
 
-  const configs: Record<Exclude<KycStatus, "unverified">, {
-    bg: string; border: string; icon: React.ReactNode; color: string; title: string; body: string;
-  }> = {
+  const configs: Record<
+    Exclude<KycStatus, "unverified">,
+    {
+      bg: string;
+      border: string;
+      icon: React.ReactNode;
+      color: string;
+      title: string;
+      body: string;
+    }
+  > = {
     pending: {
-      bg: "rgba(245,158,11,0.08)", border: "rgba(245,158,11,0.3)",
+      bg: "rgba(245,158,11,0.08)",
+      border: "rgba(245,158,11,0.3)",
       icon: <Clock size={20} color="#92400e" />,
-      color: "#92400e", title: t("statusPendingTitle"), body: t("statusPendingBody"),
+      color: "#92400e",
+      title: t("statusPendingTitle"),
+      body: t("statusPendingBody"),
     },
     approved: {
-      bg: "rgba(22,163,74,0.08)", border: "rgba(22,163,74,0.3)",
+      bg: "rgba(22,163,74,0.08)",
+      border: "rgba(22,163,74,0.3)",
       icon: <BadgeCheck size={20} color="#166534" />,
-      color: "#166534", title: t("statusApprovedTitle"), body: t("statusApprovedBody"),
+      color: "#166534",
+      title: t("statusApprovedTitle"),
+      body: t("statusApprovedBody"),
     },
     rejected: {
-      bg: "rgba(220,38,38,0.08)", border: "rgba(220,38,38,0.3)",
+      bg: "rgba(220,38,38,0.08)",
+      border: "rgba(220,38,38,0.3)",
       icon: <XCircle size={20} color="#991b1b" />,
-      color: "#991b1b", title: t("statusRejectedTitle"), body: t("statusRejectedBody"),
+      color: "#991b1b",
+      title: t("statusRejectedTitle"),
+      body: t("statusRejectedBody"),
     },
   };
 
@@ -309,10 +370,24 @@ function StatusBanner({ status, application }: { status: KycStatus; application:
     >
       <div style={{ flexShrink: 0, marginTop: "2px" }}>{cfg.icon}</div>
       <div style={{ flex: 1 }}>
-        <p style={{ margin: 0, fontWeight: 800, color: cfg.color, fontSize: "1rem" }}>
+        <p
+          style={{
+            margin: 0,
+            fontWeight: 800,
+            color: cfg.color,
+            fontSize: "1rem",
+          }}
+        >
           {cfg.title}
         </p>
-        <p style={{ margin: "4px 0 0", fontSize: "0.875rem", color: "var(--color-text-muted)", lineHeight: 1.6 }}>
+        <p
+          style={{
+            margin: "4px 0 0",
+            fontSize: "0.875rem",
+            color: "var(--color-text-muted)",
+            lineHeight: 1.6,
+          }}
+        >
           {cfg.body}
         </p>
         {application?.admin_note && status === "rejected" && (
@@ -325,19 +400,41 @@ function StatusBanner({ status, application }: { status: KycStatus; application:
               padding: "0.75rem 1rem",
             }}
           >
-            <p style={{ margin: 0, fontSize: "0.83rem", fontWeight: 700, color: "#991b1b" }}>
+            <p
+              style={{
+                margin: 0,
+                fontSize: "0.83rem",
+                fontWeight: 700,
+                color: "#991b1b",
+              }}
+            >
               {t("reviewerNote")}
             </p>
-            <p style={{ margin: "4px 0 0", fontSize: "0.83rem", color: "#7f1d1d" }}>
+            <p
+              style={{
+                margin: "4px 0 0",
+                fontSize: "0.83rem",
+                color: "#7f1d1d",
+              }}
+            >
               {application.admin_note}
             </p>
           </div>
         )}
         {application && (
-          <p style={{ margin: "0.5rem 0 0", fontSize: "0.78rem", color: "var(--color-text-muted)" }}>
+          <p
+            style={{
+              margin: "0.5rem 0 0",
+              fontSize: "0.78rem",
+              color: "var(--color-text-muted)",
+            }}
+          >
             {t("submittedOn")} {fmtDate(application.submitted_at)}
             {application.reviewed_at && (
-              <> · {t("reviewedOn")} {fmtDate(application.reviewed_at)}</>
+              <>
+                {" "}
+                · {t("reviewedOn")} {fmtDate(application.reviewed_at)}
+              </>
             )}
           </p>
         )}
@@ -383,10 +480,14 @@ export default function KycPage() {
   // ── Load current KYC status ──────────────────────────────────────────────────
   const loadStatus = useCallback(async () => {
     try {
-      const res = await Axios.get(`${API}/kyc/status`, { withCredentials: true });
+      const res = await Axios.get(`${API}/kyc/status`, {
+        withCredentials: true,
+      });
       setKycStatus(res.data.kyc_status || "unverified");
       setApplication(res.data.application || null);
-    } catch { /* ignore */ } finally {
+    } catch {
+      /* ignore */
+    } finally {
       setStatusLoading(false);
     }
   }, []);
@@ -412,8 +513,12 @@ export default function KycPage() {
     }
     if (step === 1) {
       if (!form.document_number.trim()) return t("errorDocNumber");
-      if (!docFront) return form.document_type === "passport" ? t("errorPassportDoc") : t("errorDocFront");
-      if (form.document_type !== "passport" && !docBack) return t("errorDocBack");
+      if (!docFront)
+        return form.document_type === "passport"
+          ? t("errorPassportDoc")
+          : t("errorDocFront");
+      if (form.document_type !== "passport" && !docBack)
+        return t("errorDocBack");
     }
     if (step === 2) {
       if (!selfie) return t("errorSelfie");
@@ -425,7 +530,10 @@ export default function KycPage() {
 
   const goNext = () => {
     const err = validateStep();
-    if (err) { setStepError(err); return; }
+    if (err) {
+      setStepError(err);
+      return;
+    }
     setStepError("");
     setStep((s) => s + 1);
   };
@@ -443,8 +551,8 @@ export default function KycPage() {
       const fd = new FormData();
       Object.entries(form).forEach(([k, v]) => fd.append(k, v));
       if (docFront) fd.append("document_front", docFront, docFront.name);
-      if (docBack)  fd.append("document_back",  docBack,  docBack.name);
-      if (selfie)   fd.append("selfie",          selfie,   selfie.name);
+      if (docBack) fd.append("document_back", docBack, docBack.name);
+      if (selfie) fd.append("selfie", selfie, selfie.name);
 
       await Axios.post(`${API}/kyc/submit`, fd, {
         withCredentials: true,
@@ -465,8 +573,17 @@ export default function KycPage() {
     return (
       <>
         <SiteHeader />
-        <main className="page-container" style={{ paddingTop: "3rem", textAlign: "center" }}>
-          <Loader2 size={32} style={{ animation: "spin 1s linear infinite", color: "var(--color-primary)" }} />
+        <main
+          className="page-container"
+          style={{ paddingTop: "3rem", textAlign: "center" }}
+        >
+          <Loader2
+            size={32}
+            style={{
+              animation: "spin 1s linear infinite",
+              color: "var(--color-primary)",
+            }}
+          />
         </main>
       </>
     );
@@ -540,7 +657,8 @@ export default function KycPage() {
           <div
             style={{
               marginTop: "1rem",
-              background: "linear-gradient(135deg, rgba(15,31,61,0.04), rgba(245,158,11,0.08))",
+              background:
+                "linear-gradient(135deg, rgba(15,31,61,0.04), rgba(245,158,11,0.08))",
               border: "1px solid rgba(15,31,61,0.1)",
               borderRadius: "0.875rem",
               padding: "0.875rem 1rem",
@@ -549,8 +667,22 @@ export default function KycPage() {
               alignItems: "flex-start",
             }}
           >
-            <Info size={16} style={{ flexShrink: 0, marginTop: "2px", color: "var(--color-primary)" }} />
-            <p style={{ margin: 0, fontSize: "0.83rem", color: "var(--color-text-muted)", lineHeight: 1.6 }}>
+            <Info
+              size={16}
+              style={{
+                flexShrink: 0,
+                marginTop: "2px",
+                color: "var(--color-primary)",
+              }}
+            />
+            <p
+              style={{
+                margin: 0,
+                fontSize: "0.83rem",
+                color: "var(--color-text-muted)",
+                lineHeight: 1.6,
+              }}
+            >
               {t("whyVerify")}
             </p>
           </div>
@@ -570,11 +702,29 @@ export default function KycPage() {
               borderRadius: "1.25rem",
             }}
           >
-            <CheckCircle2 size={56} color="#16a34a" style={{ marginBottom: "1rem" }} />
-            <h2 style={{ margin: "0 0 0.5rem", color: "#166534", fontSize: "1.35rem", fontWeight: 800 }}>
+            <CheckCircle2
+              size={56}
+              color="#16a34a"
+              style={{ marginBottom: "1rem" }}
+            />
+            <h2
+              style={{
+                margin: "0 0 0.5rem",
+                color: "#166534",
+                fontSize: "1.35rem",
+                fontWeight: 800,
+              }}
+            >
               {t("successTitle")}
             </h2>
-            <p style={{ margin: "0 0 1.5rem", color: "var(--color-text-muted)", lineHeight: 1.6, fontSize: "0.925rem" }}>
+            <p
+              style={{
+                margin: "0 0 1.5rem",
+                color: "var(--color-text-muted)",
+                lineHeight: 1.6,
+                fontSize: "0.925rem",
+              }}
+            >
               {t("successBody")}
             </p>
             <button
@@ -597,11 +747,29 @@ export default function KycPage() {
               borderRadius: "1.25rem",
             }}
           >
-            <BadgeCheck size={60} color="#16a34a" style={{ marginBottom: "1rem" }} />
-            <h2 style={{ margin: "0 0 0.5rem", color: "#166534", fontSize: "1.25rem", fontWeight: 800 }}>
+            <BadgeCheck
+              size={60}
+              color="#16a34a"
+              style={{ marginBottom: "1rem" }}
+            />
+            <h2
+              style={{
+                margin: "0 0 0.5rem",
+                color: "#166534",
+                fontSize: "1.25rem",
+                fontWeight: 800,
+              }}
+            >
               {t("verifiedTitle")}
             </h2>
-            <p style={{ margin: 0, color: "var(--color-text-muted)", fontSize: "0.9rem", lineHeight: 1.6 }}>
+            <p
+              style={{
+                margin: 0,
+                color: "var(--color-text-muted)",
+                fontSize: "0.9rem",
+                lineHeight: 1.6,
+              }}
+            >
               {t("verifiedBody")}
             </p>
           </div>
@@ -619,10 +787,24 @@ export default function KycPage() {
             }}
           >
             <Clock size={48} color="#F59E0B" style={{ marginBottom: "1rem" }} />
-            <h2 style={{ margin: "0 0 0.5rem", color: "#92400e", fontSize: "1.1rem", fontWeight: 800 }}>
+            <h2
+              style={{
+                margin: "0 0 0.5rem",
+                color: "#92400e",
+                fontSize: "1.1rem",
+                fontWeight: 800,
+              }}
+            >
               {t("pendingTitle")}
             </h2>
-            <p style={{ margin: 0, color: "var(--color-text-muted)", fontSize: "0.875rem", lineHeight: 1.6 }}>
+            <p
+              style={{
+                margin: 0,
+                color: "var(--color-text-muted)",
+                fontSize: "0.875rem",
+                lineHeight: 1.6,
+              }}
+            >
               {t("pendingBody")}
             </p>
           </div>
@@ -644,8 +826,16 @@ export default function KycPage() {
             {/* ── Step 0: Personal Information ── */}
             {step === 0 && (
               <div style={{ display: "grid", gap: "1.125rem" }}>
-                <SectionHeading icon={<User size={18} />} title={t("stepPersonal")} subtitle={t("stepPersonalHint")} />
-                <InputRow label={t("fieldFullName")} hint={t("fieldFullNameHint")} required>
+                <SectionHeading
+                  icon={<User size={18} />}
+                  title={t("stepPersonal")}
+                  subtitle={t("stepPersonalHint")}
+                />
+                <InputRow
+                  label={t("fieldFullName")}
+                  hint={t("fieldFullNameHint")}
+                  required
+                >
                   <input
                     className="form-input"
                     type="text"
@@ -655,14 +845,24 @@ export default function KycPage() {
                     autoComplete="name"
                   />
                 </InputRow>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "1fr 1fr",
+                    gap: "1rem",
+                  }}
+                >
                   <InputRow label={t("fieldDob")} required>
                     <input
                       className="form-input"
                       type="date"
                       value={form.date_of_birth}
-                      onChange={(e) => setField("date_of_birth", e.target.value)}
-                      max={new Date(Date.now() - 16 * 365.25 * 864e5).toISOString().slice(0, 10)}
+                      onChange={(e) =>
+                        setField("date_of_birth", e.target.value)
+                      }
+                      max={new Date(Date.now() - 16 * 365.25 * 864e5)
+                        .toISOString()
+                        .slice(0, 10)}
                     />
                   </InputRow>
                   <InputRow label={t("fieldNationality")} required>
@@ -675,7 +875,11 @@ export default function KycPage() {
                     />
                   </InputRow>
                 </div>
-                <InputRow label={t("fieldPhone")} hint={t("fieldPhoneHint")} required>
+                <InputRow
+                  label={t("fieldPhone")}
+                  hint={t("fieldPhoneHint")}
+                  required
+                >
                   <input
                     className="form-input"
                     type="tel"
@@ -685,7 +889,11 @@ export default function KycPage() {
                     autoComplete="tel"
                   />
                 </InputRow>
-                <InputRow label={t("fieldAddress")} hint={t("fieldAddressHint")} required>
+                <InputRow
+                  label={t("fieldAddress")}
+                  hint={t("fieldAddressHint")}
+                  required
+                >
                   <input
                     className="form-input"
                     type="text"
@@ -695,7 +903,13 @@ export default function KycPage() {
                     autoComplete="street-address"
                   />
                 </InputRow>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "1fr 1fr",
+                    gap: "1rem",
+                  }}
+                >
                   <InputRow label={t("fieldCity")} required>
                     <input
                       className="form-input"
@@ -723,12 +937,22 @@ export default function KycPage() {
             {/* ── Step 1: Document ── */}
             {step === 1 && (
               <div style={{ display: "grid", gap: "1.25rem" }}>
-                <SectionHeading icon={<FileText size={18} />} title={t("stepDocument")} subtitle={t("stepDocumentHint")} />
+                <SectionHeading
+                  icon={<FileText size={18} />}
+                  title={t("stepDocument")}
+                  subtitle={t("stepDocumentHint")}
+                />
 
                 {/* Document type selector */}
                 <InputRow label={t("fieldDocType")} required>
                   <div style={{ display: "grid", gap: "0.6rem" }}>
-                    {(["national_id", "drivers_license", "passport"] as DocType[]).map((dt) => (
+                    {(
+                      [
+                        "national_id",
+                        "drivers_license",
+                        "passport",
+                      ] as DocType[]
+                    ).map((dt) => (
                       <label
                         key={dt}
                         style={{
@@ -738,12 +962,14 @@ export default function KycPage() {
                           padding: "0.85rem 1rem",
                           borderRadius: "0.75rem",
                           cursor: "pointer",
-                          border: form.document_type === dt
-                            ? "2px solid var(--color-primary)"
-                            : "1.5px solid var(--color-border)",
-                          background: form.document_type === dt
-                            ? "rgba(15,31,61,0.04)"
-                            : "var(--color-white)",
+                          border:
+                            form.document_type === dt
+                              ? "2px solid var(--color-primary)"
+                              : "1.5px solid var(--color-border)",
+                          background:
+                            form.document_type === dt
+                              ? "rgba(15,31,61,0.04)"
+                              : "var(--color-white)",
                           transition: "border-color 0.2s, background 0.2s",
                         }}
                       >
@@ -758,7 +984,13 @@ export default function KycPage() {
                           }}
                           style={{ accentColor: "var(--color-primary)" }}
                         />
-                        <span style={{ fontWeight: 600, fontSize: "0.9rem", color: "var(--color-text-heading)" }}>
+                        <span
+                          style={{
+                            fontWeight: 600,
+                            fontSize: "0.9rem",
+                            color: "var(--color-text-heading)",
+                          }}
+                        >
                           {DOC_LABELS[dt]}
                         </span>
                       </label>
@@ -766,13 +998,19 @@ export default function KycPage() {
                   </div>
                 </InputRow>
 
-                <InputRow label={t("fieldDocNumber")} hint={t("fieldDocNumberHint")} required>
+                <InputRow
+                  label={t("fieldDocNumber")}
+                  hint={t("fieldDocNumberHint")}
+                  required
+                >
                   <input
                     className="form-input"
                     type="text"
                     placeholder={t("fieldDocNumberPlaceholder")}
                     value={form.document_number}
-                    onChange={(e) => setField("document_number", e.target.value)}
+                    onChange={(e) =>
+                      setField("document_number", e.target.value)
+                    }
                   />
                 </InputRow>
 
@@ -809,7 +1047,11 @@ export default function KycPage() {
             {/* ── Step 2: Selfie ── */}
             {step === 2 && (
               <div style={{ display: "grid", gap: "1.25rem" }}>
-                <SectionHeading icon={<Camera size={18} />} title={t("stepSelfie")} subtitle={t("stepSelfieHint")} />
+                <SectionHeading
+                  icon={<Camera size={18} />}
+                  title={t("stepSelfie")}
+                  subtitle={t("stepSelfieHint")}
+                />
 
                 <div
                   style={{
@@ -821,11 +1063,28 @@ export default function KycPage() {
                     gap: "0.625rem",
                   }}
                 >
-                  <AlertCircle size={16} style={{ flexShrink: 0, marginTop: "2px", color: "var(--color-primary)" }} />
-                  <ul style={{ margin: 0, paddingLeft: "1rem", fontSize: "0.83rem", color: "var(--color-text-muted)", lineHeight: 1.7 }}>
-                    {(t.raw("selfieGuidelines") as string[]).map((g: string, i: number) => (
-                      <li key={i}>{g}</li>
-                    ))}
+                  <AlertCircle
+                    size={16}
+                    style={{
+                      flexShrink: 0,
+                      marginTop: "2px",
+                      color: "var(--color-primary)",
+                    }}
+                  />
+                  <ul
+                    style={{
+                      margin: 0,
+                      paddingLeft: "1rem",
+                      fontSize: "0.83rem",
+                      color: "var(--color-text-muted)",
+                      lineHeight: 1.7,
+                    }}
+                  >
+                    {(t.raw("selfieGuidelines") as string[]).map(
+                      (g: string, i: number) => (
+                        <li key={i}>{g}</li>
+                      ),
+                    )}
                   </ul>
                 </div>
 
@@ -842,20 +1101,48 @@ export default function KycPage() {
             {/* ── Step 3: Review & Submit ── */}
             {step === 3 && (
               <div style={{ display: "grid", gap: "1.125rem" }}>
-                <SectionHeading icon={<CheckCircle2 size={18} />} title={t("stepReview")} subtitle={t("stepReviewHint")} />
+                <SectionHeading
+                  icon={<CheckCircle2 size={18} />}
+                  title={t("stepReview")}
+                  subtitle={t("stepReviewHint")}
+                />
 
-                <ReviewRow label={t("fieldFullName")}    value={form.full_name} />
-                <ReviewRow label={t("fieldDob")}         value={fmtDate(form.date_of_birth)} />
-                <ReviewRow label={t("fieldNationality")} value={form.nationality} />
-                <ReviewRow label={t("fieldPhone")}       value={form.phone} />
-                <ReviewRow label={t("fieldAddress")}     value={`${form.address}, ${form.city}, ${form.country}`} />
-                <ReviewRow label={t("fieldDocType")}     value={DOC_LABELS[form.document_type]} />
-                <ReviewRow label={t("fieldDocNumber")}   value={form.document_number} />
-                <ReviewRow label={t("fieldDocFront")}    value={docFront ? `✓ ${docFront.name}` : "—"} />
+                <ReviewRow label={t("fieldFullName")} value={form.full_name} />
+                <ReviewRow
+                  label={t("fieldDob")}
+                  value={fmtDate(form.date_of_birth)}
+                />
+                <ReviewRow
+                  label={t("fieldNationality")}
+                  value={form.nationality}
+                />
+                <ReviewRow label={t("fieldPhone")} value={form.phone} />
+                <ReviewRow
+                  label={t("fieldAddress")}
+                  value={`${form.address}, ${form.city}, ${form.country}`}
+                />
+                <ReviewRow
+                  label={t("fieldDocType")}
+                  value={DOC_LABELS[form.document_type]}
+                />
+                <ReviewRow
+                  label={t("fieldDocNumber")}
+                  value={form.document_number}
+                />
+                <ReviewRow
+                  label={t("fieldDocFront")}
+                  value={docFront ? `✓ ${docFront.name}` : "—"}
+                />
                 {form.document_type !== "passport" && (
-                  <ReviewRow label={t("fieldDocBack")} value={docBack ? `✓ ${docBack.name}` : "—"} />
+                  <ReviewRow
+                    label={t("fieldDocBack")}
+                    value={docBack ? `✓ ${docBack.name}` : "—"}
+                  />
                 )}
-                <ReviewRow label={t("fieldSelfie")}     value={selfie ? `✓ ${selfie.name}` : "—"} />
+                <ReviewRow
+                  label={t("fieldSelfie")}
+                  value={selfie ? `✓ ${selfie.name}` : "—"}
+                />
 
                 <div
                   style={{
@@ -890,7 +1177,10 @@ export default function KycPage() {
                   fontSize: "0.875rem",
                 }}
               >
-                <AlertCircle size={16} style={{ flexShrink: 0, marginTop: "1px" }} />
+                <AlertCircle
+                  size={16}
+                  style={{ flexShrink: 0, marginTop: "1px" }}
+                />
                 {stepError}
               </div>
             )}
@@ -911,7 +1201,10 @@ export default function KycPage() {
                   fontSize: "0.875rem",
                 }}
               >
-                <AlertCircle size={16} style={{ flexShrink: 0, marginTop: "1px" }} />
+                <AlertCircle
+                  size={16}
+                  style={{ flexShrink: 0, marginTop: "1px" }}
+                />
                 {submitError}
               </div>
             )}
@@ -954,7 +1247,11 @@ export default function KycPage() {
                   type="button"
                   className="btn-primary"
                   onClick={goNext}
-                  style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.4rem",
+                  }}
                 >
                   {t("next")}
                   <ChevronRight size={16} />
@@ -965,11 +1262,20 @@ export default function KycPage() {
                   className="btn-primary"
                   onClick={handleSubmit}
                   disabled={submitting}
-                  style={{ display: "flex", alignItems: "center", gap: "0.5rem", minWidth: "160px", justifyContent: "center" }}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.5rem",
+                    minWidth: "160px",
+                    justifyContent: "center",
+                  }}
                 >
                   {submitting ? (
                     <>
-                      <Loader2 size={16} style={{ animation: "spin 1s linear infinite" }} />
+                      <Loader2
+                        size={16}
+                        style={{ animation: "spin 1s linear infinite" }}
+                      />
                       {t("submitting")}
                     </>
                   ) : (
@@ -989,7 +1295,15 @@ export default function KycPage() {
 }
 
 // ── Small helpers ─────────────────────────────────────────────────────────────
-function SectionHeading({ icon, title, subtitle }: { icon: React.ReactNode; title: string; subtitle?: string }) {
+function SectionHeading({
+  icon,
+  title,
+  subtitle,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  subtitle?: string;
+}) {
   return (
     <div
       style={{
@@ -1017,11 +1331,25 @@ function SectionHeading({ icon, title, subtitle }: { icon: React.ReactNode; titl
         {icon}
       </div>
       <div>
-        <p style={{ margin: 0, fontWeight: 800, color: "var(--color-text-heading)", fontSize: "1rem" }}>
+        <p
+          style={{
+            margin: 0,
+            fontWeight: 800,
+            color: "var(--color-text-heading)",
+            fontSize: "1rem",
+          }}
+        >
           {title}
         </p>
         {subtitle && (
-          <p style={{ margin: "3px 0 0", fontSize: "0.83rem", color: "var(--color-text-muted)", lineHeight: 1.5 }}>
+          <p
+            style={{
+              margin: "3px 0 0",
+              fontSize: "0.83rem",
+              color: "var(--color-text-muted)",
+              lineHeight: 1.5,
+            }}
+          >
             {subtitle}
           </p>
         )}
@@ -1044,13 +1372,26 @@ function InputRow({
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
       <label
-        style={{ fontSize: "0.875rem", fontWeight: 600, color: "var(--color-text-heading)" }}
+        style={{
+          fontSize: "0.875rem",
+          fontWeight: 600,
+          color: "var(--color-text-heading)",
+        }}
       >
         {label}
-        {required && <span style={{ color: "#dc2626", marginLeft: "3px" }}>*</span>}
+        {required && (
+          <span style={{ color: "#dc2626", marginLeft: "3px" }}>*</span>
+        )}
       </label>
       {hint && (
-        <p style={{ margin: 0, fontSize: "0.78rem", color: "var(--color-text-muted)", lineHeight: 1.5 }}>
+        <p
+          style={{
+            margin: 0,
+            fontSize: "0.78rem",
+            color: "var(--color-text-muted)",
+            lineHeight: 1.5,
+          }}
+        >
           {hint}
         </p>
       )}
@@ -1071,7 +1412,13 @@ function ReviewRow({ label, value }: { label: string; value: string }) {
         flexWrap: "wrap",
       }}
     >
-      <span style={{ fontSize: "0.85rem", color: "var(--color-text-muted)", fontWeight: 600 }}>
+      <span
+        style={{
+          fontSize: "0.85rem",
+          color: "var(--color-text-muted)",
+          fontWeight: 600,
+        }}
+      >
         {label}
       </span>
       <span

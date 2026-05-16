@@ -199,7 +199,7 @@ export default function SettingsPage() {
             onSaved={(phone) => setProfile((p) => (p ? { ...p, phone } : p))}
           />
           <ChangePasswordForm />
-                    <KycStatusSection />
+          <KycStatusSection />
           <SessionManagerSection />
           <PasskeySection />
           <DeleteAccountSection />
@@ -211,112 +211,154 @@ export default function SettingsPage() {
 
 // ── KYC Status Section ────────────────────────────────────────────────────────
 function KycStatusSection() {
-    const t = useTranslations("Settings");
-    const [kycStatus, setKycStatus] = useState<string>("unverified");
-    const [loading, setLoading] = useState(true);
+  const t = useTranslations("Settings");
+  const [kycStatus, setKycStatus] = useState<string>("unverified");
+  const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-      Axios.get(`${API}/kyc/status`, { withCredentials: true })
-        .then((res) => setKycStatus(res.data.kyc_status || "unverified"))
-        .catch(() => {})
-        .finally(() => setLoading(false));
-    }, []);
+  useEffect(() => {
+    Axios.get(`${API}/kyc/status`, { withCredentials: true })
+      .then((res) => setKycStatus(res.data.kyc_status || "unverified"))
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
 
-    const badge = () => {
-      if (loading) return null;
-      if (kycStatus === "approved")
-        return (
-          <span
-            style={{
-              display: "inline-flex", alignItems: "center", gap: "0.35rem",
-              padding: "0.28rem 0.75rem", borderRadius: "999px",
-              background: "rgba(22,163,74,0.1)", border: "1.5px solid rgba(22,163,74,0.3)",
-              color: "#166534", fontSize: "0.78rem", fontWeight: 800,
-            }}
-          >
-            <BadgeCheck size={13} /> {t("kyc.statusApproved")}
-          </span>
-        );
-      if (kycStatus === "pending")
-        return (
-          <span
-            style={{
-              display: "inline-flex", alignItems: "center", gap: "0.35rem",
-              padding: "0.28rem 0.75rem", borderRadius: "999px",
-              background: "rgba(245,158,11,0.1)", border: "1.5px solid rgba(245,158,11,0.3)",
-              color: "#92400e", fontSize: "0.78rem", fontWeight: 800,
-            }}
-          >
-            <Clock size={13} /> {t("kyc.statusPending")}
-          </span>
-        );
-      if (kycStatus === "rejected")
-        return (
-          <span
-            style={{
-              display: "inline-flex", alignItems: "center", gap: "0.35rem",
-              padding: "0.28rem 0.75rem", borderRadius: "999px",
-              background: "rgba(220,38,38,0.08)", border: "1.5px solid rgba(220,38,38,0.2)",
-              color: "#991b1b", fontSize: "0.78rem", fontWeight: 800,
-            }}
-          >
-            <ShieldAlert size={13} /> {t("kyc.statusRejected")}
-          </span>
-        );
+  const badge = () => {
+    if (loading) return null;
+    if (kycStatus === "approved")
       return (
         <span
           style={{
-            display: "inline-flex", alignItems: "center", gap: "0.35rem",
-            padding: "0.28rem 0.75rem", borderRadius: "999px",
-            background: "rgba(100,116,139,0.08)", border: "1.5px solid rgba(100,116,139,0.2)",
-            color: "#475569", fontSize: "0.78rem", fontWeight: 700,
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "0.35rem",
+            padding: "0.28rem 0.75rem",
+            borderRadius: "999px",
+            background: "rgba(22,163,74,0.1)",
+            border: "1.5px solid rgba(22,163,74,0.3)",
+            color: "#166534",
+            fontSize: "0.78rem",
+            fontWeight: 800,
           }}
         >
-          <ShieldAlert size={13} /> {t("kyc.statusUnverified")}
+          <BadgeCheck size={13} /> {t("kyc.statusApproved")}
         </span>
       );
-    };
-
-    return (
-      <Section title={t("kyc.sectionTitle")} subtitle={t("kyc.sectionSubtitle")}>
-        <div
+    if (kycStatus === "pending")
+      return (
+        <span
           style={{
-            display: "flex",
+            display: "inline-flex",
             alignItems: "center",
-            justifyContent: "space-between",
-            gap: "1rem",
-            flexWrap: "wrap",
-            padding: "1rem 1.125rem",
-            borderRadius: "0.875rem",
-            background: kycStatus === "approved"
-              ? "rgba(22,163,74,0.05)"
-              : "linear-gradient(135deg, rgba(15,31,61,0.04), rgba(245,158,11,0.08))",
-            border: kycStatus === "approved"
-              ? "1.5px solid rgba(22,163,74,0.2)"
-              : "1px solid rgba(15,31,61,0.08)",
+            gap: "0.35rem",
+            padding: "0.28rem 0.75rem",
+            borderRadius: "999px",
+            background: "rgba(245,158,11,0.1)",
+            border: "1.5px solid rgba(245,158,11,0.3)",
+            color: "#92400e",
+            fontSize: "0.78rem",
+            fontWeight: 800,
           }}
         >
-          <div>
-            <p style={{ margin: 0, fontWeight: 700, color: "var(--color-text-heading)", fontSize: "0.95rem" }}>
-              {t("kyc.verificationStatus")}
-            </p>
-            <div style={{ marginTop: "0.4rem" }}>{badge()}</div>
-          </div>
-          {kycStatus !== "approved" && (
-            <Link href="/kyc" style={{ textDecoration: "none" }}>
-              <button
-                className="btn-primary"
-                type="button"
-                style={{ display: "flex", alignItems: "center", gap: "0.4rem", fontSize: "0.875rem" }}
-              >
-                <ShieldCheck size={15} />
-                {kycStatus === "rejected" ? t("kyc.resubmit") : kycStatus === "pending" ? t("kyc.viewStatus") : t("kyc.getVerified")}
-              </button>
-            </Link>
-          )}
-        </div>
-      </Section>
+          <Clock size={13} /> {t("kyc.statusPending")}
+        </span>
+      );
+    if (kycStatus === "rejected")
+      return (
+        <span
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "0.35rem",
+            padding: "0.28rem 0.75rem",
+            borderRadius: "999px",
+            background: "rgba(220,38,38,0.08)",
+            border: "1.5px solid rgba(220,38,38,0.2)",
+            color: "#991b1b",
+            fontSize: "0.78rem",
+            fontWeight: 800,
+          }}
+        >
+          <ShieldAlert size={13} /> {t("kyc.statusRejected")}
+        </span>
+      );
+    return (
+      <span
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          gap: "0.35rem",
+          padding: "0.28rem 0.75rem",
+          borderRadius: "999px",
+          background: "rgba(100,116,139,0.08)",
+          border: "1.5px solid rgba(100,116,139,0.2)",
+          color: "#475569",
+          fontSize: "0.78rem",
+          fontWeight: 700,
+        }}
+      >
+        <ShieldAlert size={13} /> {t("kyc.statusUnverified")}
+      </span>
     );
+  };
+
+  return (
+    <Section title={t("kyc.sectionTitle")} subtitle={t("kyc.sectionSubtitle")}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: "1rem",
+          flexWrap: "wrap",
+          padding: "1rem 1.125rem",
+          borderRadius: "0.875rem",
+          background:
+            kycStatus === "approved"
+              ? "rgba(22,163,74,0.05)"
+              : "linear-gradient(135deg, rgba(15,31,61,0.04), rgba(245,158,11,0.08))",
+          border:
+            kycStatus === "approved"
+              ? "1.5px solid rgba(22,163,74,0.2)"
+              : "1px solid rgba(15,31,61,0.08)",
+        }}
+      >
+        <div>
+          <p
+            style={{
+              margin: 0,
+              fontWeight: 700,
+              color: "var(--color-text-heading)",
+              fontSize: "0.95rem",
+            }}
+          >
+            {t("kyc.verificationStatus")}
+          </p>
+          <div style={{ marginTop: "0.4rem" }}>{badge()}</div>
+        </div>
+        {kycStatus !== "approved" && (
+          <Link href="/kyc" style={{ textDecoration: "none" }}>
+            <button
+              className="btn-primary"
+              type="button"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "0.4rem",
+                fontSize: "0.875rem",
+              }}
+            >
+              <ShieldCheck size={15} />
+              {kycStatus === "rejected"
+                ? t("kyc.resubmit")
+                : kycStatus === "pending"
+                  ? t("kyc.viewStatus")
+                  : t("kyc.getVerified")}
+            </button>
+          </Link>
+        )}
+      </div>
+    </Section>
+  );
 }
 
 function SessionManagerSection() {

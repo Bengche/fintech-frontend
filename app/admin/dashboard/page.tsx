@@ -110,7 +110,7 @@ type TabKey =
   | "referrals"
   | "messages"
   | "stuck"
-    | "kyc"
+  | "kyc"
   | "verify"
   | "controls";
 
@@ -129,7 +129,7 @@ export default function AdminDashboard() {
     { key: "disputes", label: t("dashboard.tabDisputes") },
     { key: "referrals", label: t("dashboard.tabReferrals") },
     { key: "messages", label: t("dashboard.tabMessages") },
-      { key: "kyc", label: "KYC" },
+    { key: "kyc", label: "KYC" },
     { key: "verify", label: "Verify Receipt" },
     { key: "controls", label: t("dashboard.tabControls") },
   ];
@@ -151,8 +151,12 @@ export default function AdminDashboard() {
   const [broadcasts, setBroadcasts] = useState<SectionState>(initTab());
   const [stuck, setStuck] = useState<SectionState>(initTab());
   const [kyc, setKyc] = useState<SectionState>(initTab());
-  const [kycFilter, setKycFilter] = useState<"all" | "pending" | "approved" | "rejected">("pending");
-  const [kycActionLoadingId, setKycActionLoadingId] = useState<number | null>(null);
+  const [kycFilter, setKycFilter] = useState<
+    "all" | "pending" | "approved" | "rejected"
+  >("pending");
+  const [kycActionLoadingId, setKycActionLoadingId] = useState<number | null>(
+    null,
+  );
   const [kycNoteById, setKycNoteById] = useState<Record<number, string>>({});
 
   // ── Platform Controls state ───────────────────────────────────────────────
@@ -288,7 +292,7 @@ export default function AdminDashboard() {
     if (
       !authed ||
       activeTab === "overview" ||
-        activeTab === "kyc" ||
+      activeTab === "kyc" ||
       activeTab === "verify" ||
       activeTab === "controls"
     )
@@ -2404,7 +2408,10 @@ function KycAdminTab({
   const [actionErr, setActionErr] = useState("");
 
   const statusPill = (status: string) => {
-    const map: Record<string, { bg: string; bd: string; cl: string; label: string }> = {
+    const map: Record<
+      string,
+      { bg: string; bd: string; cl: string; label: string }
+    > = {
       pending: {
         bg: "rgba(245,158,11,0.12)",
         bd: "rgba(245,158,11,0.32)",
@@ -2516,12 +2523,14 @@ function KycAdminTab({
               key={f}
               onClick={() => setFilter(f)}
               style={{
-                border: filter === f
-                  ? "1px solid var(--color-primary,#0F1F3D)"
-                  : "1px solid var(--color-border,#e2e8f0)",
+                border:
+                  filter === f
+                    ? "1px solid var(--color-primary,#0F1F3D)"
+                    : "1px solid var(--color-border,#e2e8f0)",
                 background:
                   filter === f ? "var(--color-primary,#0F1F3D)" : "#fff",
-                color: filter === f ? "#fff" : "var(--color-text-heading,#0f172a)",
+                color:
+                  filter === f ? "#fff" : "var(--color-text-heading,#0f172a)",
                 borderRadius: "999px",
                 padding: "0.35rem 0.75rem",
                 fontWeight: 700,
@@ -2584,7 +2593,8 @@ function KycAdminTab({
                         color: "var(--color-text-muted,#64748b)",
                       }}
                     >
-                      @{String(row.user_username || "")} · {String(row.user_email || "")}
+                      @{String(row.user_username || "")} ·{" "}
+                      {String(row.user_email || "")}
                     </p>
                   </div>
                   {statusPill(status)}
@@ -2599,10 +2609,19 @@ function KycAdminTab({
                     fontSize: "0.8rem",
                   }}
                 >
-                  <InfoPair label="Document" value={String(row.document_type || "—")} />
-                  <InfoPair label="Doc Number" value={String(row.document_number || "—")} />
+                  <InfoPair
+                    label="Document"
+                    value={String(row.document_type || "—")}
+                  />
+                  <InfoPair
+                    label="Doc Number"
+                    value={String(row.document_number || "—")}
+                  />
                   <InfoPair label="Phone" value={String(row.phone || "—")} />
-                  <InfoPair label="Address" value={`${String(row.address || "")} ${String(row.city || "")}, ${String(row.country || "")}`.trim()} />
+                  <InfoPair
+                    label="Address"
+                    value={`${String(row.address || "")} ${String(row.city || "")}, ${String(row.country || "")}`.trim()}
+                  />
                 </div>
 
                 <div
@@ -2647,7 +2666,10 @@ function KycAdminTab({
                       rows={3}
                       value={noteById[id] || ""}
                       onChange={(e) =>
-                        setNoteById((prev) => ({ ...prev, [id]: e.target.value }))
+                        setNoteById((prev) => ({
+                          ...prev,
+                          [id]: e.target.value,
+                        }))
                       }
                       placeholder="Optional review note (required if rejecting for clarity)."
                       style={{
@@ -2661,7 +2683,13 @@ function KycAdminTab({
                       }}
                     />
 
-                    <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: "0.5rem",
+                        flexWrap: "wrap",
+                      }}
+                    >
                       <button
                         onClick={() => review(id, "approve")}
                         disabled={actionLoadingId === id}
@@ -2696,7 +2724,12 @@ function KycAdminTab({
                       color: "var(--color-text-muted,#64748b)",
                     }}
                   >
-                    Reviewed: {row.reviewed_at ? new Date(String(row.reviewed_at)).toLocaleString("en-GB") : "—"}
+                    Reviewed:{" "}
+                    {row.reviewed_at
+                      ? new Date(String(row.reviewed_at)).toLocaleString(
+                          "en-GB",
+                        )
+                      : "—"}
                     {row.admin_note ? ` · Note: ${String(row.admin_note)}` : ""}
                   </p>
                 )}
@@ -2731,7 +2764,13 @@ function KycAdminTab({
 function InfoPair({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <span style={{ fontSize: "0.73rem", color: "var(--color-text-muted,#64748b)", fontWeight: 700 }}>
+      <span
+        style={{
+          fontSize: "0.73rem",
+          color: "var(--color-text-muted,#64748b)",
+          fontWeight: 700,
+        }}
+      >
         {label}
       </span>
       <p
