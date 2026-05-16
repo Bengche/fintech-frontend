@@ -24,7 +24,7 @@ function bufToB64url(buf: ArrayBuffer): string {
   return btoa(str).replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");
 }
 
-function b64urlToUint8(b64url: string): Uint8Array {
+function b64urlToUint8(b64url: string): Uint8Array<ArrayBuffer> {
   // Accept base64 or base64url
   const base64 = b64url.replace(/-/g, "+").replace(/_/g, "/");
   const padded = base64.padEnd(
@@ -32,7 +32,10 @@ function b64urlToUint8(b64url: string): Uint8Array {
     "=",
   );
   const str = atob(padded);
-  const buf = new Uint8Array(str.length);
+  // Explicitly back with ArrayBuffer (not SharedArrayBuffer) so the type
+  // satisfies BufferSource / ArrayBufferView<ArrayBuffer> as required by WebAuthn.
+  const ab = new ArrayBuffer(str.length);
+  const buf = new Uint8Array(ab);
   for (let i = 0; i < str.length; i++) buf[i] = str.charCodeAt(i);
   return buf;
 }
