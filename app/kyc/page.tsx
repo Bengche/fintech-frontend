@@ -473,7 +473,7 @@ export default function KycPage() {
   }
 
   const canResubmit = kycStatus === "rejected" || kycStatus === "unverified";
-  const showForm = (canResubmit || kycStatus === "unverified") && !submitSuccess;
+  const showForm = canResubmit && !submitSuccess;
 
   return (
     <>
