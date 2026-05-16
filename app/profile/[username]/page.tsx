@@ -65,7 +65,11 @@ export default function SellerProfilePage() {
         setAverageRating(response.data.averageRating);
         setCompletedCount(response.data.completedCount);
       } catch (err: unknown) {
-        setError((err as { response?: { status?: number } })?.response?.status === 404 ? t("notFound") : t("loadError"));
+        setError(
+          (err as { response?: { status?: number } })?.response?.status === 404
+            ? t("notFound")
+            : t("loadError"),
+        );
       } finally {
         setLoading(false);
       }
@@ -94,7 +98,10 @@ export default function SellerProfilePage() {
       setReviews(updated.data.reviews);
       setAverageRating(updated.data.averageRating);
     } catch (err: unknown) {
-      setReviewError((err as { response?: { data?: { message?: string } } })?.response?.data?.message || t("reviewError"));
+      setReviewError(
+        (err as { response?: { data?: { message?: string } } })?.response?.data
+          ?.message || t("reviewError"),
+      );
     }
   };
 
@@ -401,7 +408,11 @@ export default function SellerProfilePage() {
                               setEditingPhone(false);
                             } catch (err: unknown) {
                               setPhoneError(
-                                (err as { response?: { data?: { message?: string } } })?.response?.data?.message || t("phoneError"),
+                                (
+                                  err as {
+                                    response?: { data?: { message?: string } };
+                                  }
+                                )?.response?.data?.message || t("phoneError"),
                               );
                             } finally {
                               setPhoneSaving(false);

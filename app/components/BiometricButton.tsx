@@ -9,7 +9,11 @@ import { Fingerprint, Loader2 } from "lucide-react";
 
 interface Props {
   /** Called after a successful biometric sign-in with server data */
-  onSuccess?: (data: { userId: number; username: string; token: string }) => void;
+  onSuccess?: (data: {
+    userId: number;
+    username: string;
+    token: string;
+  }) => void;
   /** Called if the ceremony fails */
   onError?: (message: string) => void;
   /** Override the CTA label */
@@ -24,8 +28,13 @@ interface Props {
 export default function BiometricButton({ onSuccess, onError, label }: Props) {
   const { setUser_id, setUsername } = useAuth();
   const router = useRouter();
-  const { isAvailable, checkingAvailability, authenticateWithPasskey, authLoading, authError } =
-    usePasskey();
+  const {
+    isAvailable,
+    checkingAvailability,
+    authenticateWithPasskey,
+    authLoading,
+    authError,
+  } = usePasskey();
 
   const [localError, setLocalError] = useState("");
 
@@ -66,9 +75,21 @@ export default function BiometricButton({ onSuccess, onError, label }: Props) {
           fontSize: "0.8125rem",
         }}
       >
-        <div style={{ flex: 1, height: 1, background: "var(--color-border, #e2e8f0)" }} />
+        <div
+          style={{
+            flex: 1,
+            height: 1,
+            background: "var(--color-border, #e2e8f0)",
+          }}
+        />
         <span>or</span>
-        <div style={{ flex: 1, height: 1, background: "var(--color-border, #e2e8f0)" }} />
+        <div
+          style={{
+            flex: 1,
+            height: 1,
+            background: "var(--color-border, #e2e8f0)",
+          }}
+        />
       </div>
 
       {/* Button */}
@@ -101,7 +122,8 @@ export default function BiometricButton({ onSuccess, onError, label }: Props) {
           }
         }}
         onMouseLeave={(e) => {
-          (e.currentTarget as HTMLButtonElement).style.background = "transparent";
+          (e.currentTarget as HTMLButtonElement).style.background =
+            "transparent";
           (e.currentTarget as HTMLButtonElement).style.color =
             "var(--color-primary)";
         }}

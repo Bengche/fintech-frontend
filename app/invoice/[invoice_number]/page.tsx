@@ -7,10 +7,16 @@ import Link from "next/link";
 import { useAuth } from "@/context/UserContext";
 import { InlineSpinner } from "@/app/components/Spinner";
 import { useTranslations } from "next-intl";
+import { BRAND } from "@/config/brand";
+import {
+  ShieldCheck,
+  Clock3,
+  BadgeCheck,
+  LockKeyhole,
+} from "lucide-react";
 
 type InvoiceStats = {
   id: number;
-  clientemail?: string;
   amount: number;
   currency: string;
   status: string;
@@ -21,6 +27,10 @@ type InvoiceStats = {
   description: string;
   expires_at?: string;
   payment_type?: string;
+  seller_name?: string;
+  seller_username?: string;
+  seller_profilepicture?: string;
+  seller_phone?: string;
 };
 
 type Milestone = {
@@ -72,6 +82,7 @@ export default function InvoicePage() {
   const [resendLoading, setResendLoading] = useState(false);
   const [resendMsg, setResendMsg] = useState("");
   const [resendError, setResendError] = useState("");
+  const [countdown, setCountdown] = useState("");
   const prefix = 237;
   const paymentNumber = `${prefix}${phoneNumber}`;
   const { invoice_number } = useParams<{ invoice_number: string }>();
@@ -98,6 +109,40 @@ export default function InvoicePage() {
     };
     fetchInvoiceDetails();
   }, [invoice_number, BASE_API_URL]);
+
+  useEffect(() => {
+    if (!invoiceStats.expires_at || invoiceStats.status !== "pending") {
+      setCountdown("");
+      return;
+    }
+
+    const updateCountdown = () => {
+      const remaining =
+        new Date(invoiceStats.expires_at || "").getTime() - Date.now();
+
+      if (remaining <= 0) {
+        setCountdown(t("countdownExpired"));
+        return;
+      }
+
+      const totalSeconds = Math.floor(remaining / 1000);
+      const days = Math.floor(totalSeconds / 86400);
+      const hours = Math.floor((totalSeconds % 86400) / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const seconds = totalSeconds % 60;
+
+      if (days > 0) {
+        setCountdown(`${days}d ${hours}h ${minutes}m`);
+        return;
+      }
+
+      setCountdown(`${hours}h ${minutes}m ${seconds}s`);
+    };
+
+    updateCountdown();
+    const interval = window.setInterval(updateCountdown, 1000);
+    return () => window.clearInterval(interval);
+  }, [invoiceStats.expires_at, invoiceStats.status, t]);
 
   const markMilestoneComplete = async (milestoneId: number) => {
     setMilestoneLoadingId(milestoneId);
@@ -182,6 +227,11 @@ export default function InvoicePage() {
   const isPaid = invoiceStats.status === "paid";
   const isExpired = invoiceStats.status === "expired";
   const isDisabled = isPaid || isExpired || payLoading;
+  const sellerName =
+    invoiceStats.seller_name || invoiceStats.seller_username || BRAND.name;
+  const displayAmount = invoiceStats.amount
+    ? `${invoiceStats.amount.toLocaleString()} ${invoiceStats.currency}`
+    : "-";
 
   const statusBadgeClass = isPaid
     ? "badge badge-success"
@@ -215,6 +265,147 @@ export default function InvoicePage() {
         >
           {t("back")}
         </Link>
+
+        <div
+          className="card"
+          style={{
+            marginBottom: "1.25rem",
+            padding: "1.5rem",
+            background:
+              "radial-gradient(circle at top right, rgba(245,158,11,0.16), transparent 32%), linear-gradient(135deg, rgba(15,31,61,1), rgba(15,31,61,0.92))",
+            color: "#fff",
+            border: "none",
+            overflow: "hidden",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: "1rem",
+              flexWrap: "wrap",
+              marginBottom: "1rem",
+            }}
+          >
+            <div>
+              <p
+                style={{
+                  margin: "0 0 0.35rem",
+                  fontSize: "0.8rem",
+                  fontWeight: 700,
+                  letterSpacing: "0.08em",
+                  textTransform: "uppercase",
+                  color: "rgba(255,255,255,0.7)",
+                }}
+              >
+                {t("payPageEyebrow")}
+              </p>
+              <h1
+                style={{
+                  margin: 0,
+                  fontSize: "clamp(1.45rem, 3vw, 2.25rem)",
+                  fontWeight: 800,
+                  lineHeight: 1.08,
+                }}
+              >
+                {invoiceStats.invoicename || t("loading")}
+              </h1>
+            </div>
+            {invoiceStats.status && (
+              <span
+                className={statusBadgeClass}
+                style={{
+                  fontSize: "0.8125rem",
+                  alignSelf: "flex-start",
+                  boxShadow: "0 8px 24px rgba(15,31,61,0.18)",
+                }}
+              >
+                {invoiceStats.status.charAt(0).toUpperCase() +
+                  invoiceStats.status.slice(1)}
+              </span>
+            )}
+          </div>
+
+          <div
+            style={{
+              display: "flex",
+              gap: "0.6rem",
+              flexWrap: "wrap",
+              marginBottom: "1rem",
+            }}
+          >
+            <HeroPill icon={<ShieldCheck size={14} />} label={t("guaranteeBadge")} />
+            <HeroPill icon={<BadgeCheck size={14} />} label={t("sellerBadge")} />
+            {countdown && !isExpired && (
+              <HeroPill
+                icon={<Clock3 size={14} />}
+                label={`${t("countdownTitle")}: ${countdown}`}
+              />
+            )}
+          </div>
+
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+              gap: "1rem",
+              alignItems: "stretch",
+            }}
+          >
+            <div
+              style={{
+                padding: "1rem",
+                borderRadius: "1rem",
+                background: "rgba(255,255,255,0.08)",
+                border: "1px solid rgba(255,255,255,0.12)",
+              }}
+            >
+              <p style={{ margin: "0 0 0.35rem", color: "rgba(255,255,255,0.72)" }}>
+                {t("sellerLabel")}
+              </p>
+              <p style={{ margin: 0, fontWeight: 700, fontSize: "1.05rem" }}>
+                {sellerName}
+              </p>
+              <p
+                style={{
+                  margin: "0.5rem 0 0",
+                  color: "rgba(255,255,255,0.78)",
+                  fontSize: "0.88rem",
+                  lineHeight: 1.6,
+                }}
+              >
+                {t("trustBody")}
+              </p>
+            </div>
+
+            <div
+              style={{
+                padding: "1rem",
+                borderRadius: "1rem",
+                background: "rgba(255,255,255,0.08)",
+                border: "1px solid rgba(255,255,255,0.12)",
+              }}
+            >
+              <p style={{ margin: "0 0 0.35rem", color: "rgba(255,255,255,0.72)" }}>
+                {t("breakdownTitle")}
+              </p>
+              <p style={{ margin: 0, fontWeight: 800, fontSize: "1.3rem" }}>
+                {displayAmount}
+              </p>
+              <p
+                style={{
+                  margin: "0.5rem 0 0",
+                  color: "rgba(255,255,255,0.78)",
+                  fontSize: "0.88rem",
+                  lineHeight: 1.6,
+                }}
+              >
+                {t("breakdownSummary")}
+              </p>
+            </div>
+          </div>
+        </div>
 
         {/* Invoice header card */}
         <div className="card" style={{ marginBottom: "1.25rem" }}>
@@ -284,12 +475,6 @@ export default function InvoicePage() {
               value={invoiceStats.invoicenumber || "—"}
               mono
             />
-            {invoiceStats.clientemail && (
-              <InvoiceField
-                label={t("fieldClientEmail")}
-                value={invoiceStats.clientemail}
-              />
-            )}
             {invoiceStats.expires_at && (
               <InvoiceField
                 label={t("fieldExpires")}
@@ -340,6 +525,74 @@ export default function InvoicePage() {
               </p>
             </div>
           )}
+        </div>
+
+        <div
+          className="card"
+          style={{
+            marginBottom: "1.25rem",
+            padding: "1.2rem 1.25rem",
+            border: "1px solid rgba(15,31,61,0.09)",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              alignItems: "flex-start",
+              justifyContent: "space-between",
+              gap: "1rem",
+              flexWrap: "wrap",
+            }}
+          >
+            <div>
+              <p
+                style={{
+                  margin: "0 0 0.3rem",
+                  fontSize: "0.78rem",
+                  fontWeight: 700,
+                  letterSpacing: "0.06em",
+                  textTransform: "uppercase",
+                  color: "var(--color-text-muted)",
+                }}
+              >
+                {t("secureCheckoutTitle")}
+              </p>
+              <p
+                style={{
+                  margin: 0,
+                  color: "var(--color-text-body)",
+                  lineHeight: 1.65,
+                  fontSize: "0.9rem",
+                }}
+              >
+                {t("secureCheckoutBody")}
+              </p>
+            </div>
+            <div
+              style={{
+                minWidth: "240px",
+                padding: "1rem",
+                borderRadius: "0.9rem",
+                background: "var(--color-mist)",
+                border: "1px solid var(--color-border)",
+              }}
+            >
+              <BreakdownRow label={t("breakdownSubtotal")} value={displayAmount} />
+              <BreakdownRow
+                label={t("breakdownBuyerFee")}
+                value={t("breakdownBuyerFeeValue")}
+              />
+              <BreakdownRow
+                label={t("breakdownEscrow")}
+                value={t("breakdownEscrowValue")}
+              />
+              <BreakdownRow
+                label={t("breakdownBuyerPays")}
+                value={displayAmount}
+                strong
+              />
+            </div>
+          </div>
         </div>
 
         {/* ── Milestone progress (installment invoices) ────────────── */}
@@ -783,16 +1036,55 @@ export default function InvoicePage() {
         {/* Payment form — only show if invoice is payable */}
         {!isPaid && !isExpired && (
           <div className="card" style={{ marginBottom: "1.25rem" }}>
-            <h2
+            <div
               style={{
-                fontSize: "1.0625rem",
-                fontWeight: 700,
-                color: "var(--color-text-heading)",
-                margin: "0 0 1.25rem",
+                display: "flex",
+                alignItems: "flex-start",
+                justifyContent: "space-between",
+                gap: "1rem",
+                flexWrap: "wrap",
+                marginBottom: "1.25rem",
               }}
             >
-              {t("payTitle")}
-            </h2>
+              <div>
+                <h2
+                  style={{
+                    fontSize: "1.0625rem",
+                    fontWeight: 700,
+                    color: "var(--color-text-heading)",
+                    margin: "0 0 0.35rem",
+                  }}
+                >
+                  {t("payTitle")}
+                </h2>
+                <p
+                  style={{
+                    margin: 0,
+                    color: "var(--color-text-muted)",
+                    fontSize: "0.875rem",
+                    lineHeight: 1.6,
+                  }}
+                >
+                  {t("payIntro")}
+                </p>
+              </div>
+              <div
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "0.45rem",
+                  borderRadius: "999px",
+                  padding: "0.45rem 0.8rem",
+                  background: "rgba(15,31,61,0.06)",
+                  color: "var(--color-primary)",
+                  fontWeight: 700,
+                  fontSize: "0.82rem",
+                }}
+              >
+                <LockKeyhole size={14} />
+                {t("lockedBadge")}
+              </div>
+            </div>
 
             <div
               style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
@@ -901,6 +1193,27 @@ export default function InvoicePage() {
               >
                 {t("termsNotice")}
               </p>
+
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+                  gap: "0.75rem",
+                }}
+              >
+                <TrustFeature
+                  title={t("protectionOneTitle")}
+                  body={t("protectionOneBody")}
+                />
+                <TrustFeature
+                  title={t("protectionTwoTitle")}
+                  body={t("protectionTwoBody")}
+                />
+                <TrustFeature
+                  title={t("protectionThreeTitle")}
+                  body={t("protectionThreeBody")}
+                />
+              </div>
 
               {/* Alerts live right above the button so they are immediately visible */}
               {payError && (
@@ -1320,6 +1633,104 @@ function InvoiceField({
         }}
       >
         {value}
+      </p>
+    </div>
+  );
+}
+
+function HeroPill({ icon, label }: { icon: React.ReactNode; label: string }) {
+  return (
+    <span
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        gap: "0.4rem",
+        padding: "0.38rem 0.7rem",
+        borderRadius: "999px",
+        background: "rgba(255,255,255,0.12)",
+        border: "1px solid rgba(255,255,255,0.12)",
+        fontSize: "0.78rem",
+        fontWeight: 700,
+      }}
+    >
+      {icon}
+      {label}
+    </span>
+  );
+}
+
+function BreakdownRow({
+  label,
+  value,
+  strong,
+}: {
+  label: string;
+  value: string;
+  strong?: boolean;
+}) {
+  return (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        gap: "0.75rem",
+        padding: "0.45rem 0",
+        borderBottom: strong ? "none" : "1px solid rgba(15,31,61,0.08)",
+      }}
+    >
+      <span
+        style={{
+          color: "var(--color-text-muted)",
+          fontSize: strong ? "0.9rem" : "0.84rem",
+          fontWeight: strong ? 700 : 500,
+        }}
+      >
+        {label}
+      </span>
+      <span
+        style={{
+          color: "var(--color-text-heading)",
+          fontSize: strong ? "1rem" : "0.88rem",
+          fontWeight: strong ? 800 : 700,
+          textAlign: "right",
+        }}
+      >
+        {value}
+      </span>
+    </div>
+  );
+}
+
+function TrustFeature({ title, body }: { title: string; body: string }) {
+  return (
+    <div
+      style={{
+        padding: "0.85rem 0.95rem",
+        borderRadius: "0.8rem",
+        background: "var(--color-mist)",
+        border: "1px solid var(--color-border)",
+      }}
+    >
+      <p
+        style={{
+          margin: "0 0 0.25rem",
+          fontSize: "0.86rem",
+          fontWeight: 700,
+          color: "var(--color-text-heading)",
+        }}
+      >
+        {title}
+      </p>
+      <p
+        style={{
+          margin: 0,
+          fontSize: "0.81rem",
+          color: "var(--color-text-muted)",
+          lineHeight: 1.55,
+        }}
+      >
+        {body}
       </p>
     </div>
   );

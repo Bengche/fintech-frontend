@@ -44,7 +44,9 @@ export default function ChatWindow({ invoice_number }: ChatWindowProps) {
       // Count buyer messages so we can show a badge on the button
       setBuyerMsgCount(msgs.filter((m) => m.sender_type === "buyer").length);
     } catch (err: unknown) {
-      if ((err as { response?: { status?: number } })?.response?.status === 404) {
+      if (
+        (err as { response?: { status?: number } })?.response?.status === 404
+      ) {
         setChatExists(false);
       } else {
         console.log("Could not load messages");

@@ -118,7 +118,10 @@ export default function BuyerChatPage() {
       setMilestones(msRes.data.milestones || []);
       setTimeout(() => setReleaseSuccessId(null), 8000);
     } catch (err: unknown) {
-      setReleaseError((err as { response?: { data?: { message?: string } } })?.response?.data?.message ?? t("releaseErrorDefault"));
+      setReleaseError(
+        (err as { response?: { data?: { message?: string } } })?.response?.data
+          ?.message ?? t("releaseErrorDefault"),
+      );
     } finally {
       setReleaseLoading(null);
     }

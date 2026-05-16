@@ -311,7 +311,7 @@ export default function GetAllInvoices({
       {visible &&
         filtered.map((invoice) => {
           const isExpanded = expandedIds.has(invoice.id);
-          const invoiceUrl = `${FRONTEND_URL}/invoice/${invoice.invoicenumber}`;
+          const invoiceUrl = `${FRONTEND_URL}/pay/${invoice.invoicenumber}`;
           const createdStr = new Date(invoice.createdat).toLocaleDateString(
             "en-GB",
             { day: "2-digit", month: "short", year: "numeric" },
@@ -529,7 +529,7 @@ export default function GetAllInvoices({
                 )}
                 {/* Quick-action: view invoice page (always accessible) */}
                 <Link
-                  href={`/invoice/${invoice.invoicenumber}`}
+                  href={`/pay/${invoice.invoicenumber}`}
                   onClick={(e) => e.stopPropagation()}
                   style={{
                     marginLeft: "auto",

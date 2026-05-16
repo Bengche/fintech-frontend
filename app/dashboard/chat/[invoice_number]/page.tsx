@@ -43,7 +43,9 @@ export default function SellerChatPage() {
       setMessages(msgs);
       setChatExists(true);
     } catch (err: unknown) {
-      if ((err as { response?: { status?: number } })?.response?.status === 404) {
+      if (
+        (err as { response?: { status?: number } })?.response?.status === 404
+      ) {
         setChatExists(false);
       }
     }

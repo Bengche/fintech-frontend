@@ -62,7 +62,9 @@ function RegisterForm() {
       setRegisterMessageSuccess(t("success"));
       setTimeout(() => setRegisterMessageSuccess(""), 6000);
     } catch (error: unknown) {
-      const message = (error as { response?: { data?: { message?: string } } })?.response?.data?.message || t("errors.generic");
+      const message =
+        (error as { response?: { data?: { message?: string } } })?.response
+          ?.data?.message || t("errors.generic");
       setRegisterMessageError(message);
       setTimeout(() => setRegisterMessageError(""), 6000);
     } finally {

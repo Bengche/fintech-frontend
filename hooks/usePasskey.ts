@@ -16,7 +16,8 @@ import axios from "axios";
 const API = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
 
 function authHeaders() {
-  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  const token =
+    typeof window !== "undefined" ? localStorage.getItem("token") : null;
   return token ? { Authorization: `Bearer ${token}` } : undefined;
 }
 
@@ -73,7 +74,9 @@ function parseRegistrationOptions(
     excludeCredentials: (opts.excludeCredentials ?? []).map((c) => ({
       id: b64urlToUint8(c.id),
       type: "public-key" as PublicKeyCredentialType,
-      ...(c.transports ? { transports: c.transports as AuthenticatorTransport[] } : {}),
+      ...(c.transports
+        ? { transports: c.transports as AuthenticatorTransport[] }
+        : {}),
     })),
   };
 }
@@ -87,7 +90,9 @@ function parseAuthOptions(
     allowCredentials: (opts.allowCredentials ?? []).map((c) => ({
       id: b64urlToUint8(c.id),
       type: "public-key" as PublicKeyCredentialType,
-      ...(c.transports ? { transports: c.transports as AuthenticatorTransport[] } : {}),
+      ...(c.transports
+        ? { transports: c.transports as AuthenticatorTransport[] }
+        : {}),
     })),
   };
 }
@@ -205,58 +210,61 @@ export function usePasskey(): UsePasskeyReturn {
   }, []);
 
   // ── Register a new passkey ───────────────────────────────────────────────
-  const registerPasskey = useCallback(async (deviceName?: string): Promise<boolean> => {
-    setRegisterLoading(true);
-    setRegisterError("");
-    setRegisterSuccess(false);
-    try {
-      // Step 1: Get challenge from server
-      const { data: options } = await axios.post(
-        `${API}/passkey/register-challenge`,
-        {},
-        { withCredentials: true, headers: authHeaders() },
-      );
+  const registerPasskey = useCallback(
+    async (deviceName?: string): Promise<boolean> => {
+      setRegisterLoading(true);
+      setRegisterError("");
+      setRegisterSuccess(false);
+      try {
+        // Step 1: Get challenge from server
+        const { data: options } = await axios.post(
+          `${API}/passkey/register-challenge`,
+          {},
+          { withCredentials: true, headers: authHeaders() },
+        );
 
-      // Step 2: Browser biometric prompt
-      const credential = await navigator.credentials.create({
-        publicKey: parseRegistrationOptions(options),
-      });
+        // Step 2: Browser biometric prompt
+        const credential = await navigator.credentials.create({
+          publicKey: parseRegistrationOptions(options),
+        });
 
-      if (!credential) {
-        throw new Error("Biometric registration was cancelled.");
+        if (!credential) {
+          throw new Error("Biometric registration was cancelled.");
+        }
+
+        // Step 3: Verify with server
+        await axios.post(
+          `${API}/passkey/register-verify`,
+          {
+            ...serializeRegistration(credential as PublicKeyCredential),
+            deviceName: deviceName || guessDeviceName(),
+          },
+          { withCredentials: true, headers: authHeaders() },
+        );
+
+        setRegisterSuccess(true);
+        // Mark this device as passkey-capable in localStorage
+        localStorage.setItem("fonlok_has_passkey", "1");
+        return true;
+      } catch (err: unknown) {
+        const msg =
+          (err as { response?: { data?: { message?: string } } })?.response
+            ?.data?.message ||
+          (err as Error)?.message ||
+          "Biometric registration failed. Please try again.";
+        // DOMException name "NotAllowedError" = user cancelled the prompt
+        if ((err as DOMException)?.name === "NotAllowedError") {
+          setRegisterError("Registration was cancelled.");
+        } else {
+          setRegisterError(msg);
+        }
+        return false;
+      } finally {
+        setRegisterLoading(false);
       }
-
-      // Step 3: Verify with server
-      await axios.post(
-        `${API}/passkey/register-verify`,
-        {
-          ...serializeRegistration(credential as PublicKeyCredential),
-          deviceName: deviceName || guessDeviceName(),
-        },
-        { withCredentials: true, headers: authHeaders() },
-      );
-
-      setRegisterSuccess(true);
-      // Mark this device as passkey-capable in localStorage
-      localStorage.setItem("fonlok_has_passkey", "1");
-      return true;
-    } catch (err: unknown) {
-      const msg =
-        (err as { response?: { data?: { message?: string } } })?.response?.data
-          ?.message ||
-        (err as Error)?.message ||
-        "Biometric registration failed. Please try again.";
-      // DOMException name "NotAllowedError" = user cancelled the prompt
-      if ((err as DOMException)?.name === "NotAllowedError") {
-        setRegisterError("Registration was cancelled.");
-      } else {
-        setRegisterError(msg);
-      }
-      return false;
-    } finally {
-      setRegisterLoading(false);
-    }
-  }, []);
+    },
+    [],
+  );
 
   // ── Authenticate with passkey ─────────────────────────────────────────────
   const authenticateWithPasskey = useCallback(async () => {
@@ -332,9 +340,16 @@ export function usePasskey(): UsePasskeyReturn {
         withCredentials: true,
         headers: authHeaders(),
       });
-      
+
       setPasskeys((prev) => prev.filter((p) => p.id !== id));
-      if ((await axios.get(`${API}/passkey/list`, { withCredentials: true, headers: authHeaders() })).data.passkeys.length === 0) {
+      if (
+        (
+          await axios.get(`${API}/passkey/list`, {
+            withCredentials: true,
+            headers: authHeaders(),
+          })
+        ).data.passkeys.length === 0
+      ) {
         localStorage.removeItem("fonlok_has_passkey");
       }
     } finally {

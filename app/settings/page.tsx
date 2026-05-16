@@ -1,13 +1,23 @@
 ﻿"use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Axios from "axios";
 import SiteHeader from "../components/SiteHeader";
 import { useAuth } from "@/context/UserContext";
 import { useTranslations } from "next-intl";
 import { usePasskey } from "@/hooks/usePasskey";
-import { Fingerprint, Loader2, Trash2, Plus } from "lucide-react";
+import {
+  Fingerprint,
+  Loader2,
+  Trash2,
+  Plus,
+  ShieldCheck,
+  MapPin,
+  Clock3,
+  MonitorSmartphone,
+  LogOut,
+} from "lucide-react";
 
 const API = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
 
@@ -19,6 +29,19 @@ type UserProfile = {
   username: string;
   profilepicture: string | null;
   country: string | null;
+};
+
+type UserSession = {
+  sid: string;
+  loginMethod: string;
+  browser: string;
+  os: string;
+  deviceType: string;
+  location: string;
+  ipAddress: string;
+  createdAt: string;
+  lastActiveAt: string;
+  isCurrent: boolean;
 };
 
 // â”€â”€ Shared feedback component â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -99,7 +122,7 @@ export default function SettingsPage() {
         setProfile(profileRes.data.seller);
       })
       .catch(() => setLoadError(t("loadError")));
-  }, [authLoading, user_id, router]);
+  }, [authLoading, user_id, router, t]);
 
   if (authLoading || !user_id) return null;
 
@@ -174,11 +197,430 @@ export default function SettingsPage() {
             onSaved={(phone) => setProfile((p) => (p ? { ...p, phone } : p))}
           />
           <ChangePasswordForm />
+          <SessionManagerSection />
           <PasskeySection />
           <DeleteAccountSection />
         </div>
       </main>
     </>
+  );
+}
+
+function SessionManagerSection() {
+  const t = useTranslations("Settings");
+  const router = useRouter();
+  const { setUser_id, setUsername } = useAuth();
+  const [sessions, setSessions] = useState<UserSession[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [currentSid, setCurrentSid] = useState<string | null>(null);
+  const [msg, setMsg] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
+  const [revokeOthersLoading, setRevokeOthersLoading] = useState(false);
+  const [revokeLoadingSid, setRevokeLoadingSid] = useState<string | null>(null);
+  const [signOutLoading, setSignOutLoading] = useState(false);
+
+  const loadSessions = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await Axios.get(`${API}/user/sessions`, {
+        withCredentials: true,
+      });
+      setSessions(res.data.sessions || []);
+      setCurrentSid(res.data.currentSid || null);
+      setMsg(null);
+    } catch (err: unknown) {
+      const e = err as { response?: { data?: { message?: string } } };
+      setMsg({
+        type: "error",
+        text: e.response?.data?.message || t("sessions.loadError"),
+      });
+    } finally {
+      setLoading(false);
+    }
+  }, [t]);
+
+  useEffect(() => {
+    void loadSessions();
+  }, [loadSessions]);
+
+  const formatDate = (value: string) =>
+    new Date(value).toLocaleString("en-GB", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+
+  return (
+    <Section
+      title={t("sessions.sectionTitle")}
+      subtitle={t("sessions.sectionSubtitle")}
+    >
+      <Feedback msg={msg} />
+
+      <div
+        style={{
+          display: "flex",
+          alignItems: "flex-start",
+          justifyContent: "space-between",
+          gap: "1rem",
+          flexWrap: "wrap",
+          marginBottom: "1rem",
+          padding: "1rem 1.125rem",
+          borderRadius: "0.875rem",
+          background:
+            "linear-gradient(135deg, rgba(15,31,61,0.05), rgba(245,158,11,0.12))",
+          border: "1px solid rgba(15,31,61,0.08)",
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            gap: "0.75rem",
+            alignItems: "flex-start",
+          }}
+        >
+          <div
+            style={{
+              width: "2.5rem",
+              height: "2.5rem",
+              borderRadius: "0.8rem",
+              background: "rgba(15,31,61,0.08)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "var(--color-primary)",
+              flexShrink: 0,
+            }}
+          >
+            <ShieldCheck size={18} />
+          </div>
+          <div>
+            <p
+              style={{
+                margin: 0,
+                fontWeight: 700,
+                color: "var(--color-text-heading)",
+                fontSize: "0.95rem",
+              }}
+            >
+              {t("sessions.activeSummary", { count: sessions.length })}
+            </p>
+            <p
+              style={{
+                margin: "0.2rem 0 0",
+                color: "var(--color-text-muted)",
+                fontSize: "0.85rem",
+                lineHeight: 1.55,
+              }}
+            >
+              {currentSid ? t("sessions.secureHint") : t("sessions.reauthHint")}
+            </p>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          className="btn-primary"
+          disabled={revokeOthersLoading || !currentSid || sessions.length <= 1}
+          onClick={async () => {
+            setRevokeOthersLoading(true);
+            setMsg(null);
+            try {
+              const res = await Axios.post(
+                `${API}/user/sessions/revoke-others`,
+                {},
+                { withCredentials: true },
+              );
+              setMsg({ type: "success", text: res.data.message });
+              await loadSessions();
+            } catch (err: unknown) {
+              const e = err as { response?: { data?: { message?: string } } };
+              setMsg({
+                type: "error",
+                text: e.response?.data?.message || t("sessions.revokeOthersError"),
+              });
+            } finally {
+              setRevokeOthersLoading(false);
+            }
+          }}
+        >
+          {revokeOthersLoading
+            ? t("sessions.revokeOthersLoading")
+            : t("sessions.revokeOthers")}
+        </button>
+      </div>
+
+      {loading ? (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "0.5rem",
+            color: "var(--color-text-muted)",
+            fontSize: "0.875rem",
+          }}
+        >
+          <Loader2 size={15} style={{ animation: "spin 1s linear infinite" }} />
+          {t("sessions.loading")}
+        </div>
+      ) : sessions.length === 0 ? (
+        <p
+          style={{
+            margin: 0,
+            color: "var(--color-text-muted)",
+            fontSize: "0.875rem",
+          }}
+        >
+          {t("sessions.empty")}
+        </p>
+      ) : (
+        <div style={{ display: "grid", gap: "0.875rem" }}>
+          {sessions.map((session) => (
+            <div
+              key={session.sid}
+              style={{
+                border: session.isCurrent
+                  ? "1.5px solid rgba(15,31,61,0.18)"
+                  : "1px solid var(--color-border)",
+                borderRadius: "0.9rem",
+                padding: "1rem 1.05rem",
+                background: session.isCurrent
+                  ? "rgba(15,31,61,0.03)"
+                  : "var(--color-white)",
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  gap: "0.75rem",
+                  flexWrap: "wrap",
+                }}
+              >
+                <div style={{ minWidth: 0 }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "0.55rem",
+                      flexWrap: "wrap",
+                      marginBottom: "0.35rem",
+                    }}
+                  >
+                    <p
+                      style={{
+                        margin: 0,
+                        fontWeight: 700,
+                        color: "var(--color-text-heading)",
+                        fontSize: "0.95rem",
+                      }}
+                    >
+                      {session.browser} on {session.os}
+                    </p>
+                    {session.isCurrent && (
+                      <span
+                        style={{
+                          fontSize: "0.72rem",
+                          fontWeight: 700,
+                          padding: "0.18rem 0.55rem",
+                          borderRadius: "999px",
+                          background: "rgba(15,31,61,0.12)",
+                          color: "var(--color-primary)",
+                        }}
+                      >
+                        {t("sessions.currentBadge")}
+                      </span>
+                    )}
+                    <span
+                      style={{
+                        fontSize: "0.72rem",
+                        fontWeight: 700,
+                        padding: "0.18rem 0.55rem",
+                        borderRadius: "999px",
+                        background:
+                          session.loginMethod === "passkey"
+                            ? "rgba(22,163,74,0.12)"
+                            : "rgba(245,158,11,0.14)",
+                        color:
+                          session.loginMethod === "passkey" ? "#166534" : "#92400e",
+                      }}
+                    >
+                      {session.loginMethod === "passkey"
+                        ? t("sessions.passkeyBadge")
+                        : t("sessions.passwordBadge")}
+                    </span>
+                  </div>
+
+                  <div
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+                      gap: "0.55rem 0.75rem",
+                    }}
+                  >
+                    <SessionMeta
+                      icon={<MonitorSmartphone size={14} />}
+                      label={t("sessions.deviceLabel")}
+                      value={`${session.deviceType} • ${session.ipAddress}`}
+                    />
+                    <SessionMeta
+                      icon={<MapPin size={14} />}
+                      label={t("sessions.locationLabel")}
+                      value={session.location}
+                    />
+                    <SessionMeta
+                      icon={<Clock3 size={14} />}
+                      label={t("sessions.lastActiveLabel")}
+                      value={formatDate(session.lastActiveAt)}
+                    />
+                    <SessionMeta
+                      icon={<LogOut size={14} />}
+                      label={t("sessions.signedInLabel")}
+                      value={formatDate(session.createdAt)}
+                    />
+                  </div>
+                </div>
+
+                {session.isCurrent ? (
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      setSignOutLoading(true);
+                      setMsg(null);
+                      try {
+                        await Axios.delete(
+                          `${API}/user/sessions/${session.sid}`,
+                          { withCredentials: true },
+                        );
+                        setUser_id(null);
+                        setUsername(null);
+                        localStorage.removeItem("authToken");
+                        router.push("/login");
+                      } catch (err: unknown) {
+                        const e = err as { response?: { data?: { message?: string } } };
+                        setMsg({
+                          type: "error",
+                          text: e.response?.data?.message || t("sessions.signOutError"),
+                        });
+                        setSignOutLoading(false);
+                      }
+                    }}
+                    disabled={signOutLoading}
+                    style={{
+                      alignSelf: "flex-start",
+                      border: "1px solid rgba(220,38,38,0.18)",
+                      background: "rgba(220,38,38,0.04)",
+                      color: "#b91c1c",
+                      borderRadius: "0.7rem",
+                      padding: "0.6rem 0.8rem",
+                      fontSize: "0.85rem",
+                      fontWeight: 700,
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "0.4rem",
+                      cursor: signOutLoading ? "default" : "pointer",
+                      opacity: signOutLoading ? 0.6 : 1,
+                    }}
+                  >
+                    <LogOut size={14} />
+                    {signOutLoading
+                      ? t("sessions.signingOut")
+                      : t("sessions.signOutDevice")}
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      setRevokeLoadingSid(session.sid);
+                      setMsg(null);
+                      try {
+                        const res = await Axios.delete(
+                          `${API}/user/sessions/${session.sid}`,
+                          { withCredentials: true },
+                        );
+                        setMsg({ type: "success", text: res.data.message });
+                        await loadSessions();
+                      } catch (err: unknown) {
+                        const e = err as { response?: { data?: { message?: string } } };
+                        setMsg({
+                          type: "error",
+                          text: e.response?.data?.message || t("sessions.revokeError"),
+                        });
+                      } finally {
+                        setRevokeLoadingSid(null);
+                      }
+                    }}
+                    disabled={revokeLoadingSid === session.sid}
+                    style={{
+                      alignSelf: "flex-start",
+                      border: "1px solid rgba(220,38,38,0.18)",
+                      background: "rgba(220,38,38,0.04)",
+                      color: "#b91c1c",
+                      borderRadius: "0.7rem",
+                      padding: "0.6rem 0.8rem",
+                      fontSize: "0.85rem",
+                      fontWeight: 700,
+                      cursor: revokeLoadingSid === session.sid ? "default" : "pointer",
+                      opacity: revokeLoadingSid === session.sid ? 0.6 : 1,
+                    }}
+                  >
+                    {revokeLoadingSid === session.sid
+                      ? t("sessions.revoking")
+                      : t("sessions.revoke")}
+                  </button>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </Section>
+  );
+}
+
+function SessionMeta({
+  icon,
+  label,
+  value,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+}) {
+  return (
+    <div>
+      <p
+        style={{
+          margin: "0 0 0.2rem",
+          display: "flex",
+          alignItems: "center",
+          gap: "0.35rem",
+          fontSize: "0.76rem",
+          fontWeight: 700,
+          color: "var(--color-text-muted)",
+          textTransform: "uppercase",
+          letterSpacing: "0.05em",
+        }}
+      >
+        {icon}
+        {label}
+      </p>
+      <p
+        style={{
+          margin: 0,
+          fontSize: "0.875rem",
+          color: "var(--color-text-heading)",
+          lineHeight: 1.5,
+          wordBreak: "break-word",
+        }}
+      >
+        {value}
+      </p>
+    </div>
   );
 }
 
@@ -716,7 +1158,9 @@ function PasskeySection() {
   const [deviceName, setDeviceName] = useState("");
   const [showInput, setShowInput] = useState(false);
 
-  useEffect(() => { refreshPasskeys(); }, [refreshPasskeys]);
+  useEffect(() => {
+    refreshPasskeys();
+  }, [refreshPasskeys]);
 
   if (checkingAvailability) return null;
   if (!isAvailable) return null;
@@ -727,12 +1171,26 @@ function PasskeySection() {
       subtitle="Sign in with your device biometrics — fingerprint, Face ID, or Windows Hello. No password required."
     >
       {listLoading ? (
-        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", color: "var(--color-text-muted)", fontSize: "0.875rem" }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "0.5rem",
+            color: "var(--color-text-muted)",
+            fontSize: "0.875rem",
+          }}
+        >
           <Loader2 size={15} style={{ animation: "spin 1s linear infinite" }} />
           Loading\u2026
         </div>
       ) : passkeys.length === 0 ? (
-        <p style={{ fontSize: "0.875rem", color: "var(--color-text-muted)", marginBottom: "1rem" }}>
+        <p
+          style={{
+            fontSize: "0.875rem",
+            color: "var(--color-text-muted)",
+            marginBottom: "1rem",
+          }}
+        >
           No passkeys registered yet on this account.
         </p>
       ) : (
@@ -741,19 +1199,42 @@ function PasskeySection() {
             <li
               key={pk.id}
               style={{
-                display: "flex", alignItems: "center", justifyContent: "space-between",
-                padding: "0.75rem 1rem", borderRadius: "0.5rem",
-                background: "var(--color-cloud, #f8fafc)", marginBottom: "0.625rem",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                padding: "0.75rem 1rem",
+                borderRadius: "0.5rem",
+                background: "var(--color-cloud, #f8fafc)",
+                marginBottom: "0.625rem",
                 border: "1px solid var(--color-border, #e2e8f0)",
               }}
             >
-              <div style={{ display: "flex", alignItems: "center", gap: "0.625rem" }}>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.625rem",
+                }}
+              >
                 <Fingerprint size={18} color="var(--color-primary)" />
                 <div>
-                  <p style={{ margin: 0, fontWeight: 600, fontSize: "0.9375rem", color: "var(--color-text-heading)" }}>
+                  <p
+                    style={{
+                      margin: 0,
+                      fontWeight: 600,
+                      fontSize: "0.9375rem",
+                      color: "var(--color-text-heading)",
+                    }}
+                  >
                     {pk.device_name ?? "Unnamed device"}
                   </p>
-                  <p style={{ margin: 0, fontSize: "0.8125rem", color: "var(--color-text-muted)" }}>
+                  <p
+                    style={{
+                      margin: 0,
+                      fontSize: "0.8125rem",
+                      color: "var(--color-text-muted)",
+                    }}
+                  >
                     Added {new Date(pk.created_at).toLocaleDateString()}
                   </p>
                 </div>
@@ -762,16 +1243,23 @@ function PasskeySection() {
                 onClick={() => removePasskey(pk.id)}
                 disabled={removeLoading === pk.id}
                 style={{
-                  background: "none", border: "none",
+                  background: "none",
+                  border: "none",
                   cursor: removeLoading === pk.id ? "default" : "pointer",
                   color: "var(--color-danger, #dc2626)",
-                  padding: "0.375rem", borderRadius: "0.375rem",
+                  padding: "0.375rem",
+                  borderRadius: "0.375rem",
                   opacity: removeLoading === pk.id ? 0.5 : 1,
                 }}
               >
-                {removeLoading === pk.id
-                  ? <Loader2 size={16} style={{ animation: "spin 1s linear infinite" }} />
-                  : <Trash2 size={16} />}
+                {removeLoading === pk.id ? (
+                  <Loader2
+                    size={16}
+                    style={{ animation: "spin 1s linear infinite" }}
+                  />
+                ) : (
+                  <Trash2 size={16} />
+                )}
               </button>
             </li>
           ))}
@@ -785,7 +1273,9 @@ function PasskeySection() {
       )}
 
       {showInput ? (
-        <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+        <div
+          style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}
+        >
           <input
             className="input"
             placeholder="Device name (optional, e.g. My iPhone)"
@@ -798,21 +1288,38 @@ function PasskeySection() {
               type="button"
               className="btn-primary"
               onClick={async () => {
-                const ok = await registerPasskey(deviceName.trim() || undefined);
-                if (ok === true) { await refreshPasskeys(); setShowInput(false); setDeviceName(""); }
+                const ok = await registerPasskey(
+                  deviceName.trim() || undefined,
+                );
+                if (ok === true) {
+                  await refreshPasskeys();
+                  setShowInput(false);
+                  setDeviceName("");
+                }
               }}
               disabled={registerLoading}
-              style={{ flex: 1, justifyContent: "center", padding: "0.6875rem" }}
+              style={{
+                flex: 1,
+                justifyContent: "center",
+                padding: "0.6875rem",
+              }}
             >
               {registerLoading ? "Registering\u2026" : "Register this device"}
             </button>
             <button
               type="button"
-              onClick={() => { setShowInput(false); setDeviceName(""); }}
+              onClick={() => {
+                setShowInput(false);
+                setDeviceName("");
+              }}
               style={{
-                padding: "0.6875rem 1rem", borderRadius: "var(--radius-btn, 0.5rem)",
-                border: "1.5px solid var(--color-border, #e2e8f0)", background: "none",
-                cursor: "pointer", fontSize: "0.875rem", fontWeight: 500,
+                padding: "0.6875rem 1rem",
+                borderRadius: "var(--radius-btn, 0.5rem)",
+                border: "1.5px solid var(--color-border, #e2e8f0)",
+                background: "none",
+                cursor: "pointer",
+                fontSize: "0.875rem",
+                fontWeight: 500,
               }}
             >
               Cancel
@@ -824,10 +1331,17 @@ function PasskeySection() {
           type="button"
           onClick={() => setShowInput(true)}
           style={{
-            display: "inline-flex", alignItems: "center", gap: "0.5rem",
-            padding: "0.625rem 1.125rem", borderRadius: "var(--radius-btn, 0.5rem)",
-            border: "1.5px solid var(--color-primary)", background: "none",
-            color: "var(--color-primary)", fontWeight: 600, fontSize: "0.9375rem", cursor: "pointer",
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "0.5rem",
+            padding: "0.625rem 1.125rem",
+            borderRadius: "var(--radius-btn, 0.5rem)",
+            border: "1.5px solid var(--color-primary)",
+            background: "none",
+            color: "var(--color-primary)",
+            fontWeight: 600,
+            fontSize: "0.9375rem",
+            cursor: "pointer",
           }}
         >
           <Plus size={16} />
