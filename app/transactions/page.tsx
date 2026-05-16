@@ -29,6 +29,10 @@ export default function TransactionsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [activeTab, setActiveTab] = useState<"received" | "spent">("received");
+  const [statementStartDate, setStatementStartDate] = useState("");
+  const [statementEndDate, setStatementEndDate] = useState("");
+  const [statementLoading, setStatementLoading] = useState(false);
+  const [statementError, setStatementError] = useState("");
 
   useEffect(() => {
     const fetchTransactions = async () => {
@@ -51,7 +55,7 @@ export default function TransactionsPage() {
       }
     };
     fetchTransactions();
-  }, [user_id]);
+  }, [user_id, t]);
 
   const formatDate = (dateString: string) =>
     new Date(dateString).toLocaleDateString("en-GB", {
@@ -76,6 +80,48 @@ export default function TransactionsPage() {
         {status.charAt(0).toUpperCase() + status.slice(1)}
       </span>
     );
+  };
+
+  const downloadStatement = async () => {
+    if (!statementStartDate || !statementEndDate) {
+      setStatementError(t("statementError"));
+      return;
+    }
+    if (new Date(statementStartDate) > new Date(statementEndDate)) {
+      setStatementError(t("statementDateError"));
+      return;
+    }
+    setStatementLoading(true);
+    setStatementError("");
+    try {
+      const start = new Date(statementStartDate);
+      start.setHours(0, 0, 0, 0);
+      const end = new Date(statementEndDate);
+      end.setHours(23, 59, 59, 999);
+
+      const res = await fetch(
+        `${API}/transactions/statement?start_date=${start.toISOString()}&end_date=${end.toISOString()}`,
+        { credentials: "include" },
+      );
+      if (!res.ok) {
+        const data = await res.json();
+        setStatementError(data.message || t("statementFailed"));
+        return;
+      }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `fonlok-statement-${statementStartDate}-to-${statementEndDate}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch {
+      setStatementError(t("statementFailed"));
+    } finally {
+      setStatementLoading(false);
+    }
   };
 
   const activeTransactions =
@@ -187,6 +233,127 @@ export default function TransactionsPage() {
               </span>
             </button>
           ))}
+        </div>
+
+        {/* Download Statement Section */}
+        <div
+          className="card"
+          style={{
+            marginBottom: "1.5rem",
+            borderLeft: "4px solid var(--color-primary)",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              alignItems: "flex-start",
+              justifyContent: "space-between",
+              gap: "1.5rem",
+              flexWrap: "wrap",
+            }}
+          >
+            <div>
+              <h3
+                style={{
+                  fontSize: "1rem",
+                  fontWeight: 700,
+                  color: "var(--color-text-heading)",
+                  margin: "0 0 0.375rem",
+                }}
+              >
+                {t("downloadStatement")}
+              </h3>
+              <p
+                style={{
+                  fontSize: "0.875rem",
+                  color: "var(--color-text-muted)",
+                  margin: 0,
+                  lineHeight: 1.6,
+                }}
+              >
+                {t("downloadStatementDesc")}
+              </p>
+            </div>
+            <div
+              style={{
+                display: "flex",
+                gap: "0.75rem",
+                flexWrap: "wrap",
+                alignItems: "flex-end",
+              }}
+            >
+              <div>
+                <label
+                  style={{
+                    display: "block",
+                    fontSize: "0.8rem",
+                    fontWeight: 600,
+                    color: "var(--color-text-muted)",
+                    marginBottom: "0.375rem",
+                  }}
+                >
+                  {t("fromDate")}
+                </label>
+                <input
+                  type="date"
+                  className="input"
+                  value={statementStartDate}
+                  onChange={(e) => {
+                    setStatementStartDate(e.target.value);
+                    setStatementError("");
+                  }}
+                  style={{ minWidth: "140px" }}
+                />
+              </div>
+              <div>
+                <label
+                  style={{
+                    display: "block",
+                    fontSize: "0.8rem",
+                    fontWeight: 600,
+                    color: "var(--color-text-muted)",
+                    marginBottom: "0.375rem",
+                  }}
+                >
+                  {t("toDate")}
+                </label>
+                <input
+                  type="date"
+                  className="input"
+                  value={statementEndDate}
+                  onChange={(e) => {
+                    setStatementEndDate(e.target.value);
+                    setStatementError("");
+                  }}
+                  style={{ minWidth: "140px" }}
+                />
+              </div>
+              <button
+                onClick={downloadStatement}
+                disabled={statementLoading}
+                className="btn-primary"
+                style={{
+                  padding: "0.625rem 1.375rem",
+                  fontSize: "0.9rem",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {statementLoading ? `${t("generating")}...` : `📄 ${t("downloadBtn")}`}
+              </button>
+            </div>
+          </div>
+          {statementError && (
+            <p
+              style={{
+                marginTop: "0.75rem",
+                fontSize: "0.875rem",
+                color: "var(--color-danger)",
+                margin: "0.75rem 0 0",
+              }}
+            >
+              {statementError}
+            </p>
+          )}
         </div>
 
         {/* Loading / error states */}

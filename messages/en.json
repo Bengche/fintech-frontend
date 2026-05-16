@@ -963,7 +963,16 @@
     "emptyReceived": "No payments received yet. Create an invoice to get started.",
     "emptySpent": "No transactions yet as a buyer.",
     "errorLoad": "Failed to load transaction history. Please try again.",
-    "downloadReceipt": "Download Receipt"
+    "downloadReceipt": "Download Receipt",
+    "downloadStatement": "Download Transaction Statement",
+    "downloadStatementDesc": "Export a professional PDF statement of all your escrow transactions for a specific period. Perfect for accounting and record-keeping.",
+    "fromDate": "From",
+    "toDate": "To",
+    "downloadBtn": "Download PDF",
+    "generating": "Generating",
+    "statementError": "Please select both start and end dates.",
+    "statementDateError": "Start date must be before end date.",
+    "statementFailed": "Failed to generate statement. Please try again."
   },
   "Purchases": {
     "title": "My Purchases",

@@ -963,7 +963,16 @@
     "emptyReceived": "Aucun paiement reçu pour l'instant. Créez une facture pour commencer.",
     "emptySpent": "Aucune transaction en tant qu'acheteur.",
     "errorLoad": "Échec du chargement de l'historique. Veuillez réessayer.",
-    "downloadReceipt": "Télécharger le reçu"
+    "downloadReceipt": "Télécharger le reçu",
+    "downloadStatement": "Télécharger le relevé de transactions",
+    "downloadStatementDesc": "Exportez un relevé PDF professionnel de toutes vos transactions en séquestre pour une période donnée. Parfait pour la comptabilité et la tenue de registres.",
+    "fromDate": "De",
+    "toDate": "À",
+    "downloadBtn": "Télécharger PDF",
+    "generating": "Génération en cours",
+    "statementError": "Veuillez sélectionner les deux dates de début et de fin.",
+    "statementDateError": "La date de début doit être antérieure à la date de fin.",
+    "statementFailed": "Échec de la génération du relevé. Veuillez réessayer."
   },
   "Purchases": {
     "title": "Mes achats",
