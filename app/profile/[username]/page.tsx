@@ -4,6 +4,7 @@ import Axios from "axios";
 import { useParams } from "next/navigation";
 import { useAuth } from "@/context/UserContext";
 import { useTranslations } from "next-intl";
+import { BadgeCheck, ShieldAlert } from "lucide-react";
 
 const API = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
 
@@ -15,6 +16,7 @@ type Seller = {
   profilepicture: string;
   createdat: string;
   phone?: string;
+  kyc_status?: string;
 };
 type Review = {
   id: number;
@@ -75,7 +77,7 @@ export default function SellerProfilePage() {
       }
     };
     fetchProfile();
-  }, [username]);
+  }, [username, t]);
 
   const submitReview = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -254,6 +256,47 @@ export default function SellerProfilePage() {
                 }}
               >
                 {t("memberSince")} {formatDate(seller.createdat)}
+
+                            {/* KYC verification badge */}
+                            {seller.kyc_status === "approved" ? (
+                              <div
+                                style={{
+                                  display: "inline-flex",
+                                  alignItems: "center",
+                                  gap: "0.35rem",
+                                  marginTop: "0.5rem",
+                                  padding: "0.3rem 0.75rem",
+                                  borderRadius: "999px",
+                                  background: "rgba(22,163,74,0.1)",
+                                  border: "1.5px solid rgba(22,163,74,0.3)",
+                                  color: "#166534",
+                                  fontSize: "0.78rem",
+                                  fontWeight: 800,
+                                }}
+                              >
+                                <BadgeCheck size={14} />
+                                {t("verifiedBadge")}
+                              </div>
+                            ) : (
+                              <div
+                                style={{
+                                  display: "inline-flex",
+                                  alignItems: "center",
+                                  gap: "0.35rem",
+                                  marginTop: "0.5rem",
+                                  padding: "0.3rem 0.75rem",
+                                  borderRadius: "999px",
+                                  background: "rgba(100,116,139,0.08)",
+                                  border: "1.5px solid rgba(100,116,139,0.2)",
+                                  color: "#475569",
+                                  fontSize: "0.78rem",
+                                  fontWeight: 700,
+                                }}
+                              >
+                                <ShieldAlert size={13} />
+                                {seller.kyc_status === "pending" ? t("verificationPending") : t("notVerifiedBadge")}
+                              </div>
+                            )}
               </p>
 
               {/* MoMo phone number */}

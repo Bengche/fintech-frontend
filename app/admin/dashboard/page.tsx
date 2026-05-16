@@ -110,6 +110,7 @@ type TabKey =
   | "referrals"
   | "messages"
   | "stuck"
+    | "kyc"
   | "verify"
   | "controls";
 
@@ -128,6 +129,7 @@ export default function AdminDashboard() {
     { key: "disputes", label: t("dashboard.tabDisputes") },
     { key: "referrals", label: t("dashboard.tabReferrals") },
     { key: "messages", label: t("dashboard.tabMessages") },
+      { key: "kyc", label: "KYC" },
     { key: "verify", label: "Verify Receipt" },
     { key: "controls", label: t("dashboard.tabControls") },
   ];
@@ -148,6 +150,10 @@ export default function AdminDashboard() {
   const [referrals, setReferrals] = useState<SectionState>(initTab());
   const [broadcasts, setBroadcasts] = useState<SectionState>(initTab());
   const [stuck, setStuck] = useState<SectionState>(initTab());
+  const [kyc, setKyc] = useState<SectionState>(initTab());
+  const [kycFilter, setKycFilter] = useState<"all" | "pending" | "approved" | "rejected">("pending");
+  const [kycActionLoadingId, setKycActionLoadingId] = useState<number | null>(null);
+  const [kycNoteById, setKycNoteById] = useState<Record<number, string>>({});
 
   // ── Platform Controls state ───────────────────────────────────────────────
   interface PlatformSettings {
@@ -241,6 +247,7 @@ export default function AdminDashboard() {
         disputes: { setter: setDisputes, endpoint: "disputes" },
         referrals: { setter: setReferrals, endpoint: "referrals" },
         messages: { setter: setBroadcasts, endpoint: "broadcasts" },
+        kyc: { setter: setKyc, endpoint: `kyc?status=${kycFilter}` },
       };
 
       if (!config[tab]) return;
@@ -251,8 +258,9 @@ export default function AdminDashboard() {
       setter((prev) => ({ ...prev, loading: true, error: "" }));
 
       try {
+        const joiner = endpoint.includes("?") ? "&" : "?";
         const res = await axios.get(
-          `${API_URL}/admin/${endpoint}?page=${nextPage}&limit=${ITEMS_PER_PAGE}`,
+          `${API_URL}/admin/${endpoint}${joiner}page=${nextPage}&limit=${ITEMS_PER_PAGE}`,
           { withCredentials: true },
         );
         setter((prev) => ({
@@ -272,7 +280,7 @@ export default function AdminDashboard() {
         setter((prev) => ({ ...prev, loading: false, error: msg }));
       }
     },
-    [],
+    [kycFilter, t],
   );
 
   // ── 4. Load data when switching tabs (only if not already loaded) ────────────
@@ -280,6 +288,7 @@ export default function AdminDashboard() {
     if (
       !authed ||
       activeTab === "overview" ||
+        activeTab === "kyc" ||
       activeTab === "verify" ||
       activeTab === "controls"
     )
@@ -293,12 +302,19 @@ export default function AdminDashboard() {
       disputes,
       referrals,
       messages: broadcasts,
+      kyc,
     }[activeTab];
     if (!tabState?.loaded) {
       loadTab(activeTab, false, 0);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab, authed]);
+
+  // Reload KYC list when opening the KYC tab or switching status filter
+  useEffect(() => {
+    if (!authed || activeTab !== "kyc") return;
+    loadTab("kyc", false, 0);
+  }, [activeTab, authed, kycFilter, loadTab]);
 
   // ── 5. Debounced user search for the direct-message picker ────────────────────
   useEffect(() => {
@@ -1809,6 +1825,24 @@ export default function AdminDashboard() {
         )}
 
         {/* ─────────────────────── VERIFY RECEIPT TAB ─────────────────────── */}
+        {activeTab === "kyc" && (
+          <KycAdminTab
+            data={kyc.data}
+            loading={kyc.loading}
+            error={kyc.error}
+            hasMore={kyc.hasMore}
+            filter={kycFilter}
+            setFilter={setKycFilter}
+            onLoadMore={() => loadTab("kyc", true, kyc.page)}
+            onReload={() => loadTab("kyc", false, 0)}
+            actionLoadingId={kycActionLoadingId}
+            setActionLoadingId={setKycActionLoadingId}
+            noteById={kycNoteById}
+            setNoteById={setKycNoteById}
+          />
+        )}
+
+        {/* ─────────────────────── VERIFY RECEIPT TAB ─────────────────────── */}
         {activeTab === "verify" && <AdminVerifyTab />}
 
         {/* ─────────────────────── CONTROLS TAB ─────────────────────────────── */}
@@ -2332,6 +2366,385 @@ export default function AdminDashboard() {
           </section>
         )}
       </main>
+    </div>
+  );
+}
+
+// ─── Admin KYC Review Component ─────────────────────────────────────────────
+function KycAdminTab({
+  data,
+  loading,
+  error,
+  hasMore,
+  filter,
+  setFilter,
+  onLoadMore,
+  onReload,
+  actionLoadingId,
+  setActionLoadingId,
+  noteById,
+  setNoteById,
+}: {
+  data: Record<string, RowValue>[];
+  loading: boolean;
+  error: string;
+  hasMore: boolean;
+  filter: "all" | "pending" | "approved" | "rejected";
+  setFilter: React.Dispatch<
+    React.SetStateAction<"all" | "pending" | "approved" | "rejected">
+  >;
+  onLoadMore: () => void;
+  onReload: () => void;
+  actionLoadingId: number | null;
+  setActionLoadingId: React.Dispatch<React.SetStateAction<number | null>>;
+  noteById: Record<number, string>;
+  setNoteById: React.Dispatch<React.SetStateAction<Record<number, string>>>;
+}) {
+  const [actionMsg, setActionMsg] = useState("");
+  const [actionErr, setActionErr] = useState("");
+
+  const statusPill = (status: string) => {
+    const map: Record<string, { bg: string; bd: string; cl: string; label: string }> = {
+      pending: {
+        bg: "rgba(245,158,11,0.12)",
+        bd: "rgba(245,158,11,0.32)",
+        cl: "#92400e",
+        label: "Pending",
+      },
+      approved: {
+        bg: "rgba(22,163,74,0.1)",
+        bd: "rgba(22,163,74,0.3)",
+        cl: "#166534",
+        label: "Approved",
+      },
+      rejected: {
+        bg: "rgba(220,38,38,0.08)",
+        bd: "rgba(220,38,38,0.24)",
+        cl: "#991b1b",
+        label: "Rejected",
+      },
+    };
+    const s = map[status] || {
+      bg: "rgba(100,116,139,0.08)",
+      bd: "rgba(100,116,139,0.2)",
+      cl: "#475569",
+      label: status,
+    };
+    return (
+      <span
+        style={{
+          background: s.bg,
+          border: `1px solid ${s.bd}`,
+          color: s.cl,
+          borderRadius: "999px",
+          padding: "0.2rem 0.65rem",
+          fontSize: "0.75rem",
+          fontWeight: 800,
+        }}
+      >
+        {s.label}
+      </span>
+    );
+  };
+
+  const review = async (id: number, mode: "approve" | "reject") => {
+    setActionMsg("");
+    setActionErr("");
+    setActionLoadingId(id);
+    try {
+      await axios.post(
+        `${API_URL}/admin/kyc/${id}/${mode}`,
+        { note: noteById[id] || "" },
+        { withCredentials: true },
+      );
+      setActionMsg(
+        mode === "approve"
+          ? "Application approved and user notified."
+          : "Application rejected and user notified.",
+      );
+      onReload();
+    } catch (err: unknown) {
+      setActionErr(
+        axios.isAxiosError(err) && err.response?.data?.message
+          ? err.response.data.message
+          : "Action failed.",
+      );
+    } finally {
+      setActionLoadingId(null);
+    }
+  };
+
+  return (
+    <section
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: "1rem",
+        background: "var(--color-surface,#fff)",
+        borderRadius: "12px",
+        padding: "1rem",
+        boxShadow: "0 1px 4px rgba(0,0,0,0.07)",
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          gap: "0.75rem",
+          flexWrap: "wrap",
+        }}
+      >
+        <div>
+          <h3 style={{ margin: 0, fontSize: "1.05rem", fontWeight: 800 }}>
+            KYC Verification Queue
+          </h3>
+          <p
+            style={{
+              margin: "4px 0 0",
+              fontSize: "0.84rem",
+              color: "var(--color-text-muted)",
+            }}
+          >
+            Review identity submissions, approve verified users, or reject with
+            clear reasons.
+          </p>
+        </div>
+        <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+          {(["pending", "approved", "rejected", "all"] as const).map((f) => (
+            <button
+              key={f}
+              onClick={() => setFilter(f)}
+              style={{
+                border: filter === f
+                  ? "1px solid var(--color-primary,#0F1F3D)"
+                  : "1px solid var(--color-border,#e2e8f0)",
+                background:
+                  filter === f ? "var(--color-primary,#0F1F3D)" : "#fff",
+                color: filter === f ? "#fff" : "var(--color-text-heading,#0f172a)",
+                borderRadius: "999px",
+                padding: "0.35rem 0.75rem",
+                fontWeight: 700,
+                fontSize: "0.77rem",
+                cursor: "pointer",
+              }}
+            >
+              {f.charAt(0).toUpperCase() + f.slice(1)}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {actionMsg && <div className="alert alert-success">{actionMsg}</div>}
+      {actionErr && <div className="alert alert-danger">{actionErr}</div>}
+      {error && <div className="alert alert-danger">{error}</div>}
+
+      {data.length === 0 && !loading ? (
+        <div className="badge badge-neutral" style={{ width: "fit-content" }}>
+          No KYC applications found.
+        </div>
+      ) : (
+        <div style={{ display: "grid", gap: "0.85rem" }}>
+          {data.map((row) => {
+            const id = Number(row.id);
+            const status = String(row.status || "");
+            return (
+              <div
+                key={id}
+                style={{
+                  border: "1px solid var(--color-border,#e2e8f0)",
+                  borderRadius: "10px",
+                  padding: "0.9rem",
+                  background: "#fff",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    gap: "0.75rem",
+                    flexWrap: "wrap",
+                    marginBottom: "0.65rem",
+                  }}
+                >
+                  <div>
+                    <p
+                      style={{
+                        margin: 0,
+                        fontWeight: 800,
+                        color: "var(--color-text-heading,#0f172a)",
+                      }}
+                    >
+                      {String(row.full_name || "—")}
+                    </p>
+                    <p
+                      style={{
+                        margin: "3px 0 0",
+                        fontSize: "0.8rem",
+                        color: "var(--color-text-muted,#64748b)",
+                      }}
+                    >
+                      @{String(row.user_username || "")} · {String(row.user_email || "")}
+                    </p>
+                  </div>
+                  {statusPill(status)}
+                </div>
+
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))",
+                    gap: "0.45rem 0.75rem",
+                    marginBottom: "0.75rem",
+                    fontSize: "0.8rem",
+                  }}
+                >
+                  <InfoPair label="Document" value={String(row.document_type || "—")} />
+                  <InfoPair label="Doc Number" value={String(row.document_number || "—")} />
+                  <InfoPair label="Phone" value={String(row.phone || "—")} />
+                  <InfoPair label="Address" value={`${String(row.address || "")} ${String(row.city || "")}, ${String(row.country || "")}`.trim()} />
+                </div>
+
+                <div
+                  style={{
+                    display: "flex",
+                    gap: "0.5rem",
+                    flexWrap: "wrap",
+                    marginBottom: "0.75rem",
+                  }}
+                >
+                  <a
+                    href={String(row.document_front_url || "")}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="badge badge-info"
+                  >
+                    Front / Data Page
+                  </a>
+                  {row.document_back_url ? (
+                    <a
+                      href={String(row.document_back_url || "")}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="badge badge-info"
+                    >
+                      Back
+                    </a>
+                  ) : null}
+                  <a
+                    href={String(row.selfie_url || "")}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="badge badge-info"
+                  >
+                    Selfie
+                  </a>
+                </div>
+
+                {status === "pending" ? (
+                  <>
+                    <textarea
+                      rows={3}
+                      value={noteById[id] || ""}
+                      onChange={(e) =>
+                        setNoteById((prev) => ({ ...prev, [id]: e.target.value }))
+                      }
+                      placeholder="Optional review note (required if rejecting for clarity)."
+                      style={{
+                        width: "100%",
+                        border: "1px solid var(--color-border,#e2e8f0)",
+                        borderRadius: "8px",
+                        padding: "0.6rem 0.7rem",
+                        fontSize: "0.82rem",
+                        marginBottom: "0.6rem",
+                        resize: "vertical",
+                      }}
+                    />
+
+                    <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+                      <button
+                        onClick={() => review(id, "approve")}
+                        disabled={actionLoadingId === id}
+                        className="btn-primary"
+                        style={{ minWidth: "130px" }}
+                      >
+                        {actionLoadingId === id ? "Processing..." : "Approve"}
+                      </button>
+                      <button
+                        onClick={() => review(id, "reject")}
+                        disabled={actionLoadingId === id}
+                        style={{
+                          minWidth: "130px",
+                          borderRadius: "8px",
+                          border: "1px solid rgba(220,38,38,0.25)",
+                          background: "rgba(220,38,38,0.07)",
+                          color: "#991b1b",
+                          fontWeight: 700,
+                          padding: "0.6rem 0.8rem",
+                          cursor: "pointer",
+                        }}
+                      >
+                        {actionLoadingId === id ? "Processing..." : "Reject"}
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <p
+                    style={{
+                      margin: 0,
+                      fontSize: "0.8rem",
+                      color: "var(--color-text-muted,#64748b)",
+                    }}
+                  >
+                    Reviewed: {row.reviewed_at ? new Date(String(row.reviewed_at)).toLocaleString("en-GB") : "—"}
+                    {row.admin_note ? ` · Note: ${String(row.admin_note)}` : ""}
+                  </p>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {hasMore && (
+        <button
+          onClick={onLoadMore}
+          disabled={loading}
+          style={{
+            alignSelf: "flex-start",
+            padding: "0.5rem 1.2rem",
+            borderRadius: "8px",
+            border: "1px solid var(--color-border,#e2e8f0)",
+            background: "#fff",
+            cursor: "pointer",
+            fontWeight: 700,
+            fontSize: "0.84rem",
+          }}
+        >
+          {loading ? "Loading..." : "Load More"}
+        </button>
+      )}
+    </section>
+  );
+}
+
+function InfoPair({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <span style={{ fontSize: "0.73rem", color: "var(--color-text-muted,#64748b)", fontWeight: 700 }}>
+        {label}
+      </span>
+      <p
+        style={{
+          margin: "2px 0 0",
+          fontSize: "0.82rem",
+          color: "var(--color-text-heading,#0f172a)",
+          fontWeight: 600,
+          lineHeight: 1.45,
+        }}
+      >
+        {value || "—"}
+      </p>
     </div>
   );
 }

@@ -8,12 +8,7 @@ import { useAuth } from "@/context/UserContext";
 import { InlineSpinner } from "@/app/components/Spinner";
 import { useTranslations } from "next-intl";
 import { BRAND } from "@/config/brand";
-import {
-  ShieldCheck,
-  Clock3,
-  BadgeCheck,
-  LockKeyhole,
-} from "lucide-react";
+import { ShieldCheck, Clock3, BadgeCheck, LockKeyhole } from "lucide-react";
 
 type InvoiceStats = {
   id: number;
@@ -335,8 +330,14 @@ export default function InvoicePage() {
               marginBottom: "1rem",
             }}
           >
-            <HeroPill icon={<ShieldCheck size={14} />} label={t("guaranteeBadge")} />
-            <HeroPill icon={<BadgeCheck size={14} />} label={t("sellerBadge")} />
+            <HeroPill
+              icon={<ShieldCheck size={14} />}
+              label={t("guaranteeBadge")}
+            />
+            <HeroPill
+              icon={<BadgeCheck size={14} />}
+              label={t("sellerBadge")}
+            />
             {countdown && !isExpired && (
               <HeroPill
                 icon={<Clock3 size={14} />}
@@ -361,7 +362,12 @@ export default function InvoicePage() {
                 border: "1px solid rgba(255,255,255,0.12)",
               }}
             >
-              <p style={{ margin: "0 0 0.35rem", color: "rgba(255,255,255,0.72)" }}>
+              <p
+                style={{
+                  margin: "0 0 0.35rem",
+                  color: "rgba(255,255,255,0.72)",
+                }}
+              >
                 {t("sellerLabel")}
               </p>
               <p style={{ margin: 0, fontWeight: 700, fontSize: "1.05rem" }}>
@@ -387,7 +393,12 @@ export default function InvoicePage() {
                 border: "1px solid rgba(255,255,255,0.12)",
               }}
             >
-              <p style={{ margin: "0 0 0.35rem", color: "rgba(255,255,255,0.72)" }}>
+              <p
+                style={{
+                  margin: "0 0 0.35rem",
+                  color: "rgba(255,255,255,0.72)",
+                }}
+              >
                 {t("breakdownTitle")}
               </p>
               <p style={{ margin: 0, fontWeight: 800, fontSize: "1.3rem" }}>
@@ -577,7 +588,10 @@ export default function InvoicePage() {
                 border: "1px solid var(--color-border)",
               }}
             >
-              <BreakdownRow label={t("breakdownSubtotal")} value={displayAmount} />
+              <BreakdownRow
+                label={t("breakdownSubtotal")}
+                value={displayAmount}
+              />
               <BreakdownRow
                 label={t("breakdownBuyerFee")}
                 value={t("breakdownBuyerFeeValue")}
