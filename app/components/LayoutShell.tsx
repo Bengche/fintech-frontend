@@ -59,7 +59,16 @@ export default function LayoutShell({
             <Navbar />
           </div>
 
-          <main style={{ flex: 1 }}>
+          <main
+            style={{
+              flex: 1,
+              // On mobile/tablet the fixed bottom nav sits ~3.5rem + safe-area tall.
+              // Apply clearance globally so no page content is obscured beneath it.
+              // On lg+ the bottom nav is hidden so this padding is zero-cost.
+              paddingBottom: "calc(3.5rem + env(safe-area-inset-bottom, 0px))",
+            }}
+            className="lg:pb-0"
+          >
             {children}
           </main>
 

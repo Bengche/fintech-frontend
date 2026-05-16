@@ -817,7 +817,7 @@
       "title": "Your Invoices",
       "refresh": "Refresh Invoices",
       "loading": "Loading…",
-      "empty": "No invoices yet. Click \"Refresh Invoices\" to load or create your first one above.",
+      "empty": "No invoices yet. Click \"Refresh Invoices\" to load or create your first Invoice.",
       "noMatch": "No invoices match this filter.",
       "statusAll": "All",
       "statusPending": "Pending",

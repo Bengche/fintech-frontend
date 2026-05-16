@@ -85,7 +85,7 @@ export default function Dashboard() {
         style={{
           maxWidth: "1100px",
           margin: "0 auto",
-          padding: "2rem 1.25rem 4rem",
+          padding: "2rem 1.25rem calc(4rem + env(safe-area-inset-bottom, 0px))",
         }}
       >
         {/* â”€â”€ Escrow balance â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
