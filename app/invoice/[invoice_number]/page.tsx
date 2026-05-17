@@ -1640,28 +1640,28 @@ export default function InvoicePage() {
                   fontSize: "0.9375rem",
                 }}
               >
-            <div style={{ marginBottom: "1rem", textAlign: "left" }}>
-              <label
-                style={{
-                  display: "block",
-                  fontSize: "0.8rem",
-                  fontWeight: 600,
-                  color: "var(--color-text-muted)",
-                  marginBottom: "0.375rem",
-                }}
-              >
-                {t("receiptLanguage")}
-              </label>
-              <select
-                className="input"
-                value={receiptLanguage}
-                onChange={(e) => setReceiptLanguage(e.target.value)}
-                style={{ maxWidth: "180px" }}
-              >
-                <option value="en">English</option>
-                <option value="fr">Français</option>
-              </select>
-            </div>
+                <div style={{ marginBottom: "1rem", textAlign: "left" }}>
+                  <label
+                    style={{
+                      display: "block",
+                      fontSize: "0.8rem",
+                      fontWeight: 600,
+                      color: "var(--color-text-muted)",
+                      marginBottom: "0.375rem",
+                    }}
+                  >
+                    {t("receiptLanguage")}
+                  </label>
+                  <select
+                    className="input"
+                    value={receiptLanguage}
+                    onChange={(e) => setReceiptLanguage(e.target.value)}
+                    style={{ maxWidth: "180px" }}
+                  >
+                    <option value="en">English</option>
+                    <option value="fr">Français</option>
+                  </select>
+                </div>
                 {t("resendTitle")}
               </p>
               <p

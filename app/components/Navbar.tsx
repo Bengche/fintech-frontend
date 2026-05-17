@@ -231,9 +231,7 @@ export default function Navbar() {
                 <NavLink href="/verify">Verify Receipt</NavLink>
                 <RequestFeatureButton variant="nav" />
                 {username && (
-                  <NavLink href={`/seller/${username}`}>
-                    {t("profile")}
-                  </NavLink>
+                  <NavLink href={`/seller/${username}`}>{t("profile")}</NavLink>
                 )}
                 <NavLink href="/settings">{t("settings")}</NavLink>
                 <NotificationBell

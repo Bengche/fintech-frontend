@@ -80,8 +80,9 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <div className="card" style={{ padding: "2rem", marginBottom: "1.5rem" }}>
+    <div className="card settings-section" style={{ padding: "2rem", marginBottom: "1.5rem" }}>
       <h2
+        className="settings-section-title"
         style={{
           fontSize: "1.0625rem",
           fontWeight: 700,
@@ -93,6 +94,7 @@ function Section({
       </h2>
       {subtitle && (
         <p
+          className="settings-section-subtitle"
           style={{
             fontSize: "0.875rem",
             color: "var(--color-text-muted)",
@@ -139,6 +141,7 @@ export default function SettingsPage() {
       <>
         <SiteHeader />
         <main
+          className="settings-page"
           style={{
             backgroundColor: "var(--color-cloud)",
             minHeight: "calc(100vh - 8rem)",
@@ -159,14 +162,16 @@ export default function SettingsPage() {
     <>
       <SiteHeader />
       <main
+        className="settings-page"
         style={{
           backgroundColor: "var(--color-cloud)",
           minHeight: "calc(100vh - 8rem)",
           padding: "3rem 1.5rem",
         }}
       >
-        <div className="page-wrapper" style={{ maxWidth: "680px" }}>
+        <div className="page-wrapper settings-shell" style={{ maxWidth: "680px" }}>
           <h1
+            className="settings-title"
             style={{
               fontSize: "1.625rem",
               fontWeight: 800,
@@ -177,6 +182,7 @@ export default function SettingsPage() {
             {t("title")}
           </h1>
           <p
+            className="settings-subtitle"
             style={{
               fontSize: "0.9375rem",
               color: "var(--color-text-muted)",
@@ -186,7 +192,9 @@ export default function SettingsPage() {
             {t("subtitle")}
           </p>
 
-          {profile?.username && <PublicProfileLinkSection username={profile.username} />}
+          {profile?.username && (
+            <PublicProfileLinkSection username={profile.username} />
+          )}
 
           <UpdateNameForm
             current={profile?.name ?? ""}
@@ -209,9 +217,7 @@ export default function SettingsPage() {
           <EmailLanguageForm
             current={profile?.preferred_email_language ?? "en"}
             onSaved={(preferred_email_language) =>
-              setProfile((p) =>
-                p ? { ...p, preferred_email_language } : p,
-              )
+              setProfile((p) => (p ? { ...p, preferred_email_language } : p))
             }
           />
           <ChangePasswordForm />
@@ -266,6 +272,7 @@ function PublicProfileLinkSection({ username }: { username: string }) {
       subtitle={t("publicProfile.sectionSubtitle")}
     >
       <div
+        className="settings-link-row"
         style={{
           display: "flex",
           gap: "0.75rem",
@@ -297,6 +304,7 @@ function PublicProfileLinkSection({ username }: { username: string }) {
       </div>
 
       <div
+        className="settings-link-actions"
         style={{
           display: "flex",
           justifyContent: "flex-end",
@@ -421,6 +429,7 @@ function KycStatusSection() {
   return (
     <Section title={t("kyc.sectionTitle")} subtitle={t("kyc.sectionSubtitle")}>
       <div
+        className="settings-kyc-row"
         style={{
           display: "flex",
           alignItems: "center",
@@ -455,7 +464,7 @@ function KycStatusSection() {
         {kycStatus !== "approved" && (
           <Link href="/kyc" style={{ textDecoration: "none" }}>
             <button
-              className="btn-primary"
+              className="btn-primary settings-inline-cta"
               type="button"
               style={{
                 display: "flex",
@@ -534,6 +543,7 @@ function SessionManagerSection() {
       <Feedback msg={msg} />
 
       <div
+        className="settings-session-summary"
         style={{
           display: "flex",
           alignItems: "flex-start",
@@ -549,6 +559,7 @@ function SessionManagerSection() {
         }}
       >
         <div
+          className="settings-session-summary-body"
           style={{
             display: "flex",
             gap: "0.75rem",
@@ -596,7 +607,7 @@ function SessionManagerSection() {
 
         <button
           type="button"
-          className="btn-primary"
+          className="btn-primary settings-session-revoke-all"
           disabled={revokeOthersLoading || !currentSid || sessions.length <= 1}
           onClick={async () => {
             setRevokeOthersLoading(true);
@@ -629,6 +640,7 @@ function SessionManagerSection() {
 
       {loading ? (
         <div
+          className="settings-loading-inline"
           style={{
             display: "flex",
             alignItems: "center",
@@ -651,10 +663,11 @@ function SessionManagerSection() {
           {t("sessions.empty")}
         </p>
       ) : (
-        <div style={{ display: "grid", gap: "0.875rem" }}>
+        <div className="settings-session-list" style={{ display: "grid", gap: "0.875rem" }}>
           {sessions.map((session) => (
             <div
               key={session.sid}
+              className={`settings-session-item ${session.isCurrent ? "is-current" : ""}`}
               style={{
                 border: session.isCurrent
                   ? "1.5px solid rgba(15,31,61,0.18)"
@@ -667,6 +680,7 @@ function SessionManagerSection() {
               }}
             >
               <div
+                className="settings-session-item-top"
                 style={{
                   display: "flex",
                   justifyContent: "space-between",
@@ -676,6 +690,7 @@ function SessionManagerSection() {
               >
                 <div style={{ minWidth: 0 }}>
                   <div
+                    className="settings-session-head"
                     style={{
                       display: "flex",
                       alignItems: "center",
@@ -731,6 +746,7 @@ function SessionManagerSection() {
                   </div>
 
                   <div
+                    className="settings-session-meta-grid"
                     style={{
                       display: "grid",
                       gridTemplateColumns:
@@ -805,6 +821,7 @@ function SessionManagerSection() {
                       cursor: signOutLoading ? "default" : "pointer",
                       opacity: signOutLoading ? 0.6 : 1,
                     }}
+                    className="settings-session-danger-btn"
                   >
                     <LogOut size={14} />
                     {signOutLoading
@@ -854,6 +871,7 @@ function SessionManagerSection() {
                           : "pointer",
                       opacity: revokeLoadingSid === session.sid ? 0.6 : 1,
                     }}
+                    className="settings-session-danger-btn"
                   >
                     {revokeLoadingSid === session.sid
                       ? t("sessions.revoking")
@@ -879,7 +897,7 @@ function SessionMeta({
   value: string;
 }) {
   return (
-    <div>
+    <div className="settings-session-meta">
       <p
         style={{
           margin: "0 0 0.2rem",
@@ -958,8 +976,8 @@ function UpdateNameForm({
   return (
     <Section title={t("name.sectionTitle")}>
       <Feedback msg={msg} />
-      <form onSubmit={handleSubmit}>
-        <div style={{ marginBottom: "1.25rem" }}>
+      <form className="settings-form" onSubmit={handleSubmit}>
+        <div className="settings-field" style={{ marginBottom: "1.25rem" }}>
           <label className="label" htmlFor="s-name">
             {t("name.label")}
           </label>
@@ -1027,8 +1045,8 @@ function UpdateEmailForm({
   return (
     <Section title={t("email.sectionTitle")}>
       <Feedback msg={msg} />
-      <form onSubmit={handleSubmit}>
-        <div style={{ marginBottom: "1.25rem" }}>
+      <form className="settings-form" onSubmit={handleSubmit}>
+        <div className="settings-field" style={{ marginBottom: "1.25rem" }}>
           <label className="label" htmlFor="s-email">
             {t("email.label")}
           </label>
@@ -1125,8 +1143,9 @@ function UpdateProfilePictureForm({
       subtitle={t("picture.sectionSubtitle")}
     >
       <Feedback msg={msg} />
-      <form onSubmit={handleSubmit}>
+      <form className="settings-form" onSubmit={handleSubmit}>
         <div
+          className="settings-avatar-row"
           style={{
             display: "flex",
             alignItems: "center",
@@ -1136,6 +1155,7 @@ function UpdateProfilePictureForm({
           }}
         >
           <div
+            className="settings-avatar-preview"
             style={{
               width: 72,
               height: 72,
@@ -1164,7 +1184,7 @@ function UpdateProfilePictureForm({
             )}
           </div>
 
-          <div style={{ flex: 1 }}>
+          <div className="settings-avatar-controls" style={{ flex: 1 }}>
             <input
               ref={inputRef}
               type="file"
@@ -1258,12 +1278,13 @@ function UpdatePhoneForm({
       subtitle={t("phone.sectionSubtitle")}
     >
       <Feedback msg={msg} />
-      <form onSubmit={handleSubmit}>
-        <div style={{ marginBottom: "1.25rem" }}>
+      <form className="settings-form" onSubmit={handleSubmit}>
+        <div className="settings-field" style={{ marginBottom: "1.25rem" }}>
           <label className="label" htmlFor="s-phone">
             {t("phone.label")}
           </label>
           <div
+            className="settings-phone-wrap"
             style={{
               display: "flex",
               alignItems: "center",
@@ -1274,6 +1295,7 @@ function UpdatePhoneForm({
             }}
           >
             <span
+              className="settings-phone-prefix"
               style={{
                 padding: "0.625rem 0.75rem",
                 background: "var(--color-cloud)",
@@ -1286,6 +1308,7 @@ function UpdatePhoneForm({
               +237
             </span>
             <input
+              className="settings-phone-input"
               id="s-phone"
               type="tel"
               placeholder={t("phone.inputPlaceholder")}
@@ -1372,8 +1395,9 @@ function ChangePasswordForm() {
   return (
     <Section title={t("password.sectionTitle")}>
       <Feedback msg={msg} />
-      <form onSubmit={handleSubmit}>
+      <form className="settings-form" onSubmit={handleSubmit}>
         <div
+          className="settings-password-grid"
           style={{
             display: "flex",
             flexDirection: "column",
@@ -1481,10 +1505,11 @@ function PasskeySection() {
           No passkeys registered yet on this account.
         </p>
       ) : (
-        <ul style={{ listStyle: "none", padding: 0, margin: "0 0 1.25rem" }}>
+        <ul className="settings-passkey-list" style={{ listStyle: "none", padding: 0, margin: "0 0 1.25rem" }}>
           {passkeys.map((pk) => (
             <li
               key={pk.id}
+              className="settings-passkey-item"
               style={{
                 display: "flex",
                 alignItems: "center",
@@ -1497,6 +1522,7 @@ function PasskeySection() {
               }}
             >
               <div
+                className="settings-passkey-main"
                 style={{
                   display: "flex",
                   alignItems: "center",
@@ -1529,6 +1555,7 @@ function PasskeySection() {
               <button
                 onClick={() => removePasskey(pk.id)}
                 disabled={removeLoading === pk.id}
+                className="settings-passkey-remove"
                 style={{
                   background: "none",
                   border: "none",
@@ -1561,6 +1588,7 @@ function PasskeySection() {
 
       {showInput ? (
         <div
+          className="settings-passkey-register"
           style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}
         >
           <input
@@ -1570,7 +1598,7 @@ function PasskeySection() {
             onChange={(e) => setDeviceName(e.target.value)}
             maxLength={60}
           />
-          <div style={{ display: "flex", gap: "0.75rem" }}>
+          <div className="settings-passkey-register-actions" style={{ display: "flex", gap: "0.75rem" }}>
             <button
               type="button"
               className="btn-primary"
@@ -1595,6 +1623,7 @@ function PasskeySection() {
             </button>
             <button
               type="button"
+              className="settings-passkey-cancel"
               onClick={() => {
                 setShowInput(false);
                 setDeviceName("");
@@ -1616,6 +1645,7 @@ function PasskeySection() {
       ) : (
         <button
           type="button"
+          className="settings-passkey-add"
           onClick={() => setShowInput(true)}
           style={{
             display: "inline-flex",
@@ -1675,7 +1705,7 @@ function DeleteAccountSection() {
   return (
     <>
       <div
-        className="card"
+        className="card settings-danger-card"
         style={{
           padding: "2rem",
           marginBottom: "1.5rem",
@@ -1720,6 +1750,7 @@ function DeleteAccountSection() {
 
       {showModal && (
         <div
+          className="settings-modal-backdrop"
           style={{
             position: "fixed",
             inset: 0,
@@ -1735,6 +1766,7 @@ function DeleteAccountSection() {
           }}
         >
           <div
+            className="settings-modal"
             style={{
               backgroundColor: "var(--color-white, #fff)",
               borderRadius: "var(--radius-md, 12px)",
@@ -1770,8 +1802,8 @@ function DeleteAccountSection() {
 
             <Feedback msg={msg} />
 
-            <form onSubmit={handleDelete}>
-              <div style={{ marginBottom: "1.25rem" }}>
+            <form className="settings-form" onSubmit={handleDelete}>
+              <div className="settings-field" style={{ marginBottom: "1.25rem" }}>
                 <label className="label" htmlFor="del-pass">
                   {t("delete.passwordLabel")}
                 </label>
@@ -1788,6 +1820,7 @@ function DeleteAccountSection() {
               </div>
 
               <div
+                className="settings-modal-actions"
                 style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap" }}
               >
                 <button

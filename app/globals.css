@@ -605,3 +605,1025 @@ a:hover {
     gap: 0.5rem !important;
   }
 }
+
+/* ─────────────────────────────────────────────────────────────
+   SETTINGS PAGE — polished responsive styling
+   ───────────────────────────────────────────────────────────── */
+
+.settings-page {
+  background:
+    radial-gradient(circle at 0% 0%, rgba(15, 31, 61, 0.05), transparent 36%),
+    radial-gradient(circle at 100% 100%, rgba(245, 158, 11, 0.12), transparent 32%),
+    var(--color-cloud);
+}
+
+.settings-shell {
+  max-width: 720px;
+}
+
+.settings-title {
+  letter-spacing: -0.01em;
+}
+
+.settings-subtitle {
+  max-width: 62ch;
+  line-height: 1.65;
+}
+
+.settings-section {
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-card);
+}
+
+.settings-section-title {
+  letter-spacing: -0.01em;
+}
+
+.settings-link-row {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+.settings-link-actions {
+  align-items: stretch;
+}
+
+.settings-inline-cta {
+  min-height: 42px;
+}
+
+.settings-session-summary {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+.settings-session-summary-body {
+  min-width: 0;
+}
+
+.settings-session-revoke-all {
+  min-height: 44px;
+}
+
+.settings-loading-inline {
+  padding: 0.25rem 0;
+}
+
+.settings-session-list {
+  grid-template-columns: 1fr;
+}
+
+.settings-session-item {
+  box-shadow: 0 1px 0 rgba(15, 31, 61, 0.04);
+}
+
+.settings-session-item-top {
+  align-items: flex-start;
+}
+
+.settings-session-head {
+  min-width: 0;
+}
+
+.settings-session-meta-grid {
+  margin-top: 0.35rem;
+}
+
+.settings-session-meta p {
+  margin-block: 0;
+}
+
+.settings-session-danger-btn {
+  min-height: 40px;
+  white-space: nowrap;
+}
+
+.settings-form {
+  width: 100%;
+}
+
+.settings-avatar-preview {
+  box-shadow: 0 0 0 4px rgba(15, 31, 61, 0.05);
+}
+
+.settings-phone-wrap:focus-within {
+  border-color: var(--color-primary) !important;
+  box-shadow: 0 0 0 3px var(--color-primary-light);
+}
+
+.settings-phone-input {
+  background: transparent;
+}
+
+.settings-passkey-list {
+  display: grid;
+  gap: 0.625rem;
+}
+
+.settings-passkey-item {
+  margin-bottom: 0 !important;
+}
+
+.settings-passkey-main {
+  min-width: 0;
+}
+
+.settings-passkey-remove,
+.settings-passkey-add,
+.settings-passkey-cancel {
+  min-height: 40px;
+}
+
+.settings-passkey-register-actions {
+  align-items: stretch;
+}
+
+.settings-danger-card {
+  background: linear-gradient(180deg, rgba(239, 68, 68, 0.03), var(--color-white));
+}
+
+.settings-modal-backdrop {
+  backdrop-filter: blur(3px);
+}
+
+.settings-modal {
+  border: 1px solid rgba(15, 31, 61, 0.1);
+}
+
+.settings-modal-actions > button {
+  min-height: 44px;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   SELLER PROFILE PAGE — polished responsive styling
+   ───────────────────────────────────────────────────────────── */
+
+.seller-profile-page {
+  background:
+    radial-gradient(circle at 100% 0%, rgba(245, 158, 11, 0.08), transparent 34%),
+    radial-gradient(circle at 0% 100%, rgba(15, 31, 61, 0.06), transparent 36%),
+    var(--color-cloud);
+}
+
+.seller-profile-shell {
+  max-width: 760px;
+}
+
+.seller-hero-card,
+.seller-contact-card,
+.seller-review-card {
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-card);
+}
+
+.seller-kyc-panel {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+.seller-kyc-btn {
+  min-height: 44px;
+}
+
+.seller-stats-row {
+  justify-content: space-between;
+}
+
+.seller-stat-box {
+  min-width: 110px;
+}
+
+.seller-stat-value {
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+}
+
+.seller-contact-form .btn-primary {
+  min-height: 44px;
+  justify-content: center;
+}
+
+.seller-completed-item {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45);
+}
+
+.seller-review-top {
+  align-items: center;
+}
+
+@media (max-width: 768px) {
+  .settings-page {
+    padding: 1.25rem 1rem 2.75rem !important;
+  }
+
+  .settings-shell {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  .settings-title {
+    font-size: 1.35rem !important;
+  }
+
+  .settings-subtitle {
+    font-size: 0.875rem !important;
+    margin-bottom: 1.5rem !important;
+  }
+
+  .settings-section {
+    padding: 1.2rem !important;
+    margin-bottom: 1rem !important;
+    border-radius: 0.875rem !important;
+  }
+
+  .settings-section-subtitle {
+    margin-bottom: 1rem !important;
+    font-size: 0.8125rem !important;
+  }
+
+  .settings-link-row {
+    padding: 0.75rem !important;
+    gap: 0.625rem !important;
+    flex-direction: column;
+    align-items: stretch !important;
+  }
+
+  .settings-link-actions,
+  .settings-passkey-register-actions,
+  .settings-modal-actions {
+    flex-direction: column;
+  }
+
+  .settings-link-actions > * {
+    width: 100%;
+  }
+
+  .settings-link-actions button,
+  .settings-inline-cta,
+  .settings-session-revoke-all,
+  .settings-form .btn-primary,
+  .settings-form .btn-ghost,
+  .settings-passkey-add,
+  .settings-passkey-cancel {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .settings-kyc-row,
+  .settings-session-summary {
+    padding: 0.875rem !important;
+  }
+
+  .settings-session-item {
+    padding: 0.875rem !important;
+  }
+
+  .settings-session-item-top {
+    flex-direction: column;
+  }
+
+  .settings-session-meta-grid {
+    grid-template-columns: 1fr !important;
+    gap: 0.5rem !important;
+  }
+
+  .settings-session-danger-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .settings-avatar-row {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 0.75rem !important;
+  }
+
+  .settings-avatar-controls,
+  .settings-avatar-controls .btn-ghost {
+    width: 100%;
+  }
+
+  .settings-passkey-item {
+    flex-direction: column;
+    align-items: stretch !important;
+    gap: 0.625rem !important;
+  }
+
+  .settings-passkey-remove {
+    align-self: flex-end;
+  }
+
+  .settings-modal {
+    padding: 1.125rem !important;
+  }
+
+  .seller-profile-shell {
+    padding: 1.25rem 0.95rem 3rem !important;
+  }
+
+  .seller-hero-card,
+  .seller-contact-card,
+  .seller-review-card {
+    border-radius: 0.9rem !important;
+  }
+
+  .seller-hero-top,
+  .seller-reviews-head {
+    flex-direction: column;
+    align-items: flex-start !important;
+  }
+
+  .seller-hero-top .btn-ghost {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .seller-identity-row {
+    gap: 0.85rem !important;
+  }
+
+  .seller-identity-main h1 {
+    font-size: 1.15rem !important;
+  }
+
+  .seller-kyc-panel {
+    padding: 0.875rem !important;
+    gap: 0.75rem !important;
+  }
+
+  .seller-kyc-copy {
+    min-width: 0 !important;
+  }
+
+  .seller-kyc-btn {
+    width: 100% !important;
+  }
+
+  .seller-stats-row {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.875rem !important;
+  }
+
+  .seller-stat-box {
+    text-align: left !important;
+    min-width: 0;
+  }
+
+  .seller-stat-value {
+    font-size: 1.4rem !important;
+  }
+
+  .seller-stat-label {
+    font-size: 0.76rem !important;
+  }
+
+  .seller-contact-form .input {
+    font-size: 0.9375rem;
+  }
+
+  .seller-contact-form .btn-primary {
+    width: 100%;
+  }
+
+  .seller-completed-item {
+    padding: 0.75rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .settings-page {
+    padding: 1rem 0.75rem 2.25rem !important;
+  }
+
+  .settings-section,
+  .settings-danger-card {
+    padding: 1rem !important;
+  }
+
+  .settings-section-title {
+    font-size: 0.98rem !important;
+  }
+
+  .seller-profile-shell {
+    padding: 1rem 0.75rem 2.5rem !important;
+  }
+
+  .seller-stats-row {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ────────────────────────────────────────────────────────────────────────────
+   KYC VERIFICATION — Professional Responsive Design
+   Premium mobile-first styling for knowledge-your-customer verification flow
+   ──────────────────────────────────────────────────────────────────────────── */
+
+/* ── KYC Container — adaptive width and padding ── */
+.kyc-container {
+  max-width: 640px;
+  margin-inline: auto;
+  padding-top: 2rem;
+  padding-bottom: 4rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+/* ── Form Input — enhanced styling ── */
+.form-input {
+  width: 100%;
+  background-color: var(--color-white);
+  border: 1.5px solid var(--color-border);
+  border-radius: 0.5rem;
+  padding: 0.75rem 0.875rem;
+  font-size: 1rem;
+  color: var(--color-text-heading);
+  outline: none;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+  font-family: inherit;
+}
+
+.form-input::placeholder {
+  color: var(--color-text-placeholder);
+}
+
+.form-input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 4px var(--color-primary-light);
+}
+
+.form-input:disabled {
+  background-color: var(--color-mist);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* ── Grid for 2-column responsive layout ── */
+.kyc-grid-2col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+/* Collapse to single column on tablets and mobile */
+@media (max-width: 768px) {
+  .kyc-grid-2col {
+    grid-template-columns: 1fr;
+    gap: 0.875rem;
+  }
+}
+
+/* ── Upload box — responsive container ── */
+.kyc-upload-box {
+  border: 2px dashed var(--color-border);
+  border-radius: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  overflow: hidden;
+  background: var(--color-cloud, #f8fafc);
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    transform 0.2s ease;
+  min-height: 140px;
+  position: relative;
+}
+
+.kyc-upload-box:hover {
+  border-color: var(--color-primary);
+  background-color: rgba(15, 31, 61, 0.02);
+  transform: scale(1.01);
+}
+
+.kyc-upload-box.has-preview {
+  border: 2px solid rgba(15, 31, 61, 0.25);
+  background: #000;
+  min-height: 160px;
+}
+
+/* ── Image preview styling ── */
+.kyc-image-preview {
+  width: 100%;
+  height: 180px;
+  object-fit: contain;
+}
+
+.kyc-preview-label {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  background: rgba(0, 0, 0, 0.75);
+  border-radius: 6px;
+  padding: 4px 10px;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.kyc-upload-placeholder {
+  text-align: center;
+  padding: 1.5rem 1rem;
+}
+
+/* ── Step progress bar ── */
+.kyc-step-bar {
+  margin-bottom: 2rem;
+}
+
+.kyc-step-indicators {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 0.75rem;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.kyc-step-indicators::-webkit-scrollbar {
+  display: none;
+}
+
+.kyc-step-indicator {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 800;
+  flex-shrink: 0;
+  transition: background 0.3s ease;
+}
+
+.kyc-step-connector {
+  height: 2px;
+  margin: 0 4px;
+  transition: background 0.3s ease;
+}
+
+.kyc-step-label {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  font-weight: 600;
+}
+
+/* ── Section heading ── */
+.kyc-section-heading {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  padding-bottom: 0.875rem;
+  border-bottom: 1px solid var(--color-border);
+  margin-bottom: 0.25rem;
+}
+
+.kyc-section-icon {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 0.6rem;
+  background: rgba(15, 31, 61, 0.07);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.kyc-section-title {
+  font-weight: 800;
+  color: var(--color-text-heading);
+  font-size: 1rem;
+  margin: 0;
+}
+
+.kyc-section-subtitle {
+  font-size: 0.83rem;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+  margin: 3px 0 0;
+}
+
+/* ── Form row (label + input) ── */
+.kyc-form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.kyc-form-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text-heading);
+}
+
+.kyc-form-label--required::after {
+  content: "*";
+  color: #dc2626;
+  margin-left: 3px;
+}
+
+.kyc-form-hint {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+}
+
+/* ── Review row — label + value ── */
+.kyc-review-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.7rem 0;
+  border-bottom: 1px solid var(--color-border);
+  flex-wrap: wrap;
+}
+
+.kyc-review-label {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  font-weight: 600;
+  flex: 0 1 auto;
+}
+
+.kyc-review-value {
+  font-size: 0.875rem;
+  color: var(--color-text-heading);
+  font-weight: 700;
+  word-break: break-word;
+  text-align: right;
+  flex: 0 1 auto;
+}
+
+/* ── Status banners ── */
+.kyc-status-banner {
+  border-radius: 1rem;
+  padding: 1.125rem 1.25rem;
+  margin-bottom: 1.75rem;
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.kyc-banner-pending {
+  background: rgba(245, 158, 11, 0.08);
+  border: 1.5px solid rgba(245, 158, 11, 0.3);
+}
+
+.kyc-banner-approved {
+  background: rgba(22, 163, 74, 0.08);
+  border: 1.5px solid rgba(22, 163, 74, 0.3);
+}
+
+.kyc-banner-rejected {
+  background: rgba(220, 38, 38, 0.08);
+  border: 1.5px solid rgba(220, 38, 38, 0.3);
+}
+
+.kyc-banner-icon {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.kyc-banner-content {
+  flex: 1;
+}
+
+.kyc-banner-title {
+  margin: 0;
+  font-weight: 800;
+  font-size: 1rem;
+}
+
+.kyc-banner-body {
+  margin: 4px 0 0;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  line-height: 1.6;
+}
+
+.kyc-banner-note {
+  margin-top: 0.75rem;
+  background: rgba(220, 38, 38, 0.06);
+  border: 1px solid rgba(220, 38, 38, 0.2);
+  border-radius: 0.6rem;
+  padding: 0.75rem 1rem;
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  line-height: 1.6;
+}
+
+/* ── Success/Approved states ── */
+.kyc-success-box {
+  text-align: center;
+  padding: 3rem 1.5rem;
+  border-radius: 1.25rem;
+  border: 1.5px solid rgba(22, 163, 74, 0.25);
+  background: rgba(22, 163, 74, 0.05);
+}
+
+.kyc-success-box h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #166534;
+}
+
+.kyc-success-box p {
+  margin: 0;
+  color: var(--color-text-muted);
+  line-height: 1.6;
+  font-size: 0.925rem;
+}
+
+/* ── Page header ── */
+.kyc-page-header {
+  margin-bottom: 1.75rem;
+}
+
+.kyc-header-top {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.kyc-header-badge {
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 0.875rem;
+  background: linear-gradient(135deg, #0f1f3d 0%, #1e3a5f 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.kyc-header-title {
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--color-text-heading);
+  line-height: 1.2;
+}
+
+.kyc-header-subtitle {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+.kyc-header-info {
+  margin-top: 1rem;
+  background: linear-gradient(135deg, rgba(15, 31, 61, 0.04), rgba(245, 158, 11, 0.08));
+  border: 1px solid rgba(15, 31, 61, 0.1);
+  border-radius: 0.875rem;
+  padding: 0.875rem 1rem;
+  display: flex;
+  gap: 0.625rem;
+  align-items: flex-start;
+}
+
+.kyc-header-info p {
+  margin: 0;
+  font-size: 0.83rem;
+  color: var(--color-text-muted);
+  line-height: 1.6;
+}
+
+/* ── Navigation buttons ── */
+.kyc-button-row {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.kyc-button-row--start {
+  justify-content: flex-end;
+}
+
+.kyc-btn-secondary {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.75rem 1.25rem;
+  border-radius: 0.75rem;
+  border: 1.5px solid var(--color-border);
+  background: var(--color-white);
+  color: var(--color-text-heading);
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-height: 44px;
+}
+
+.kyc-btn-secondary:hover {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+}
+
+.kyc-btn-secondary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   MOBILE RESPONSIVE — KYC Optimizations
+   Breakpoint: 640px (small mobile devices)
+   ────────────────────────────────────────────────────────────────────────── */
+
+@media (max-width: 640px) {
+  /* Container: tighter padding on small screens */
+  .kyc-container {
+    padding-left: 0.875rem;
+    padding-right: 0.875rem;
+    padding-top: 1.5rem;
+    padding-bottom: 3rem;
+  }
+
+  /* Page header: stack title + subtitle on mobile */
+  .kyc-header-top {
+    gap: 0.5rem;
+  }
+
+  .kyc-header-badge {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+
+  .kyc-header-title {
+    font-size: 1.1rem;
+  }
+
+  /* Header info box: reduce padding */
+  .kyc-header-info {
+    padding: 0.75rem 0.875rem;
+  }
+
+  .kyc-header-info p {
+    font-size: 0.78rem;
+  }
+
+  /* Step bar: smaller indicators on mobile */
+  .kyc-step-indicator {
+    width: 28px;
+    height: 28px;
+    font-size: 0.75rem;
+  }
+
+  .kyc-step-label {
+    font-size: 0.75rem;
+  }
+
+  /* Section heading: more compact */
+  .kyc-section-heading {
+    gap: 0.5rem;
+    padding-bottom: 0.75rem;
+    margin-bottom: 0.15rem;
+  }
+
+  .kyc-section-icon {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  .kyc-section-title {
+    font-size: 0.95rem;
+  }
+
+  .kyc-section-subtitle {
+    font-size: 0.78rem;
+  }
+
+  /* Form label: slightly smaller on mobile */
+  .kyc-form-label {
+    font-size: 0.8125rem;
+    font-weight: 700;
+  }
+
+  .kyc-form-hint {
+    font-size: 0.75rem;
+  }
+
+  /* Form input: mobile optimized padding */
+  .form-input {
+    padding: 0.8rem 0.875rem;
+    font-size: 1rem;
+  }
+
+  /* 2-column grid already converted to 1-column above */
+
+  /* Upload box: better mobile sizing */
+  .kyc-upload-box {
+    min-height: 120px;
+  }
+
+  .kyc-upload-box.has-preview {
+    min-height: 140px;
+  }
+
+  .kyc-image-preview {
+    height: 150px;
+  }
+
+  .kyc-upload-placeholder {
+    padding: 1rem 0.75rem;
+  }
+
+  /* Review rows: better spacing on mobile */
+  .kyc-review-row {
+    padding: 0.625rem 0;
+    gap: 0.75rem;
+    flex-direction: column;
+  }
+
+  .kyc-review-label {
+    font-size: 0.8rem;
+  }
+
+  .kyc-review-value {
+    font-size: 0.825rem;
+    text-align: left;
+  }
+
+  /* Status banner: more compact */
+  .kyc-status-banner {
+    padding: 1rem 1.125rem;
+    margin-bottom: 1.5rem;
+    gap: 0.75rem;
+  }
+
+  .kyc-banner-title {
+    font-size: 0.95rem;
+  }
+
+  .kyc-banner-body {
+    font-size: 0.8rem;
+  }
+
+  /* Success box: mobile responsive */
+  .kyc-success-box {
+    padding: 2.5rem 1.25rem;
+    border-radius: 1rem;
+  }
+
+  .kyc-success-box h2 {
+    font-size: 1.15rem;
+  }
+
+  .kyc-success-box p {
+    font-size: 0.875rem;
+  }
+
+  /* Buttons: full width on mobile */
+  .kyc-button-row {
+    gap: 0.5rem;
+    flex-direction: column-reverse;
+  }
+
+  .kyc-button-row--start {
+    justify-content: flex-end;
+    flex-direction: column;
+  }
+
+  .btn-primary,
+  .kyc-btn-secondary {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    font-size: 0.9375rem;
+    min-height: 48px;
+    justify-content: center;
+  }
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   TABLET RESPONSIVE — KYC Optimizations
+   Breakpoint: 768px (tablets in portrait) — 1024px (landscape)
+   ────────────────────────────────────────────────────────────────────────── */
+
+@media (min-width: 641px) and (max-width: 1023px) {
+  .kyc-container {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+  }
+
+  .kyc-grid-2col {
+    gap: 1.125rem;
+  }
+
+  .form-input {
+    padding: 0.75rem 1rem;
+    font-size: 0.9375rem;
+  }
+
+  .kyc-button-row {
+    gap: 1rem;
+  }
+}

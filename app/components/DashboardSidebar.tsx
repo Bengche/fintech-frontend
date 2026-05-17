@@ -288,10 +288,7 @@ export default function DashboardSidebar() {
 
         {/* User identity chip */}
         {username && (
-          <Link
-            href={`/seller/${username}`}
-            style={{ textDecoration: "none" }}
-          >
+          <Link href={`/seller/${username}`} style={{ textDecoration: "none" }}>
             <div
               style={{
                 display: "flex",

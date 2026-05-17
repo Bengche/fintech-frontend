@@ -146,9 +146,7 @@ export default function SellerProfilePage() {
       <Star
         key={i}
         size={16}
-        fill={
-          i < Math.round(rating) ? "var(--color-accent)" : "transparent"
-        }
+        fill={i < Math.round(rating) ? "var(--color-accent)" : "transparent"}
         stroke={
           i < Math.round(rating)
             ? "var(--color-accent)"
@@ -162,6 +160,7 @@ export default function SellerProfilePage() {
   if (loading)
     return (
       <div
+        className="seller-profile-page"
         style={{ minHeight: "100vh", backgroundColor: "var(--color-cloud)" }}
       >
         <div
@@ -179,6 +178,7 @@ export default function SellerProfilePage() {
   if (error)
     return (
       <div
+        className="seller-profile-page"
         style={{ minHeight: "100vh", backgroundColor: "var(--color-cloud)" }}
       >
         <div
@@ -191,7 +191,9 @@ export default function SellerProfilePage() {
 
   if (!seller) return null;
 
-  const isOwnProfile = Boolean(authUsername && authUsername === seller.username);
+  const isOwnProfile = Boolean(
+    authUsername && authUsername === seller.username,
+  );
   const needsKycAction = isOwnProfile && seller.kyc_status !== "approved";
   const kycPanelTitle =
     seller.kyc_status === "pending"
@@ -225,8 +227,9 @@ export default function SellerProfilePage() {
         : "1px solid rgba(15,31,61,0.08)";
 
   return (
-    <div style={{ minHeight: "100vh", backgroundColor: "var(--color-cloud)" }}>
+    <div className="seller-profile-page" style={{ minHeight: "100vh", backgroundColor: "var(--color-cloud)" }}>
       <div
+        className="seller-profile-shell"
         style={{
           maxWidth: "720px",
           margin: "0 auto",
@@ -234,8 +237,9 @@ export default function SellerProfilePage() {
         }}
       >
         {/* Seller hero card */}
-        <div className="card" style={{ marginBottom: "1.5rem" }}>
+        <div className="card seller-hero-card" style={{ marginBottom: "1.5rem" }}>
           <div
+            className="seller-hero-top"
             style={{
               display: "flex",
               alignItems: "center",
@@ -264,6 +268,7 @@ export default function SellerProfilePage() {
           </div>
 
           <div
+            className="seller-identity-row"
             style={{
               display: "flex",
               alignItems: "flex-start",
@@ -308,7 +313,7 @@ export default function SellerProfilePage() {
                 {seller.name.charAt(0).toUpperCase()}
               </div>
             )}
-            <div style={{ flex: 1 }}>
+            <div className="seller-identity-main" style={{ flex: 1 }}>
               <h1
                 style={{
                   fontSize: "1.375rem",
@@ -404,6 +409,7 @@ export default function SellerProfilePage() {
 
           {needsKycAction && (
             <div
+              className="seller-kyc-panel"
               style={{
                 marginTop: "1rem",
                 padding: "1rem 1.05rem",
@@ -417,7 +423,7 @@ export default function SellerProfilePage() {
                 flexWrap: "wrap",
               }}
             >
-              <div style={{ flex: 1, minWidth: "220px" }}>
+              <div className="seller-kyc-copy" style={{ flex: 1, minWidth: "220px" }}>
                 <p
                   style={{
                     margin: "0 0 0.25rem",
@@ -442,7 +448,7 @@ export default function SellerProfilePage() {
               </div>
               <Link
                 href="/kyc"
-                className="btn-primary"
+                className="btn-primary seller-kyc-btn"
                 style={{
                   textDecoration: "none",
                   flexShrink: 0,
@@ -461,6 +467,7 @@ export default function SellerProfilePage() {
 
           {/* Stats row */}
           <div
+            className="seller-stats-row"
             style={{
               display: "flex",
               gap: "1.5rem",
@@ -490,7 +497,7 @@ export default function SellerProfilePage() {
         </div>
 
         {/* Contact CTA */}
-        <div className="card" style={{ marginBottom: "1.5rem" }}>
+        <div className="card seller-contact-card" style={{ marginBottom: "1.5rem" }}>
           <h2
             style={{
               fontSize: "1.0625rem",
@@ -512,6 +519,7 @@ export default function SellerProfilePage() {
           </p>
           <form
             onSubmit={submitDealRequest}
+            className="seller-contact-form"
             style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}
           >
             <input
@@ -540,11 +548,17 @@ export default function SellerProfilePage() {
               maxLength={1000}
               style={{ minHeight: "96px", resize: "vertical" }}
             />
-            {requestError && <div className="alert alert-danger">{requestError}</div>}
+            {requestError && (
+              <div className="alert alert-danger">{requestError}</div>
+            )}
             {requestSuccess && (
               <div className="alert alert-success">{requestSuccess}</div>
             )}
-            <button className="btn-primary" type="submit" disabled={requestLoading}>
+            <button
+              className="btn-primary"
+              type="submit"
+              disabled={requestLoading}
+            >
               <Send size={16} />
               {requestLoading ? t("sending") : t("sendDealRequest")}
             </button>
@@ -570,6 +584,7 @@ export default function SellerProfilePage() {
           </p>
         ) : (
           <div
+            className="seller-completed-list"
             style={{
               display: "flex",
               flexDirection: "column",
@@ -580,6 +595,7 @@ export default function SellerProfilePage() {
             {completedInvoices.map((inv, index) => (
               <div
                 key={index}
+                className="seller-completed-item"
                 style={{
                   padding: "0.875rem 1rem",
                   backgroundColor: "var(--color-white)",
@@ -613,6 +629,7 @@ export default function SellerProfilePage() {
 
         {/* Reviews header */}
         <div
+          className="seller-reviews-head"
           style={{
             display: "flex",
             alignItems: "center",
@@ -653,6 +670,7 @@ export default function SellerProfilePage() {
           </p>
         ) : (
           <div
+            className="seller-reviews-list"
             style={{
               display: "flex",
               flexDirection: "column",
@@ -662,10 +680,11 @@ export default function SellerProfilePage() {
             {reviews.map((review) => (
               <div
                 key={review.id}
-                className="card"
+                className="card seller-review-card"
                 style={{ padding: "1.125rem" }}
               >
                 <div
+                  className="seller-review-top"
                   style={{
                     display: "flex",
                     justifyContent: "space-between",
@@ -726,8 +745,9 @@ function StatBox({
   suffix?: string;
 }) {
   return (
-    <div style={{ textAlign: "center" }}>
+    <div className="seller-stat-box" style={{ textAlign: "center" }}>
       <p
+        className="seller-stat-value"
         style={{
           fontSize: "1.75rem",
           fontWeight: 800,
@@ -735,10 +755,11 @@ function StatBox({
           margin: "0 0 0.2rem",
         }}
       >
-          {value.toLocaleString()}
-          {suffix}
+        {value.toLocaleString()}
+        {suffix}
       </p>
       <p
+        className="seller-stat-label"
         style={{
           fontSize: "0.8125rem",
           color: "var(--color-text-muted)",

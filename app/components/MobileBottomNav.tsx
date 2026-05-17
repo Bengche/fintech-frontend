@@ -180,9 +180,11 @@ export default function MobileBottomNav() {
         {NAV_ITEMS.map((item) => {
           const active =
             item.href === "/dashboard?action=create"
-                ? pathname === "/dashboard" && searchParams.get("action") === "create"
+              ? pathname === "/dashboard" &&
+                searchParams.get("action") === "create"
               : item.href === "/dashboard"
-                ? pathname === "/dashboard" && searchParams.get("action") !== "create"
+                ? pathname === "/dashboard" &&
+                  searchParams.get("action") !== "create"
                 : isActive(item, pathname);
           return (
             <Link

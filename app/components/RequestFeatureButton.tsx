@@ -70,17 +70,27 @@ export default function RequestFeatureButton({ variant = "nav" }: Props) {
   );
 
   const submitLabel = locale === "fr" ? "Envoyer la demande" : "Send request";
-  const titleLabel = locale === "fr" ? "Titre de la fonctionnalité" : "Feature title";
-  const detailsLabel = locale === "fr" ? "Décrivez votre idée" : "Describe your idea";
+  const titleLabel =
+    locale === "fr" ? "Titre de la fonctionnalité" : "Feature title";
+  const detailsLabel =
+    locale === "fr" ? "Décrivez votre idée" : "Describe your idea";
   const nameLabel = locale === "fr" ? "Votre nom" : "Your name";
   const emailLabel = locale === "fr" ? "Adresse e-mail" : "Email address";
-  const helperText = locale === "fr"
-    ? "Partagez une idée claire et utile. Nous la transmettrons directement à notre équipe produit."
-    : "Share a clear idea that would improve Fonlok. We will forward it directly to our product team.";
-  const optionalText = locale === "fr" ? "optionnel si vous êtes connecté" : "optional for signed-in users";
+  const helperText =
+    locale === "fr"
+      ? "Partagez une idée claire et utile. Nous la transmettrons directement à notre équipe produit."
+      : "Share a clear idea that would improve Fonlok. We will forward it directly to our product team.";
+  const optionalText =
+    locale === "fr"
+      ? "optionnel si vous êtes connecté"
+      : "optional for signed-in users";
   const emailHint = isSignedIn
-    ? (locale === "fr" ? "Laisser vide pour utiliser l'e-mail de votre compte." : "Leave blank to use your account email.")
-    : (locale === "fr" ? "Nous avons besoin d'un e-mail pour vous répondre." : "We need an email so we can reply.");
+    ? locale === "fr"
+      ? "Laisser vide pour utiliser l'e-mail de votre compte."
+      : "Leave blank to use your account email."
+    : locale === "fr"
+      ? "Nous avons besoin d'un e-mail pour vous répondre."
+      : "We need an email so we can reply.";
 
   const submitRequest = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -94,7 +104,11 @@ export default function RequestFeatureButton({ variant = "nav" }: Props) {
     const trimmedEmail = email.trim();
 
     if (!trimmedTitle || !trimmedDetails || (!isSignedIn && !trimmedEmail)) {
-      setError(locale === "fr" ? "Veuillez remplir tous les champs requis." : "Please fill in the required fields.");
+      setError(
+        locale === "fr"
+          ? "Veuillez remplir tous les champs requis."
+          : "Please fill in the required fields.",
+      );
       setSubmitting(false);
       return;
     }
@@ -166,7 +180,8 @@ export default function RequestFeatureButton({ variant = "nav" }: Props) {
             padding: "0.42rem 0.85rem",
             borderRadius: "999px",
             border: "1.5px solid rgba(255,255,255,0.18)",
-            background: "linear-gradient(135deg, rgba(245,158,11,0.14), rgba(255,255,255,0.06))",
+            background:
+              "linear-gradient(135deg, rgba(245,158,11,0.14), rgba(255,255,255,0.06))",
             color: "rgba(255,255,255,0.92)",
             cursor: "pointer",
             fontWeight: 700,
@@ -178,14 +193,20 @@ export default function RequestFeatureButton({ variant = "nav" }: Props) {
   const trigger =
     variant === "mobile" ? (
       <>
-        <span className="nav-mob-icon" style={{ background: "rgba(245,158,11,0.14)" }}>
+        <span
+          className="nav-mob-icon"
+          style={{ background: "rgba(245,158,11,0.14)" }}
+        >
           <Sparkles size={15} strokeWidth={2} color="#f59e0b" />
         </span>
         {triggerText}
       </>
     ) : variant === "sidebar" ? (
       <>
-        <span className="sidebar-icon" style={{ background: "rgba(245,158,11,0.16)" }}>
+        <span
+          className="sidebar-icon"
+          style={{ background: "rgba(245,158,11,0.16)" }}
+        >
           <Sparkles size={17} strokeWidth={1.8} color="#f59e0b" />
         </span>
         <span>{triggerText}</span>
@@ -268,13 +289,37 @@ export default function RequestFeatureButton({ variant = "nav" }: Props) {
                   }}
                 >
                   <div>
-                    <p style={{ margin: 0, color: "#f59e0b", fontSize: "0.76rem", fontWeight: 800, letterSpacing: "0.16em", textTransform: "uppercase" }}>
+                    <p
+                      style={{
+                        margin: 0,
+                        color: "#f59e0b",
+                        fontSize: "0.76rem",
+                        fontWeight: 800,
+                        letterSpacing: "0.16em",
+                        textTransform: "uppercase",
+                      }}
+                    >
                       {locale === "fr" ? "Idée produit" : "Product idea"}
                     </p>
-                    <h2 id="feature-request-title" style={{ margin: "0.35rem 0 0.4rem", color: "#fff", fontSize: "1.35rem", fontWeight: 800 }}>
+                    <h2
+                      id="feature-request-title"
+                      style={{
+                        margin: "0.35rem 0 0.4rem",
+                        color: "#fff",
+                        fontSize: "1.35rem",
+                        fontWeight: 800,
+                      }}
+                    >
                       {triggerText}
                     </h2>
-                    <p style={{ margin: 0, color: "rgba(255,255,255,0.68)", lineHeight: 1.6, fontSize: "0.95rem" }}>
+                    <p
+                      style={{
+                        margin: 0,
+                        color: "rgba(255,255,255,0.68)",
+                        lineHeight: 1.6,
+                        fontSize: "0.95rem",
+                      }}
+                    >
                       {helperText}
                     </p>
                   </div>
@@ -301,20 +346,39 @@ export default function RequestFeatureButton({ variant = "nav" }: Props) {
 
                 <form onSubmit={submitRequest} style={{ padding: "1.25rem" }}>
                   <div style={{ display: "grid", gap: "0.95rem" }}>
-                    <FieldLabel label={nameLabel} optional={isSignedIn && variant !== "mobile" ? optionalText : undefined}>
+                    <FieldLabel
+                      label={nameLabel}
+                      optional={
+                        isSignedIn && variant !== "mobile"
+                          ? optionalText
+                          : undefined
+                      }
+                    >
                       <input
                         value={name}
                         onChange={(event) => setName(event.target.value)}
-                        placeholder={locale === "fr" ? "Votre nom ou pseudo" : "Your name or username"}
+                        placeholder={
+                          locale === "fr"
+                            ? "Votre nom ou pseudo"
+                            : "Your name or username"
+                        }
                         style={inputStyle}
                       />
                     </FieldLabel>
-                    <FieldLabel label={emailLabel} optional={optionalText} hint={emailHint}>
+                    <FieldLabel
+                      label={emailLabel}
+                      optional={optionalText}
+                      hint={emailHint}
+                    >
                       <input
                         value={email}
                         onChange={(event) => setEmail(event.target.value)}
                         type="email"
-                        placeholder={locale === "fr" ? "vous@exemple.com" : "you@example.com"}
+                        placeholder={
+                          locale === "fr"
+                            ? "vous@exemple.com"
+                            : "you@example.com"
+                        }
                         style={inputStyle}
                       />
                     </FieldLabel>
@@ -322,7 +386,11 @@ export default function RequestFeatureButton({ variant = "nav" }: Props) {
                       <input
                         value={title}
                         onChange={(event) => setTitle(event.target.value)}
-                        placeholder={locale === "fr" ? "Ex. Relevés PDF améliorés" : "E.g. Better PDF statements"}
+                        placeholder={
+                          locale === "fr"
+                            ? "Ex. Relevés PDF améliorés"
+                            : "E.g. Better PDF statements"
+                        }
                         style={inputStyle}
                       />
                     </FieldLabel>
@@ -330,25 +398,65 @@ export default function RequestFeatureButton({ variant = "nav" }: Props) {
                       <textarea
                         value={details}
                         onChange={(event) => setDetails(event.target.value)}
-                        placeholder={locale === "fr" ? "Expliquez l'amélioration, le gain pour les utilisateurs et pourquoi elle est importante." : "Explain the improvement, the benefit to users, and why it matters."}
+                        placeholder={
+                          locale === "fr"
+                            ? "Expliquez l'amélioration, le gain pour les utilisateurs et pourquoi elle est importante."
+                            : "Explain the improvement, the benefit to users, and why it matters."
+                        }
                         rows={5}
-                        style={{ ...inputStyle, resize: "vertical", minHeight: "132px" }}
+                        style={{
+                          ...inputStyle,
+                          resize: "vertical",
+                          minHeight: "132px",
+                        }}
                       />
                     </FieldLabel>
                   </div>
 
                   {error && (
-                    <div style={{ marginTop: "0.95rem", padding: "0.85rem 1rem", borderRadius: "14px", background: "rgba(220,38,38,0.14)", border: "1px solid rgba(220,38,38,0.24)", color: "#fecaca", fontSize: "0.92rem", lineHeight: 1.5 }}>
+                    <div
+                      style={{
+                        marginTop: "0.95rem",
+                        padding: "0.85rem 1rem",
+                        borderRadius: "14px",
+                        background: "rgba(220,38,38,0.14)",
+                        border: "1px solid rgba(220,38,38,0.24)",
+                        color: "#fecaca",
+                        fontSize: "0.92rem",
+                        lineHeight: 1.5,
+                      }}
+                    >
                       {error}
                     </div>
                   )}
                   {sent && (
-                    <div style={{ marginTop: "0.95rem", padding: "0.85rem 1rem", borderRadius: "14px", background: "rgba(22,163,74,0.14)", border: "1px solid rgba(22,163,74,0.24)", color: "#bbf7d0", fontSize: "0.92rem", lineHeight: 1.5 }}>
-                      {locale === "fr" ? "Votre demande a été envoyée à l'équipe Fonlok." : "Your request has been sent to the Fonlok team."}
+                    <div
+                      style={{
+                        marginTop: "0.95rem",
+                        padding: "0.85rem 1rem",
+                        borderRadius: "14px",
+                        background: "rgba(22,163,74,0.14)",
+                        border: "1px solid rgba(22,163,74,0.24)",
+                        color: "#bbf7d0",
+                        fontSize: "0.92rem",
+                        lineHeight: 1.5,
+                      }}
+                    >
+                      {locale === "fr"
+                        ? "Votre demande a été envoyée à l'équipe Fonlok."
+                        : "Your request has been sent to the Fonlok team."}
                     </div>
                   )}
 
-                  <div style={{ display: "flex", gap: "0.75rem", justifyContent: "flex-end", marginTop: "1.2rem", flexWrap: "wrap" }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: "0.75rem",
+                      justifyContent: "flex-end",
+                      marginTop: "1.2rem",
+                      flexWrap: "wrap",
+                    }}
+                  >
                     <button
                       type="button"
                       onClick={() => setOpen(false)}
@@ -374,7 +482,8 @@ export default function RequestFeatureButton({ variant = "nav" }: Props) {
                         padding: "0.82rem 1.15rem",
                         borderRadius: "14px",
                         border: "1px solid rgba(245,158,11,0.42)",
-                        background: "linear-gradient(135deg, #f59e0b 0%, #facc15 100%)",
+                        background:
+                          "linear-gradient(135deg, #f59e0b 0%, #facc15 100%)",
                         color: "#0f1f3d",
                         fontWeight: 800,
                         cursor: submitting ? "wait" : "pointer",
@@ -382,7 +491,11 @@ export default function RequestFeatureButton({ variant = "nav" }: Props) {
                       }}
                     >
                       <Send size={16} strokeWidth={2.2} />
-                      {submitting ? (locale === "fr" ? "Envoi…" : "Sending…") : submitLabel}
+                      {submitting
+                        ? locale === "fr"
+                          ? "Envoi…"
+                          : "Sending…"
+                        : submitLabel}
                     </button>
                   </div>
                 </form>
@@ -408,12 +521,41 @@ function FieldLabel({
 }) {
   return (
     <label style={{ display: "grid", gap: "0.45rem" }}>
-      <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: "0.75rem" }}>
-        <span style={{ color: "rgba(255,255,255,0.88)", fontSize: "0.88rem", fontWeight: 700 }}>{label}</span>
-        {optional ? <span style={{ color: "rgba(255,255,255,0.4)", fontSize: "0.74rem" }}>{optional}</span> : null}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "baseline",
+          justifyContent: "space-between",
+          gap: "0.75rem",
+        }}
+      >
+        <span
+          style={{
+            color: "rgba(255,255,255,0.88)",
+            fontSize: "0.88rem",
+            fontWeight: 700,
+          }}
+        >
+          {label}
+        </span>
+        {optional ? (
+          <span style={{ color: "rgba(255,255,255,0.4)", fontSize: "0.74rem" }}>
+            {optional}
+          </span>
+        ) : null}
       </div>
       {children}
-      {hint ? <span style={{ color: "rgba(255,255,255,0.46)", fontSize: "0.78rem", lineHeight: 1.5 }}>{hint}</span> : null}
+      {hint ? (
+        <span
+          style={{
+            color: "rgba(255,255,255,0.46)",
+            fontSize: "0.78rem",
+            lineHeight: 1.5,
+          }}
+        >
+          {hint}
+        </span>
+      ) : null}
     </label>
   );
 }

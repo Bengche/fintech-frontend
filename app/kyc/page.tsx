@@ -104,28 +104,12 @@ function ImageUploadBox({
   };
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-      <label
-        style={{
-          fontSize: "0.875rem",
-          fontWeight: 600,
-          color: "var(--color-text-heading)",
-        }}
-      >
+    <div className="kyc-form-row">
+      <label className={`kyc-form-label ${required ? "kyc-form-label--required" : ""}`}>
         {label}
-        {required && (
-          <span style={{ color: "#dc2626", marginLeft: "3px" }}>*</span>
-        )}
       </label>
       {hint && (
-        <p
-          style={{
-            margin: 0,
-            fontSize: "0.78rem",
-            color: "var(--color-text-muted)",
-            lineHeight: 1.5,
-          }}
-        >
+        <p className="kyc-form-hint">
           {hint}
         </p>
       )}
@@ -136,48 +120,21 @@ function ImageUploadBox({
           e.preventDefault();
           handleFile(e.dataTransfer.files[0] ?? null);
         }}
-        style={{
-          border: preview
-            ? "2px solid rgba(15,31,61,0.25)"
-            : "2px dashed var(--color-border)",
-          borderRadius: "1rem",
-          minHeight: "140px",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          cursor: "pointer",
-          overflow: "hidden",
-          background: preview ? "#000" : "var(--color-bg-subtle, #f8fafc)",
-          transition: "border-color 0.2s, background 0.2s",
-          position: "relative",
-        }}
+        className={`kyc-upload-box ${preview ? "has-preview" : ""}`}
       >
         {preview ? (
           <>
             <img
               src={preview}
               alt={label}
-              style={{ width: "100%", height: "180px", objectFit: "contain" }}
+              className="kyc-image-preview"
             />
-            <div
-              style={{
-                position: "absolute",
-                bottom: "8px",
-                right: "8px",
-                background: "rgba(0,0,0,0.6)",
-                borderRadius: "6px",
-                padding: "4px 10px",
-                color: "#fff",
-                fontSize: "0.75rem",
-                fontWeight: 600,
-              }}
-            >
+            <div className="kyc-preview-label">
               Tap to change
             </div>
           </>
         ) : (
-          <div style={{ textAlign: "center", padding: "1.5rem 1rem" }}>
+          <div className="kyc-upload-placeholder">
             <Upload
               size={28}
               style={{
@@ -228,16 +185,8 @@ function StepBar({ step, total }: { step: number; total: number }) {
     t("stepReview"),
   ];
   return (
-    <div style={{ marginBottom: "2rem" }}>
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 0,
-          marginBottom: "0.75rem",
-          overflowX: "auto",
-        }}
-      >
+    <div className="kyc-step-bar">
+      <div className="kyc-step-indicators">
         {Array.from({ length: total }).map((_, i) => (
           <div
             key={i}
@@ -248,16 +197,8 @@ function StepBar({ step, total }: { step: number; total: number }) {
             }}
           >
             <div
+              className="kyc-step-indicator"
               style={{
-                width: "30px",
-                height: "30px",
-                borderRadius: "50%",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: "0.8rem",
-                fontWeight: 800,
-                flexShrink: 0,
                 background:
                   i < step
                     ? "var(--color-primary)"
@@ -270,34 +211,23 @@ function StepBar({ step, total }: { step: number; total: number }) {
                     : i === step
                       ? "var(--color-primary)"
                       : "var(--color-text-muted)",
-                transition: "background 0.3s",
               }}
             >
               {i < step ? <CheckCircle2 size={16} /> : i + 1}
             </div>
             {i < total - 1 && (
               <div
+                className="kyc-step-connector"
                 style={{
-                  flex: 1,
-                  height: "2px",
                   background:
                     i < step ? "var(--color-primary)" : "var(--color-border)",
-                  margin: "0 4px",
-                  transition: "background 0.3s",
                 }}
               />
             )}
           </div>
         ))}
       </div>
-      <p
-        style={{
-          margin: 0,
-          fontSize: "0.8rem",
-          color: "var(--color-text-muted)",
-          fontWeight: 600,
-        }}
-      >
+      <p className="kyc-step-label">
         {t("stepLabel", { current: step + 1, total })} — {labels[step]}
       </p>
     </div>
@@ -356,50 +286,17 @@ function StatusBanner({
   const cfg = configs[status as Exclude<KycStatus, "unverified">];
 
   return (
-    <div
-      style={{
-        background: cfg.bg,
-        border: `1.5px solid ${cfg.border}`,
-        borderRadius: "1rem",
-        padding: "1.125rem 1.25rem",
-        marginBottom: "1.75rem",
-        display: "flex",
-        gap: "1rem",
-        alignItems: "flex-start",
-      }}
-    >
-      <div style={{ flexShrink: 0, marginTop: "2px" }}>{cfg.icon}</div>
-      <div style={{ flex: 1 }}>
-        <p
-          style={{
-            margin: 0,
-            fontWeight: 800,
-            color: cfg.color,
-            fontSize: "1rem",
-          }}
-        >
+    <div className={`kyc-status-banner kyc-banner-${status}`}>
+      <div className="kyc-banner-icon">{cfg.icon}</div>
+      <div className="kyc-banner-content">
+        <p className="kyc-banner-title" style={{ color: cfg.color }}>
           {cfg.title}
         </p>
-        <p
-          style={{
-            margin: "4px 0 0",
-            fontSize: "0.875rem",
-            color: "var(--color-text-muted)",
-            lineHeight: 1.6,
-          }}
-        >
+        <p className="kyc-banner-body">
           {cfg.body}
         </p>
         {application?.admin_note && status === "rejected" && (
-          <div
-            style={{
-              marginTop: "0.75rem",
-              background: "rgba(220,38,38,0.06)",
-              border: "1px solid rgba(220,38,38,0.2)",
-              borderRadius: "0.6rem",
-              padding: "0.75rem 1rem",
-            }}
-          >
+          <div className="kyc-banner-note">
             <p
               style={{
                 margin: 0,
@@ -595,78 +492,25 @@ export default function KycPage() {
   return (
     <>
       <SiteHeader />
-      <main
-        className="page-container"
-        style={{
-          maxWidth: "640px",
-          marginInline: "auto",
-          paddingTop: "2rem",
-          paddingBottom: "4rem",
-          paddingInline: "1rem",
-        }}
-      >
+      <main className="kyc-container">
         {/* Page header */}
-        <div style={{ marginBottom: "1.75rem" }}>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "0.75rem",
-              marginBottom: "0.5rem",
-            }}
-          >
-            <div
-              style={{
-                width: "2.75rem",
-                height: "2.75rem",
-                borderRadius: "0.875rem",
-                background: "linear-gradient(135deg, #0F1F3D 0%, #1e3a5f 100%)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                flexShrink: 0,
-              }}
-            >
+        <div className="kyc-page-header">
+          <div className="kyc-header-top">
+            <div className="kyc-header-badge">
               <ShieldCheck size={20} color="#F59E0B" />
             </div>
             <div>
-              <h1
-                style={{
-                  margin: 0,
-                  fontSize: "1.35rem",
-                  fontWeight: 800,
-                  color: "var(--color-text-heading)",
-                  lineHeight: 1.2,
-                }}
-              >
+              <h1 className="kyc-header-title">
                 {t("pageTitle")}
               </h1>
-              <p
-                style={{
-                  margin: 0,
-                  fontSize: "0.875rem",
-                  color: "var(--color-text-muted)",
-                }}
-              >
+              <p className="kyc-header-subtitle">
                 {t("pageSubtitle")}
               </p>
             </div>
           </div>
 
           {/* Why verify — collapsed info banner */}
-          <div
-            style={{
-              marginTop: "1rem",
-              background:
-                "linear-gradient(135deg, rgba(15,31,61,0.04), rgba(245,158,11,0.08))",
-              border: "1px solid rgba(15,31,61,0.1)",
-              borderRadius: "0.875rem",
-              padding: "0.875rem 1rem",
-              display: "flex",
-              gap: "0.625rem",
-              alignItems: "flex-start",
-            }}
-          >
+          <div className="kyc-header-info">
             <Info
               size={16}
               style={{
@@ -675,14 +519,7 @@ export default function KycPage() {
                 color: "var(--color-primary)",
               }}
             />
-            <p
-              style={{
-                margin: 0,
-                fontSize: "0.83rem",
-                color: "var(--color-text-muted)",
-                lineHeight: 1.6,
-              }}
-            >
+            <p>
               {t("whyVerify")}
             </p>
           </div>
@@ -693,38 +530,16 @@ export default function KycPage() {
 
         {/* Success state */}
         {submitSuccess && (
-          <div
-            style={{
-              textAlign: "center",
-              padding: "3rem 1.5rem",
-              background: "rgba(22,163,74,0.05)",
-              border: "1.5px solid rgba(22,163,74,0.25)",
-              borderRadius: "1.25rem",
-            }}
-          >
+          <div className="kyc-success-box">
             <CheckCircle2
               size={56}
               color="#16a34a"
               style={{ marginBottom: "1rem" }}
             />
-            <h2
-              style={{
-                margin: "0 0 0.5rem",
-                color: "#166534",
-                fontSize: "1.35rem",
-                fontWeight: 800,
-              }}
-            >
+            <h2 style={{ color: "#166534" }}>
               {t("successTitle")}
             </h2>
-            <p
-              style={{
-                margin: "0 0 1.5rem",
-                color: "var(--color-text-muted)",
-                lineHeight: 1.6,
-                fontSize: "0.925rem",
-              }}
-            >
+            <p>
               {t("successBody")}
             </p>
             <button
@@ -738,38 +553,16 @@ export default function KycPage() {
 
         {/* Approved — show nice badge display */}
         {kycStatus === "approved" && !submitSuccess && (
-          <div
-            style={{
-              textAlign: "center",
-              padding: "2.5rem 1.5rem",
-              background: "rgba(22,163,74,0.05)",
-              border: "1.5px solid rgba(22,163,74,0.2)",
-              borderRadius: "1.25rem",
-            }}
-          >
+          <div className="kyc-success-box">
             <BadgeCheck
               size={60}
               color="#16a34a"
               style={{ marginBottom: "1rem" }}
             />
-            <h2
-              style={{
-                margin: "0 0 0.5rem",
-                color: "#166534",
-                fontSize: "1.25rem",
-                fontWeight: 800,
-              }}
-            >
+            <h2 style={{ color: "#166534" }}>
               {t("verifiedTitle")}
             </h2>
-            <p
-              style={{
-                margin: 0,
-                color: "var(--color-text-muted)",
-                fontSize: "0.9rem",
-                lineHeight: 1.6,
-              }}
-            >
+            <p>
               {t("verifiedBody")}
             </p>
           </div>
@@ -777,34 +570,12 @@ export default function KycPage() {
 
         {/* Pending — show status only */}
         {kycStatus === "pending" && !submitSuccess && (
-          <div
-            style={{
-              textAlign: "center",
-              padding: "2rem 1.5rem",
-              background: "rgba(245,158,11,0.05)",
-              border: "1.5px solid rgba(245,158,11,0.2)",
-              borderRadius: "1.25rem",
-            }}
-          >
+          <div className="kyc-success-box">
             <Clock size={48} color="#F59E0B" style={{ marginBottom: "1rem" }} />
-            <h2
-              style={{
-                margin: "0 0 0.5rem",
-                color: "#92400e",
-                fontSize: "1.1rem",
-                fontWeight: 800,
-              }}
-            >
+            <h2 style={{ color: "#92400e" }}>
               {t("pendingTitle")}
             </h2>
-            <p
-              style={{
-                margin: 0,
-                color: "var(--color-text-muted)",
-                fontSize: "0.875rem",
-                lineHeight: 1.6,
-              }}
-            >
+            <p>
               {t("pendingBody")}
             </p>
           </div>
@@ -845,13 +616,7 @@ export default function KycPage() {
                     autoComplete="name"
                   />
                 </InputRow>
-                <div
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "1fr 1fr",
-                    gap: "1rem",
-                  }}
-                >
+                <div className="kyc-grid-2col">
                   <InputRow label={t("fieldDob")} required>
                     <input
                       className="form-input"
@@ -903,13 +668,7 @@ export default function KycPage() {
                     autoComplete="street-address"
                   />
                 </InputRow>
-                <div
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "1fr 1fr",
-                    gap: "1rem",
-                  }}
-                >
+                <div className="kyc-grid-2col">
                   <InputRow label={t("fieldCity")} required>
                     <input
                       className="form-input"
@@ -1210,32 +969,13 @@ export default function KycPage() {
             )}
 
             {/* Navigation buttons */}
-            <div
-              style={{
-                display: "flex",
-                gap: "0.75rem",
-                marginTop: "1.5rem",
-                justifyContent: step === 0 ? "flex-end" : "space-between",
-              }}
-            >
+            <div className={`kyc-button-row ${step === 0 ? "kyc-button-row--start" : ""}`}>
               {step > 0 && (
                 <button
                   type="button"
+                  className="kyc-btn-secondary"
                   onClick={goBack}
                   disabled={submitting}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "0.4rem",
-                    padding: "0.75rem 1.25rem",
-                    borderRadius: "0.75rem",
-                    border: "1.5px solid var(--color-border)",
-                    background: "var(--color-white)",
-                    color: "var(--color-text-heading)",
-                    fontWeight: 700,
-                    fontSize: "0.9rem",
-                    cursor: "pointer",
-                  }}
                 >
                   <ChevronLeft size={16} />
                   {t("back")}
@@ -1305,51 +1045,16 @@ function SectionHeading({
   subtitle?: string;
 }) {
   return (
-    <div
-      style={{
-        display: "flex",
-        gap: "0.75rem",
-        alignItems: "flex-start",
-        paddingBottom: "0.875rem",
-        borderBottom: "1px solid var(--color-border)",
-        marginBottom: "0.25rem",
-      }}
-    >
-      <div
-        style={{
-          width: "2.25rem",
-          height: "2.25rem",
-          borderRadius: "0.6rem",
-          background: "rgba(15,31,61,0.07)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          color: "var(--color-primary)",
-          flexShrink: 0,
-        }}
-      >
+    <div className="kyc-section-heading">
+      <div className="kyc-section-icon">
         {icon}
       </div>
       <div>
-        <p
-          style={{
-            margin: 0,
-            fontWeight: 800,
-            color: "var(--color-text-heading)",
-            fontSize: "1rem",
-          }}
-        >
+        <p className="kyc-section-title">
           {title}
         </p>
         {subtitle && (
-          <p
-            style={{
-              margin: "3px 0 0",
-              fontSize: "0.83rem",
-              color: "var(--color-text-muted)",
-              lineHeight: 1.5,
-            }}
-          >
+          <p className="kyc-section-subtitle">
             {subtitle}
           </p>
         )}
@@ -1370,28 +1075,12 @@ function InputRow({
   children: React.ReactNode;
 }) {
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
-      <label
-        style={{
-          fontSize: "0.875rem",
-          fontWeight: 600,
-          color: "var(--color-text-heading)",
-        }}
-      >
+    <div className="kyc-form-row">
+      <label className={`kyc-form-label ${required ? "kyc-form-label--required" : ""}`}>
         {label}
-        {required && (
-          <span style={{ color: "#dc2626", marginLeft: "3px" }}>*</span>
-        )}
       </label>
       {hint && (
-        <p
-          style={{
-            margin: 0,
-            fontSize: "0.78rem",
-            color: "var(--color-text-muted)",
-            lineHeight: 1.5,
-          }}
-        >
+        <p className="kyc-form-hint">
           {hint}
         </p>
       )}
@@ -1402,35 +1091,11 @@ function InputRow({
 
 function ReviewRow({ label, value }: { label: string; value: string }) {
   return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "space-between",
-        gap: "1rem",
-        padding: "0.7rem 0",
-        borderBottom: "1px solid var(--color-border)",
-        flexWrap: "wrap",
-      }}
-    >
-      <span
-        style={{
-          fontSize: "0.85rem",
-          color: "var(--color-text-muted)",
-          fontWeight: 600,
-        }}
-      >
+    <div className="kyc-review-row">
+      <span className="kyc-review-label">
         {label}
       </span>
-      <span
-        style={{
-          fontSize: "0.875rem",
-          color: "var(--color-text-heading)",
-          fontWeight: 700,
-          wordBreak: "break-all",
-          textAlign: "right",
-          maxWidth: "60%",
-        }}
-      >
+      <span className="kyc-review-value">
         {value}
       </span>
     </div>
