@@ -613,7 +613,11 @@ a:hover {
 .settings-page {
   background:
     radial-gradient(circle at 0% 0%, rgba(15, 31, 61, 0.05), transparent 36%),
-    radial-gradient(circle at 100% 100%, rgba(245, 158, 11, 0.12), transparent 32%),
+    radial-gradient(
+      circle at 100% 100%,
+      rgba(245, 158, 11, 0.12),
+      transparent 32%
+    ),
     var(--color-cloud);
 }
 
@@ -737,7 +741,11 @@ a:hover {
 }
 
 .settings-danger-card {
-  background: linear-gradient(180deg, rgba(239, 68, 68, 0.03), var(--color-white));
+  background: linear-gradient(
+    180deg,
+    rgba(239, 68, 68, 0.03),
+    var(--color-white)
+  );
 }
 
 .settings-modal-backdrop {
@@ -758,7 +766,11 @@ a:hover {
 
 .seller-profile-page {
   background:
-    radial-gradient(circle at 100% 0%, rgba(245, 158, 11, 0.08), transparent 34%),
+    radial-gradient(
+      circle at 100% 0%,
+      rgba(245, 158, 11, 0.08),
+      transparent 34%
+    ),
     radial-gradient(circle at 0% 100%, rgba(15, 31, 61, 0.06), transparent 36%),
     var(--color-cloud);
 }
@@ -1379,7 +1391,11 @@ a:hover {
 
 .kyc-header-info {
   margin-top: 1rem;
-  background: linear-gradient(135deg, rgba(15, 31, 61, 0.04), rgba(245, 158, 11, 0.08));
+  background: linear-gradient(
+    135deg,
+    rgba(15, 31, 61, 0.04),
+    rgba(245, 158, 11, 0.08)
+  );
   border: 1px solid rgba(15, 31, 61, 0.1);
   border-radius: 0.875rem;
   padding: 0.875rem 1rem;

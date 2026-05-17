@@ -80,7 +80,10 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <div className="card settings-section" style={{ padding: "2rem", marginBottom: "1.5rem" }}>
+    <div
+      className="card settings-section"
+      style={{ padding: "2rem", marginBottom: "1.5rem" }}
+    >
       <h2
         className="settings-section-title"
         style={{
@@ -169,7 +172,10 @@ export default function SettingsPage() {
           padding: "3rem 1.5rem",
         }}
       >
-        <div className="page-wrapper settings-shell" style={{ maxWidth: "680px" }}>
+        <div
+          className="page-wrapper settings-shell"
+          style={{ maxWidth: "680px" }}
+        >
           <h1
             className="settings-title"
             style={{
@@ -663,7 +669,10 @@ function SessionManagerSection() {
           {t("sessions.empty")}
         </p>
       ) : (
-        <div className="settings-session-list" style={{ display: "grid", gap: "0.875rem" }}>
+        <div
+          className="settings-session-list"
+          style={{ display: "grid", gap: "0.875rem" }}
+        >
           {sessions.map((session) => (
             <div
               key={session.sid}
@@ -1505,7 +1514,10 @@ function PasskeySection() {
           No passkeys registered yet on this account.
         </p>
       ) : (
-        <ul className="settings-passkey-list" style={{ listStyle: "none", padding: 0, margin: "0 0 1.25rem" }}>
+        <ul
+          className="settings-passkey-list"
+          style={{ listStyle: "none", padding: 0, margin: "0 0 1.25rem" }}
+        >
           {passkeys.map((pk) => (
             <li
               key={pk.id}
@@ -1598,7 +1610,10 @@ function PasskeySection() {
             onChange={(e) => setDeviceName(e.target.value)}
             maxLength={60}
           />
-          <div className="settings-passkey-register-actions" style={{ display: "flex", gap: "0.75rem" }}>
+          <div
+            className="settings-passkey-register-actions"
+            style={{ display: "flex", gap: "0.75rem" }}
+          >
             <button
               type="button"
               className="btn-primary"
@@ -1803,7 +1818,10 @@ function DeleteAccountSection() {
             <Feedback msg={msg} />
 
             <form className="settings-form" onSubmit={handleDelete}>
-              <div className="settings-field" style={{ marginBottom: "1.25rem" }}>
+              <div
+                className="settings-field"
+                style={{ marginBottom: "1.25rem" }}
+              >
                 <label className="label" htmlFor="del-pass">
                   {t("delete.passwordLabel")}
                 </label>

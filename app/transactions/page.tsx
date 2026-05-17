@@ -84,41 +84,73 @@ export default function TransactionsPage() {
   };
 
   const downloadStatement = async () => {
-    if (!statementStartDate || !statementEndDate) {
-      setStatementError(t("statementError"));
-      return;
-    }
-    if (new Date(statementStartDate) > new Date(statementEndDate)) {
+    if (
+      statementStartDate &&
+      statementEndDate &&
+      new Date(statementStartDate) > new Date(statementEndDate)
+    ) {
       setStatementError(t("statementDateError"));
       return;
     }
     setStatementLoading(true);
     setStatementError("");
     try {
-      const start = new Date(statementStartDate);
-      start.setHours(0, 0, 0, 0);
-      const end = new Date(statementEndDate);
-      end.setHours(23, 59, 59, 999);
-
-      const res = await fetch(
-        `${API}/transactions/statement?start_date=${start.toISOString()}&end_date=${end.toISOString()}&lang=${statementLanguage}`,
-        { credentials: "include" },
-      );
-      if (!res.ok) {
-        const data = await res.json();
-        setStatementError(data.message || t("statementFailed"));
-        return;
+      const params = new URLSearchParams();
+      if (statementStartDate) {
+        const start = new Date(statementStartDate);
+        start.setHours(0, 0, 0, 0);
+        params.set("start_date", start.toISOString());
       }
-      const blob = await res.blob();
+      if (statementEndDate) {
+        const end = new Date(statementEndDate);
+        end.setHours(23, 59, 59, 999);
+        params.set("end_date", end.toISOString());
+      }
+      params.set("lang", statementLanguage);
+
+      const token =
+        typeof window !== "undefined"
+          ? localStorage.getItem("authToken")
+          : null;
+
+      const res = await Axios.get(`${API}/transactions/statement?${params.toString()}`, {
+        withCredentials: true,
+        responseType: "blob",
+        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+      });
+
+      const blob = res.data as Blob;
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `fonlok-statement-${statementStartDate}-to-${statementEndDate}.pdf`;
+      a.download =
+        statementStartDate && statementEndDate
+          ? `fonlok-statement-${statementStartDate}-to-${statementEndDate}.pdf`
+          : "fonlok-statement-full.pdf";
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-    } catch {
+    } catch (err: unknown) {
+      const e = err as {
+        response?: {
+          data?: Blob;
+          status?: number;
+        };
+      };
+
+      // Backend may send JSON in a blob for non-2xx responses.
+      if (e.response?.data instanceof Blob) {
+        try {
+          const text = await e.response.data.text();
+          const parsed = JSON.parse(text) as { message?: string };
+          setStatementError(parsed.message || t("statementFailed"));
+          return;
+        } catch {
+          // Fall through to generic message.
+        }
+      }
+
       setStatementError(t("statementFailed"));
     } finally {
       setStatementLoading(false);

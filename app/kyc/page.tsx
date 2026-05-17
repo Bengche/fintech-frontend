@@ -105,14 +105,12 @@ function ImageUploadBox({
 
   return (
     <div className="kyc-form-row">
-      <label className={`kyc-form-label ${required ? "kyc-form-label--required" : ""}`}>
+      <label
+        className={`kyc-form-label ${required ? "kyc-form-label--required" : ""}`}
+      >
         {label}
       </label>
-      {hint && (
-        <p className="kyc-form-hint">
-          {hint}
-        </p>
-      )}
+      {hint && <p className="kyc-form-hint">{hint}</p>}
       <div
         onClick={() => inputRef.current?.click()}
         onDragOver={(e) => e.preventDefault()}
@@ -124,14 +122,8 @@ function ImageUploadBox({
       >
         {preview ? (
           <>
-            <img
-              src={preview}
-              alt={label}
-              className="kyc-image-preview"
-            />
-            <div className="kyc-preview-label">
-              Tap to change
-            </div>
+            <img src={preview} alt={label} className="kyc-image-preview" />
+            <div className="kyc-preview-label">Tap to change</div>
           </>
         ) : (
           <div className="kyc-upload-placeholder">
@@ -292,9 +284,7 @@ function StatusBanner({
         <p className="kyc-banner-title" style={{ color: cfg.color }}>
           {cfg.title}
         </p>
-        <p className="kyc-banner-body">
-          {cfg.body}
-        </p>
+        <p className="kyc-banner-body">{cfg.body}</p>
         {application?.admin_note && status === "rejected" && (
           <div className="kyc-banner-note">
             <p
@@ -500,12 +490,8 @@ export default function KycPage() {
               <ShieldCheck size={20} color="#F59E0B" />
             </div>
             <div>
-              <h1 className="kyc-header-title">
-                {t("pageTitle")}
-              </h1>
-              <p className="kyc-header-subtitle">
-                {t("pageSubtitle")}
-              </p>
+              <h1 className="kyc-header-title">{t("pageTitle")}</h1>
+              <p className="kyc-header-subtitle">{t("pageSubtitle")}</p>
             </div>
           </div>
 
@@ -519,9 +505,7 @@ export default function KycPage() {
                 color: "var(--color-primary)",
               }}
             />
-            <p>
-              {t("whyVerify")}
-            </p>
+            <p>{t("whyVerify")}</p>
           </div>
         </div>
 
@@ -536,12 +520,8 @@ export default function KycPage() {
               color="#16a34a"
               style={{ marginBottom: "1rem" }}
             />
-            <h2 style={{ color: "#166534" }}>
-              {t("successTitle")}
-            </h2>
-            <p>
-              {t("successBody")}
-            </p>
+            <h2 style={{ color: "#166534" }}>{t("successTitle")}</h2>
+            <p>{t("successBody")}</p>
             <button
               className="btn-primary"
               onClick={() => router.push("/dashboard")}
@@ -559,12 +539,8 @@ export default function KycPage() {
               color="#16a34a"
               style={{ marginBottom: "1rem" }}
             />
-            <h2 style={{ color: "#166534" }}>
-              {t("verifiedTitle")}
-            </h2>
-            <p>
-              {t("verifiedBody")}
-            </p>
+            <h2 style={{ color: "#166534" }}>{t("verifiedTitle")}</h2>
+            <p>{t("verifiedBody")}</p>
           </div>
         )}
 
@@ -572,12 +548,8 @@ export default function KycPage() {
         {kycStatus === "pending" && !submitSuccess && (
           <div className="kyc-success-box">
             <Clock size={48} color="#F59E0B" style={{ marginBottom: "1rem" }} />
-            <h2 style={{ color: "#92400e" }}>
-              {t("pendingTitle")}
-            </h2>
-            <p>
-              {t("pendingBody")}
-            </p>
+            <h2 style={{ color: "#92400e" }}>{t("pendingTitle")}</h2>
+            <p>{t("pendingBody")}</p>
           </div>
         )}
 
@@ -969,7 +941,9 @@ export default function KycPage() {
             )}
 
             {/* Navigation buttons */}
-            <div className={`kyc-button-row ${step === 0 ? "kyc-button-row--start" : ""}`}>
+            <div
+              className={`kyc-button-row ${step === 0 ? "kyc-button-row--start" : ""}`}
+            >
               {step > 0 && (
                 <button
                   type="button"
@@ -1046,18 +1020,10 @@ function SectionHeading({
 }) {
   return (
     <div className="kyc-section-heading">
-      <div className="kyc-section-icon">
-        {icon}
-      </div>
+      <div className="kyc-section-icon">{icon}</div>
       <div>
-        <p className="kyc-section-title">
-          {title}
-        </p>
-        {subtitle && (
-          <p className="kyc-section-subtitle">
-            {subtitle}
-          </p>
-        )}
+        <p className="kyc-section-title">{title}</p>
+        {subtitle && <p className="kyc-section-subtitle">{subtitle}</p>}
       </div>
     </div>
   );
@@ -1076,14 +1042,12 @@ function InputRow({
 }) {
   return (
     <div className="kyc-form-row">
-      <label className={`kyc-form-label ${required ? "kyc-form-label--required" : ""}`}>
+      <label
+        className={`kyc-form-label ${required ? "kyc-form-label--required" : ""}`}
+      >
         {label}
       </label>
-      {hint && (
-        <p className="kyc-form-hint">
-          {hint}
-        </p>
-      )}
+      {hint && <p className="kyc-form-hint">{hint}</p>}
       {children}
     </div>
   );
@@ -1092,12 +1056,8 @@ function InputRow({
 function ReviewRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="kyc-review-row">
-      <span className="kyc-review-label">
-        {label}
-      </span>
-      <span className="kyc-review-value">
-        {value}
-      </span>
+      <span className="kyc-review-label">{label}</span>
+      <span className="kyc-review-value">{value}</span>
     </div>
   );
 }

@@ -227,7 +227,10 @@ export default function SellerProfilePage() {
         : "1px solid rgba(15,31,61,0.08)";
 
   return (
-    <div className="seller-profile-page" style={{ minHeight: "100vh", backgroundColor: "var(--color-cloud)" }}>
+    <div
+      className="seller-profile-page"
+      style={{ minHeight: "100vh", backgroundColor: "var(--color-cloud)" }}
+    >
       <div
         className="seller-profile-shell"
         style={{
@@ -237,7 +240,10 @@ export default function SellerProfilePage() {
         }}
       >
         {/* Seller hero card */}
-        <div className="card seller-hero-card" style={{ marginBottom: "1.5rem" }}>
+        <div
+          className="card seller-hero-card"
+          style={{ marginBottom: "1.5rem" }}
+        >
           <div
             className="seller-hero-top"
             style={{
@@ -423,7 +429,10 @@ export default function SellerProfilePage() {
                 flexWrap: "wrap",
               }}
             >
-              <div className="seller-kyc-copy" style={{ flex: 1, minWidth: "220px" }}>
+              <div
+                className="seller-kyc-copy"
+                style={{ flex: 1, minWidth: "220px" }}
+              >
                 <p
                   style={{
                     margin: "0 0 0.25rem",
@@ -497,7 +506,10 @@ export default function SellerProfilePage() {
         </div>
 
         {/* Contact CTA */}
-        <div className="card seller-contact-card" style={{ marginBottom: "1.5rem" }}>
+        <div
+          className="card seller-contact-card"
+          style={{ marginBottom: "1.5rem" }}
+        >
           <h2
             style={{
               fontSize: "1.0625rem",
