@@ -258,6 +258,143 @@ a:hover {
   font-weight: 600;
   padding: 0.2rem 0.625rem;
   border-radius: 9999px;
+}
+
+/* Auth + settings responsive polish */
+.login-card {
+  width: 100%;
+  backdrop-filter: blur(14px);
+}
+
+.login-otp-panel {
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(15, 31, 61, 0.08);
+  background: linear-gradient(135deg, rgba(15, 31, 61, 0.03), rgba(245, 158, 11, 0.08));
+}
+
+.login-otp-kicker {
+  margin: 0 0 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-accent-hover);
+}
+
+.login-otp-title {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.login-otp-body {
+  margin: 0.5rem 0 0;
+  color: var(--color-text-body);
+  font-size: 0.925rem;
+  line-height: 1.6;
+}
+
+.login-otp-info {
+  margin: 0.75rem 0 0;
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+}
+
+.login-otp-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: space-between;
+}
+
+.settings-2fa-panel {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.125rem;
+  border-radius: 0.875rem;
+  border: 1px solid rgba(15, 31, 61, 0.08);
+  background: linear-gradient(135deg, rgba(15, 31, 61, 0.04), rgba(245, 158, 11, 0.09));
+}
+
+.settings-2fa-copy {
+  min-width: 0;
+  max-width: 36rem;
+}
+
+.settings-2fa-title {
+  margin: 0;
+  font-size: 0.975rem;
+  font-weight: 800;
+  color: var(--color-text-heading);
+}
+
+.settings-2fa-body {
+  margin: 0.35rem 0 0;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--color-text-body);
+}
+
+.settings-2fa-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0.75rem;
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+
+.settings-2fa-badge.is-on {
+  background: rgba(22, 163, 74, 0.1);
+  border: 1px solid rgba(22, 163, 74, 0.25);
+  color: #166534;
+}
+
+.settings-2fa-badge.is-off {
+  background: rgba(100, 116, 139, 0.09);
+  border: 1px solid rgba(100, 116, 139, 0.22);
+  color: #475569;
+}
+
+.settings-2fa-btn {
+  flex-shrink: 0;
+}
+
+.settings-2fa-btn-off {
+  background-color: var(--color-accent);
+  color: var(--color-primary);
+}
+
+.settings-2fa-note {
+  margin: 0.75rem 0 0;
+  color: var(--color-text-muted);
+  font-size: 0.825rem;
+  line-height: 1.55;
+}
+
+@media (max-width: 640px) {
+  .login-card,
+  .settings-section {
+    padding: 1.25rem;
+  }
+
+  .login-otp-actions,
+  .settings-2fa-panel {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .settings-2fa-btn,
+  .settings-2fa-btn-off {
+    width: 100%;
+    justify-content: center;
+  }
+}
   border: 1px solid;
   text-transform: capitalize;
 }

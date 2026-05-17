@@ -227,6 +227,7 @@ export default function SettingsPage() {
             }
           />
           <ChangePasswordForm />
+          <TwoFactorSection />
           <KycStatusSection />
           <SessionManagerSection />
           <PasskeySection />
@@ -1380,6 +1381,7 @@ function ChangePasswordForm() {
       });
       return;
     }
+
     setLoading(true);
     setMsg(null);
     try {
@@ -1459,6 +1461,93 @@ function ChangePasswordForm() {
 }
 
 // â”€â”€ 6. Delete account â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+// ── Biometrics & Passkeys ────────────────────────────────────────────────────
+// ── Two-Factor Authentication ────────────────────────────────────────────────
+function TwoFactorSection() {
+  const t = useTranslations("Settings");
+  const [enabled, setEnabled] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [msg, setMsg] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
+
+  useEffect(() => {
+    Axios.get(`${API}/user/two-factor`, { withCredentials: true })
+      .then((res) => setEnabled(Boolean(res.data.two_factor_enabled)))
+      .catch(() => setMsg({ type: "error", text: t("twoFactor.loadError") }))
+      .finally(() => setLoading(false));
+  }, [t]);
+
+  const toggleTwoFactor = async () => {
+    setSaving(true);
+    setMsg(null);
+    try {
+      const res = await Axios.patch(
+        `${API}/user/two-factor`,
+        { enabled: !enabled },
+        { withCredentials: true },
+      );
+      setEnabled(Boolean(res.data.two_factor_enabled));
+      setMsg({
+        type: "success",
+        text: !enabled
+          ? t("twoFactor.enabledSuccess")
+          : t("twoFactor.disabledSuccess"),
+      });
+    } catch (err: unknown) {
+      const e = err as { response?: { data?: { message?: string } } };
+      setMsg({
+        type: "error",
+        text: e.response?.data?.message || t("twoFactor.error"),
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <Section
+      title={t("twoFactor.sectionTitle")}
+      subtitle={t("twoFactor.sectionSubtitle")}
+    >
+      <Feedback msg={msg} />
+      <div className="settings-2fa-panel">
+        <div className="settings-2fa-copy">
+          <p className="settings-2fa-title">
+            {enabled ? t("twoFactor.onTitle") : t("twoFactor.offTitle")}
+          </p>
+          <p className="settings-2fa-body">
+            {enabled ? t("twoFactor.onBody") : t("twoFactor.offBody")}
+          </p>
+          <div
+            className={`settings-2fa-badge ${enabled ? "is-on" : "is-off"}`}
+          >
+            {enabled ? <BadgeCheck size={13} /> : <Clock size={13} />}
+            {enabled ? t("twoFactor.enabled") : t("twoFactor.disabled")}
+          </div>
+        </div>
+
+        <button
+          type="button"
+          className={`btn-primary settings-2fa-btn ${enabled ? "settings-2fa-btn-off" : ""}`}
+          onClick={toggleTwoFactor}
+          disabled={loading || saving}
+          style={{ justifyContent: "center" }}
+        >
+          {saving
+            ? t("twoFactor.saving")
+            : enabled
+              ? t("twoFactor.disable")
+              : t("twoFactor.enable")}
+        </button>
+      </div>
+      <p className="settings-2fa-note">{t("twoFactor.note")}</p>
+    </Section>
+  );
+}
 
 // ── Biometrics & Passkeys ────────────────────────────────────────────────────
 function PasskeySection() {

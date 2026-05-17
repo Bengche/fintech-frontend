@@ -113,11 +113,14 @@ export default function TransactionsPage() {
           ? localStorage.getItem("authToken")
           : null;
 
-      const res = await Axios.get(`${API}/transactions/statement?${params.toString()}`, {
-        withCredentials: true,
-        responseType: "blob",
-        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-      });
+      const res = await Axios.get(
+        `${API}/transactions/statement?${params.toString()}`,
+        {
+          withCredentials: true,
+          responseType: "blob",
+          headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+        },
+      );
 
       const blob = res.data as Blob;
       const url = URL.createObjectURL(blob);
