@@ -1016,7 +1016,16 @@
     "generating": "Génération en cours",
     "statementError": "Veuillez sélectionner les deux dates de début et de fin.",
     "statementDateError": "La date de début doit être antérieure à la date de fin.",
-    "statementFailed": "Échec de la génération du relevé. Veuillez réessayer."
+    "statementFailed": "Échec de la génération du relevé. Veuillez réessayer.",
+    "viewInvoice": "Voir la facture",
+    "modalTitle": "Détails de la transaction",
+    "close": "Fermer",
+    "modalInvoiceName": "Facture",
+    "modalReference": "Référence",
+    "modalDate": "Date et heure",
+    "modalType": "Type",
+    "typePaymentReceived": "Paiement reçu",
+    "typePaymentSent": "Paiement envoyé"
   },
   "Purchases": {
     "title": "Mes achats",
@@ -1039,7 +1048,23 @@
     "statusDelivered": "Livré",
     "statusCompleted": "Terminé",
     "statusExpired": "Expiré",
-    "statusDisputed": "Litié"
+    "statusDisputed": "Litié",
+    "backToDashboard": "← Tableau de bord",
+    "errorLoad": "Échec du chargement de vos achats. Veuillez réessayer.",
+    "emptyPurchases": "Aucun achat pour l'instant.",
+    "browseSellers": "Parcourir les offres",
+    "statTotal": "Total des achats",
+    "statSpent": "Total dépensé",
+    "statDelivered": "Livré",
+    "modalTitle": "Détails de l'achat",
+    "close": "Fermer",
+    "modalInvoice": "Facture",
+    "modalReference": "Référence",
+    "modalPaidOn": "Payé le",
+    "modalDeliveredOn": "Livré le",
+    "modalPaymentType": "Type de paiement",
+    "modalDescription": "Description",
+    "contactSeller": "Contacter le vendeur"
   },
   "Referral": {
     "loading": "Chargement de votre tableau de bord de parrainage…",

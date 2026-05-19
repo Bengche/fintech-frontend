@@ -334,10 +334,11 @@ export default function GetAllInvoices({
               key={invoice.id}
               className="card"
               style={{
-                marginBottom: "0.75rem",
+                marginBottom: "0.625rem",
                 padding: 0,
                 overflow: "hidden",
                 border: "1px solid var(--color-border)",
+                boxShadow: "var(--shadow-card)",
               }}
             >
               {/* ── Collapsed summary row (always visible, clickable) ── */}
@@ -346,122 +347,65 @@ export default function GetAllInvoices({
                   haptic("soft");
                   toggleExpand(invoice.id);
                 }}
-                style={{
-                  width: "100%",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  gap: "0.75rem",
-                  padding: "0.875rem 1rem",
-                  background: "none",
-                  border: "none",
-                  cursor: "pointer",
-                  textAlign: "left",
-                }}
+                className="tx-row"
+                style={{ borderBottom: isExpanded ? "1px solid var(--color-border)" : "none" }}
                 aria-expanded={isExpanded}
               >
-                {/* Left — status dot + name/number */}
+                {/* Status icon dot */}
                 <div
+                  className="tx-row-icon"
                   style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "0.625rem",
-                    minWidth: 0,
+                    background:
+                      invoice.status === "paid"
+                        ? "rgba(59,130,246,0.12)"
+                        : invoice.status === "delivered" || invoice.status === "completed"
+                          ? "rgba(16,185,129,0.12)"
+                          : invoice.status === "pending"
+                            ? "rgba(245,158,11,0.12)"
+                            : "var(--color-mist)",
+                    color:
+                      invoice.status === "paid"
+                        ? "#3b82f6"
+                        : invoice.status === "delivered" || invoice.status === "completed"
+                          ? "#059669"
+                          : invoice.status === "pending"
+                            ? "#d97706"
+                            : "var(--color-text-muted)",
                   }}
                 >
-                  <span
-                    style={{
-                      flexShrink: 0,
-                      width: 8,
-                      height: 8,
-                      borderRadius: "50%",
-                      backgroundColor:
-                        invoice.status === "paid"
-                          ? "#3b82f6"
-                          : invoice.status === "delivered"
-                            ? "#10b981"
-                            : invoice.status === "completed"
-                              ? "#16a34a"
-                              : invoice.status === "pending"
-                                ? "#f59e0b"
-                                : "#9ca3af",
-                    }}
-                  />
-                  <div style={{ minWidth: 0 }}>
-                    <p
-                      style={{
-                        margin: 0,
-                        fontWeight: 700,
-                        fontSize: "0.9375rem",
-                        color: "var(--color-text-heading)",
-                        whiteSpace: "nowrap",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        maxWidth: "18ch",
-                      }}
-                    >
-                      {invoice.invoicename}
-                    </p>
-                    <p
-                      style={{
-                        margin: 0,
-                        fontSize: "0.75rem",
-                        color: "var(--color-text-muted)",
-                        fontFamily: "monospace",
-                      }}
-                    >
-                      #{invoice.invoicenumber}
-                    </p>
-                  </div>
+                  <span style={{ width: 8, height: 8, borderRadius: "50%", background: "currentColor", display: "block" }} />
                 </div>
 
-                {/* Right — amount + badge + chevron */}
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "0.625rem",
-                    flexShrink: 0,
-                  }}
-                >
-                  <span
-                    style={{
-                      fontWeight: 700,
-                      fontSize: "0.9375rem",
-                      color: "var(--color-text-heading)",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    {Number(invoice.amount).toLocaleString()} {invoice.currency}
-                  </span>
-                  <span
-                    className={statusBadge(invoice.status)}
-                    style={{ flexShrink: 0 }}
-                  >
-                    {invoice.status.charAt(0).toUpperCase() +
-                      invoice.status.slice(1)}
-                  </span>
-                  {isExpanded ? (
-                    <ChevronUp
-                      size={16}
-                      style={{
-                        color: "var(--color-text-muted)",
-                        flexShrink: 0,
-                      }}
-                    />
-                  ) : (
-                    <ChevronDown
-                      size={16}
-                      style={{
-                        color: "var(--color-text-muted)",
-                        flexShrink: 0,
-                      }}
-                    />
-                  )}
+                {/* Name + ref */}
+                <div className="tx-row-body">
+                  <p className="tx-row-name">{invoice.invoicename}</p>
+                  <p className="tx-row-sub">
+                    <span style={{ fontFamily: 'ui-monospace,"Cascadia Code",monospace', fontSize: "0.7rem" }}>
+                      #{invoice.invoicenumber}
+                    </span>
+                    <span style={{ color: "var(--color-border-strong)", margin: "0 0.3rem" }}>·</span>
+                    <span>{createdStr}</span>
+                  </p>
+                </div>
+
+                {/* Amount + badge + chevron */}
+                <div className="tx-row-right" style={{ flexDirection: "row", alignItems: "center", gap: "0.625rem" }}>
+                  <div style={{ textAlign: "right" }}>
+                    <p className="tx-row-amount">
+                      {Number(invoice.amount).toLocaleString()} {invoice.currency}
+                    </p>
+                    <span className={statusBadge(invoice.status)} style={{ fontSize: "0.7rem" }}>
+                      {invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1)}
+                    </span>
+                  </div>
+                  {isExpanded
+                    ? <ChevronUp size={16} style={{ color: "var(--color-text-muted)", flexShrink: 0 }} />
+                    : <ChevronDown size={16} style={{ color: "var(--color-text-muted)", flexShrink: 0 }} />
+                  }
                 </div>
               </button>
 
-              {/* ── Meta bar (always visible below summary) ── */}
+              {/* ── Meta bar ── */}
               <div
                 style={{
                   display: "flex",

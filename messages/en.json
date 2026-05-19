@@ -1016,7 +1016,16 @@
     "generating": "Generating",
     "statementError": "Please select both start and end dates.",
     "statementDateError": "Start date must be before end date.",
-    "statementFailed": "Failed to generate statement. Please try again."
+    "statementFailed": "Failed to generate statement. Please try again.",
+    "viewInvoice": "View Invoice",
+    "modalTitle": "Transaction Details",
+    "close": "Close",
+    "modalInvoiceName": "Invoice",
+    "modalReference": "Reference",
+    "modalDate": "Date & Time",
+    "modalType": "Type",
+    "typePaymentReceived": "Payment received",
+    "typePaymentSent": "Payment sent"
   },
   "Purchases": {
     "title": "My Purchases",
@@ -1039,7 +1048,23 @@
     "statusDelivered": "Delivered",
     "statusCompleted": "Completed",
     "statusExpired": "Expired",
-    "statusDisputed": "Disputed"
+    "statusDisputed": "Disputed",
+    "backToDashboard": "← Dashboard",
+    "errorLoad": "Failed to load your purchases. Please try again.",
+    "emptyPurchases": "No purchases yet.",
+    "browseSellers": "Browse Offers",
+    "statTotal": "Total Purchases",
+    "statSpent": "Total Spent",
+    "statDelivered": "Delivered",
+    "modalTitle": "Purchase Details",
+    "close": "Close",
+    "modalInvoice": "Invoice",
+    "modalReference": "Reference",
+    "modalPaidOn": "Paid on",
+    "modalDeliveredOn": "Delivered on",
+    "modalPaymentType": "Payment type",
+    "modalDescription": "Description",
+    "contactSeller": "Contact Seller"
   },
   "Referral": {
     "loading": "Loading your referral dashboard…",

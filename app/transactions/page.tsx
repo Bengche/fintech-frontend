@@ -1,10 +1,17 @@
-"use client";
+﻿"use client";
 import { useState, useEffect } from "react";
 import Axios from "axios";
 import { useAuth } from "@/context/UserContext";
 import Link from "next/link";
 import { SkeletonRow } from "@/app/components/Spinner";
 import { useTranslations } from "next-intl";
+import {
+  X,
+  ArrowDownLeft,
+  ArrowUpRight,
+  Download,
+  ExternalLink,
+} from "lucide-react";
 
 const API = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
 
@@ -19,16 +26,157 @@ type Transaction = {
   invoicenumber: string;
 };
 
+// ── Helpers ──────────────────────────────────────────────────────────────────
+
+function statusPill(status: string) {
+  const s = status.toLowerCase();
+  if (s === "paid" || s === "success" || s === "completed")
+    return { bg: "var(--color-success-bg)", color: "#166534", border: "var(--color-success-border)", label: status.charAt(0).toUpperCase() + status.slice(1) };
+  if (s === "pending")
+    return { bg: "var(--color-warning-bg)", color: "#92400e", border: "var(--color-warning-border)", label: "Pending" };
+  if (s === "failed" || s === "disputed")
+    return { bg: "var(--color-danger-bg)", color: "#991b1b", border: "var(--color-danger-border)", label: status.charAt(0).toUpperCase() + status.slice(1) };
+  return { bg: "var(--color-mist)", color: "var(--color-text-muted)", border: "var(--color-border)", label: status.charAt(0).toUpperCase() + status.slice(1) };
+}
+
+function shortDate(d: string) {
+  return new Date(d).toLocaleDateString("en-GB", { day: "2-digit", month: "short" });
+}
+
+function fullDate(d: string) {
+  return new Date(d).toLocaleString("en-GB", {
+    day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit",
+  });
+}
+
+function canDownload(status: string) {
+  const s = status.toLowerCase();
+  return s === "paid" || s === "completed" || s === "delivered";
+}
+
+// ── Transaction Detail Modal ──────────────────────────────────────────────────
+
+function TransactionDetailModal({
+  tx,
+  isReceived,
+  onClose,
+  t,
+}: {
+  tx: Transaction;
+  isReceived: boolean;
+  onClose: () => void;
+  t: ReturnType<typeof useTranslations<"Transactions">>;
+}) {
+  const pill = statusPill(tx.status);
+
+  useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [onClose]);
+
+  return (
+    <div
+      className="tx-modal-backdrop"
+      role="dialog"
+      aria-modal="true"
+      aria-label={t("modalTitle")}
+      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+    >
+      <div className="tx-modal">
+        <div className="tx-modal-handle-wrap">
+          <div className="tx-modal-handle" />
+        </div>
+
+        <div className="tx-modal-topbar">
+          <span className="tx-modal-topbar-title">{t("modalTitle")}</span>
+          <button className="tx-modal-close" onClick={onClose} aria-label={t("close")}>
+            <X size={16} />
+          </button>
+        </div>
+
+        <div className="tx-modal-hero">
+          <div className={`tx-modal-hero-icon ${isReceived ? "is-received" : "is-spent"}`}>
+            {isReceived ? <ArrowDownLeft size={24} /> : <ArrowUpRight size={24} />}
+          </div>
+          <div className={`tx-modal-amount ${isReceived ? "is-credit" : ""}`}>
+            {isReceived ? "+" : "−"}
+            {Number(tx.amount).toLocaleString()} {tx.currency}
+          </div>
+          <span
+            className="tx-status-pill"
+            style={{ background: pill.bg, color: pill.color, border: `1px solid ${pill.border}` }}
+          >
+            {pill.label}
+          </span>
+        </div>
+
+        <div className="tx-modal-rows">
+          <div className="tx-modal-row">
+            <span className="tx-modal-label">{t("modalInvoiceName")}</span>
+            <span className="tx-modal-value">{tx.invoicename}</span>
+          </div>
+          <div className="tx-modal-row">
+            <span className="tx-modal-label">{t("modalReference")}</span>
+            <span className="tx-modal-value mono">#{tx.invoicenumber}</span>
+          </div>
+          <div className="tx-modal-row">
+            <span className="tx-modal-label">{t("modalDate")}</span>
+            <span className="tx-modal-value">{fullDate(tx.createdat)}</span>
+          </div>
+          <div className="tx-modal-row">
+            <span className="tx-modal-label">{t("modalType")}</span>
+            <span className="tx-modal-value">
+              {isReceived ? t("typePaymentReceived") : t("typePaymentSent")}
+            </span>
+          </div>
+        </div>
+
+        <div className="tx-modal-actions">
+          <Link
+            href={`/pay/${tx.invoicenumber}`}
+            className="btn-ghost"
+            style={{ justifyContent: "center", flex: 1, textDecoration: "none" }}
+          >
+            <ExternalLink size={14} />
+            {t("viewInvoice")}
+          </Link>
+          {canDownload(tx.status) && (
+            <a
+              href={`${API}/invoice/receipt/${tx.invoicenumber}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-primary"
+              style={{ justifyContent: "center", flex: 1, textDecoration: "none" }}
+            >
+              <Download size={14} />
+              {t("downloadReceipt")}
+            </a>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Page ──────────────────────────────────────────────────────────────────────
+
 export default function TransactionsPage() {
   const { user_id } = useAuth();
   const t = useTranslations("Transactions");
-  const [sellerTransactions, setSellerTransactions] = useState<Transaction[]>(
-    [],
-  );
+  const [sellerTransactions, setSellerTransactions] = useState<Transaction[]>([]);
   const [buyerTransactions, setBuyerTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [activeTab, setActiveTab] = useState<"received" | "spent">("received");
+  const [selected, setSelected] = useState<Transaction | null>(null);
+
+  // Statement state
   const [statementStartDate, setStatementStartDate] = useState("");
   const [statementEndDate, setStatementEndDate] = useState("");
   const [statementLanguage, setStatementLanguage] = useState("en");
@@ -43,9 +191,8 @@ export default function TransactionsPage() {
           `${API}/transactions/history/${user_id}`,
           { withCredentials: true },
         );
-        // Deduplicate by id to guard against JOIN duplicates from the backend
         const dedup = <T extends { id: number }>(arr: T[]): T[] => [
-          ...new Map(arr.map((t) => [t.id, t])).values(),
+          ...new Map(arr.map((item) => [item.id, item])).values(),
         ];
         setSellerTransactions(dedup(response.data.sellerTransactions));
         setBuyerTransactions(dedup(response.data.buyerTransactions));
@@ -58,37 +205,8 @@ export default function TransactionsPage() {
     fetchTransactions();
   }, [user_id, t]);
 
-  const formatDate = (dateString: string) =>
-    new Date(dateString).toLocaleDateString("en-GB", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-
-  const statusBadge = (status: string) => {
-    const cls =
-      status === "paid" || status === "success"
-        ? "badge badge-success"
-        : status === "pending"
-          ? "badge badge-warning"
-          : status === "failed"
-            ? "badge badge-danger"
-            : "badge badge-neutral";
-    return (
-      <span className={cls}>
-        {status.charAt(0).toUpperCase() + status.slice(1)}
-      </span>
-    );
-  };
-
   const downloadStatement = async () => {
-    if (
-      statementStartDate &&
-      statementEndDate &&
-      new Date(statementStartDate) > new Date(statementEndDate)
-    ) {
+    if (statementStartDate && statementEndDate && new Date(statementStartDate) > new Date(statementEndDate)) {
       setStatementError(t("statementDateError"));
       return;
     }
@@ -108,10 +226,7 @@ export default function TransactionsPage() {
       }
       params.set("lang", statementLanguage);
 
-      const token =
-        typeof window !== "undefined"
-          ? localStorage.getItem("authToken")
-          : null;
+      const token = typeof window !== "undefined" ? localStorage.getItem("authToken") : null;
 
       const res = await Axios.get(
         `${API}/transactions/statement?${params.toString()}`,
@@ -126,445 +241,185 @@ export default function TransactionsPage() {
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download =
-        statementStartDate && statementEndDate
-          ? `fonlok-statement-${statementStartDate}-to-${statementEndDate}.pdf`
-          : "fonlok-statement-full.pdf";
+      a.download = statementStartDate && statementEndDate
+        ? `fonlok-statement-${statementStartDate}-to-${statementEndDate}.pdf`
+        : "fonlok-statement-full.pdf";
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
     } catch (err: unknown) {
-      const e = err as {
-        response?: {
-          data?: Blob;
-          status?: number;
-        };
-      };
-
-      // Backend may send JSON in a blob for non-2xx responses.
+      const e = err as { response?: { data?: Blob; status?: number } };
       if (e.response?.data instanceof Blob) {
         try {
           const text = await e.response.data.text();
           const parsed = JSON.parse(text) as { message?: string };
           setStatementError(parsed.message || t("statementFailed"));
           return;
-        } catch {
-          // Fall through to generic message.
-        }
+        } catch { /* fall through */ }
       }
-
       setStatementError(t("statementFailed"));
     } finally {
       setStatementLoading(false);
     }
   };
 
-  const activeTransactions =
-    activeTab === "received" ? sellerTransactions : buyerTransactions;
+  const activeTransactions = activeTab === "received" ? sellerTransactions : buyerTransactions;
 
   return (
     <div style={{ minHeight: "100vh", backgroundColor: "var(--color-cloud)" }}>
-      <div
-        style={{ maxWidth: "860px", margin: "0 auto", padding: "2rem 1.25rem" }}
-      >
-        {/* Header */}
-        <div
-          style={{
-            marginBottom: "1.75rem",
-            display: "flex",
-            alignItems: "center",
-            gap: "1rem",
-            flexWrap: "wrap",
-            justifyContent: "space-between",
-          }}
-        >
+      <div style={{ maxWidth: "680px", margin: "0 auto", padding: "2rem 1.25rem calc(4rem + env(safe-area-inset-bottom, 0px))" }}>
+
+        {/* ── Header ── */}
+        <div style={{ marginBottom: "1.75rem", display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "1rem", flexWrap: "wrap" }}>
           <div>
-            <h1
-              style={{
-                fontSize: "1.5rem",
-                fontWeight: 700,
-                color: "var(--color-text-heading)",
-                margin: 0,
-              }}
-            >
+            <h1 style={{ fontSize: "1.5rem", fontWeight: 800, color: "var(--color-text-heading)", margin: 0, letterSpacing: "-0.02em" }}>
               {t("title")}
             </h1>
-            <p
-              style={{
-                marginTop: "0.25rem",
-                fontSize: "0.9rem",
-                color: "var(--color-text-muted)",
-              }}
-            >
+            <p style={{ marginTop: "0.25rem", fontSize: "0.9rem", color: "var(--color-text-muted)" }}>
               {t("subtitle")}
             </p>
           </div>
-          <Link
-            href="/dashboard"
-            style={{
-              fontSize: "0.875rem",
-              color: "var(--color-text-muted)",
-              textDecoration: "none",
-            }}
-          >
+          <Link href="/dashboard" style={{ fontSize: "0.875rem", color: "var(--color-text-muted)", textDecoration: "none", alignSelf: "center" }}>
             {t("backToDashboard")}
           </Link>
         </div>
 
-        {/* Tab switcher */}
-        <div
-          style={{
-            display: "inline-flex",
-            backgroundColor: "var(--color-mist)",
-            borderRadius: "var(--radius-md)",
-            padding: "0.25rem",
-            marginBottom: "1.5rem",
-            gap: "0.25rem",
-          }}
-        >
+        {/* ── Tab switcher ── */}
+        <div style={{ display: "flex", backgroundColor: "var(--color-mist)", borderRadius: "var(--radius-md)", padding: "0.25rem", marginBottom: "1.5rem", gap: "0.25rem" }}>
           {(["received", "spent"] as const).map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
               style={{
-                padding: "0.5rem 1.25rem",
+                flex: 1, padding: "0.5625rem 1rem",
                 borderRadius: "calc(var(--radius-md) - 2px)",
-                border: "none",
-                cursor: "pointer",
-                fontWeight: 600,
-                fontSize: "0.9rem",
-                transition:
-                  "background-color 0.15s, color 0.15s, box-shadow 0.15s",
-                backgroundColor:
-                  activeTab === tab ? "var(--color-white)" : "transparent",
-                color:
-                  activeTab === tab
-                    ? "var(--color-text-heading)"
-                    : "var(--color-text-muted)",
+                border: "none", cursor: "pointer", fontWeight: 600, fontSize: "0.9rem",
+                transition: "background-color 0.15s, color 0.15s, box-shadow 0.15s",
+                backgroundColor: activeTab === tab ? "var(--color-white)" : "transparent",
+                color: activeTab === tab ? "var(--color-text-heading)" : "var(--color-text-muted)",
                 boxShadow: activeTab === tab ? "var(--shadow-card)" : "none",
               }}
             >
               {tab === "received" ? t("tabReceived") : t("tabSpent")}
-              <span
-                style={{
-                  marginLeft: "0.5rem",
-                  fontSize: "0.75rem",
-                  backgroundColor:
-                    activeTab === tab
-                      ? "var(--color-mist)"
-                      : "var(--color-border)",
-                  color:
-                    activeTab === tab
-                      ? "var(--color-text-body)"
-                      : "var(--color-text-muted)",
-                  borderRadius: "9999px",
-                  padding: "0.1rem 0.5rem",
-                }}
-              >
-                {tab === "received"
-                  ? sellerTransactions.length
-                  : buyerTransactions.length}
+              <span style={{
+                marginLeft: "0.5rem", fontSize: "0.75rem",
+                backgroundColor: activeTab === tab ? "var(--color-mist)" : "var(--color-border)",
+                color: activeTab === tab ? "var(--color-text-body)" : "var(--color-text-muted)",
+                borderRadius: "9999px", padding: "0.1rem 0.5rem",
+              }}>
+                {tab === "received" ? sellerTransactions.length : buyerTransactions.length}
               </span>
             </button>
           ))}
         </div>
 
-        {/* Download Statement Section */}
-        <div
-          className="card"
-          style={{
-            marginBottom: "1.5rem",
-            borderLeft: "4px solid var(--color-primary)",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              alignItems: "flex-start",
-              justifyContent: "space-between",
-              gap: "1.5rem",
-              flexWrap: "wrap",
-            }}
-          >
-            <div>
-              <h3
-                style={{
-                  fontSize: "1rem",
-                  fontWeight: 700,
-                  color: "var(--color-text-heading)",
-                  margin: "0 0 0.375rem",
-                }}
-              >
-                {t("downloadStatement")}
-              </h3>
-              <p
-                style={{
-                  fontSize: "0.875rem",
-                  color: "var(--color-text-muted)",
-                  margin: 0,
-                  lineHeight: 1.6,
-                }}
-              >
-                {t("downloadStatementDesc")}
-              </p>
+        {/* ── Statement download card ── */}
+        <div className="card" style={{ marginBottom: "1.5rem", borderLeft: "4px solid var(--color-primary)" }}>
+          <h3 style={{ fontSize: "1rem", fontWeight: 700, color: "var(--color-text-heading)", margin: "0 0 0.3rem" }}>
+            {t("downloadStatement")}
+          </h3>
+          <p style={{ fontSize: "0.875rem", color: "var(--color-text-muted)", margin: "0 0 1rem", lineHeight: 1.6 }}>
+            {t("downloadStatementDesc")}
+          </p>
+          <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap", alignItems: "flex-end" }}>
+            {[
+              { key: "start", label: t("fromDate"), value: statementStartDate, set: setStatementStartDate },
+              { key: "end",   label: t("toDate"),   value: statementEndDate,   set: setStatementEndDate  },
+            ].map(({ key, label, value, set }) => (
+              <div key={key} style={{ flex: "1 1 120px" }}>
+                <label className="label">{label}</label>
+                <input type="date" className="input" value={value} onChange={(e) => { set(e.target.value); setStatementError(""); }} />
+              </div>
+            ))}
+            <div style={{ flex: "1 1 120px" }}>
+              <label className="label">{t("language")}</label>
+              <select className="input" value={statementLanguage} onChange={(e) => setStatementLanguage(e.target.value)}>
+                <option value="en">English</option>
+                <option value="fr">Français</option>
+              </select>
             </div>
-            <div
-              style={{
-                display: "flex",
-                gap: "0.75rem",
-                flexWrap: "wrap",
-                alignItems: "flex-end",
-              }}
-            >
-              <div>
-                <label
-                  style={{
-                    display: "block",
-                    fontSize: "0.8rem",
-                    fontWeight: 600,
-                    color: "var(--color-text-muted)",
-                    marginBottom: "0.375rem",
-                  }}
-                >
-                  {t("fromDate")}
-                </label>
-                <input
-                  type="date"
-                  className="input"
-                  value={statementStartDate}
-                  onChange={(e) => {
-                    setStatementStartDate(e.target.value);
-                    setStatementError("");
-                  }}
-                  style={{ minWidth: "140px" }}
-                />
-              </div>
-              <div>
-                <label
-                  style={{
-                    display: "block",
-                    fontSize: "0.8rem",
-                    fontWeight: 600,
-                    color: "var(--color-text-muted)",
-                    marginBottom: "0.375rem",
-                  }}
-                >
-                  {t("toDate")}
-                </label>
-                <input
-                  type="date"
-                  className="input"
-                  value={statementEndDate}
-                  onChange={(e) => {
-                    setStatementEndDate(e.target.value);
-                    setStatementError("");
-                  }}
-                  style={{ minWidth: "140px" }}
-                />
-              </div>
-              <div>
-                <label
-                  style={{
-                    display: "block",
-                    fontSize: "0.8rem",
-                    fontWeight: 600,
-                    color: "var(--color-text-muted)",
-                    marginBottom: "0.375rem",
-                  }}
-                >
-                  {t("language")}
-                </label>
-                <select
-                  className="input"
-                  value={statementLanguage}
-                  onChange={(e) => setStatementLanguage(e.target.value)}
-                  style={{ minWidth: "140px" }}
-                >
-                  <option value="en">English</option>
-                  <option value="fr">Français</option>
-                </select>
-              </div>
-              <button
-                onClick={downloadStatement}
-                disabled={statementLoading}
-                className="btn-primary"
-                style={{
-                  padding: "0.625rem 1.375rem",
-                  fontSize: "0.9rem",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                {statementLoading
-                  ? `${t("generating")}...`
-                  : `📄 ${t("downloadBtn")}`}
-              </button>
-            </div>
+            <button onClick={downloadStatement} disabled={statementLoading} className="btn-primary" style={{ padding: "0.625rem 1.25rem", whiteSpace: "nowrap" }}>
+              <Download size={14} />
+              {statementLoading ? `${t("generating")}…` : t("downloadBtn")}
+            </button>
           </div>
           {statementError && (
-            <p
-              style={{
-                marginTop: "0.75rem",
-                fontSize: "0.875rem",
-                color: "var(--color-danger)",
-                margin: "0.75rem 0 0",
-              }}
-            >
-              {statementError}
-            </p>
+            <p style={{ marginTop: "0.75rem", fontSize: "0.875rem", color: "var(--color-danger)" }}>{statementError}</p>
           )}
         </div>
 
-        {/* Loading / error states */}
+        {/* ── Loading skeletons ── */}
         {loading && (
-          <div
-            style={{
-              background: "var(--color-white)",
-              border: "1px solid var(--color-border)",
-              borderRadius: "var(--radius-lg)",
-              overflow: "hidden",
-            }}
-          >
-            {[...Array(6)].map((_, i) => (
-              <SkeletonRow key={i} cols={4} />
-            ))}
+          <div className="tx-row-list">
+            {[...Array(6)].map((_, i) => <SkeletonRow key={i} cols={3} />)}
           </div>
         )}
 
-        {error && <div className="alert alert-danger">{error}</div>}
+        {error && (
+          <div className="alert alert-danger" style={{ marginBottom: "1rem" }}>{error}</div>
+        )}
 
-        {/* Transaction list */}
+        {/* ── Transaction list ── */}
         {!loading && !error && (
           <>
             {activeTransactions.length === 0 ? (
-              <div
-                style={{
-                  textAlign: "center",
-                  padding: "3.5rem 1.5rem",
-                  backgroundColor: "var(--color-white)",
-                  borderRadius: "var(--radius-lg)",
-                  border: "1px solid var(--color-border)",
-                }}
-              >
-                <p
-                  style={{
-                    color: "var(--color-text-muted)",
-                    fontSize: "0.9375rem",
-                  }}
-                >
-                  {activeTab === "received"
-                    ? t("emptyReceived")
-                    : t("emptySpent")}
+              <div style={{ textAlign: "center", padding: "3.5rem 1.5rem", backgroundColor: "var(--color-white)", borderRadius: "var(--radius-lg)", border: "1px solid var(--color-border)" }}>
+                <p style={{ color: "var(--color-text-muted)", fontSize: "0.9375rem" }}>
+                  {activeTab === "received" ? t("emptyReceived") : t("emptySpent")}
                 </p>
               </div>
             ) : (
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "0.75rem",
-                }}
-              >
-                {activeTransactions.map((tx, i) => (
-                  <div
-                    key={`${activeTab}-${tx.id}-${i}`}
-                    className="card"
-                    style={{ padding: "1.125rem 1.375rem" }}
-                  >
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "flex-start",
-                        gap: "0.75rem",
-                      }}
+              <div className="tx-row-list">
+                {activeTransactions.map((tx, i) => {
+                  const isReceived = activeTab === "received";
+                  const pill = statusPill(tx.status);
+                  return (
+                    <button
+                      key={`${activeTab}-${tx.id}-${i}`}
+                      className="tx-row"
+                      onClick={() => setSelected(tx)}
+                      aria-label={`${tx.invoicename} ${tx.amount} ${tx.currency}`}
                     >
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <p
-                          style={{
-                            fontWeight: 600,
-                            color: "var(--color-text-heading)",
-                            margin: "0 0 0.2rem",
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                            whiteSpace: "nowrap",
-                          }}
-                        >
-                          {tx.invoicename}
-                        </p>
-                        <p
-                          style={{
-                            fontSize: "0.8rem",
-                            color: "var(--color-text-muted)",
-                            margin: 0,
-                            fontFamily: "monospace",
-                          }}
-                        >
-                          #{tx.invoicenumber}
+                      <div className={`tx-row-icon ${isReceived ? "is-received" : "is-spent"}`}>
+                        {isReceived ? <ArrowDownLeft size={17} /> : <ArrowUpRight size={17} />}
+                      </div>
+                      <div className="tx-row-body">
+                        <p className="tx-row-name">{tx.invoicename}</p>
+                        <p className="tx-row-sub">
+                          <span style={{ fontFamily: 'ui-monospace,"Cascadia Code",monospace', fontSize: "0.7rem" }}>
+                            #{tx.invoicenumber}
+                          </span>
+                          <span style={{ color: "var(--color-border-strong)", margin: "0 0.3rem" }}>·</span>
+                          <span>{shortDate(tx.createdat)}</span>
                         </p>
                       </div>
-                      <div style={{ textAlign: "right", flexShrink: 0 }}>
-                        <p
-                          style={{
-                            fontWeight: 700,
-                            fontSize: "1.0625rem",
-                            margin: "0 0 0.25rem",
-                            color:
-                              activeTab === "received"
-                                ? "var(--color-success)"
-                                : "var(--color-text-heading)",
-                          }}
-                        >
-                          {activeTab === "received" ? "+" : "âˆ’"}
-                          {tx.amount.toLocaleString()} {tx.currency}
+                      <div className="tx-row-right">
+                        <p className={`tx-row-amount ${isReceived ? "is-credit" : ""}`}>
+                          {isReceived ? "+" : "−"}{Number(tx.amount).toLocaleString()} {tx.currency}
                         </p>
-                        <p
-                          style={{
-                            fontSize: "0.8rem",
-                            color: "var(--color-text-muted)",
-                            margin: 0,
-                          }}
-                        >
-                          {formatDate(tx.createdat)}
-                        </p>
+                        <span className="tx-status-pill" style={{ background: pill.bg, color: pill.color, border: `1px solid ${pill.border}` }}>
+                          {pill.label}
+                        </span>
                       </div>
-                    </div>
-                    <div
-                      style={{
-                        marginTop: "0.625rem",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "0.75rem",
-                        flexWrap: "wrap",
-                      }}
-                    >
-                      {statusBadge(tx.status)}
-                      {tx.status === "paid" && (
-                        <a
-                          href={`${API}/invoice/receipt/${tx.invoicenumber}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          style={{
-                            fontSize: "0.78rem",
-                            fontWeight: 600,
-                            color: "var(--color-primary)",
-                            textDecoration: "none",
-                            display: "inline-flex",
-                            alignItems: "center",
-                            gap: "0.25rem",
-                          }}
-                        >
-                          â†“ {t("downloadReceipt")}
-                        </a>
-                      )}
-                    </div>
-                  </div>
-                ))}
+                    </button>
+                  );
+                })}
               </div>
             )}
           </>
         )}
       </div>
+
+      {/* ── Detail modal ── */}
+      {selected && (
+        <TransactionDetailModal
+          tx={selected}
+          isReceived={activeTab === "received"}
+          onClose={() => setSelected(null)}
+          t={t}
+        />
+      )}
     </div>
   );
 }
