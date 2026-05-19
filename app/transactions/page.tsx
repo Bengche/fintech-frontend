@@ -68,6 +68,9 @@ function TransactionDetailModal({
   t: ReturnType<typeof useTranslations<"Transactions">>;
 }) {
   const pill = statusPill(tx.status);
+  const [receiptLoading, setReceiptLoading] = useState(false);
+  const [receiptError, setReceiptError] = useState("");
+  const hasInvoice = Boolean(tx.invoicenumber);
 
   useEffect(() => {
     const prev = document.body.style.overflow;
@@ -79,6 +82,41 @@ function TransactionDetailModal({
       window.removeEventListener("keydown", onKey);
     };
   }, [onClose]);
+
+  async function handleDownloadReceipt() {
+    setReceiptLoading(true);
+    setReceiptError("");
+    try {
+      const res = await fetch(
+        `${API}/invoice/receipt/${tx.invoicenumber}`,
+        { credentials: "include" },
+      );
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        setReceiptError((data as { message?: string }).message || t("receiptFetchError"));
+        return;
+      }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const isIOS = typeof navigator !== "undefined" && /iPad|iPhone|iPod/.test(navigator.userAgent);
+      if (isIOS) {
+        window.open(url, "_blank");
+        setTimeout(() => URL.revokeObjectURL(url), 10000);
+      } else {
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `fonlok-receipt-${tx.invoicenumber}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }
+    } catch {
+      setReceiptError(t("receiptFetchError"));
+    } finally {
+      setReceiptLoading(false);
+    }
+  }
 
   return (
     <div
@@ -121,10 +159,12 @@ function TransactionDetailModal({
             <span className="tx-modal-label">{t("modalInvoiceName")}</span>
             <span className="tx-modal-value">{tx.invoicename}</span>
           </div>
-          <div className="tx-modal-row">
-            <span className="tx-modal-label">{t("modalReference")}</span>
-            <span className="tx-modal-value mono">#{tx.invoicenumber}</span>
-          </div>
+          {hasInvoice && (
+            <div className="tx-modal-row">
+              <span className="tx-modal-label">{t("modalReference")}</span>
+              <span className="tx-modal-value mono">#{tx.invoicenumber}</span>
+            </div>
+          )}
           <div className="tx-modal-row">
             <span className="tx-modal-label">{t("modalDate")}</span>
             <span className="tx-modal-value">{fullDate(tx.createdat)}</span>
@@ -137,28 +177,35 @@ function TransactionDetailModal({
           </div>
         </div>
 
-        <div className="tx-modal-actions">
-          <Link
-            href={`/pay/${tx.invoicenumber}`}
-            className="btn-ghost"
-            style={{ justifyContent: "center", flex: 1, textDecoration: "none" }}
-          >
-            <ExternalLink size={14} />
-            {t("viewInvoice")}
-          </Link>
-          {canDownload(tx.status) && (
-            <a
-              href={`${API}/invoice/receipt/${tx.invoicenumber}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-primary"
+        {/* Action buttons — only shown when there is a linked invoice */}
+        {hasInvoice && (
+          <div className="tx-modal-actions">
+            <Link
+              href={`/pay/${tx.invoicenumber}`}
+              className="btn-ghost"
               style={{ justifyContent: "center", flex: 1, textDecoration: "none" }}
             >
-              <Download size={14} />
-              {t("downloadReceipt")}
-            </a>
-          )}
-        </div>
+              <ExternalLink size={14} />
+              {t("viewInvoice")}
+            </Link>
+            {canDownload(tx.status) && (
+              <button
+                className="btn-primary"
+                style={{ justifyContent: "center", flex: 1 }}
+                onClick={handleDownloadReceipt}
+                disabled={receiptLoading}
+              >
+                <Download size={14} />
+                {receiptLoading ? `${t("generating")}…` : t("downloadReceipt")}
+              </button>
+            )}
+          </div>
+        )}
+        {receiptError && (
+          <p style={{ marginTop: "0.75rem", fontSize: "0.8125rem", color: "var(--color-danger)", textAlign: "center" }}>
+            {receiptError}
+          </p>
+        )}
       </div>
     </div>
   );

@@ -272,7 +272,11 @@ a:hover {
   padding: 1rem;
   border-radius: var(--radius-md);
   border: 1px solid rgba(15, 31, 61, 0.08);
-  background: linear-gradient(135deg, rgba(15, 31, 61, 0.03), rgba(245, 158, 11, 0.08));
+  background: linear-gradient(
+    135deg,
+    rgba(15, 31, 61, 0.03),
+    rgba(245, 158, 11, 0.08)
+  );
 }
 
 .login-otp-kicker {
@@ -318,7 +322,11 @@ a:hover {
   padding: 1rem 1.125rem;
   border-radius: 0.875rem;
   border: 1px solid rgba(15, 31, 61, 0.08);
-  background: linear-gradient(135deg, rgba(15, 31, 61, 0.04), rgba(245, 158, 11, 0.09));
+  background: linear-gradient(
+    135deg,
+    rgba(15, 31, 61, 0.04),
+    rgba(245, 158, 11, 0.09)
+  );
 }
 
 .settings-2fa-copy {
@@ -514,9 +522,15 @@ a:hover {
   text-align: left;
   transition: background-color 0.12s ease;
 }
-.tx-row:last-child { border-bottom: none; }
-.tx-row:hover { background-color: var(--color-mist); }
-.tx-row:active { background-color: var(--color-primary-light); }
+.tx-row:last-child {
+  border-bottom: none;
+}
+.tx-row:hover {
+  background-color: var(--color-mist);
+}
+.tx-row:active {
+  background-color: var(--color-primary-light);
+}
 .tx-row:focus-visible {
   outline: 2px solid var(--color-primary);
   outline-offset: -2px;
@@ -545,7 +559,10 @@ a:hover {
   color: var(--color-text-muted);
 }
 
-.tx-row-body { flex: 1; min-width: 0; }
+.tx-row-body {
+  flex: 1;
+  min-width: 0;
+}
 .tx-row-name {
   margin: 0;
   font-size: 0.9375rem;
@@ -579,7 +596,9 @@ a:hover {
   color: var(--color-text-heading);
   white-space: nowrap;
 }
-.tx-row-amount.is-credit { color: #059669; }
+.tx-row-amount.is-credit {
+  color: #059669;
+}
 
 /* Seller avatar circle in purchases rows */
 .tx-row-avatar {
@@ -666,7 +685,9 @@ a:hover {
   padding: 0.875rem 0 0;
 }
 @media (min-width: 640px) {
-  .tx-modal-handle-wrap { display: none; }
+  .tx-modal-handle-wrap {
+    display: none;
+  }
 }
 .tx-modal-handle {
   width: 2.5rem;
@@ -702,7 +723,9 @@ a:hover {
   transition: background 0.15s;
   flex-shrink: 0;
 }
-.tx-modal-close:hover { background: var(--color-border); }
+.tx-modal-close:hover {
+  background: var(--color-border);
+}
 
 .tx-modal-hero {
   display: flex;
@@ -740,7 +763,9 @@ a:hover {
   color: var(--color-text-heading);
   line-height: 1;
 }
-.tx-modal-amount.is-credit { color: #059669; }
+.tx-modal-amount.is-credit {
+  color: #059669;
+}
 
 .tx-modal-rows {
   display: flex;
@@ -755,7 +780,9 @@ a:hover {
   padding: 0.8rem 0;
   border-bottom: 1px solid var(--color-border);
 }
-.tx-modal-row:last-child { border-bottom: none; }
+.tx-modal-row:last-child {
+  border-bottom: none;
+}
 .tx-modal-label {
   font-size: 0.8125rem;
   color: var(--color-text-muted);
@@ -793,16 +820,28 @@ a:hover {
   gap: 0.75rem;
 }
 @media (max-width: 399px) {
-  .tx-modal-actions { flex-direction: column; }
+  .tx-modal-actions {
+    flex-direction: column;
+  }
 }
 
 @keyframes txFadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 @keyframes txSlideUp {
-  from { transform: translateY(24px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  from {
+    transform: translateY(24px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 /* ─────────────────────────────────────────────────────────────

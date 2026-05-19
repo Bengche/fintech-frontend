@@ -1025,7 +1025,8 @@
     "modalDate": "Date et heure",
     "modalType": "Type",
     "typePaymentReceived": "Paiement reçu",
-    "typePaymentSent": "Paiement envoyé"
+    "typePaymentSent": "Paiement envoyé",
+    "receiptFetchError": "Échec du téléchargement du reçu. Veuillez réessayer."
   },
   "Purchases": {
     "title": "Mes achats",
@@ -1064,7 +1065,9 @@
     "modalDeliveredOn": "Livré le",
     "modalPaymentType": "Type de paiement",
     "modalDescription": "Description",
-    "contactSeller": "Contacter le vendeur"
+    "contactSeller": "Contacter le vendeur",
+    "generating": "Génération en cours",
+    "receiptFetchError": "Échec du téléchargement du reçu. Veuillez réessayer."
   },
   "Referral": {
     "loading": "Chargement de votre tableau de bord de parrainage…",

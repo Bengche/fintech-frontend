@@ -1025,7 +1025,8 @@
     "modalDate": "Date & Time",
     "modalType": "Type",
     "typePaymentReceived": "Payment received",
-    "typePaymentSent": "Payment sent"
+    "typePaymentSent": "Payment sent",
+    "receiptFetchError": "Failed to download receipt. Please try again."
   },
   "Purchases": {
     "title": "My Purchases",
@@ -1064,7 +1065,9 @@
     "modalDeliveredOn": "Delivered on",
     "modalPaymentType": "Payment type",
     "modalDescription": "Description",
-    "contactSeller": "Contact Seller"
+    "contactSeller": "Contact Seller",
+    "generating": "Generating",
+    "receiptFetchError": "Failed to download receipt. Please try again."
   },
   "Referral": {
     "loading": "Loading your referral dashboard…",

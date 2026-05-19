@@ -348,7 +348,11 @@ export default function GetAllInvoices({
                   toggleExpand(invoice.id);
                 }}
                 className="tx-row"
-                style={{ borderBottom: isExpanded ? "1px solid var(--color-border)" : "none" }}
+                style={{
+                  borderBottom: isExpanded
+                    ? "1px solid var(--color-border)"
+                    : "none",
+                }}
                 aria-expanded={isExpanded}
               >
                 {/* Status icon dot */}
@@ -358,7 +362,8 @@ export default function GetAllInvoices({
                     background:
                       invoice.status === "paid"
                         ? "rgba(59,130,246,0.12)"
-                        : invoice.status === "delivered" || invoice.status === "completed"
+                        : invoice.status === "delivered" ||
+                            invoice.status === "completed"
                           ? "rgba(16,185,129,0.12)"
                           : invoice.status === "pending"
                             ? "rgba(245,158,11,0.12)"
@@ -366,42 +371,88 @@ export default function GetAllInvoices({
                     color:
                       invoice.status === "paid"
                         ? "#3b82f6"
-                        : invoice.status === "delivered" || invoice.status === "completed"
+                        : invoice.status === "delivered" ||
+                            invoice.status === "completed"
                           ? "#059669"
                           : invoice.status === "pending"
                             ? "#d97706"
                             : "var(--color-text-muted)",
                   }}
                 >
-                  <span style={{ width: 8, height: 8, borderRadius: "50%", background: "currentColor", display: "block" }} />
+                  <span
+                    style={{
+                      width: 8,
+                      height: 8,
+                      borderRadius: "50%",
+                      background: "currentColor",
+                      display: "block",
+                    }}
+                  />
                 </div>
 
                 {/* Name + ref */}
                 <div className="tx-row-body">
                   <p className="tx-row-name">{invoice.invoicename}</p>
                   <p className="tx-row-sub">
-                    <span style={{ fontFamily: 'ui-monospace,"Cascadia Code",monospace', fontSize: "0.7rem" }}>
+                    <span
+                      style={{
+                        fontFamily: 'ui-monospace,"Cascadia Code",monospace',
+                        fontSize: "0.7rem",
+                      }}
+                    >
                       #{invoice.invoicenumber}
                     </span>
-                    <span style={{ color: "var(--color-border-strong)", margin: "0 0.3rem" }}>·</span>
+                    <span
+                      style={{
+                        color: "var(--color-border-strong)",
+                        margin: "0 0.3rem",
+                      }}
+                    >
+                      ·
+                    </span>
                     <span>{createdStr}</span>
                   </p>
                 </div>
 
                 {/* Amount + badge + chevron */}
-                <div className="tx-row-right" style={{ flexDirection: "row", alignItems: "center", gap: "0.625rem" }}>
+                <div
+                  className="tx-row-right"
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    gap: "0.625rem",
+                  }}
+                >
                   <div style={{ textAlign: "right" }}>
                     <p className="tx-row-amount">
-                      {Number(invoice.amount).toLocaleString()} {invoice.currency}
+                      {Number(invoice.amount).toLocaleString()}{" "}
+                      {invoice.currency}
                     </p>
-                    <span className={statusBadge(invoice.status)} style={{ fontSize: "0.7rem" }}>
-                      {invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1)}
+                    <span
+                      className={statusBadge(invoice.status)}
+                      style={{ fontSize: "0.7rem" }}
+                    >
+                      {invoice.status.charAt(0).toUpperCase() +
+                        invoice.status.slice(1)}
                     </span>
                   </div>
-                  {isExpanded
-                    ? <ChevronUp size={16} style={{ color: "var(--color-text-muted)", flexShrink: 0 }} />
-                    : <ChevronDown size={16} style={{ color: "var(--color-text-muted)", flexShrink: 0 }} />
-                  }
+                  {isExpanded ? (
+                    <ChevronUp
+                      size={16}
+                      style={{
+                        color: "var(--color-text-muted)",
+                        flexShrink: 0,
+                      }}
+                    />
+                  ) : (
+                    <ChevronDown
+                      size={16}
+                      style={{
+                        color: "var(--color-text-muted)",
+                        flexShrink: 0,
+                      }}
+                    />
+                  )}
                 </div>
               </button>
 
