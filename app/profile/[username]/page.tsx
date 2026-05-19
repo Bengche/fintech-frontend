@@ -26,12 +26,7 @@ type Review = {
   created_at: string;
   reviewer_name: string;
 };
-type CompletedInvoice = {
-  invoicename: string;
-  amount: number;
-  currency: string;
-  delivered_at: string;
-};
+
 
 export default function SellerProfilePage() {
   const { username } = useParams<{ username: string }>();
@@ -39,9 +34,6 @@ export default function SellerProfilePage() {
   const { username: authUsername } = useAuth();
   const [seller, setSeller] = useState<Seller | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
-  const [completedInvoices, setCompletedInvoices] = useState<
-    CompletedInvoice[]
-  >([]);
   const [averageRating, setAverageRating] = useState(0);
   const [completedCount, setCompletedCount] = useState(0);
   const [totalSecured, setTotalSecured] = useState(0);
@@ -63,7 +55,6 @@ export default function SellerProfilePage() {
         const response = await Axios.get(`${API}/profile/${username}`);
         setSeller(response.data.seller);
         setReviews(response.data.reviews);
-        setCompletedInvoices(response.data.completedInvoices);
         setAverageRating(response.data.averageRating);
         setCompletedCount(response.data.completedCount);
         setTotalSecured(response.data.totalSecured || 0);
@@ -359,14 +350,16 @@ export default function SellerProfilePage() {
                   {seller.country}
                 </p>
               )}
-              <p
-                style={{
-                  margin: 0,
-                  fontSize: "0.8rem",
-                  color: "var(--color-text-muted)",
-                }}
-              >
-                {t("memberSince")} {formatDate(seller.createdat)}
+              <div style={{ margin: 0 }}>
+                <p
+                  style={{
+                    margin: "0 0 0.5rem",
+                    fontSize: "0.8rem",
+                    color: "var(--color-text-muted)",
+                  }}
+                >
+                  {t("memberSince")} {formatDate(seller.createdat)}
+                </p>
                 {/* KYC verification badge */}
                 {seller.kyc_status === "approved" ? (
                   <div
@@ -374,7 +367,6 @@ export default function SellerProfilePage() {
                       display: "inline-flex",
                       alignItems: "center",
                       gap: "0.35rem",
-                      marginTop: "0.5rem",
                       padding: "0.3rem 0.75rem",
                       borderRadius: "999px",
                       background: "rgba(22,163,74,0.1)",
@@ -393,7 +385,6 @@ export default function SellerProfilePage() {
                       display: "inline-flex",
                       alignItems: "center",
                       gap: "0.35rem",
-                      marginTop: "0.5rem",
                       padding: "0.3rem 0.75rem",
                       borderRadius: "999px",
                       background: "rgba(100,116,139,0.08)",
@@ -409,7 +400,7 @@ export default function SellerProfilePage() {
                       : t("notVerifiedBadge")}
                   </div>
                 )}
-              </p>
+              </div>
             </div>
           </div>
 
@@ -576,68 +567,6 @@ export default function SellerProfilePage() {
             </button>
           </form>
         </div>
-
-        {/* Completed Orders */}
-        <h2
-          style={{
-            fontSize: "1.0625rem",
-            fontWeight: 700,
-            color: "var(--color-text-heading)",
-            margin: "0 0 1rem",
-          }}
-        >
-          {t("completedOrders")}
-        </h2>
-        {completedInvoices.length === 0 ? (
-          <p
-            style={{ color: "var(--color-text-muted)", marginBottom: "1.5rem" }}
-          >
-            {t("noCompleted")}
-          </p>
-        ) : (
-          <div
-            className="seller-completed-list"
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "0.625rem",
-              marginBottom: "1.75rem",
-            }}
-          >
-            {completedInvoices.map((inv, index) => (
-              <div
-                key={index}
-                className="seller-completed-item"
-                style={{
-                  padding: "0.875rem 1rem",
-                  backgroundColor: "var(--color-white)",
-                  border: "1px solid var(--color-border)",
-                  borderRadius: "var(--radius-sm)",
-                }}
-              >
-                <p
-                  style={{
-                    fontWeight: 600,
-                    color: "var(--color-text-heading)",
-                    margin: "0 0 0.25rem",
-                  }}
-                >
-                  {inv.invoicename}
-                </p>
-                <p
-                  style={{
-                    margin: 0,
-                    fontSize: "0.8125rem",
-                    color: "var(--color-text-muted)",
-                  }}
-                >
-                  {inv.amount.toLocaleString()} {inv.currency} —{" "}
-                  {t("deliveredOn")} {formatDate(inv.delivered_at)}
-                </p>
-              </div>
-            ))}
-          </div>
-        )}
 
         {/* Reviews header */}
         <div

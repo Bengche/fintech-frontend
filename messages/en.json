@@ -1067,7 +1067,10 @@
     "modalDescription": "Description",
     "contactSeller": "Contact Seller",
     "generating": "Generating",
-    "receiptFetchError": "Failed to download receipt. Please try again."
+    "receiptFetchError": "Failed to download receipt. Please try again.",
+    "completedOrdersTitle": "Completed Orders",
+    "completedOrdersSubtitle": "Your successfully completed purchases",
+    "completedNoOrders": "No completed orders yet."
   },
   "Referral": {
     "loading": "Loading your referral dashboard…",

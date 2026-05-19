@@ -1067,7 +1067,10 @@
     "modalDescription": "Description",
     "contactSeller": "Contacter le vendeur",
     "generating": "Génération en cours",
-    "receiptFetchError": "Échec du téléchargement du reçu. Veuillez réessayer."
+    "receiptFetchError": "Échec du téléchargement du reçu. Veuillez réessayer.",
+    "completedOrdersTitle": "Commandes terminées",
+    "completedOrdersSubtitle": "Vos achats complétés avec succès",
+    "completedNoOrders": "Aucune commande terminée pour l'instant."
   },
   "Referral": {
     "loading": "Chargement de votre tableau de bord de parrainage…",

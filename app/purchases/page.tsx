@@ -175,12 +175,16 @@ function PurchaseDetailModal({
       );
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        setReceiptError((data as { message?: string }).message || t("receiptFetchError"));
+        setReceiptError(
+          (data as { message?: string }).message || t("receiptFetchError"),
+        );
         return;
       }
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
-      const isIOS = typeof navigator !== "undefined" && /iPad|iPhone|iPod/.test(navigator.userAgent);
+      const isIOS =
+        typeof navigator !== "undefined" &&
+        /iPad|iPhone|iPod/.test(navigator.userAgent);
       if (isIOS) {
         window.open(url, "_blank");
         setTimeout(() => URL.revokeObjectURL(url), 10000);
@@ -363,7 +367,14 @@ function PurchaseDetailModal({
           </div>
         )}
         {receiptError && (
-          <p style={{ marginTop: "0.75rem", fontSize: "0.8125rem", color: "var(--color-danger)", textAlign: "center" }}>
+          <p
+            style={{
+              marginTop: "0.75rem",
+              fontSize: "0.8125rem",
+              color: "var(--color-danger)",
+              textAlign: "center",
+            }}
+          >
             {receiptError}
           </p>
         )}
@@ -382,6 +393,7 @@ export default function PurchasesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [selected, setSelected] = useState<Purchase | null>(null);
+  const [completedSelected, setCompletedSelected] = useState<Purchase | null>(null);
 
   useEffect(() => {
     const fetchPurchases = async () => {
@@ -410,6 +422,8 @@ export default function PurchasesPage() {
   const deliveredCount = purchases.filter(
     (p) => p.status === "delivered" || p.status === "completed",
   ).length;
+
+  const completedPurchases = purchases.filter((p) => p.status === "completed");
 
   return (
     <div style={{ minHeight: "100vh", backgroundColor: "var(--color-cloud)" }}>
@@ -665,13 +679,150 @@ export default function PurchasesPage() {
             )}
           </>
         )}
+
+        {/* ── Completed Orders section ── */}
+        {!loading && !error && completedPurchases.length > 0 && (
+          <div style={{ marginTop: "2.5rem" }}>
+            {/* Section header */}
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                marginBottom: "0.875rem",
+                gap: "0.75rem",
+                flexWrap: "wrap",
+              }}
+            >
+              <div>
+                <h2
+                  style={{
+                    fontSize: "1.0625rem",
+                    fontWeight: 700,
+                    color: "var(--color-text-heading)",
+                    margin: "0 0 0.2rem",
+                    letterSpacing: "-0.01em",
+                  }}
+                >
+                  {t("completedOrdersTitle")}
+                </h2>
+                <p
+                  style={{
+                    margin: 0,
+                    fontSize: "0.8125rem",
+                    color: "var(--color-text-muted)",
+                  }}
+                >
+                  {t("completedOrdersSubtitle")}
+                </p>
+              </div>
+              <span
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  minWidth: "2rem",
+                  height: "1.625rem",
+                  padding: "0 0.6rem",
+                  borderRadius: "9999px",
+                  background: "rgba(22,163,74,0.1)",
+                  border: "1px solid rgba(22,163,74,0.28)",
+                  color: "#166534",
+                  fontSize: "0.8125rem",
+                  fontWeight: 700,
+                  letterSpacing: "0.01em",
+                }}
+              >
+                {completedPurchases.length}
+              </span>
+            </div>
+
+            {/* Completed orders list */}
+            <div className="tx-row-list">
+              {completedPurchases.map((p, i) => {
+                const pill = statusPill(p.status);
+                return (
+                  <button
+                    key={`completed-${p.invoicenumber}-${i}`}
+                    className="tx-row"
+                    onClick={() => setCompletedSelected(p)}
+                    aria-label={`${p.invoicename} — ${p.amount} ${p.currency}`}
+                    style={{ position: "relative" }}
+                  >
+                    {/* Green left accent bar */}
+                    <span
+                      style={{
+                        position: "absolute",
+                        left: 0,
+                        top: "20%",
+                        bottom: "20%",
+                        width: "3px",
+                        borderRadius: "0 3px 3px 0",
+                        background: "rgba(22,163,74,0.7)",
+                      }}
+                      aria-hidden="true"
+                    />
+                    <SellerAvatar purchase={p} size={40} />
+                    <div className="tx-row-body">
+                      <p className="tx-row-name">{p.invoicename}</p>
+                      <p className="tx-row-sub">
+                        <span
+                          style={{
+                            fontWeight: 600,
+                            color: "var(--color-text-body)",
+                          }}
+                        >
+                          {p.seller_name}
+                        </span>
+                        <span
+                          style={{
+                            color: "var(--color-border-strong)",
+                            margin: "0 0.3rem",
+                          }}
+                        >
+                          ·
+                        </span>
+                        <span>{shortDate(p.delivered_at || p.createdat)}</span>
+                      </p>
+                    </div>
+                    <div className="tx-row-right">
+                      <p className="tx-row-amount">
+                        {fmt(p.amount)} {p.currency}
+                      </p>
+                      <span
+                        className="tx-status-pill"
+                        style={{
+                          background: pill.bg,
+                          color: pill.color,
+                          border: `1px solid ${pill.border}`,
+                        }}
+                      >
+                        {statusLabel(p.status)}
+                      </span>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* ── Detail modal ── */}
+      {/* ── Purchase detail modal (all purchases) ── */}
       {selected && (
         <PurchaseDetailModal
           purchase={selected}
           onClose={() => setSelected(null)}
+          t={t}
+          router={router}
+        />
+      )}
+
+      {/* ── Completed order detail modal ── */}
+      {completedSelected && (
+        <PurchaseDetailModal
+          purchase={completedSelected}
+          onClose={() => setCompletedSelected(null)}
           t={t}
           router={router}
         />
