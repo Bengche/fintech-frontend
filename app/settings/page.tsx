@@ -1522,9 +1522,7 @@ function TwoFactorSection() {
           <p className="settings-2fa-body">
             {enabled ? t("twoFactor.onBody") : t("twoFactor.offBody")}
           </p>
-          <div
-            className={`settings-2fa-badge ${enabled ? "is-on" : "is-off"}`}
-          >
+          <div className={`settings-2fa-badge ${enabled ? "is-on" : "is-off"}`}>
             {enabled ? <BadgeCheck size={13} /> : <Clock size={13} />}
             {enabled ? t("twoFactor.enabled") : t("twoFactor.disabled")}
           </div>

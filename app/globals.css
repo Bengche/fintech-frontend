@@ -258,6 +258,8 @@ a:hover {
   font-weight: 600;
   padding: 0.2rem 0.625rem;
   border-radius: 9999px;
+  border: 1px solid;
+  text-transform: capitalize;
 }
 
 /* Auth + settings responsive polish */
@@ -394,9 +396,6 @@ a:hover {
     width: 100%;
     justify-content: center;
   }
-}
-  border: 1px solid;
-  text-transform: capitalize;
 }
 .badge-success {
   color: var(--color-success);

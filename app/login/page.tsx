@@ -334,7 +334,7 @@ export default function Login() {
                 color: "var(--color-text-muted)",
               }}
             >
-              {t("noAccount")} {" "}
+              {t("noAccount")}{" "}
               <Link
                 href="/register"
                 style={{ color: "var(--color-primary)", fontWeight: 600 }}
