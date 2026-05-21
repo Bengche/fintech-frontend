@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Axios from "axios";
 import { useTranslations } from "next-intl";
-import { useAuth } from "../../../context/UserContext";
+import { useAuth } from "../../../../context/UserContext";
 import Link from "next/link";
 
 const API = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
