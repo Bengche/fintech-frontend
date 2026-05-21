@@ -1239,7 +1239,10 @@
       "revokeError": "Failed to revoke that session.",
       "signOutDevice": "Sign out this device",
       "signingOut": "Signing out…",
-      "signOutError": "Failed to sign out. Please try again."
+      "signOutError": "Failed to sign out. Please try again.",
+      "manageLink": "View & manage active sessions",
+      "manageLinkHint": "See every device signed in to your account and revoke access instantly.",
+      "backToSettings": "Back to settings"
     },
     "delete": {
       "sectionTitle": "Delete account",

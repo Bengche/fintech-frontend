@@ -27,7 +27,6 @@ type Review = {
   reviewer_name: string;
 };
 
-
 export default function SellerProfilePage() {
   const { username } = useParams<{ username: string }>();
   const t = useTranslations("Profile");

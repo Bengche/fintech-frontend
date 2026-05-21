@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/context/UserContext";
 import { useTranslations } from "next-intl";
 import { X, ExternalLink, Download, MessageCircle } from "lucide-react";
 import Image from "next/image";
@@ -386,25 +385,22 @@ function PurchaseDetailModal({
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 export default function PurchasesPage() {
-  const { user_id } = useAuth();
   const t = useTranslations("Purchases");
   const router = useRouter();
   const [purchases, setPurchases] = useState<Purchase[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [selected, setSelected] = useState<Purchase | null>(null);
-  const [completedSelected, setCompletedSelected] = useState<Purchase | null>(null);
+  const [completedSelected, setCompletedSelected] = useState<Purchase | null>(
+    null,
+  );
 
   useEffect(() => {
     const fetchPurchases = async () => {
-      if (!user_id) return;
       try {
-        const res = await axios.get(
-          `${API}/transactions/purchases/${user_id}`,
-          {
-            withCredentials: true,
-          },
-        );
+        const res = await axios.get(`${API}/invoice/my-purchases`, {
+          withCredentials: true,
+        });
         setPurchases(res.data.purchases || []);
       } catch {
         setError(t("errorLoad"));
@@ -413,7 +409,7 @@ export default function PurchasesPage() {
       }
     };
     fetchPurchases();
-  }, [user_id, t]);
+  }, [t]);
 
   const totalSpent = purchases
     .filter((p) => ["paid", "delivered", "completed"].includes(p.status))

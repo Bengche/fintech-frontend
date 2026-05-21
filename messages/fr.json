@@ -1239,7 +1239,10 @@
       "revokeError": "Impossible de révoquer cette session.",
       "signOutDevice": "Déconnecter cet appareil",
       "signingOut": "Déconnexion…",
-      "signOutError": "Impossible de se déconnecter. Veuillez réessayer."
+      "signOutError": "Impossible de se déconnecter. Veuillez réessayer.",
+      "manageLink": "Voir et gérer les sessions actives",
+      "manageLinkHint": "Consultez chaque appareil connecté à votre compte et révoquez l'accès instantanément.",
+      "backToSettings": "Retour aux paramètres"
     },
     "delete": {
       "sectionTitle": "Supprimer le compte",

@@ -1191,6 +1191,14 @@ a:hover {
   white-space: nowrap;
 }
 
+.settings-sessions-link {
+  transition: box-shadow 0.18s, border-color 0.18s;
+}
+.settings-sessions-link:hover {
+  box-shadow: var(--shadow-card);
+  border-color: rgba(15, 31, 61, 0.16) !important;
+}
+
 .settings-form {
   width: 100%;
 }
