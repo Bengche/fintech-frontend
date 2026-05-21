@@ -24,6 +24,7 @@ type Transaction = {
   createdat: string;
   invoicename: string;
   invoicenumber: string;
+  gross_amount?: number;
 };
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -73,6 +74,7 @@ function fullDate(d: string) {
     year: "numeric",
     hour: "2-digit",
     minute: "2-digit",
+    hour12: true,
   });
 }
 
@@ -219,17 +221,36 @@ function TransactionDetailModal({
           </div>
           <div className="tx-modal-row">
             <span className="tx-modal-label">{t("modalType")}</span>
-            <span className="tx-modal-value">
-              {isReceived ? t("typePaymentReceived") : t("typePaymentSent")}
-            </span>
+            <span className="tx-modal-value">{pill.label}</span>
           </div>
+          {tx.transaction_type === "payout" &&
+            tx.gross_amount !== undefined &&
+            tx.gross_amount !== tx.amount && (
+              <>
+                <div className="tx-modal-row">
+                  <span className="tx-modal-label">{t("modalGrossAmount")}</span>
+                  <span className="tx-modal-value">
+                    {Number(tx.gross_amount).toLocaleString()} {tx.currency}
+                  </span>
+                </div>
+                <div className="tx-modal-row">
+                  <span className="tx-modal-label">{t("modalNetReceived")}</span>
+                  <span
+                    className="tx-modal-value"
+                    style={{ color: "var(--color-success)", fontWeight: 600 }}
+                  >
+                    {Number(tx.amount).toLocaleString()} {tx.currency}
+                  </span>
+                </div>
+              </>
+            )}
         </div>
 
         {/* Action buttons — only shown when there is a linked invoice */}
         {hasInvoice && (
           <div className="tx-modal-actions">
             <Link
-              href={`/pay/${tx.invoicenumber}`}
+              href={isReceived ? `/invoice/${tx.invoicenumber}` : `/pay/${tx.invoicenumber}`}
               className="btn-ghost"
               style={{
                 justifyContent: "center",

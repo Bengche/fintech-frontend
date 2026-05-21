@@ -1020,10 +1020,12 @@
     "viewInvoice": "Voir la facture",
     "modalTitle": "Détails de la transaction",
     "close": "Fermer",
-    "modalInvoiceName": "Facture",
-    "modalReference": "Référence",
+    "modalInvoiceName": "Nom de la facture",
+    "modalReference": "N° de facture",
     "modalDate": "Date et heure",
-    "modalType": "Type",
+    "modalType": "Statut",
+    "modalGrossAmount": "Montant brut",
+    "modalNetReceived": "Montant net reçu",
     "typePaymentReceived": "Paiement reçu",
     "typePaymentSent": "Paiement envoyé",
     "receiptFetchError": "Échec du téléchargement du reçu. Veuillez réessayer."
@@ -1257,6 +1259,24 @@
       "deleting": "Suppression…",
       "cancel": "Annuler",
       "error": "Impossible de supprimer le compte."
+    },
+    "twoFactor": {
+      "sectionTitle": "Authentification à deux facteurs",
+      "sectionSubtitle": "Ajoutez une couche de sécurité supplémentaire en exigeant un code de vérification par e-mail à chaque connexion.",
+      "onTitle": "L'authentification à deux facteurs est activée",
+      "offTitle": "L'authentification à deux facteurs est désactivée",
+      "onBody": "Votre compte est protégé. Un code de vérification sera envoyé à votre adresse e-mail à chaque connexion.",
+      "offBody": "Votre compte repose uniquement sur votre mot de passe. Activer la 2FA réduit considérablement le risque d'accès non autorisé.",
+      "enabled": "Activée",
+      "disabled": "Non activée",
+      "enable": "Activer l'authentification à deux facteurs",
+      "disable": "Désactiver l'authentification à deux facteurs",
+      "saving": "Enregistrement…",
+      "enabledSuccess": "L'authentification à deux facteurs a été activée. Un code sera requis à chaque connexion.",
+      "disabledSuccess": "L'authentification à deux facteurs a été désactivée.",
+      "loadError": "Impossible de charger l’état de l’authentification à deux facteurs.",
+      "error": "Impossible de mettre à jour l’authentification à deux facteurs. Veuillez réessayer.",
+      "note": "Lorsqu’elle est activée, Fonlok envoie un code à usage unique à votre adresse e-mail enregistrée à chaque connexion. Les codes expirent après 10 minutes."
     }
   },
   "Profile": {

@@ -1020,10 +1020,12 @@
     "viewInvoice": "View Invoice",
     "modalTitle": "Transaction Details",
     "close": "Close",
-    "modalInvoiceName": "Invoice",
-    "modalReference": "Reference",
+    "modalInvoiceName": "Invoice Name",
+    "modalReference": "Invoice No.",
     "modalDate": "Date & Time",
-    "modalType": "Type",
+    "modalType": "Status",
+    "modalGrossAmount": "Gross Amount",
+    "modalNetReceived": "Net Received",
     "typePaymentReceived": "Payment received",
     "typePaymentSent": "Payment sent",
     "receiptFetchError": "Failed to download receipt. Please try again."
@@ -1257,6 +1259,24 @@
       "deleting": "Deleting…",
       "cancel": "Cancel",
       "error": "Failed to delete account."
+    },
+    "twoFactor": {
+      "sectionTitle": "Two-factor authentication",
+      "sectionSubtitle": "Add an extra layer of security to your account by requiring an email verification code every time you sign in.",
+      "onTitle": "Two-factor authentication is on",
+      "offTitle": "Two-factor authentication is off",
+      "onBody": "Your account is protected. A verification code will be sent to your email each time you sign in.",
+      "offBody": "Your account relies on your password alone. Enabling 2FA significantly reduces the risk of unauthorised access.",
+      "enabled": "Enabled",
+      "disabled": "Not enabled",
+      "enable": "Enable two-factor authentication",
+      "disable": "Disable two-factor authentication",
+      "saving": "Saving…",
+      "enabledSuccess": "Two-factor authentication has been enabled. A code will be required at every sign-in.",
+      "disabledSuccess": "Two-factor authentication has been disabled.",
+      "loadError": "Failed to load two-factor authentication status.",
+      "error": "Failed to update two-factor authentication. Please try again.",
+      "note": "When enabled, Fonlok will send a one-time code to your registered email address each time you sign in. Codes expire after 10 minutes."
     }
   },
   "Profile": {
