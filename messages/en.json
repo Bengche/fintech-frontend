@@ -1740,7 +1740,7 @@
     "submitting": "Submitting...",
     "success": "Review submitted",
     "successBody": "Thank you for your feedback. Your review will appear on the seller's profile.",
-    "alreadyReviewed": "You have already left a review for this transaction.",
+    "alreadyReviewed": "You have already left a review of this type for this seller. Select the opposite option if you want to change it.",
     "notEligible": "You can only leave a review for a seller after releasing funds for their invoice.",
     "loadError": "Could not load review information. Please try again.",
     "choiceRequired": "Please select Positive or Negative before submitting.",

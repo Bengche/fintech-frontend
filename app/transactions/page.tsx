@@ -413,7 +413,8 @@ export default function TransactionsPage() {
 
   const sortByNewest = (txs: Transaction[]) =>
     [...txs].sort(
-      (a, b) => new Date(b.createdat).getTime() - new Date(a.createdat).getTime(),
+      (a, b) =>
+        new Date(b.createdat).getTime() - new Date(a.createdat).getTime(),
     );
 
   const activeTransactions =

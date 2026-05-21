@@ -1740,7 +1740,7 @@
     "submitting": "Envoi en cours...",
     "success": "Avis soumis",
     "successBody": "Merci pour votre retour. Votre avis apparaîtra sur le profil du vendeur.",
-    "alreadyReviewed": "Vous avez déjà laissé un avis pour cette transaction.",
+    "alreadyReviewed": "Vous avez déjà laissé un avis de ce type pour ce vendeur. Choisissez l'option opposée si vous souhaitez le modifier.",
     "notEligible": "Vous ne pouvez laisser un avis à un vendeur qu'après avoir libéré les fonds de sa facture.",
     "loadError": "Impossible de charger les informations. Veuillez réessayer.",
     "choiceRequired": "Veuillez sélectionner Positif ou Négatif avant de soumettre.",
