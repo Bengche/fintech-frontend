@@ -929,7 +929,10 @@
     "releaseCancel": "Cancel",
     "releasing": "Releasing…",
     "releaseSuccess": "Payment released successfully. The seller has been notified.",
-    "releaseErrorDefault": "Failed to release payment. Please try again."
+    "releaseErrorDefault": "Failed to release payment. Please try again.",
+    "reviewPromptTitle": "Share your experience",
+    "reviewPromptBody": "How was your experience with this seller? Your review helps the Fonlok community.",
+    "reviewPromptCta": "Leave a Review"
   },
   "Dashboard": {
     "title": "Dashboard",
@@ -1144,6 +1147,21 @@
       "whatsapp": "Share on WhatsApp",
       "whatsappText": "Hi, you can verify my profile and start a secure escrow deal here: {url}"
     },
+    "bioTags": {
+      "sectionTitle": "Bio & service tags",
+      "sectionSubtitle": "Add a short bio and tags that describe your services. These appear on your public profile.",
+      "bioLabel": "Short bio",
+      "bioPlaceholder": "Briefly describe what you do and who you work with…",
+      "bioCounter": "{count}/160",
+      "tagsLabel": "Service tags",
+      "tagsPlaceholder": "Add a tag (e.g. Web design)",
+      "addTag": "Add",
+      "removeTag": "Remove tag",
+      "save": "Save bio & tags",
+      "saving": "Saving…",
+      "success": "Bio and tags updated successfully.",
+      "error": "Failed to save. Please try again."
+    },
     "emailLanguage": {
       "sectionTitle": "Email language",
       "sectionSubtitle": "Choose the language used for account emails and attached receipts. English stays the default unless you switch to French.",
@@ -1346,7 +1364,32 @@
     "sendDealRequest": "Send deal request",
     "sending": "Sending…",
     "dealRequestSuccess": "Request sent. The seller has received your message and can create an invoice for you.",
-    "dealRequestError": "Failed to send your request. Please try again."
+    "dealRequestError": "Failed to send your request. Please try again.",
+    "disputeRate": "Dispute rate",
+    "successRate": "Success rate",
+    "idVerified": "ID verified",
+    "phoneVerified": "Phone verified",
+    "emailVerified": "Email verified",
+    "invoiceTag": "Invoice",
+    "pinReview": "Pin",
+    "unpinReview": "Unpin",
+    "replyToReview": "Reply",
+    "sellerReply": "Seller reply",
+    "submitReply": "Post reply",
+    "cancelReply": "Cancel",
+    "replyPlaceholder": "Write a professional reply to this review…",
+    "replySuccess": "Reply posted.",
+    "replyError": "Failed to post reply. Please try again.",
+    "pinSuccess": "Review pinned.",
+    "unpinSuccess": "Review unpinned.",
+    "pinError": "Failed to update pin. Please try again.",
+    "showMoreReviews": "Show all {count} reviews",
+    "showLessReviews": "Show fewer reviews",
+    "escrowStripTitle": "How does Fonlok protect you?",
+    "escrowStripBody": "Your payment is held by Fonlok until you confirm that the seller delivered as agreed. If there is a problem, you can open a dispute.",
+    "safeEscrow": "Funds held in escrow",
+    "safeGuarantee": "Full buyer protection",
+    "safeDelivery": "You control the release"
   },
   "Kyc": {
     "pageTitle": "Identity verification",
@@ -1680,5 +1723,28 @@
     "gross": "Gross",
     "held": "Held securely in escrow",
     "refresh": "Refresh balance"
+  },
+  "Review": {
+    "pageTitle": "Leave a Review",
+    "subtitle": "Share your experience with this seller to help others in the Fonlok community.",
+    "positiveChoice": "Positive",
+    "negativeChoice": "Negative",
+    "positiveHint": "Smooth transaction, delivered as promised",
+    "negativeHint": "Issues with delivery or communication",
+    "commentLabel": "Comment (optional)",
+    "commentPlaceholder": "Tell others about your experience with this seller...",
+    "commentMax": "{count}/1000",
+    "showInvoiceNameLabel": "Show invoice name on my review",
+    "submit": "Submit Review",
+    "submitting": "Submitting...",
+    "success": "Review submitted",
+    "successBody": "Thank you for your feedback. Your review will appear on the seller's profile.",
+    "alreadyReviewed": "You have already left a review for this transaction.",
+    "notEligible": "You can only leave a review for a seller after releasing funds for their invoice.",
+    "loadError": "Could not load review information. Please try again.",
+    "choiceRequired": "Please select Positive or Negative before submitting.",
+    "backToProfile": "Back to seller profile",
+    "sellerLabel": "Seller",
+    "invoiceLabel": "Invoice"
   }
 }

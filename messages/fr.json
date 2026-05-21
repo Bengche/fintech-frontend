@@ -929,7 +929,10 @@
     "releaseCancel": "Annuler",
     "releasing": "En cours…",
     "releaseSuccess": "Paiement libéré avec succès. Le vendeur a été notifié.",
-    "releaseErrorDefault": "Échec de la libération du paiement. Veuillez réessayer."
+    "releaseErrorDefault": "Échec de la libération du paiement. Veuillez réessayer.",
+    "reviewPromptTitle": "Partagez votre expérience",
+    "reviewPromptBody": "Comment s'est passée votre expérience avec ce vendeur ? Votre avis aide la communauté Fonlok.",
+    "reviewPromptCta": "Laisser un avis"
   },
   "Dashboard": {
     "title": "Tableau de bord",
@@ -1144,6 +1147,21 @@
       "whatsapp": "Partager sur WhatsApp",
       "whatsappText": "Bonjour, vous pouvez vérifier mon profil et démarrer un deal escrow sécurisé ici : {url}"
     },
+    "bioTags": {
+      "sectionTitle": "Bio et tags de service",
+      "sectionSubtitle": "Ajoutez une courte bio et des tags décrivant vos services. Ils apparaîtront sur votre profil public.",
+      "bioLabel": "Courte bio",
+      "bioPlaceholder": "Décrivez brièvement ce que vous faites et avec qui vous travaillez…",
+      "bioCounter": "{count}/160",
+      "tagsLabel": "Tags de service",
+      "tagsPlaceholder": "Ajouter un tag (ex. Web design)",
+      "addTag": "Ajouter",
+      "removeTag": "Supprimer le tag",
+      "save": "Enregistrer la bio et les tags",
+      "saving": "Enregistrement…",
+      "success": "Bio et tags mis à jour avec succès.",
+      "error": "Échec de l'enregistrement. Veuillez réessayer."
+    },
     "emailLanguage": {
       "sectionTitle": "Langue des e-mails",
       "sectionSubtitle": "Choisissez la langue utilisée pour les e-mails du compte et les reçus joints. L'anglais reste la langue par défaut, sauf si vous passez au français.",
@@ -1346,7 +1364,32 @@
     "sendDealRequest": "Envoyer la demande",
     "sending": "Envoi…",
     "dealRequestSuccess": "Demande envoyée. Le vendeur a reçu votre message et peut créer une facture pour vous.",
-    "dealRequestError": "Impossible d'envoyer votre demande. Veuillez réessayer."
+    "dealRequestError": "Impossible d'envoyer votre demande. Veuillez réessayer.",
+    "disputeRate": "Taux de litige",
+    "successRate": "Taux de réussite",
+    "idVerified": "ID vérifié",
+    "phoneVerified": "Téléphone vérifié",
+    "emailVerified": "E-mail vérifié",
+    "invoiceTag": "Facture",
+    "pinReview": "Épingler",
+    "unpinReview": "Désépingler",
+    "replyToReview": "Répondre",
+    "sellerReply": "Réponse du vendeur",
+    "submitReply": "Publier la réponse",
+    "cancelReply": "Annuler",
+    "replyPlaceholder": "Rédigez une réponse professionnelle à cet avis…",
+    "replySuccess": "Réponse publiée.",
+    "replyError": "Échec de la publication. Veuillez réessayer.",
+    "pinSuccess": "Avis épinglé.",
+    "unpinSuccess": "Avis désépinglé.",
+    "pinError": "Échec de la mise à jour de l'épingle. Veuillez réessayer.",
+    "showMoreReviews": "Voir tous les {count} avis",
+    "showLessReviews": "Réduire les avis",
+    "escrowStripTitle": "Comment Fonlok vous protège-t-il ?",
+    "escrowStripBody": "Votre paiement est conservé par Fonlok jusqu'à ce que vous confirmiez la livraison. En cas de problème, vous pouvez ouvrir un litige.",
+    "safeEscrow": "Fonds en séquestre",
+    "safeGuarantee": "Protection acheteur complète",
+    "safeDelivery": "Vous contrôlez le déblocage"
   },
   "Kyc": {
     "pageTitle": "Vérification d'identité",
@@ -1680,5 +1723,28 @@
     "gross": "Brut",
     "held": "Détenu en sécurité en séquestre",
     "refresh": "Actualiser le solde"
+  },
+  "Review": {
+    "pageTitle": "Laisser un avis",
+    "subtitle": "Partagez votre expérience avec ce vendeur pour aider la communauté Fonlok.",
+    "positiveChoice": "Positif",
+    "negativeChoice": "Négatif",
+    "positiveHint": "Transaction fluide, livré comme promis",
+    "negativeHint": "Problèmes de livraison ou de communication",
+    "commentLabel": "Commentaire (facultatif)",
+    "commentPlaceholder": "Décrivez votre expérience avec ce vendeur...",
+    "commentMax": "{count}/1000",
+    "showInvoiceNameLabel": "Afficher le nom de la facture sur mon avis",
+    "submit": "Soumettre l'avis",
+    "submitting": "Envoi en cours...",
+    "success": "Avis soumis",
+    "successBody": "Merci pour votre retour. Votre avis apparaîtra sur le profil du vendeur.",
+    "alreadyReviewed": "Vous avez déjà laissé un avis pour cette transaction.",
+    "notEligible": "Vous ne pouvez laisser un avis à un vendeur qu'après avoir libéré les fonds de sa facture.",
+    "loadError": "Impossible de charger les informations. Veuillez réessayer.",
+    "choiceRequired": "Veuillez sélectionner Positif ou Négatif avant de soumettre.",
+    "backToProfile": "Retour au profil du vendeur",
+    "sellerLabel": "Vendeur",
+    "invoiceLabel": "Facture"
   }
 }

@@ -228,13 +228,17 @@ function TransactionDetailModal({
             tx.gross_amount !== tx.amount && (
               <>
                 <div className="tx-modal-row">
-                  <span className="tx-modal-label">{t("modalGrossAmount")}</span>
+                  <span className="tx-modal-label">
+                    {t("modalGrossAmount")}
+                  </span>
                   <span className="tx-modal-value">
                     {Number(tx.gross_amount).toLocaleString()} {tx.currency}
                   </span>
                 </div>
                 <div className="tx-modal-row">
-                  <span className="tx-modal-label">{t("modalNetReceived")}</span>
+                  <span className="tx-modal-label">
+                    {t("modalNetReceived")}
+                  </span>
                   <span
                     className="tx-modal-value"
                     style={{ color: "var(--color-success)", fontWeight: 600 }}
@@ -250,7 +254,11 @@ function TransactionDetailModal({
         {hasInvoice && (
           <div className="tx-modal-actions">
             <Link
-              href={isReceived ? `/invoice/${tx.invoicenumber}` : `/pay/${tx.invoicenumber}`}
+              href={
+                isReceived
+                  ? `/invoice/${tx.invoicenumber}`
+                  : `/pay/${tx.invoicenumber}`
+              }
               className="btn-ghost"
               style={{
                 justifyContent: "center",
