@@ -330,33 +330,38 @@ export default function SellerProfilePage() {
 
               {/* Badges row */}
               <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem" }}>
-                {/* Main KYC badge */}
+                {/* Main KYC / identity-verification badge */}
                 {seller.kyc_status === "approved" ? (
-                  <div style={{ display: "inline-flex", alignItems: "center", gap: "0.35rem", padding: "0.3rem 0.75rem", borderRadius: "999px", background: "rgba(22,163,74,0.1)", border: "1.5px solid rgba(22,163,74,0.3)", color: "#166534", fontSize: "0.78rem", fontWeight: 800 }}>
-                    <BadgeCheck size={14} />
+                  <div style={{ display: "inline-flex", alignItems: "center", gap: "0.35rem", padding: "0.3rem 0.85rem", borderRadius: "999px", background: "rgba(22,163,74,0.1)", border: "1.5px solid rgba(22,163,74,0.35)", color: "#166534", fontSize: "0.8rem", fontWeight: 800, letterSpacing: "0.01em" }}>
+                    <BadgeCheck size={15} />
                     {t("verifiedBadge")}
                   </div>
+                ) : seller.kyc_status === "pending" ? (
+                  <div style={{ display: "inline-flex", alignItems: "center", gap: "0.35rem", padding: "0.3rem 0.85rem", borderRadius: "999px", background: "rgba(245,158,11,0.1)", border: "1.5px solid rgba(245,158,11,0.35)", color: "#92400e", fontSize: "0.8rem", fontWeight: 700 }}>
+                    <ShieldAlert size={14} />
+                    {t("verificationPending")}
+                  </div>
                 ) : (
-                  <div style={{ display: "inline-flex", alignItems: "center", gap: "0.35rem", padding: "0.3rem 0.75rem", borderRadius: "999px", background: "rgba(100,116,139,0.08)", border: "1.5px solid rgba(100,116,139,0.2)", color: "#475569", fontSize: "0.78rem", fontWeight: 700 }}>
-                    <ShieldAlert size={13} />
-                    {seller.kyc_status === "pending" ? t("verificationPending") : t("notVerifiedBadge")}
+                  <div style={{ display: "inline-flex", alignItems: "center", gap: "0.35rem", padding: "0.3rem 0.85rem", borderRadius: "999px", background: "rgba(100,116,139,0.08)", border: "1.5px solid rgba(100,116,139,0.25)", color: "#64748b", fontSize: "0.8rem", fontWeight: 700 }}>
+                    <ShieldAlert size={14} />
+                    {t("notVerifiedBadge")}
                   </div>
                 )}
-                {/* Sub-badges */}
+                {/* Sub-badges for individual verifications */}
                 {verifiedBadges.id && (
-                  <div style={{ display: "inline-flex", alignItems: "center", gap: "0.25rem", padding: "0.25rem 0.6rem", borderRadius: "999px", background: "rgba(22,163,74,0.06)", border: "1px solid rgba(22,163,74,0.2)", color: "#15803d", fontSize: "0.73rem", fontWeight: 600 }}>
+                  <div style={{ display: "inline-flex", alignItems: "center", gap: "0.25rem", padding: "0.25rem 0.65rem", borderRadius: "999px", background: "rgba(22,163,74,0.06)", border: "1px solid rgba(22,163,74,0.22)", color: "#15803d", fontSize: "0.75rem", fontWeight: 600 }}>
                     <BadgeCheck size={12} style={{ flexShrink: 0 }} />
                     {t("idVerified")}
                   </div>
                 )}
                 {verifiedBadges.phone && (
-                  <div style={{ display: "inline-flex", alignItems: "center", gap: "0.25rem", padding: "0.25rem 0.6rem", borderRadius: "999px", background: "rgba(22,163,74,0.06)", border: "1px solid rgba(22,163,74,0.2)", color: "#15803d", fontSize: "0.73rem", fontWeight: 600 }}>
+                  <div style={{ display: "inline-flex", alignItems: "center", gap: "0.25rem", padding: "0.25rem 0.65rem", borderRadius: "999px", background: "rgba(22,163,74,0.06)", border: "1px solid rgba(22,163,74,0.22)", color: "#15803d", fontSize: "0.75rem", fontWeight: 600 }}>
                     <BadgeCheck size={12} style={{ flexShrink: 0 }} />
                     {t("phoneVerified")}
                   </div>
                 )}
                 {verifiedBadges.email && (
-                  <div style={{ display: "inline-flex", alignItems: "center", gap: "0.25rem", padding: "0.25rem 0.6rem", borderRadius: "999px", background: "rgba(22,163,74,0.06)", border: "1px solid rgba(22,163,74,0.2)", color: "#15803d", fontSize: "0.73rem", fontWeight: 600 }}>
+                  <div style={{ display: "inline-flex", alignItems: "center", gap: "0.25rem", padding: "0.25rem 0.65rem", borderRadius: "999px", background: "rgba(22,163,74,0.06)", border: "1px solid rgba(22,163,74,0.22)", color: "#15803d", fontSize: "0.75rem", fontWeight: 600 }}>
                     <BadgeCheck size={12} style={{ flexShrink: 0 }} />
                     {t("emailVerified")}
                   </div>

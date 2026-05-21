@@ -8,7 +8,7 @@ import { useAuth } from "@/context/UserContext";
 import { InlineSpinner } from "@/app/components/Spinner";
 import { useTranslations } from "next-intl";
 import { BRAND } from "@/config/brand";
-import { ShieldCheck, Clock3, BadgeCheck, LockKeyhole } from "lucide-react";
+import { ShieldCheck, ShieldAlert, Clock3, BadgeCheck, LockKeyhole } from "lucide-react";
 
 type InvoiceStats = {
   id: number;
@@ -456,29 +456,54 @@ export default function InvoicePage() {
                 <p style={{ margin: 0, fontWeight: 700, fontSize: "1.05rem" }}>
                   {sellerName}
                 </p>
-                {invoiceStats.seller_kyc_status === "approved" && (
+                {invoiceStats.seller_kyc_status === "approved" ? (
                   <div
                     style={{
                       display: "inline-flex",
                       alignItems: "center",
                       gap: "0.35rem",
-                      padding: "0.25rem 0.6rem",
+                      padding: "0.28rem 0.75rem",
                       borderRadius: "999px",
                       background: "rgba(34,197,94,0.15)",
-                      border: "1px solid rgba(34,197,94,0.3)",
+                      border: "1.5px solid rgba(34,197,94,0.4)",
                     }}
                   >
                     <BadgeCheck size={14} color="#22c55e" />
                     <span
                       style={{
-                        fontSize: "0.7rem",
+                        fontSize: "0.72rem",
                         fontWeight: 700,
-                        color: "#22c55e",
+                        color: "#4ade80",
                         letterSpacing: "0.03em",
                         textTransform: "uppercase",
                       }}
                     >
                       {t("verifiedBadge")}
+                    </span>
+                  </div>
+                ) : (
+                  <div
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "0.35rem",
+                      padding: "0.28rem 0.75rem",
+                      borderRadius: "999px",
+                      background: "rgba(251,191,36,0.12)",
+                      border: "1.5px solid rgba(251,191,36,0.35)",
+                    }}
+                  >
+                    <ShieldAlert size={13} color="#FCD34D" />
+                    <span
+                      style={{
+                        fontSize: "0.72rem",
+                        fontWeight: 700,
+                        color: "#FDE68A",
+                        letterSpacing: "0.03em",
+                        textTransform: "uppercase",
+                      }}
+                    >
+                      {t("notIdentityVerified")}
                     </span>
                   </div>
                 )}
