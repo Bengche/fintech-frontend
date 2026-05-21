@@ -68,9 +68,7 @@ export default function ReviewPage() {
       } else if (status === 403) {
         setNotEligible(true);
       } else {
-        setError(
-          e.response?.data?.message ?? t("loadError"),
-        );
+        setError(e.response?.data?.message ?? t("loadError"));
       }
     } finally {
       setSubmitting(false);
@@ -113,19 +111,25 @@ export default function ReviewPage() {
             </svg>
             {t("backToProfile")}
           </Link>
-          <h1 className="text-2xl font-bold text-slate-900">{t("pageTitle")}</h1>
+          <h1 className="text-2xl font-bold text-slate-900">
+            {t("pageTitle")}
+          </h1>
           <p className="text-sm text-slate-500 mt-1">{t("subtitle")}</p>
         </div>
 
         {/* Invoice + seller info strip */}
         <div className="mb-5 px-4 py-3 bg-white border border-slate-200 rounded-lg text-sm text-slate-600 flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4">
           <span>
-            <span className="font-semibold text-slate-800">{t("sellerLabel")}:</span>{" "}
+            <span className="font-semibold text-slate-800">
+              {t("sellerLabel")}:
+            </span>{" "}
             @{username}
           </span>
           <span className="hidden sm:block text-slate-300">|</span>
           <span>
-            <span className="font-semibold text-slate-800">{t("invoiceLabel")}:</span>{" "}
+            <span className="font-semibold text-slate-800">
+              {t("invoiceLabel")}:
+            </span>{" "}
             {invoice_number}
           </span>
         </div>
@@ -162,7 +166,9 @@ export default function ReviewPage() {
         {/* Already reviewed */}
         {!success && alreadyReviewed && (
           <div className="bg-amber-50 border border-amber-200 rounded-xl p-6 text-center">
-            <p className="font-semibold text-amber-800">{t("alreadyReviewed")}</p>
+            <p className="font-semibold text-amber-800">
+              {t("alreadyReviewed")}
+            </p>
             <Link
               href={`/profile/${username}`}
               className="mt-3 inline-block text-sm font-semibold text-amber-700 underline"

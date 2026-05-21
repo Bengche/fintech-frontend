@@ -411,8 +411,15 @@ export default function TransactionsPage() {
     }
   };
 
+  const sortByNewest = (txs: Transaction[]) =>
+    [...txs].sort(
+      (a, b) => new Date(b.createdat).getTime() - new Date(a.createdat).getTime(),
+    );
+
   const activeTransactions =
-    activeTab === "received" ? sellerTransactions : buyerTransactions;
+    activeTab === "received"
+      ? sortByNewest(sellerTransactions)
+      : sortByNewest(buyerTransactions);
 
   return (
     <div style={{ minHeight: "100vh", backgroundColor: "var(--color-cloud)" }}>

@@ -108,11 +108,14 @@ export default function BuyerChatPage() {
     setReleaseLoading(milestoneId);
     setReleaseError("");
     try {
-      const { data } = await Axios.post(`${API}/api/release-milestone/confirm`, {
-        invoice_number,
-        buyer_token: token,
-        milestone_id: milestoneId,
-      });
+      const { data } = await Axios.post(
+        `${API}/api/release-milestone/confirm`,
+        {
+          invoice_number,
+          buyer_token: token,
+          milestone_id: milestoneId,
+        },
+      );
       setReleaseConfirmId(null);
       setReleaseSuccessId(milestoneId);
       if (data.sellerUsername) {

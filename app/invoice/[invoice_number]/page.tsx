@@ -8,7 +8,13 @@ import { useAuth } from "@/context/UserContext";
 import { InlineSpinner } from "@/app/components/Spinner";
 import { useTranslations } from "next-intl";
 import { BRAND } from "@/config/brand";
-import { ShieldCheck, ShieldAlert, Clock3, BadgeCheck, LockKeyhole } from "lucide-react";
+import {
+  ShieldCheck,
+  ShieldAlert,
+  Clock3,
+  BadgeCheck,
+  LockKeyhole,
+} from "lucide-react";
 
 type InvoiceStats = {
   id: number;
@@ -337,10 +343,6 @@ export default function InvoicePage() {
             <HeroPill
               icon={<ShieldCheck size={14} />}
               label={t("guaranteeBadge")}
-            />
-            <HeroPill
-              icon={<BadgeCheck size={14} />}
-              label={t("sellerBadge")}
             />
             {countdown && !isExpired && (
               <HeroPill

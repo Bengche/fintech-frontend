@@ -208,7 +208,9 @@ export default function SettingsPage() {
           <BioTagsForm
             currentBio={profile?.bio ?? ""}
             currentTags={profile?.tags ?? []}
-            onSaved={(bio, tags) => setProfile((p) => (p ? { ...p, bio, tags } : p))}
+            onSaved={(bio, tags) =>
+              setProfile((p) => (p ? { ...p, bio, tags } : p))
+            }
           />
           <EmailLanguageForm
             current={profile?.preferred_email_language ?? "en"}
@@ -243,10 +245,16 @@ function BioTagsForm({
   const [tags, setTags] = useState<string[]>(currentTags);
   const [tagInput, setTagInput] = useState("");
   const [saving, setSaving] = useState(false);
-  const [feedback, setFeedback] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [feedback, setFeedback] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
 
   // Sync initial values when profile loads
-  useEffect(() => { setBio(currentBio); setTags(currentTags); }, [currentBio, currentTags]);
+  useEffect(() => {
+    setBio(currentBio);
+    setTags(currentTags);
+  }, [currentBio, currentTags]);
 
   const addTag = () => {
     const trimmed = tagInput.trim().slice(0, 40);
@@ -255,14 +263,19 @@ function BioTagsForm({
     setTagInput("");
   };
 
-  const removeTag = (tag: string) => setTags((prev) => prev.filter((t) => t !== tag));
+  const removeTag = (tag: string) =>
+    setTags((prev) => prev.filter((t) => t !== tag));
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setFeedback(null);
     setSaving(true);
     try {
-      await Axios.patch(`${API}/profile/bio-tags`, { bio: bio.trim(), tags }, { withCredentials: true });
+      await Axios.patch(
+        `${API}/profile/bio-tags`,
+        { bio: bio.trim(), tags },
+        { withCredentials: true },
+      );
       setFeedback({ type: "success", text: t("bioTags.success") });
       onSaved(bio.trim(), tags);
     } catch {
@@ -273,14 +286,38 @@ function BioTagsForm({
   };
 
   return (
-    <Section title={t("bioTags.sectionTitle")} subtitle={t("bioTags.sectionSubtitle")}>
-      <form onSubmit={handleSave} style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+    <Section
+      title={t("bioTags.sectionTitle")}
+      subtitle={t("bioTags.sectionSubtitle")}
+    >
+      <form
+        onSubmit={handleSave}
+        style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}
+      >
         <div>
-          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.375rem" }}>
-            <label className="settings-label" style={{ fontSize: "0.875rem", fontWeight: 600, color: "var(--color-text-heading)" }}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              marginBottom: "0.375rem",
+            }}
+          >
+            <label
+              className="settings-label"
+              style={{
+                fontSize: "0.875rem",
+                fontWeight: 600,
+                color: "var(--color-text-heading)",
+              }}
+            >
               {t("bioTags.bioLabel")}
             </label>
-            <span style={{ fontSize: "0.78rem", color: bio.length > 140 ? "#dc2626" : "var(--color-text-muted)" }}>
+            <span
+              style={{
+                fontSize: "0.78rem",
+                color: bio.length > 140 ? "#dc2626" : "var(--color-text-muted)",
+              }}
+            >
               {t("bioTags.bioCounter", { count: String(bio.length) })}
             </span>
           </div>
@@ -290,24 +327,69 @@ function BioTagsForm({
             value={bio}
             onChange={(e) => setBio(e.target.value.slice(0, 160))}
             maxLength={160}
-            style={{ minHeight: "80px", resize: "vertical", fontSize: "0.9rem" }}
+            style={{
+              minHeight: "80px",
+              resize: "vertical",
+              fontSize: "0.9rem",
+            }}
           />
         </div>
 
         <div>
-          <label className="settings-label" style={{ fontSize: "0.875rem", fontWeight: 600, color: "var(--color-text-heading)", display: "block", marginBottom: "0.5rem" }}>
+          <label
+            className="settings-label"
+            style={{
+              fontSize: "0.875rem",
+              fontWeight: 600,
+              color: "var(--color-text-heading)",
+              display: "block",
+              marginBottom: "0.5rem",
+            }}
+          >
             {t("bioTags.tagsLabel")}
           </label>
           {tags.length > 0 && (
-            <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem", marginBottom: "0.625rem" }}>
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                gap: "0.4rem",
+                marginBottom: "0.625rem",
+              }}
+            >
               {tags.map((tag) => (
-                <span key={tag} style={{ display: "inline-flex", alignItems: "center", gap: "0.3rem", padding: "0.25rem 0.65rem", borderRadius: "999px", background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.25)", color: "var(--color-accent)", fontSize: "0.8rem", fontWeight: 600 }}>
+                <span
+                  key={tag}
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "0.3rem",
+                    padding: "0.25rem 0.65rem",
+                    borderRadius: "999px",
+                    background: "rgba(245,158,11,0.1)",
+                    border: "1px solid rgba(245,158,11,0.25)",
+                    color: "var(--color-accent)",
+                    fontSize: "0.8rem",
+                    fontWeight: 600,
+                  }}
+                >
                   {tag}
                   <button
                     type="button"
                     aria-label={t("bioTags.removeTag")}
                     onClick={() => removeTag(tag)}
-                    style={{ background: "none", border: "none", cursor: "pointer", padding: 0, color: "inherit", display: "flex", alignItems: "center", fontSize: "1rem", lineHeight: 1, opacity: 0.7 }}
+                    style={{
+                      background: "none",
+                      border: "none",
+                      cursor: "pointer",
+                      padding: 0,
+                      color: "inherit",
+                      display: "flex",
+                      alignItems: "center",
+                      fontSize: "1rem",
+                      lineHeight: 1,
+                      opacity: 0.7,
+                    }}
                   >
                     &times;
                   </button>
@@ -322,11 +404,21 @@ function BioTagsForm({
                 placeholder={t("bioTags.tagsPlaceholder")}
                 value={tagInput}
                 onChange={(e) => setTagInput(e.target.value)}
-                onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addTag(); } }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    addTag();
+                  }
+                }}
                 maxLength={40}
                 style={{ flex: 1, fontSize: "0.9rem" }}
               />
-              <button type="button" className="btn-ghost" onClick={addTag} disabled={!tagInput.trim()}>
+              <button
+                type="button"
+                className="btn-ghost"
+                onClick={addTag}
+                disabled={!tagInput.trim()}
+              >
                 {t("bioTags.addTag")}
               </button>
             </div>
@@ -334,7 +426,12 @@ function BioTagsForm({
         </div>
 
         <Feedback msg={feedback} />
-        <button className="btn-primary" type="submit" disabled={saving} style={{ alignSelf: "flex-start" }}>
+        <button
+          className="btn-primary"
+          type="submit"
+          disabled={saving}
+          style={{ alignSelf: "flex-start" }}
+        >
           {saving ? t("bioTags.saving") : t("bioTags.save")}
         </button>
       </form>

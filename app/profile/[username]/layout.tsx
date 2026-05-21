@@ -48,19 +48,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const isVerified = data?.seller?.kyc_status === "approved";
 
   const rawPic = data?.seller?.profilepicture;
-  const picture =
-    rawPic
-      ? rawPic.startsWith("http")
-        ? rawPic
-        : `${API}/uploads/${rawPic}`
-      : `${SITE}/icons/icon-512.png`;
+  const picture = rawPic
+    ? rawPic.startsWith("http")
+      ? rawPic
+      : `${API}/uploads/${rawPic}`
+    : `${SITE}/icons/icon-512.png`;
 
   const verifiedLabel = isVerified ? " · ID Verified" : "";
   const title = `${name}${verifiedLabel} — Seller on Fonlok`;
-  const description =
-    bio
-      ? `${bio} · ${deals} deals completed · ${Math.round(secured).toLocaleString()} XAF secured via Fonlok escrow.`
-      : `${deals} deals completed · ${Math.round(secured).toLocaleString()} XAF secured with ${rating ? `${rating}/5 rating` : "Fonlok escrow"}. Pay ${name} safely — funds held until delivery confirmed.`;
+  const description = bio
+    ? `${bio} · ${deals} deals completed · ${Math.round(secured).toLocaleString()} XAF secured via Fonlok escrow.`
+    : `${deals} deals completed · ${Math.round(secured).toLocaleString()} XAF secured with ${rating ? `${rating}/5 rating` : "Fonlok escrow"}. Pay ${name} safely — funds held until delivery confirmed.`;
 
   return {
     title,
@@ -93,12 +91,11 @@ export default async function ProfileLayout({ params, children }: Props) {
   const rating = data?.averageRating ?? 0;
   const reviewCount = rating > 0 ? 1 : 0; // conservative; used as fallback
   const rawPic = data?.seller?.profilepicture;
-  const picture =
-    rawPic
-      ? rawPic.startsWith("http")
-        ? rawPic
-        : `${API}/uploads/${rawPic}`
-      : undefined;
+  const picture = rawPic
+    ? rawPic.startsWith("http")
+      ? rawPic
+      : `${API}/uploads/${rawPic}`
+    : undefined;
   const country = data?.seller?.country ?? "CM";
   const isVerified = data?.seller?.kyc_status === "approved";
 
@@ -109,22 +106,30 @@ export default async function ProfileLayout({ params, children }: Props) {
     url: `${SITE}/seller/${username}`,
     image: picture,
     description: data?.seller?.bio ?? undefined,
-    address: country ? { "@type": "PostalAddress", addressCountry: country } : undefined,
+    address: country
+      ? { "@type": "PostalAddress", addressCountry: country }
+      : undefined,
     memberOf: {
       "@type": "Organization",
       name: "Fonlok",
       url: SITE,
     },
-    ...(isVerified && { hasCredential: { "@type": "EducationalOccupationalCredential", name: "Fonlok ID Verified" } }),
-    ...(rating > 0 && deals > 0 && {
-      aggregateRating: {
-        "@type": "AggregateRating",
-        ratingValue: String(rating),
-        bestRating: "5",
-        worstRating: "1",
-        reviewCount: String(Math.max(reviewCount, deals)),
+    ...(isVerified && {
+      hasCredential: {
+        "@type": "EducationalOccupationalCredential",
+        name: "Fonlok ID Verified",
       },
     }),
+    ...(rating > 0 &&
+      deals > 0 && {
+        aggregateRating: {
+          "@type": "AggregateRating",
+          ratingValue: String(rating),
+          bestRating: "5",
+          worstRating: "1",
+          reviewCount: String(Math.max(reviewCount, deals)),
+        },
+      }),
     knowsAbout: data ? undefined : undefined,
   };
 
