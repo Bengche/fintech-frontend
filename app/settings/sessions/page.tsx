@@ -214,7 +214,11 @@ export default function ActiveSessionsPage() {
         >
           <div
             className="settings-session-summary-body"
-            style={{ display: "flex", gap: "0.75rem", alignItems: "flex-start" }}
+            style={{
+              display: "flex",
+              gap: "0.75rem",
+              alignItems: "flex-start",
+            }}
           >
             <div
               style={{
@@ -530,7 +534,9 @@ export default function ActiveSessionsPage() {
                         fontSize: "0.85rem",
                         fontWeight: 700,
                         cursor:
-                          revokeLoadingSid === session.sid ? "default" : "pointer",
+                          revokeLoadingSid === session.sid
+                            ? "default"
+                            : "pointer",
                         opacity: revokeLoadingSid === session.sid ? 0.6 : 1,
                       }}
                       className="settings-session-danger-btn"

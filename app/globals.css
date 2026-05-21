@@ -1192,7 +1192,9 @@ a:hover {
 }
 
 .settings-sessions-link {
-  transition: box-shadow 0.18s, border-color 0.18s;
+  transition:
+    box-shadow 0.18s,
+    border-color 0.18s;
 }
 .settings-sessions-link:hover {
   box-shadow: var(--shadow-card);

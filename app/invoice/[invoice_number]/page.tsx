@@ -305,6 +305,7 @@ export default function InvoicePage() {
                   fontSize: "clamp(1.45rem, 3vw, 2.25rem)",
                   fontWeight: 800,
                   lineHeight: 1.08,
+                  color: "var(--color-accent)",
                 }}
               >
                 {invoiceStats.invoicename || t("loading")}
