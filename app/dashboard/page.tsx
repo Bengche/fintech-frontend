@@ -230,10 +230,8 @@ export default function Dashboard() {
             <div
               style={{
                 display: "flex",
-                justifyContent: "space-between",
-                alignItems: "flex-start",
+                flexDirection: "column",
                 gap: "1rem",
-                flexWrap: "wrap",
               }}
             >
               <div style={{ flex: 1, minWidth: 0 }}>
@@ -254,6 +252,7 @@ export default function Dashboard() {
                       color: "#7f1d1d",
                       margin: "0 0 0.35rem",
                       lineHeight: 1.5,
+                      wordBreak: "break-word",
                     }}
                   >
                     Reason: {suspension.suspension_reason}
@@ -328,11 +327,12 @@ export default function Dashboard() {
                     color: "#fff",
                     border: "none",
                     borderRadius: "8px",
-                    padding: "0.5rem 1.1rem",
+                    padding: "0.65rem 1.1rem",
                     fontWeight: 700,
                     fontSize: "0.85rem",
                     cursor: "pointer",
-                    flexShrink: 0,
+                    width: "100%",
+                    textAlign: "center",
                   }}
                 >
                   Submit Appeal
@@ -341,7 +341,6 @@ export default function Dashboard() {
             </div>
           </div>
         )}
-
         {/* Appeal modal */}
         {showAppealModal && (
           <div

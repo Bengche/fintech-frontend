@@ -225,9 +225,13 @@ export default function AdminDashboard() {
   const [userActionErr, setUserActionErr] = useState("");
 
   // Users tab — suspend form state
-  const [suspendFormUserId, setSuspendFormUserId] = useState<number | null>(null);
+  const [suspendFormUserId, setSuspendFormUserId] = useState<number | null>(
+    null,
+  );
   const [suspendReason, setSuspendReason] = useState("");
-  const [suspendType, setSuspendType] = useState<"permanent" | "temporary">("temporary");
+  const [suspendType, setSuspendType] = useState<"permanent" | "temporary">(
+    "temporary",
+  );
   const [suspendDays, setSuspendDays] = useState("7");
   const [suspendSubmitting, setSuspendSubmitting] = useState(false);
 
@@ -500,7 +504,10 @@ export default function AdminDashboard() {
       setUserActionErr("Suspension reason is required.");
       return;
     }
-    if (suspendType === "temporary" && (isNaN(Number(suspendDays)) || Number(suspendDays) < 1)) {
+    if (
+      suspendType === "temporary" &&
+      (isNaN(Number(suspendDays)) || Number(suspendDays) < 1)
+    ) {
       setUserActionErr("Enter a valid number of days (minimum 1).");
       return;
     }
@@ -511,7 +518,8 @@ export default function AdminDashboard() {
         {
           reason: suspendReason.trim(),
           type: suspendType,
-          duration_days: suspendType === "temporary" ? Number(suspendDays) : undefined,
+          duration_days:
+            suspendType === "temporary" ? Number(suspendDays) : undefined,
         },
         { withCredentials: true },
       );
@@ -1290,167 +1298,262 @@ export default function AdminDashboard() {
                   const showSuspendForm = suspendFormUserId === uid;
                   return (
                     <Fragment key={String(u.id)}>
-                    <tr
-                      style={{ borderBottom: showSuspendForm ? "none" : "1px solid var(--color-border)" }}
-                    >
-                      <Td bold>{u.name}</Td>
-                      <Td muted>@{u.username}</Td>
-                      <Td>{u.email}</Td>
-                      <Td mono>{u.phone}</Td>
-                      <Td>{u.country}</Td>
-                      <Td>{u.invoice_count}</Td>
-                      <Td mono>{u.referral_code ?? "—"}</Td>
-                      <Td muted>{fmtDate(u.createdat)}</Td>
-                      <Td>
-                        <div style={{ display: "flex", gap: "0.3rem", flexWrap: "wrap" }}>
-                        <button
-                          disabled={isDeleting}
-                          onClick={async () => {
-                            const confirmed = window.confirm(
-                              `Permanently delete account for @${u.username || u.email}?\n\nThis cannot be undone. Their email and phone will be blocked from creating new accounts.`,
-                            );
-                            if (!confirmed) return;
-                            setUserActionMsg("");
-                            setUserActionErr("");
-                            setUserDeleteLoadingId(uid);
-                            try {
-                              const r = await axios.delete(
-                                `${API_URL}/admin/users/${uid}`,
-                                { withCredentials: true },
-                              );
-                              setUserActionMsg(
-                                r.data.message ?? "Account deleted.",
-                              );
-                              loadTab("users", false, 0);
-                            } catch (err: unknown) {
-                              setUserActionErr(
-                                axios.isAxiosError(err) &&
-                                  err.response?.data?.message
-                                  ? err.response.data.message
-                                  : "Failed to delete account.",
-                              );
-                            } finally {
-                              setUserDeleteLoadingId(null);
-                            }
-                          }}
-                          style={{
-                            background: "#991b1b",
-                            color: "#fff",
-                            border: "none",
-                            borderRadius: "6px",
-                            padding: "0.3rem 0.7rem",
-                            fontWeight: 700,
-                            fontSize: "0.76rem",
-                            cursor: isDeleting ? "not-allowed" : "pointer",
-                            opacity: isDeleting ? 0.6 : 1,
-                            whiteSpace: "nowrap",
-                          }}
-                        >
-                          {isDeleting ? "..." : "Delete"}
-                        </button>
-                        <button
-                          onClick={() => {
-                            setSuspendFormUserId(showSuspendForm ? null : uid);
-                            setSuspendReason("");
-                            setSuspendType("temporary");
-                            setSuspendDays("7");
-                            setUserActionMsg("");
-                            setUserActionErr("");
-                          }}
-                          style={{
-                            background: showSuspendForm ? "#64748b" : "#d97706",
-                            color: "#fff",
-                            border: "none",
-                            borderRadius: "6px",
-                            padding: "0.3rem 0.7rem",
-                            fontWeight: 700,
-                            fontSize: "0.76rem",
-                            cursor: "pointer",
-                            whiteSpace: "nowrap",
-                          }}
-                        >
-                          {showSuspendForm ? "Cancel" : "Suspend"}
-                        </button>
-                        <button
-                          onClick={() => setProfileUserId(uid)}
-                          style={{
-                            background: "#0F1F3D",
-                            color: "#fff",
-                            border: "none",
-                            borderRadius: "6px",
-                            padding: "0.3rem 0.7rem",
-                            fontWeight: 700,
-                            fontSize: "0.76rem",
-                            cursor: "pointer",
-                            whiteSpace: "nowrap",
-                          }}
-                        >
-                          Profile
-                        </button>
-                        </div>
-                      </Td>
-                    </tr>
-                    {showSuspendForm && (
-                      <tr style={{ borderBottom: "1px solid var(--color-border)" }}>
-                        <td colSpan={9} style={{ padding: "0.75rem 1rem", background: "#fffbeb" }}>
-                          <div style={{ display: "flex", flexWrap: "wrap", gap: "0.75rem", alignItems: "flex-end" }}>
-                            <div style={{ flex: "1 1 220px" }}>
-                              <label style={{ display: "block", fontSize: "0.78rem", fontWeight: 700, color: "#92400e", marginBottom: "3px" }}>
-                                Reason <span style={{ color: "#ef4444" }}>*</span>
-                              </label>
-                              <input
-                                type="text"
-                                value={suspendReason}
-                                onChange={(e) => setSuspendReason(e.target.value)}
-                                placeholder="e.g. Violation of terms of service"
-                                style={{ width: "100%", padding: "0.4rem 0.6rem", borderRadius: "6px", border: "1px solid #d97706", fontSize: "0.83rem", boxSizing: "border-box" }}
-                              />
-                            </div>
-                            <div style={{ flex: "0 0 130px" }}>
-                              <label style={{ display: "block", fontSize: "0.78rem", fontWeight: 700, color: "#92400e", marginBottom: "3px" }}>Type</label>
-                              <select
-                                value={suspendType}
-                                onChange={(e) => setSuspendType(e.target.value as "permanent" | "temporary")}
-                                style={{ width: "100%", padding: "0.4rem 0.6rem", borderRadius: "6px", border: "1px solid #d97706", fontSize: "0.83rem", background: "#fff" }}
-                              >
-                                <option value="temporary">Temporary</option>
-                                <option value="permanent">Permanent</option>
-                              </select>
-                            </div>
-                            {suspendType === "temporary" && (
-                              <div style={{ flex: "0 0 110px" }}>
-                                <label style={{ display: "block", fontSize: "0.78rem", fontWeight: 700, color: "#92400e", marginBottom: "3px" }}>Days</label>
-                                <input
-                                  type="number"
-                                  min="1"
-                                  value={suspendDays}
-                                  onChange={(e) => setSuspendDays(e.target.value)}
-                                  style={{ width: "100%", padding: "0.4rem 0.6rem", borderRadius: "6px", border: "1px solid #d97706", fontSize: "0.83rem", boxSizing: "border-box" }}
-                                />
-                              </div>
-                            )}
+                      <tr
+                        style={{
+                          borderBottom: showSuspendForm
+                            ? "none"
+                            : "1px solid var(--color-border)",
+                        }}
+                      >
+                        <Td bold>{u.name}</Td>
+                        <Td muted>@{u.username}</Td>
+                        <Td>{u.email}</Td>
+                        <Td mono>{u.phone}</Td>
+                        <Td>{u.country}</Td>
+                        <Td>{u.invoice_count}</Td>
+                        <Td mono>{u.referral_code ?? "—"}</Td>
+                        <Td muted>{fmtDate(u.createdat)}</Td>
+                        <Td>
+                          <div
+                            style={{
+                              display: "flex",
+                              gap: "0.3rem",
+                              flexWrap: "wrap",
+                            }}
+                          >
                             <button
-                              disabled={suspendSubmitting}
-                              onClick={() => submitSuspend(uid)}
+                              disabled={isDeleting}
+                              onClick={async () => {
+                                const confirmed = window.confirm(
+                                  `Permanently delete account for @${u.username || u.email}?\n\nThis cannot be undone. Their email and phone will be blocked from creating new accounts.`,
+                                );
+                                if (!confirmed) return;
+                                setUserActionMsg("");
+                                setUserActionErr("");
+                                setUserDeleteLoadingId(uid);
+                                try {
+                                  const r = await axios.delete(
+                                    `${API_URL}/admin/users/${uid}`,
+                                    { withCredentials: true },
+                                  );
+                                  setUserActionMsg(
+                                    r.data.message ?? "Account deleted.",
+                                  );
+                                  loadTab("users", false, 0);
+                                } catch (err: unknown) {
+                                  setUserActionErr(
+                                    axios.isAxiosError(err) &&
+                                      err.response?.data?.message
+                                      ? err.response.data.message
+                                      : "Failed to delete account.",
+                                  );
+                                } finally {
+                                  setUserDeleteLoadingId(null);
+                                }
+                              }}
                               style={{
-                                background: "#d97706",
+                                background: "#991b1b",
                                 color: "#fff",
                                 border: "none",
                                 borderRadius: "6px",
-                                padding: "0.45rem 1rem",
+                                padding: "0.3rem 0.7rem",
                                 fontWeight: 700,
-                                fontSize: "0.83rem",
-                                cursor: suspendSubmitting ? "not-allowed" : "pointer",
-                                opacity: suspendSubmitting ? 0.6 : 1,
+                                fontSize: "0.76rem",
+                                cursor: isDeleting ? "not-allowed" : "pointer",
+                                opacity: isDeleting ? 0.6 : 1,
                                 whiteSpace: "nowrap",
                               }}
                             >
-                              {suspendSubmitting ? "Suspending…" : "Confirm Suspend"}
+                              {isDeleting ? "..." : "Delete"}
+                            </button>
+                            <button
+                              onClick={() => {
+                                setSuspendFormUserId(
+                                  showSuspendForm ? null : uid,
+                                );
+                                setSuspendReason("");
+                                setSuspendType("temporary");
+                                setSuspendDays("7");
+                                setUserActionMsg("");
+                                setUserActionErr("");
+                              }}
+                              style={{
+                                background: showSuspendForm
+                                  ? "#64748b"
+                                  : "#d97706",
+                                color: "#fff",
+                                border: "none",
+                                borderRadius: "6px",
+                                padding: "0.3rem 0.7rem",
+                                fontWeight: 700,
+                                fontSize: "0.76rem",
+                                cursor: "pointer",
+                                whiteSpace: "nowrap",
+                              }}
+                            >
+                              {showSuspendForm ? "Cancel" : "Suspend"}
+                            </button>
+                            <button
+                              onClick={() => setProfileUserId(uid)}
+                              style={{
+                                background: "#0F1F3D",
+                                color: "#fff",
+                                border: "none",
+                                borderRadius: "6px",
+                                padding: "0.3rem 0.7rem",
+                                fontWeight: 700,
+                                fontSize: "0.76rem",
+                                cursor: "pointer",
+                                whiteSpace: "nowrap",
+                              }}
+                            >
+                              Profile
                             </button>
                           </div>
-                        </td>
+                        </Td>
                       </tr>
-                    )}
+                      {showSuspendForm && (
+                        <tr
+                          style={{
+                            borderBottom: "1px solid var(--color-border)",
+                          }}
+                        >
+                          <td
+                            colSpan={9}
+                            style={{
+                              padding: "0.75rem 1rem",
+                              background: "#fffbeb",
+                            }}
+                          >
+                            <div
+                              style={{
+                                display: "flex",
+                                flexWrap: "wrap",
+                                gap: "0.75rem",
+                                alignItems: "flex-end",
+                              }}
+                            >
+                              <div style={{ flex: "1 1 220px" }}>
+                                <label
+                                  style={{
+                                    display: "block",
+                                    fontSize: "0.78rem",
+                                    fontWeight: 700,
+                                    color: "#92400e",
+                                    marginBottom: "3px",
+                                  }}
+                                >
+                                  Reason{" "}
+                                  <span style={{ color: "#ef4444" }}>*</span>
+                                </label>
+                                <input
+                                  type="text"
+                                  value={suspendReason}
+                                  onChange={(e) =>
+                                    setSuspendReason(e.target.value)
+                                  }
+                                  placeholder="e.g. Violation of terms of service"
+                                  style={{
+                                    width: "100%",
+                                    padding: "0.4rem 0.6rem",
+                                    borderRadius: "6px",
+                                    border: "1px solid #d97706",
+                                    fontSize: "0.83rem",
+                                    boxSizing: "border-box",
+                                  }}
+                                />
+                              </div>
+                              <div style={{ flex: "0 0 130px" }}>
+                                <label
+                                  style={{
+                                    display: "block",
+                                    fontSize: "0.78rem",
+                                    fontWeight: 700,
+                                    color: "#92400e",
+                                    marginBottom: "3px",
+                                  }}
+                                >
+                                  Type
+                                </label>
+                                <select
+                                  value={suspendType}
+                                  onChange={(e) =>
+                                    setSuspendType(
+                                      e.target.value as
+                                        | "permanent"
+                                        | "temporary",
+                                    )
+                                  }
+                                  style={{
+                                    width: "100%",
+                                    padding: "0.4rem 0.6rem",
+                                    borderRadius: "6px",
+                                    border: "1px solid #d97706",
+                                    fontSize: "0.83rem",
+                                    background: "#fff",
+                                  }}
+                                >
+                                  <option value="temporary">Temporary</option>
+                                  <option value="permanent">Permanent</option>
+                                </select>
+                              </div>
+                              {suspendType === "temporary" && (
+                                <div style={{ flex: "0 0 110px" }}>
+                                  <label
+                                    style={{
+                                      display: "block",
+                                      fontSize: "0.78rem",
+                                      fontWeight: 700,
+                                      color: "#92400e",
+                                      marginBottom: "3px",
+                                    }}
+                                  >
+                                    Days
+                                  </label>
+                                  <input
+                                    type="number"
+                                    min="1"
+                                    value={suspendDays}
+                                    onChange={(e) =>
+                                      setSuspendDays(e.target.value)
+                                    }
+                                    style={{
+                                      width: "100%",
+                                      padding: "0.4rem 0.6rem",
+                                      borderRadius: "6px",
+                                      border: "1px solid #d97706",
+                                      fontSize: "0.83rem",
+                                      boxSizing: "border-box",
+                                    }}
+                                  />
+                                </div>
+                              )}
+                              <button
+                                disabled={suspendSubmitting}
+                                onClick={() => submitSuspend(uid)}
+                                style={{
+                                  background: "#d97706",
+                                  color: "#fff",
+                                  border: "none",
+                                  borderRadius: "6px",
+                                  padding: "0.45rem 1rem",
+                                  fontWeight: 700,
+                                  fontSize: "0.83rem",
+                                  cursor: suspendSubmitting
+                                    ? "not-allowed"
+                                    : "pointer",
+                                  opacity: suspendSubmitting ? 0.6 : 1,
+                                  whiteSpace: "nowrap",
+                                }}
+                              >
+                                {suspendSubmitting
+                                  ? "Suspending…"
+                                  : "Confirm Suspend"}
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      )}
                     </Fragment>
                   );
                 })}
