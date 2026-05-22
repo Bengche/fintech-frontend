@@ -275,23 +275,39 @@ export default function Dashboard() {
                   </p>
                 ) : (
                   <p
-                    style={{ fontSize: "0.83rem", color: "#9a3412", margin: "0 0 0.35rem" }}
+                    style={{
+                      fontSize: "0.83rem",
+                      color: "#9a3412",
+                      margin: "0 0 0.35rem",
+                    }}
                   >
                     This suspension is permanent.
                   </p>
                 )}
                 {suspension.appeal_status === "none" && (
-                  <p style={{ fontSize: "0.83rem", color: "#6b7280", margin: 0 }}>
-                    You may appeal this decision if you believe it was made in error.
+                  <p
+                    style={{ fontSize: "0.83rem", color: "#6b7280", margin: 0 }}
+                  >
+                    You may appeal this decision if you believe it was made in
+                    error.
                   </p>
                 )}
                 {suspension.appeal_status === "pending" && (
-                  <p style={{ fontSize: "0.83rem", color: "#92400e", margin: 0, fontWeight: 700 }}>
+                  <p
+                    style={{
+                      fontSize: "0.83rem",
+                      color: "#92400e",
+                      margin: 0,
+                      fontWeight: 700,
+                    }}
+                  >
                     Your appeal is under review. We will notify you by email.
                   </p>
                 )}
                 {suspension.appeal_status === "declined" && (
-                  <p style={{ fontSize: "0.83rem", color: "#991b1b", margin: 0 }}>
+                  <p
+                    style={{ fontSize: "0.83rem", color: "#991b1b", margin: 0 }}
+                  >
                     Your appeal was declined.
                     {suspension.appeal_admin_note && (
                       <span> Note: {suspension.appeal_admin_note}</span>
@@ -371,7 +387,9 @@ export default function Dashboard() {
                   lineHeight: 1.5,
                 }}
               >
-                Explain why you believe your account should be reinstated. Provide as much detail as possible. Our team will review your appeal within 1&ndash;3 business days.
+                Explain why you believe your account should be reinstated.
+                Provide as much detail as possible. Our team will review your
+                appeal within 1&ndash;3 business days.
               </p>
               {appealSuccess ? (
                 <div style={{ textAlign: "center", padding: "1rem 0" }}>
@@ -424,7 +442,8 @@ export default function Dashboard() {
                   <p
                     style={{
                       fontSize: "0.77rem",
-                      color: appealText.trim().length < 20 ? "#dc2626" : "#64748b",
+                      color:
+                        appealText.trim().length < 20 ? "#dc2626" : "#64748b",
                       margin: "0.35rem 0 0.75rem",
                     }}
                   >
@@ -465,9 +484,7 @@ export default function Dashboard() {
                     </button>
                     <button
                       onClick={submitAppeal}
-                      disabled={
-                        appealLoading || appealText.trim().length < 20
-                      }
+                      disabled={appealLoading || appealText.trim().length < 20}
                       style={{
                         background: "#0F1F3D",
                         color: "#fff",

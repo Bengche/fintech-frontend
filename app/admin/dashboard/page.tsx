@@ -166,10 +166,15 @@ export default function AdminDashboard() {
   const [suspensionFilter, setSuspensionFilter] = useState<
     "all" | "appeal_pending" | "permanent" | "temporary"
   >("all");
-  const [suspActionLoadingId, setSuspActionLoadingId] = useState<
-    number | null
-  >(null);
+  const [suspActionLoadingId, setSuspActionLoadingId] = useState<number | null>(
+    null,
+  );
   const [suspNoteById, setSuspNoteById] = useState<Record<number, string>>({});
+
+  // Users tab — delete action state
+  const [userDeleteLoadingId, setUserDeleteLoadingId] = useState<number | null>(null);
+  const [userActionMsg, setUserActionMsg] = useState("");
+  const [userActionErr, setUserActionErr] = useState("");
 
   // ── Platform Controls state ───────────────────────────────────────────────
   interface PlatformSettings {
@@ -888,6 +893,16 @@ export default function AdminDashboard() {
             onLoadMore={() => loadTab("users", true, users.page)}
             emptyMessage={t("dashboard.usersEmpty")}
           >
+            {userActionMsg && (
+              <div className="alert alert-success" style={{ marginBottom: "0.75rem" }}>
+                {userActionMsg}
+              </div>
+            )}
+            {userActionErr && (
+              <div className="alert alert-danger" style={{ marginBottom: "0.75rem" }}>
+                {userActionErr}
+              </div>
+            )}
             <table
               style={{
                 width: "100%",
@@ -905,24 +920,74 @@ export default function AdminDashboard() {
                   <Th>{t("dashboard.colInvoiceCount")}</Th>
                   <Th>{t("dashboard.colReferralCode")}</Th>
                   <Th>{t("dashboard.colJoined")}</Th>
+                  <Th>Actions</Th>
                 </tr>
               </thead>
               <tbody>
-                {users.data.map((u) => (
-                  <tr
-                    key={String(u.id)}
-                    style={{ borderBottom: "1px solid var(--color-border)" }}
-                  >
-                    <Td bold>{u.name}</Td>
-                    <Td muted>@{u.username}</Td>
-                    <Td>{u.email}</Td>
-                    <Td mono>{u.phone}</Td>
-                    <Td>{u.country}</Td>
-                    <Td>{u.invoice_count}</Td>
-                    <Td mono>{u.referral_code ?? "—"}</Td>
-                    <Td muted>{fmtDate(u.createdat)}</Td>
-                  </tr>
-                ))}
+                {users.data.map((u) => {
+                  const uid = Number(u.id);
+                  const isDeleting = userDeleteLoadingId === uid;
+                  return (
+                    <tr
+                      key={String(u.id)}
+                      style={{ borderBottom: "1px solid var(--color-border)" }}
+                    >
+                      <Td bold>{u.name}</Td>
+                      <Td muted>@{u.username}</Td>
+                      <Td>{u.email}</Td>
+                      <Td mono>{u.phone}</Td>
+                      <Td>{u.country}</Td>
+                      <Td>{u.invoice_count}</Td>
+                      <Td mono>{u.referral_code ?? "—"}</Td>
+                      <Td muted>{fmtDate(u.createdat)}</Td>
+                      <Td>
+                        <button
+                          disabled={isDeleting}
+                          onClick={async () => {
+                            const confirmed = window.confirm(
+                              `Permanently delete account for @${u.username || u.email}?\n\nThis cannot be undone. Their email and phone will be blocked from creating new accounts.`,
+                            );
+                            if (!confirmed) return;
+                            setUserActionMsg("");
+                            setUserActionErr("");
+                            setUserDeleteLoadingId(uid);
+                            try {
+                              const r = await axios.delete(
+                                `${API_URL}/admin/users/${uid}`,
+                                { withCredentials: true },
+                              );
+                              setUserActionMsg(r.data.message ?? "Account deleted.");
+                              loadTab("users", false, 0);
+                            } catch (err: unknown) {
+                              setUserActionErr(
+                                axios.isAxiosError(err) &&
+                                  err.response?.data?.message
+                                  ? err.response.data.message
+                                  : "Failed to delete account.",
+                              );
+                            } finally {
+                              setUserDeleteLoadingId(null);
+                            }
+                          }}
+                          style={{
+                            background: "#991b1b",
+                            color: "#fff",
+                            border: "none",
+                            borderRadius: "6px",
+                            padding: "0.3rem 0.7rem",
+                            fontWeight: 700,
+                            fontSize: "0.76rem",
+                            cursor: isDeleting ? "not-allowed" : "pointer",
+                            opacity: isDeleting ? 0.6 : 1,
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          {isDeleting ? "..." : "Delete"}
+                        </button>
+                      </Td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </TabSection>
@@ -2534,7 +2599,8 @@ function SuspensionsAdminTab({
       );
       const msgMap: Record<string, string> = {
         unsuspend: "Account reactivated and user notified.",
-        "appeal/accept": "Appeal accepted, account reinstated and user notified.",
+        "appeal/accept":
+          "Appeal accepted, account reinstated and user notified.",
         "appeal/decline": "Appeal declined and user notified.",
       };
       setActionMsg(msgMap[action] ?? "Done.");
@@ -2550,7 +2616,10 @@ function SuspensionsAdminTab({
     }
   };
 
-  const FILTERS: { key: "all" | "appeal_pending" | "permanent" | "temporary"; label: string }[] = [
+  const FILTERS: {
+    key: "all" | "appeal_pending" | "permanent" | "temporary";
+    label: string;
+  }[] = [
     { key: "all", label: "All" },
     { key: "appeal_pending", label: "Pending Appeals" },
     { key: "permanent", label: "Permanent" },
@@ -2667,7 +2736,11 @@ function SuspensionsAdminTab({
             >
               <div>
                 <div
-                  style={{ fontWeight: 800, fontSize: "0.95rem", color: "#0f172a" }}
+                  style={{
+                    fontWeight: 800,
+                    fontSize: "0.95rem",
+                    color: "#0f172a",
+                  }}
                 >
                   {String(row.name || "—")}
                   {row.username && (
@@ -2683,11 +2756,24 @@ function SuspensionsAdminTab({
                     </span>
                   )}
                 </div>
-                <div style={{ fontSize: "0.82rem", color: "#64748b", marginTop: "2px" }}>
+                <div
+                  style={{
+                    fontSize: "0.82rem",
+                    color: "#64748b",
+                    marginTop: "2px",
+                  }}
+                >
                   {String(row.email || "—")}
                 </div>
               </div>
-              <div style={{ display: "flex", gap: "0.4rem", flexWrap: "wrap", alignItems: "center" }}>
+              <div
+                style={{
+                  display: "flex",
+                  gap: "0.4rem",
+                  flexWrap: "wrap",
+                  alignItems: "center",
+                }}
+              >
                 {suspensionPill(row)}
                 {appealPill(row.appeal_status)}
               </div>
