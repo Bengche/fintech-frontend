@@ -1744,6 +1744,13 @@
     "notEligible": "Vous ne pouvez laisser un avis à un vendeur qu'après avoir libéré les fonds de sa facture.",
     "loadError": "Impossible de charger les informations. Veuillez réessayer.",
     "choiceRequired": "Veuillez sélectionner Positif ou Négatif avant de soumettre.",
+    "guestName": "Votre nom",
+    "guestNamePlaceholder": "Entrez votre nom",
+    "guestNameRequired": "Veuillez entrer votre nom.",
+    "guestEmail": "Votre adresse e-mail",
+    "guestEmailPlaceholder": "Entrez l'e-mail utilisé lors du paiement",
+    "guestEmailRequired": "Veuillez entrer votre adresse e-mail.",
+    "guestEmailHint": "Doit correspondre à l'e-mail que vous avez fourni lors du paiement.",
     "backToProfile": "Retour au profil du vendeur",
     "sellerLabel": "Vendeur",
     "invoiceLabel": "Facture"

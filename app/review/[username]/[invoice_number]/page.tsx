@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import Axios from "axios";
 import { useTranslations } from "next-intl";
 import { useAuth } from "../../../../context/UserContext";
@@ -15,7 +15,6 @@ export default function ReviewPage() {
     username: string;
     invoice_number: string;
   }>();
-  const router = useRouter();
   const t = useTranslations("Review");
   const { user_id, authLoading } = useAuth();
 
@@ -23,25 +22,34 @@ export default function ReviewPage() {
   const [comment, setComment] = useState("");
   const [showInvoiceName, setShowInvoiceName] = useState(false);
 
+  // Guest-only fields
+  const [guestName, setGuestName] = useState("");
+  const [guestEmail, setGuestEmail] = useState("");
+
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
   const [alreadyReviewed, setAlreadyReviewed] = useState(false);
   const [notEligible, setNotEligible] = useState(false);
   const [error, setError] = useState("");
 
-  // Redirect to login if not authenticated once auth check completes
-  useEffect(() => {
-    if (!authLoading && user_id === null) {
-      router.replace(
-        `/login?redirect=${encodeURIComponent(`/review/${username}/${invoice_number}`)}`,
-      );
-    }
-  }, [authLoading, user_id, router, username, invoice_number]);
+  // Auth is still used to decide whether to show guest fields, but we no
+  // longer redirect unauthenticated buyers to login.
+  const isGuest = !authLoading && !user_id;
 
   const handleSubmit = async () => {
     if (!reviewType) {
       setError(t("choiceRequired"));
       return;
+    }
+    if (isGuest) {
+      if (!guestName.trim()) {
+        setError(t("guestNameRequired"));
+        return;
+      }
+      if (!guestEmail.trim()) {
+        setError(t("guestEmailRequired"));
+        return;
+      }
     }
     setError("");
     setSubmitting(true);
@@ -54,6 +62,7 @@ export default function ReviewPage() {
           rating: reviewType === "positive" ? 5 : 1,
           comment: comment.trim() || undefined,
           show_invoice_name: showInvoiceName,
+          ...(isGuest && { reviewer_name: guestName.trim(), reviewer_email: guestEmail.trim() }),
         },
         { withCredentials: true },
       );
@@ -75,7 +84,7 @@ export default function ReviewPage() {
     }
   };
 
-  // Loading state
+  // Show spinner while auth state resolves so we know whether to show guest fields
   if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
@@ -83,9 +92,6 @@ export default function ReviewPage() {
       </div>
     );
   }
-
-  // Not logged in — will redirect
-  if (!user_id) return null;
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-start py-10 px-4">
@@ -194,6 +200,38 @@ export default function ReviewPage() {
         {/* Review form */}
         {!success && !alreadyReviewed && !notEligible && (
           <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+            {/* Guest identity fields — only shown when not logged in */}
+            {isGuest && (
+              <div className="p-5 border-b border-slate-100 flex flex-col gap-4">
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+                    {t("guestName")}
+                  </label>
+                  <input
+                    type="text"
+                    value={guestName}
+                    onChange={(e) => setGuestName(e.target.value)}
+                    placeholder={t("guestNamePlaceholder")}
+                    maxLength={100}
+                    className="w-full px-3 py-2.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-400 text-slate-800 placeholder:text-slate-400"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+                    {t("guestEmail")}
+                  </label>
+                  <input
+                    type="email"
+                    value={guestEmail}
+                    onChange={(e) => setGuestEmail(e.target.value)}
+                    placeholder={t("guestEmailPlaceholder")}
+                    className="w-full px-3 py-2.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-400 text-slate-800 placeholder:text-slate-400"
+                  />
+                  <p className="text-xs text-slate-400 mt-1">{t("guestEmailHint")}</p>
+                </div>
+              </div>
+            )}
+
             {/* Positive / Negative selector */}
             <div className="p-5 border-b border-slate-100">
               <div className="grid grid-cols-2 gap-3">

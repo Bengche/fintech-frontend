@@ -1744,6 +1744,13 @@
     "notEligible": "You can only leave a review for a seller after releasing funds for their invoice.",
     "loadError": "Could not load review information. Please try again.",
     "choiceRequired": "Please select Positive or Negative before submitting.",
+    "guestName": "Your Name",
+    "guestNamePlaceholder": "Enter your name",
+    "guestNameRequired": "Please enter your name.",
+    "guestEmail": "Your Email Address",
+    "guestEmailPlaceholder": "Enter the email you used at payment",
+    "guestEmailRequired": "Please enter your email address.",
+    "guestEmailHint": "Must match the email you provided when you made the payment.",
     "backToProfile": "Back to seller profile",
     "sellerLabel": "Seller",
     "invoiceLabel": "Invoice"
