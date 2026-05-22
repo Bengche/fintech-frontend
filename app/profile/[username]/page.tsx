@@ -234,7 +234,14 @@ export default function SellerProfilePage() {
     });
 
   const renderStars = (rating: number) => (
-    <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: "2px" }}>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "center",
+        gap: "2px",
+      }}
+    >
       {Array.from({ length: 5 }, (_, i) => (
         <Star
           key={i}
@@ -994,8 +1001,10 @@ export default function SellerProfilePage() {
                               fontSize: "0.68rem",
                               fontWeight: 700,
                               color: "var(--color-accent)",
-                              background: "rgba(var(--color-accent-rgb, 59,130,246),0.08)",
-                              border: "1px solid rgba(var(--color-accent-rgb, 59,130,246),0.2)",
+                              background:
+                                "rgba(var(--color-accent-rgb, 59,130,246),0.08)",
+                              border:
+                                "1px solid rgba(var(--color-accent-rgb, 59,130,246),0.2)",
                               borderRadius: "999px",
                               padding: "0.1rem 0.45rem",
                             }}
@@ -1006,20 +1015,32 @@ export default function SellerProfilePage() {
                         )}
                       </div>
                       {/* Stars row — always horizontal */}
-                      <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: "0.4rem" }}>
+                      <div
+                        style={{
+                          display: "flex",
+                          flexDirection: "row",
+                          alignItems: "center",
+                          gap: "0.4rem",
+                        }}
+                      >
                         {renderStars(review.rating)}
                         <span
                           style={{
                             fontSize: "0.72rem",
                             fontWeight: 700,
                             color: review.rating >= 4 ? "#16a34a" : "#dc2626",
-                            background: review.rating >= 4 ? "rgba(22,163,74,0.08)" : "rgba(220,38,38,0.08)",
+                            background:
+                              review.rating >= 4
+                                ? "rgba(22,163,74,0.08)"
+                                : "rgba(220,38,38,0.08)",
                             border: `1px solid ${review.rating >= 4 ? "rgba(22,163,74,0.2)" : "rgba(220,38,38,0.2)"}`,
                             borderRadius: "999px",
                             padding: "0.1rem 0.45rem",
                           }}
                         >
-                          {review.rating >= 4 ? t("positiveLabel") : t("negativeLabel")}
+                          {review.rating >= 4
+                            ? t("positiveLabel")
+                            : t("negativeLabel")}
                         </span>
                       </div>
                     </div>
@@ -1095,7 +1116,10 @@ export default function SellerProfilePage() {
                       >
                         <MessageSquare
                           size={12}
-                          style={{ marginRight: "0.3rem", verticalAlign: "middle" }}
+                          style={{
+                            marginRight: "0.3rem",
+                            verticalAlign: "middle",
+                          }}
                         />
                         {t("sellerReply")}
                       </p>
@@ -1137,7 +1161,10 @@ export default function SellerProfilePage() {
                     >
                       <button
                         className="btn-ghost"
-                        style={{ fontSize: "0.78rem", padding: "0.25rem 0.6rem" }}
+                        style={{
+                          fontSize: "0.78rem",
+                          padding: "0.25rem 0.6rem",
+                        }}
                         disabled={pinLoading[review.id]}
                         onClick={() => togglePin(review.id, !!review.pinned)}
                       >
@@ -1147,7 +1174,10 @@ export default function SellerProfilePage() {
                       {!review.seller_reply && (
                         <button
                           className="btn-ghost"
-                          style={{ fontSize: "0.78rem", padding: "0.25rem 0.6rem" }}
+                          style={{
+                            fontSize: "0.78rem",
+                            padding: "0.25rem 0.6rem",
+                          }}
                           onClick={() =>
                             setReplyOpen((prev) => ({
                               ...prev,
@@ -1163,45 +1193,68 @@ export default function SellerProfilePage() {
                   )}
 
                   {/* Reply form */}
-                  {isOwnProfile && replyOpen[review.id] && !review.seller_reply && (
-                    <div style={{ marginTop: "0.75rem" }}>
-                      <textarea
-                        className="input"
-                        placeholder={t("replyPlaceholder")}
-                        value={replyDraft[review.id] || ""}
-                        onChange={(e) =>
-                          setReplyDraft((prev) => ({
-                            ...prev,
-                            [review.id]: e.target.value,
-                          }))
-                        }
-                        maxLength={800}
-                        style={{ minHeight: "80px", resize: "vertical", fontSize: "0.875rem" }}
-                      />
-                      <div style={{ display: "flex", gap: "0.5rem", marginTop: "0.5rem" }}>
-                        <button
-                          className="btn-primary"
-                          style={{ fontSize: "0.8rem", padding: "0.35rem 0.875rem" }}
-                          disabled={
-                            replySubmitting[review.id] ||
-                            !(replyDraft[review.id] || "").trim()
+                  {isOwnProfile &&
+                    replyOpen[review.id] &&
+                    !review.seller_reply && (
+                      <div style={{ marginTop: "0.75rem" }}>
+                        <textarea
+                          className="input"
+                          placeholder={t("replyPlaceholder")}
+                          value={replyDraft[review.id] || ""}
+                          onChange={(e) =>
+                            setReplyDraft((prev) => ({
+                              ...prev,
+                              [review.id]: e.target.value,
+                            }))
                           }
-                          onClick={() => submitReply(review.id)}
+                          maxLength={800}
+                          style={{
+                            minHeight: "80px",
+                            resize: "vertical",
+                            fontSize: "0.875rem",
+                          }}
+                        />
+                        <div
+                          style={{
+                            display: "flex",
+                            gap: "0.5rem",
+                            marginTop: "0.5rem",
+                          }}
                         >
-                          {replySubmitting[review.id] ? "..." : t("submitReply")}
-                        </button>
-                        <button
-                          className="btn-ghost"
-                          style={{ fontSize: "0.8rem", padding: "0.35rem 0.875rem" }}
-                          onClick={() =>
-                            setReplyOpen((prev) => ({ ...prev, [review.id]: false }))
-                          }
-                        >
-                          {t("cancelReply")}
-                        </button>
+                          <button
+                            className="btn-primary"
+                            style={{
+                              fontSize: "0.8rem",
+                              padding: "0.35rem 0.875rem",
+                            }}
+                            disabled={
+                              replySubmitting[review.id] ||
+                              !(replyDraft[review.id] || "").trim()
+                            }
+                            onClick={() => submitReply(review.id)}
+                          >
+                            {replySubmitting[review.id]
+                              ? "..."
+                              : t("submitReply")}
+                          </button>
+                          <button
+                            className="btn-ghost"
+                            style={{
+                              fontSize: "0.8rem",
+                              padding: "0.35rem 0.875rem",
+                            }}
+                            onClick={() =>
+                              setReplyOpen((prev) => ({
+                                ...prev,
+                                [review.id]: false,
+                              }))
+                            }
+                          >
+                            {t("cancelReply")}
+                          </button>
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
                 </div>
               ))}
             </div>

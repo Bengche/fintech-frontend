@@ -62,7 +62,10 @@ export default function ReviewPage() {
           rating: reviewType === "positive" ? 5 : 1,
           comment: comment.trim() || undefined,
           show_invoice_name: showInvoiceName,
-          ...(isGuest && { reviewer_name: guestName.trim(), reviewer_email: guestEmail.trim() }),
+          ...(isGuest && {
+            reviewer_name: guestName.trim(),
+            reviewer_email: guestEmail.trim(),
+          }),
         },
         { withCredentials: true },
       );
@@ -227,7 +230,9 @@ export default function ReviewPage() {
                     placeholder={t("guestEmailPlaceholder")}
                     className="w-full px-3 py-2.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-400 text-slate-800 placeholder:text-slate-400"
                   />
-                  <p className="text-xs text-slate-400 mt-1">{t("guestEmailHint")}</p>
+                  <p className="text-xs text-slate-400 mt-1">
+                    {t("guestEmailHint")}
+                  </p>
                 </div>
               </div>
             )}
