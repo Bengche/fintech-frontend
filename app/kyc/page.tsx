@@ -210,6 +210,23 @@ function SelfieCaptureBox({
     setError(null);
     setStarting(true);
     try {
+      // Check current permission state before requesting
+      let permState: PermissionState | null = null;
+      try {
+        const status = await navigator.permissions.query({ name: "camera" as PermissionName });
+        permState = status.state;
+      } catch {
+        // Permissions API not supported in this browser — proceed anyway
+      }
+
+      if (permState === "denied") {
+        setError(
+          "Camera access has been blocked for this site. To fix this: tap the camera/lock icon in your browser's address bar → tap 'Reset permission' or 'Allow' → then reload this page.",
+        );
+        setStarting(false);
+        return;
+      }
+
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: "user", width: { ideal: 1280 }, height: { ideal: 720 } },
         audio: false,
@@ -221,8 +238,19 @@ function SelfieCaptureBox({
       }
       setCameraOn(true);
       setPreview(null);
-    } catch {
-      setError("Camera access denied. Please allow camera permissions in your browser and try again.");
+    } catch (err: unknown) {
+      const name = err instanceof Error ? err.name : "";
+      if (name === "NotAllowedError" || name === "PermissionDeniedError") {
+        setError(
+          "Camera access was denied. Tap the camera or lock icon in your browser's address bar, set camera to 'Allow', then tap 'Open Camera' again.",
+        );
+      } else if (name === "NotFoundError" || name === "DevicesNotFoundError") {
+        setError("No camera was found on this device. Please use a device with a front-facing camera.");
+      } else if (name === "NotReadableError" || name === "TrackStartError") {
+        setError("Your camera is in use by another app. Please close it and try again.");
+      } else {
+        setError("Could not start camera. Please ensure camera permissions are allowed for this site and try again.");
+      }
     } finally {
       setStarting(false);
     }
