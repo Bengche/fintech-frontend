@@ -184,12 +184,17 @@ export default function AdminDashboard() {
   const [inboxLoading, setInboxLoading] = useState(false);
   const [inboxLoaded, setInboxLoaded] = useState(false);
   const [inboxError, setInboxError] = useState("");
-  const [inboxStatusFilter, setInboxStatusFilter] = useState<"all" | "new" | "read" | "archived">("new");
+  const [inboxStatusFilter, setInboxStatusFilter] = useState<
+    "all" | "new" | "read" | "archived"
+  >("new");
   const [inboxUpdatingId, setInboxUpdatingId] = useState<number | null>(null);
 
   // User profile drilldown state
   const [profileUserId, setProfileUserId] = useState<number | null>(null);
-  const [profileData, setProfileData] = useState<Record<string, unknown> | null>(null);
+  const [profileData, setProfileData] = useState<Record<
+    string,
+    unknown
+  > | null>(null);
   const [profileLoading, setProfileLoading] = useState(false);
   const [profileError, setProfileError] = useState("");
 
@@ -203,7 +208,10 @@ export default function AdminDashboard() {
 
   // 2FA management (controls tab)
   const [twoFaEnabled, setTwoFaEnabled] = useState<boolean | null>(null);
-  const [twoFaSetupData, setTwoFaSetupData] = useState<{ base32: string; otpauthUrl: string } | null>(null);
+  const [twoFaSetupData, setTwoFaSetupData] = useState<{
+    base32: string;
+    otpauthUrl: string;
+  } | null>(null);
   const [twoFaOtp, setTwoFaOtp] = useState("");
   const [twoFaMsg, setTwoFaMsg] = useState("");
   const [twoFaErr, setTwoFaErr] = useState("");
@@ -635,9 +643,12 @@ export default function AdminDashboard() {
     setInboxError("");
     try {
       const q = status && status !== "all" ? `status=${status}&` : "";
-      const res = await axios.get(`${API_URL}/admin/feature-requests?${q}limit=30`, {
-        withCredentials: true,
-      });
+      const res = await axios.get(
+        `${API_URL}/admin/feature-requests?${q}limit=30`,
+        {
+          withCredentials: true,
+        },
+      );
       setInboxData(res.data.data);
       setInboxLoaded(true);
     } catch {
@@ -673,7 +684,9 @@ export default function AdminDashboard() {
     setProfileLoading(true);
     setProfileError("");
     axios
-      .get(`${API_URL}/admin/users/${profileUserId}/profile`, { withCredentials: true })
+      .get(`${API_URL}/admin/users/${profileUserId}/profile`, {
+        withCredentials: true,
+      })
       .then((r) => setProfileData(r.data))
       .catch(() => setProfileError("Failed to load profile."))
       .finally(() => setProfileLoading(false));
@@ -685,7 +698,11 @@ export default function AdminDashboard() {
     setTwoFaMsg("");
     setTwoFaErr("");
     try {
-      const r = await axios.post(`${API_URL}/admin/2fa/setup`, {}, { withCredentials: true });
+      const r = await axios.post(
+        `${API_URL}/admin/2fa/setup`,
+        {},
+        { withCredentials: true },
+      );
       setTwoFaSetupData(r.data);
     } catch {
       setTwoFaErr("Failed to start 2FA setup.");
@@ -699,14 +716,20 @@ export default function AdminDashboard() {
     setTwoFaMsg("");
     setTwoFaErr("");
     try {
-      await axios.post(`${API_URL}/admin/2fa/verify`, { token: twoFaOtp }, { withCredentials: true });
+      await axios.post(
+        `${API_URL}/admin/2fa/verify`,
+        { token: twoFaOtp },
+        { withCredentials: true },
+      );
       setTwoFaEnabled(true);
       setTwoFaSetupData(null);
       setTwoFaOtp("");
       setTwoFaMsg("2FA enabled successfully.");
     } catch (err: unknown) {
       setTwoFaErr(
-        axios.isAxiosError(err) ? (err.response?.data?.message ?? "Invalid code.") : "Invalid code.",
+        axios.isAxiosError(err)
+          ? (err.response?.data?.message ?? "Invalid code.")
+          : "Invalid code.",
       );
     } finally {
       setTwoFaLoading(false);
@@ -714,12 +737,21 @@ export default function AdminDashboard() {
   };
 
   const handle2FaDisable = async () => {
-    if (!window.confirm("Disable two-factor authentication? This makes admin login less secure.")) return;
+    if (
+      !window.confirm(
+        "Disable two-factor authentication? This makes admin login less secure.",
+      )
+    )
+      return;
     setTwoFaLoading(true);
     setTwoFaMsg("");
     setTwoFaErr("");
     try {
-      await axios.post(`${API_URL}/admin/2fa/disable`, {}, { withCredentials: true });
+      await axios.post(
+        `${API_URL}/admin/2fa/disable`,
+        {},
+        { withCredentials: true },
+      );
       setTwoFaEnabled(false);
       setTwoFaSetupData(null);
       setTwoFaMsg("2FA has been disabled.");
@@ -895,177 +927,269 @@ export default function AdminDashboard() {
         {/* ────────────────────── OVERVIEW TAB ──────────────────────────────── */}
         {activeTab === "overview" && (
           <>
-          <section
-            style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}
-          >
-            <h2
+            <section
               style={{
-                fontSize: "1.25rem",
-                fontWeight: 800,
-                color: "var(--color-text-heading)",
-                margin: 0,
+                display: "flex",
+                flexDirection: "column",
+                gap: "1.5rem",
               }}
             >
-              {t("dashboard.overviewTitle")}
-            </h2>
+              <h2
+                style={{
+                  fontSize: "1.25rem",
+                  fontWeight: 800,
+                  color: "var(--color-text-heading)",
+                  margin: 0,
+                }}
+              >
+                {t("dashboard.overviewTitle")}
+              </h2>
 
-            {statsLoading ? (
-              <p style={{ color: "var(--color-text-muted)" }}>
-                {t("dashboard.loadingStats")}
-              </p>
-            ) : stats ? (
-              <>
-                {/* First row: activity stats */}
-                <div
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns:
-                      "repeat(auto-fill, minmax(180px, 1fr))",
-                    gap: "1rem",
-                  }}
-                >
-                  <StatCard
-                    label={t("dashboard.statTotalUsers")}
-                    value={stats.totalUsers.toLocaleString()}
-                    color="blue"
-                    icon="👤"
-                  />
-                  <StatCard
-                    label={t("dashboard.statTotalInvoices")}
-                    value={stats.totalInvoices.toLocaleString()}
-                    color="indigo"
-                    icon="🧾"
-                  />
-                  <StatCard
-                    label={t("dashboard.statPayments")}
-                    value={stats.totalPaymentsCount.toLocaleString()}
-                    color="teal"
-                    icon="💳"
-                  />
-                  <StatCard
-                    label={t("dashboard.statPayouts")}
-                    value={stats.totalPayoutsCount.toLocaleString()}
-                    color="cyan"
-                    icon="📤"
-                  />
-                </div>
+              {statsLoading ? (
+                <p style={{ color: "var(--color-text-muted)" }}>
+                  {t("dashboard.loadingStats")}
+                </p>
+              ) : stats ? (
+                <>
+                  {/* First row: activity stats */}
+                  <div
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns:
+                        "repeat(auto-fill, minmax(180px, 1fr))",
+                      gap: "1rem",
+                    }}
+                  >
+                    <StatCard
+                      label={t("dashboard.statTotalUsers")}
+                      value={stats.totalUsers.toLocaleString()}
+                      color="blue"
+                      icon="👤"
+                    />
+                    <StatCard
+                      label={t("dashboard.statTotalInvoices")}
+                      value={stats.totalInvoices.toLocaleString()}
+                      color="indigo"
+                      icon="🧾"
+                    />
+                    <StatCard
+                      label={t("dashboard.statPayments")}
+                      value={stats.totalPaymentsCount.toLocaleString()}
+                      color="teal"
+                      icon="💳"
+                    />
+                    <StatCard
+                      label={t("dashboard.statPayouts")}
+                      value={stats.totalPayoutsCount.toLocaleString()}
+                      color="cyan"
+                      icon="📤"
+                    />
+                  </div>
 
-                {/* Second row: money stats */}
-                <div
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns:
-                      "repeat(auto-fill, minmax(220px, 1fr))",
-                    gap: "1rem",
-                  }}
-                >
-                  <StatCard
-                    label={t("dashboard.statVolume")}
-                    value={fmtXAF(stats.totalAmountProcessed)}
-                    color="green"
-                    icon="💰"
-                    large
-                  />
-                  <StatCard
-                    label={t("dashboard.statRevenue")}
-                    value={fmtXAF(stats.platformRevenue)}
-                    color="emerald"
-                    icon="📈"
-                    large
-                  />
-                  <StatCard
-                    label={t("dashboard.statEscrowBalance")}
-                    value={fmtXAF(stats.escrowBalance)}
-                    color="orange"
-                    icon="🔒"
-                    large
-                  />
-                  <StatCard
-                    label={t("dashboard.statPendingReferrals")}
-                    value={fmtXAF(stats.pendingReferralBalance)}
-                    color="violet"
-                    icon="⏳"
-                    large
-                  />
-                  <StatCard
-                    label={t("dashboard.statReferralsPaid")}
-                    value={fmtXAF(stats.totalReferralCommissionsPaid)}
-                    color="purple"
-                    icon="🤝"
-                    large
-                  />
-                </div>
+                  {/* Second row: money stats */}
+                  <div
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns:
+                        "repeat(auto-fill, minmax(220px, 1fr))",
+                      gap: "1rem",
+                    }}
+                  >
+                    <StatCard
+                      label={t("dashboard.statVolume")}
+                      value={fmtXAF(stats.totalAmountProcessed)}
+                      color="green"
+                      icon="💰"
+                      large
+                    />
+                    <StatCard
+                      label={t("dashboard.statRevenue")}
+                      value={fmtXAF(stats.platformRevenue)}
+                      color="emerald"
+                      icon="📈"
+                      large
+                    />
+                    <StatCard
+                      label={t("dashboard.statEscrowBalance")}
+                      value={fmtXAF(stats.escrowBalance)}
+                      color="orange"
+                      icon="🔒"
+                      large
+                    />
+                    <StatCard
+                      label={t("dashboard.statPendingReferrals")}
+                      value={fmtXAF(stats.pendingReferralBalance)}
+                      color="violet"
+                      icon="⏳"
+                      large
+                    />
+                    <StatCard
+                      label={t("dashboard.statReferralsPaid")}
+                      value={fmtXAF(stats.totalReferralCommissionsPaid)}
+                      color="purple"
+                      icon="🤝"
+                      large
+                    />
+                  </div>
 
-                {/* Third row: disputes & referrers */}
-                <div
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns:
-                      "repeat(auto-fill, minmax(180px, 1fr))",
-                    gap: "1rem",
-                  }}
-                >
-                  <StatCard
-                    label={t("dashboard.statOpenDisputes")}
-                    value={stats.openDisputes.toLocaleString()}
-                    color={stats.openDisputes > 0 ? "red" : "gray"}
-                    icon="⚠️"
-                  />
-                  <StatCard
-                    label={t("dashboard.statResolvedDisputes")}
-                    value={stats.resolvedDisputes.toLocaleString()}
-                    color="blue"
-                    icon="✅"
-                  />
-                  <StatCard
-                    label={t("dashboard.statReferrers")}
-                    value={stats.activeReferrers.toLocaleString()}
-                    color="violet"
-                    icon="🔗"
-                  />
-                </div>
-              </>
-            ) : (
-              <p style={{ color: "var(--color-text-muted)" }}>
-                {t("dashboard.noStats")}
+                  {/* Third row: disputes & referrers */}
+                  <div
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns:
+                        "repeat(auto-fill, minmax(180px, 1fr))",
+                      gap: "1rem",
+                    }}
+                  >
+                    <StatCard
+                      label={t("dashboard.statOpenDisputes")}
+                      value={stats.openDisputes.toLocaleString()}
+                      color={stats.openDisputes > 0 ? "red" : "gray"}
+                      icon="⚠️"
+                    />
+                    <StatCard
+                      label={t("dashboard.statResolvedDisputes")}
+                      value={stats.resolvedDisputes.toLocaleString()}
+                      color="blue"
+                      icon="✅"
+                    />
+                    <StatCard
+                      label={t("dashboard.statReferrers")}
+                      value={stats.activeReferrers.toLocaleString()}
+                      color="violet"
+                      icon="🔗"
+                    />
+                  </div>
+                </>
+              ) : (
+                <p style={{ color: "var(--color-text-muted)" }}>
+                  {t("dashboard.noStats")}
+                </p>
+              )}
+            </section>
+
+            {/* ── Revenue / users / payments sparklines ── */}
+            {analyticsLoading && (
+              <p
+                style={{
+                  color: "var(--color-text-muted)",
+                  padding: "0 1.5rem",
+                }}
+              >
+                Loading charts…
               </p>
             )}
-          </section>
-
-          {/* ── Revenue / users / payments sparklines ── */}
-          {analyticsLoading && (
-            <p style={{ color: "var(--color-text-muted)", padding: "0 1.5rem" }}>Loading charts…</p>
-          )}
-          {analytics && !analyticsLoading && (
-            <section style={{ padding: "0 1.5rem 1.5rem", display: "flex", flexWrap: "wrap", gap: "1rem" }}>
-              {[
-                { label: "Revenue (30d)", data: analytics.revenue, key: "total" as const, color: "#16a34a", fmt: (v: number) => `${v.toLocaleString()} XAF` },
-                { label: "New Users (30d)", data: analytics.users, key: "count" as const, color: "#2563eb", fmt: (v: number) => String(v) },
-                { label: "Payments (30d)", data: analytics.payments, key: "count" as const, color: "#7c3aed", fmt: (v: number) => String(v) },
-              ].map(({ label, data, key, color, fmt }) => {
-                const vals = data.map((d) => Number((d as Record<string, unknown>)[key]) || 0);
-                const max = Math.max(...vals, 1);
-                const total = vals.reduce((a, b) => a + b, 0);
-                const W = 240, H = 60, P = 4;
-                const pts = vals.length > 1
-                  ? vals.map((v, i) => `${P + (i / (vals.length - 1)) * (W - P * 2)},${H - P - ((v / max) * (H - P * 2))}`).join(" ")
-                  : "";
-                return (
-                  <div key={label} style={{ background: "var(--color-surface,#fff)", borderRadius: "12px", padding: "1rem 1.25rem", minWidth: "240px", flex: "1 1 240px", boxShadow: "0 1px 4px rgba(0,0,0,0.07)" }}>
-                    <p style={{ margin: "0 0 0.25rem", fontSize: "0.75rem", fontWeight: 700, color: "var(--color-text-muted)", textTransform: "uppercase", letterSpacing: "0.06em" }}>{label}</p>
-                    <p style={{ margin: "0 0 0.75rem", fontSize: "1.25rem", fontWeight: 800, color }}>{fmt(total)}</p>
-                    {pts && (
-                      <svg width={W} height={H} style={{ display: "block", overflow: "visible" }}>
-                        <polyline points={pts} fill="none" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
-                        <polyline points={`${P},${H} ${pts} ${P + ((vals.length - 1) / (vals.length - 1)) * (W - P * 2)},${H}`} fill={color} fillOpacity={0.08} stroke="none" />
-                      </svg>
-                    )}
-                  </div>
-                );
-              })}
-            </section>
-          )}
-        </>
+            {analytics && !analyticsLoading && (
+              <section
+                style={{
+                  padding: "0 1.5rem 1.5rem",
+                  display: "flex",
+                  flexWrap: "wrap",
+                  gap: "1rem",
+                }}
+              >
+                {[
+                  {
+                    label: "Revenue (30d)",
+                    data: analytics.revenue,
+                    key: "total" as const,
+                    color: "#16a34a",
+                    fmt: (v: number) => `${v.toLocaleString()} XAF`,
+                  },
+                  {
+                    label: "New Users (30d)",
+                    data: analytics.users,
+                    key: "count" as const,
+                    color: "#2563eb",
+                    fmt: (v: number) => String(v),
+                  },
+                  {
+                    label: "Payments (30d)",
+                    data: analytics.payments,
+                    key: "count" as const,
+                    color: "#7c3aed",
+                    fmt: (v: number) => String(v),
+                  },
+                ].map(({ label, data, key, color, fmt }) => {
+                  const vals = data.map(
+                    (d) => Number((d as Record<string, unknown>)[key]) || 0,
+                  );
+                  const max = Math.max(...vals, 1);
+                  const total = vals.reduce((a, b) => a + b, 0);
+                  const W = 240,
+                    H = 60,
+                    P = 4;
+                  const pts =
+                    vals.length > 1
+                      ? vals
+                          .map(
+                            (v, i) =>
+                              `${P + (i / (vals.length - 1)) * (W - P * 2)},${H - P - (v / max) * (H - P * 2)}`,
+                          )
+                          .join(" ")
+                      : "";
+                  return (
+                    <div
+                      key={label}
+                      style={{
+                        background: "var(--color-surface,#fff)",
+                        borderRadius: "12px",
+                        padding: "1rem 1.25rem",
+                        minWidth: "240px",
+                        flex: "1 1 240px",
+                        boxShadow: "0 1px 4px rgba(0,0,0,0.07)",
+                      }}
+                    >
+                      <p
+                        style={{
+                          margin: "0 0 0.25rem",
+                          fontSize: "0.75rem",
+                          fontWeight: 700,
+                          color: "var(--color-text-muted)",
+                          textTransform: "uppercase",
+                          letterSpacing: "0.06em",
+                        }}
+                      >
+                        {label}
+                      </p>
+                      <p
+                        style={{
+                          margin: "0 0 0.75rem",
+                          fontSize: "1.25rem",
+                          fontWeight: 800,
+                          color,
+                        }}
+                      >
+                        {fmt(total)}
+                      </p>
+                      {pts && (
+                        <svg
+                          width={W}
+                          height={H}
+                          style={{ display: "block", overflow: "visible" }}
+                        >
+                          <polyline
+                            points={pts}
+                            fill="none"
+                            stroke={color}
+                            strokeWidth={2}
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                          <polyline
+                            points={`${P},${H} ${pts} ${P + ((vals.length - 1) / (vals.length - 1)) * (W - P * 2)},${H}`}
+                            fill={color}
+                            fillOpacity={0.08}
+                            stroke="none"
+                          />
+                        </svg>
+                      )}
+                    </div>
+                  );
+                })}
+              </section>
+            )}
+          </>
         )}
 
         {/* ────────────────────── USERS TAB ─────────────────────────────────── */}
@@ -2684,62 +2808,189 @@ export default function AdminDashboard() {
 
             {/* ── Two-Factor Authentication ─── */}
             <div className="ctrl-card">
-              <h2 style={{ margin: "0 0 1.25rem", fontSize: "1.1rem", fontWeight: 700 }}>
+              <h2
+                style={{
+                  margin: "0 0 1.25rem",
+                  fontSize: "1.1rem",
+                  fontWeight: 700,
+                }}
+              >
                 Two-Factor Authentication (2FA)
               </h2>
-              {twoFaMsg && <div style={{ background: "#f0fdf4", border: "1px solid #86efac", color: "#166534", borderRadius: "8px", padding: "0.625rem 0.875rem", marginBottom: "0.75rem", fontSize: "0.875rem" }}>{twoFaMsg}</div>}
-              {twoFaErr && <div style={{ background: "#fef2f2", border: "1px solid #fca5a5", color: "#991b1b", borderRadius: "8px", padding: "0.625rem 0.875rem", marginBottom: "0.75rem", fontSize: "0.875rem" }}>{twoFaErr}</div>}
+              {twoFaMsg && (
+                <div
+                  style={{
+                    background: "#f0fdf4",
+                    border: "1px solid #86efac",
+                    color: "#166534",
+                    borderRadius: "8px",
+                    padding: "0.625rem 0.875rem",
+                    marginBottom: "0.75rem",
+                    fontSize: "0.875rem",
+                  }}
+                >
+                  {twoFaMsg}
+                </div>
+              )}
+              {twoFaErr && (
+                <div
+                  style={{
+                    background: "#fef2f2",
+                    border: "1px solid #fca5a5",
+                    color: "#991b1b",
+                    borderRadius: "8px",
+                    padding: "0.625rem 0.875rem",
+                    marginBottom: "0.75rem",
+                    fontSize: "0.875rem",
+                  }}
+                >
+                  {twoFaErr}
+                </div>
+              )}
               {twoFaEnabled === null ? (
-                <p style={{ color: "var(--color-text-muted)" }}>Loading 2FA status…</p>
+                <p style={{ color: "var(--color-text-muted)" }}>
+                  Loading 2FA status…
+                </p>
               ) : twoFaEnabled ? (
                 <div>
-                  <p style={{ color: "var(--color-text-body)", marginBottom: "1rem" }}>
-                    2FA is <strong style={{ color: "#16a34a" }}>enabled</strong>. Every login requires a valid TOTP code from your authenticator app.
+                  <p
+                    style={{
+                      color: "var(--color-text-body)",
+                      marginBottom: "1rem",
+                    }}
+                  >
+                    2FA is <strong style={{ color: "#16a34a" }}>enabled</strong>
+                    . Every login requires a valid TOTP code from your
+                    authenticator app.
                   </p>
-                  <button onClick={handle2FaDisable} disabled={twoFaLoading}
-                    style={{ padding: "0.5rem 1.25rem", borderRadius: "8px", background: "#991b1b", color: "#fff", border: "none", cursor: twoFaLoading ? "not-allowed" : "pointer", fontWeight: 700, opacity: twoFaLoading ? 0.6 : 1 }}>
+                  <button
+                    onClick={handle2FaDisable}
+                    disabled={twoFaLoading}
+                    style={{
+                      padding: "0.5rem 1.25rem",
+                      borderRadius: "8px",
+                      background: "#991b1b",
+                      color: "#fff",
+                      border: "none",
+                      cursor: twoFaLoading ? "not-allowed" : "pointer",
+                      fontWeight: 700,
+                      opacity: twoFaLoading ? 0.6 : 1,
+                    }}
+                  >
                     {twoFaLoading ? "…" : "Disable 2FA"}
                   </button>
                 </div>
               ) : twoFaSetupData ? (
                 <div>
-                  <p style={{ color: "var(--color-text-body)", marginBottom: "0.75rem", fontSize: "0.875rem" }}>
-                    Scan this QR code with your authenticator app (Google Authenticator, Authy, etc.),
-                    then enter the 6-digit code to confirm and enable 2FA.
+                  <p
+                    style={{
+                      color: "var(--color-text-body)",
+                      marginBottom: "0.75rem",
+                      fontSize: "0.875rem",
+                    }}
+                  >
+                    Scan this QR code with your authenticator app (Google
+                    Authenticator, Authy, etc.), then enter the 6-digit code to
+                    confirm and enable 2FA.
                   </p>
                   <div style={{ marginBottom: "1rem" }}>
                     <QRCodeSVG value={twoFaSetupData.otpauthUrl} size={180} />
                   </div>
-                  <p style={{ fontSize: "0.75rem", color: "var(--color-text-muted)", marginBottom: "0.75rem", fontFamily: "monospace", wordBreak: "break-all" }}>
+                  <p
+                    style={{
+                      fontSize: "0.75rem",
+                      color: "var(--color-text-muted)",
+                      marginBottom: "0.75rem",
+                      fontFamily: "monospace",
+                      wordBreak: "break-all",
+                    }}
+                  >
                     Manual key: {twoFaSetupData.base32}
                   </p>
-                  <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+                  <div
+                    style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}
+                  >
                     <input
                       type="text"
                       inputMode="numeric"
                       value={twoFaOtp}
-                      onChange={(e) => setTwoFaOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                      onChange={(e) =>
+                        setTwoFaOtp(
+                          e.target.value.replace(/\D/g, "").slice(0, 6),
+                        )
+                      }
                       placeholder="6-digit code"
                       maxLength={6}
-                      style={{ padding: "0.5rem 0.75rem", borderRadius: "8px", border: "1px solid var(--color-border)", fontSize: "1rem", width: "9rem", letterSpacing: "0.25em" }}
+                      style={{
+                        padding: "0.5rem 0.75rem",
+                        borderRadius: "8px",
+                        border: "1px solid var(--color-border)",
+                        fontSize: "1rem",
+                        width: "9rem",
+                        letterSpacing: "0.25em",
+                      }}
                     />
-                    <button onClick={handle2FaVerify} disabled={twoFaLoading || twoFaOtp.length !== 6}
-                      style={{ padding: "0.5rem 1.25rem", borderRadius: "8px", background: "#0F1F3D", color: "#fff", border: "none", cursor: twoFaOtp.length !== 6 || twoFaLoading ? "not-allowed" : "pointer", fontWeight: 700, opacity: twoFaOtp.length !== 6 || twoFaLoading ? 0.5 : 1 }}>
+                    <button
+                      onClick={handle2FaVerify}
+                      disabled={twoFaLoading || twoFaOtp.length !== 6}
+                      style={{
+                        padding: "0.5rem 1.25rem",
+                        borderRadius: "8px",
+                        background: "#0F1F3D",
+                        color: "#fff",
+                        border: "none",
+                        cursor:
+                          twoFaOtp.length !== 6 || twoFaLoading
+                            ? "not-allowed"
+                            : "pointer",
+                        fontWeight: 700,
+                        opacity:
+                          twoFaOtp.length !== 6 || twoFaLoading ? 0.5 : 1,
+                      }}
+                    >
                       {twoFaLoading ? "Verifying…" : "Enable 2FA"}
                     </button>
-                    <button onClick={() => setTwoFaSetupData(null)}
-                      style={{ padding: "0.5rem 0.875rem", borderRadius: "8px", background: "none", color: "var(--color-text-muted)", border: "1px solid var(--color-border)", cursor: "pointer" }}>
+                    <button
+                      onClick={() => setTwoFaSetupData(null)}
+                      style={{
+                        padding: "0.5rem 0.875rem",
+                        borderRadius: "8px",
+                        background: "none",
+                        color: "var(--color-text-muted)",
+                        border: "1px solid var(--color-border)",
+                        cursor: "pointer",
+                      }}
+                    >
                       Cancel
                     </button>
                   </div>
                 </div>
               ) : (
                 <div>
-                  <p style={{ color: "var(--color-text-body)", marginBottom: "1rem" }}>
-                    2FA is <strong style={{ color: "#dc2626" }}>disabled</strong>. Enable it to require a TOTP code at every login.
+                  <p
+                    style={{
+                      color: "var(--color-text-body)",
+                      marginBottom: "1rem",
+                    }}
+                  >
+                    2FA is{" "}
+                    <strong style={{ color: "#dc2626" }}>disabled</strong>.
+                    Enable it to require a TOTP code at every login.
                   </p>
-                  <button onClick={handle2FaSetup} disabled={twoFaLoading}
-                    style={{ padding: "0.5rem 1.25rem", borderRadius: "8px", background: "#0F1F3D", color: "#fff", border: "none", cursor: twoFaLoading ? "not-allowed" : "pointer", fontWeight: 700, opacity: twoFaLoading ? 0.6 : 1 }}>
+                  <button
+                    onClick={handle2FaSetup}
+                    disabled={twoFaLoading}
+                    style={{
+                      padding: "0.5rem 1.25rem",
+                      borderRadius: "8px",
+                      background: "#0F1F3D",
+                      color: "#fff",
+                      border: "none",
+                      cursor: twoFaLoading ? "not-allowed" : "pointer",
+                      fontWeight: 700,
+                      opacity: twoFaLoading ? 0.6 : 1,
+                    }}
+                  >
                     {twoFaLoading ? "…" : "Set Up 2FA"}
                   </button>
                 </div>
@@ -2773,9 +3024,15 @@ export default function AdminDashboard() {
             onUpdateStatus={async (id, status) => {
               setInboxUpdatingId(id);
               try {
-                await axios.patch(`${API_URL}/admin/feature-requests/${id}`, { status }, { withCredentials: true });
+                await axios.patch(
+                  `${API_URL}/admin/feature-requests/${id}`,
+                  { status },
+                  { withCredentials: true },
+                );
                 loadInbox(inboxStatusFilter);
-              } catch { /* silent */ } finally {
+              } catch {
+                /* silent */
+              } finally {
                 setInboxUpdatingId(null);
               }
             }}
@@ -2784,15 +3041,61 @@ export default function AdminDashboard() {
 
         {/* ─────────────────────── USER PROFILE MODAL ─────────────────────────── */}
         {profileUserId !== null && (
-          <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: "1rem" }}>
-            <div style={{ background: "#fff", borderRadius: "16px", width: "100%", maxWidth: "680px", maxHeight: "90vh", overflowY: "auto", boxShadow: "0 20px 60px rgba(0,0,0,0.3)" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "1.25rem 1.5rem", borderBottom: "1px solid var(--color-border)" }}>
-                <h2 style={{ margin: 0, fontSize: "1.1rem", fontWeight: 800 }}>User Profile</h2>
-                <button onClick={() => setProfileUserId(null)} style={{ background: "none", border: "none", fontSize: "1.25rem", cursor: "pointer", color: "var(--color-text-muted)" }}>×</button>
+          <div
+            style={{
+              position: "fixed",
+              inset: 0,
+              background: "rgba(0,0,0,0.5)",
+              zIndex: 1000,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: "1rem",
+            }}
+          >
+            <div
+              style={{
+                background: "#fff",
+                borderRadius: "16px",
+                width: "100%",
+                maxWidth: "680px",
+                maxHeight: "90vh",
+                overflowY: "auto",
+                boxShadow: "0 20px 60px rgba(0,0,0,0.3)",
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  padding: "1.25rem 1.5rem",
+                  borderBottom: "1px solid var(--color-border)",
+                }}
+              >
+                <h2 style={{ margin: 0, fontSize: "1.1rem", fontWeight: 800 }}>
+                  User Profile
+                </h2>
+                <button
+                  onClick={() => setProfileUserId(null)}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    fontSize: "1.25rem",
+                    cursor: "pointer",
+                    color: "var(--color-text-muted)",
+                  }}
+                >
+                  ×
+                </button>
               </div>
               <div style={{ padding: "1.5rem" }}>
-                {profileLoading && <p style={{ color: "var(--color-text-muted)" }}>Loading…</p>}
-                {profileError && <p style={{ color: "#dc2626" }}>{profileError}</p>}
+                {profileLoading && (
+                  <p style={{ color: "var(--color-text-muted)" }}>Loading…</p>
+                )}
+                {profileError && (
+                  <p style={{ color: "#dc2626" }}>{profileError}</p>
+                )}
                 {profileData && <UserProfileDrilldown data={profileData} />}
               </div>
             </div>
@@ -4382,44 +4685,122 @@ function AuditLogTab({
   }, []);
 
   const actionColor = (action: string) => {
-    if (action.includes("deleted") || action.includes("suspended")) return "#dc2626";
-    if (action.includes("approved") || action.includes("accepted") || action.includes("unsuspended")) return "#16a34a";
-    if (action.includes("rejected") || action.includes("declined")) return "#d97706";
+    if (action.includes("deleted") || action.includes("suspended"))
+      return "#dc2626";
+    if (
+      action.includes("approved") ||
+      action.includes("accepted") ||
+      action.includes("unsuspended")
+    )
+      return "#16a34a";
+    if (action.includes("rejected") || action.includes("declined"))
+      return "#d97706";
     if (action.includes("2fa")) return "#7c3aed";
     return "#2563eb";
   };
 
   return (
     <section style={{ padding: "1.5rem" }}>
-      <h2 style={{ margin: "0 0 1.25rem", fontSize: "1.25rem", fontWeight: 800 }}>Audit Log</h2>
+      <h2
+        style={{ margin: "0 0 1.25rem", fontSize: "1.25rem", fontWeight: 800 }}
+      >
+        Audit Log
+      </h2>
       {error && <p style={{ color: "#dc2626" }}>{error}</p>}
-      {loading && data.length === 0 && <p style={{ color: "var(--color-text-muted)" }}>Loading…</p>}
-      {!loading && data.length === 0 && !error && <p style={{ color: "var(--color-text-muted)" }}>No audit events yet.</p>}
+      {loading && data.length === 0 && (
+        <p style={{ color: "var(--color-text-muted)" }}>Loading…</p>
+      )}
+      {!loading && data.length === 0 && !error && (
+        <p style={{ color: "var(--color-text-muted)" }}>No audit events yet.</p>
+      )}
       {data.length > 0 && (
         <div style={{ overflowX: "auto" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.875rem" }}>
+          <table
+            style={{
+              width: "100%",
+              borderCollapse: "collapse",
+              fontSize: "0.875rem",
+            }}
+          >
             <thead>
-              <tr style={{ borderBottom: "2px solid var(--color-border,#e2e8f0)" }}>
+              <tr
+                style={{
+                  borderBottom: "2px solid var(--color-border,#e2e8f0)",
+                }}
+              >
                 {["Date", "Action", "User ID", "Detail"].map((h) => (
-                  <th key={h} style={{ padding: "0.5rem 0.75rem", textAlign: "left", whiteSpace: "nowrap", fontWeight: 700 }}>{h}</th>
+                  <th
+                    key={h}
+                    style={{
+                      padding: "0.5rem 0.75rem",
+                      textAlign: "left",
+                      whiteSpace: "nowrap",
+                      fontWeight: 700,
+                    }}
+                  >
+                    {h}
+                  </th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {data.map((row) => (
-                <tr key={String(row.id)} style={{ borderBottom: "1px solid var(--color-border,#e2e8f0)" }}>
-                  <td style={{ padding: "0.5rem 0.75rem", whiteSpace: "nowrap", color: "var(--color-text-muted)", fontSize: "0.8rem" }}>
-                    {row.created_at ? new Date(String(row.created_at)).toLocaleString("en-GB", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }) : "—"}
+                <tr
+                  key={String(row.id)}
+                  style={{
+                    borderBottom: "1px solid var(--color-border,#e2e8f0)",
+                  }}
+                >
+                  <td
+                    style={{
+                      padding: "0.5rem 0.75rem",
+                      whiteSpace: "nowrap",
+                      color: "var(--color-text-muted)",
+                      fontSize: "0.8rem",
+                    }}
+                  >
+                    {row.created_at
+                      ? new Date(String(row.created_at)).toLocaleString(
+                          "en-GB",
+                          {
+                            day: "2-digit",
+                            month: "short",
+                            year: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          },
+                        )
+                      : "—"}
                   </td>
                   <td style={{ padding: "0.5rem 0.75rem" }}>
-                    <span style={{ padding: "2px 8px", borderRadius: "12px", fontSize: "0.75rem", fontWeight: 700, background: `${actionColor(String(row.action))}18`, color: actionColor(String(row.action)) }}>
+                    <span
+                      style={{
+                        padding: "2px 8px",
+                        borderRadius: "12px",
+                        fontSize: "0.75rem",
+                        fontWeight: 700,
+                        background: `${actionColor(String(row.action))}18`,
+                        color: actionColor(String(row.action)),
+                      }}
+                    >
                       {String(row.action).replace(/_/g, " ")}
                     </span>
                   </td>
-                  <td style={{ padding: "0.5rem 0.75rem", fontFamily: "monospace" }}>
+                  <td
+                    style={{
+                      padding: "0.5rem 0.75rem",
+                      fontFamily: "monospace",
+                    }}
+                  >
                     {row.target_id != null ? String(row.target_id) : "—"}
                   </td>
-                  <td style={{ padding: "0.5rem 0.75rem", color: "var(--color-text-body)", maxWidth: "300px" }}>
+                  <td
+                    style={{
+                      padding: "0.5rem 0.75rem",
+                      color: "var(--color-text-body)",
+                      maxWidth: "300px",
+                    }}
+                  >
                     {row.detail ? String(row.detail) : "—"}
                   </td>
                 </tr>
@@ -4427,8 +4808,20 @@ function AuditLogTab({
             </tbody>
           </table>
           {hasMore && (
-            <button onClick={onLoadMore} disabled={loading}
-              style={{ marginTop: "1rem", padding: "0.5rem 1.25rem", borderRadius: "8px", background: "var(--color-primary,#0F1F3D)", color: "#fff", border: "none", cursor: loading ? "not-allowed" : "pointer", fontSize: "0.875rem" }}>
+            <button
+              onClick={onLoadMore}
+              disabled={loading}
+              style={{
+                marginTop: "1rem",
+                padding: "0.5rem 1.25rem",
+                borderRadius: "8px",
+                background: "var(--color-primary,#0F1F3D)",
+                color: "#fff",
+                border: "none",
+                cursor: loading ? "not-allowed" : "pointer",
+                fontSize: "0.875rem",
+              }}
+            >
               {loading ? "Loading…" : "Load More"}
             </button>
           )}
@@ -4463,55 +4856,177 @@ function SupportInboxTab({
 
   return (
     <section style={{ padding: "1.5rem" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.25rem", flexWrap: "wrap", gap: "0.75rem" }}>
-        <h2 style={{ margin: 0, fontSize: "1.25rem", fontWeight: 800 }}>Support Inbox</h2>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: "1.25rem",
+          flexWrap: "wrap",
+          gap: "0.75rem",
+        }}
+      >
+        <h2 style={{ margin: 0, fontSize: "1.25rem", fontWeight: 800 }}>
+          Support Inbox
+        </h2>
         <div style={{ display: "flex", gap: "0.375rem" }}>
           {(["new", "all", "read", "archived"] as const).map((f) => (
-            <button key={f} onClick={() => setStatusFilter(f)}
-              style={{ padding: "0.3rem 0.75rem", borderRadius: "20px", border: "1px solid var(--color-border)", background: statusFilter === f ? "#0F1F3D" : "transparent", color: statusFilter === f ? "#fff" : "var(--color-text-body)", fontWeight: 600, fontSize: "0.8rem", cursor: "pointer", textTransform: "capitalize" }}>
+            <button
+              key={f}
+              onClick={() => setStatusFilter(f)}
+              style={{
+                padding: "0.3rem 0.75rem",
+                borderRadius: "20px",
+                border: "1px solid var(--color-border)",
+                background: statusFilter === f ? "#0F1F3D" : "transparent",
+                color: statusFilter === f ? "#fff" : "var(--color-text-body)",
+                fontWeight: 600,
+                fontSize: "0.8rem",
+                cursor: "pointer",
+                textTransform: "capitalize",
+              }}
+            >
               {f}
             </button>
           ))}
         </div>
       </div>
       {error && <p style={{ color: "#dc2626" }}>{error}</p>}
-      {loading && !loaded && <p style={{ color: "var(--color-text-muted)" }}>Loading…</p>}
-      {loaded && data.length === 0 && <p style={{ color: "var(--color-text-muted)" }}>No requests found.</p>}
-      <div style={{ display: "flex", flexDirection: "column", gap: "0.875rem" }}>
+      {loading && !loaded && (
+        <p style={{ color: "var(--color-text-muted)" }}>Loading…</p>
+      )}
+      {loaded && data.length === 0 && (
+        <p style={{ color: "var(--color-text-muted)" }}>No requests found.</p>
+      )}
+      <div
+        style={{ display: "flex", flexDirection: "column", gap: "0.875rem" }}
+      >
         {data.map((item) => {
           const id = Number(item.id);
           const isUpdating = updatingId === id;
           return (
-            <div key={id} style={{ background: "var(--color-surface,#fff)", borderRadius: "12px", padding: "1.25rem 1.5rem", boxShadow: "0 1px 4px rgba(0,0,0,0.07)", borderLeft: `4px solid ${statusColor(String(item.status))}` }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "0.75rem", flexWrap: "wrap", marginBottom: "0.5rem" }}>
+            <div
+              key={id}
+              style={{
+                background: "var(--color-surface,#fff)",
+                borderRadius: "12px",
+                padding: "1.25rem 1.5rem",
+                boxShadow: "0 1px 4px rgba(0,0,0,0.07)",
+                borderLeft: `4px solid ${statusColor(String(item.status))}`,
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "flex-start",
+                  gap: "0.75rem",
+                  flexWrap: "wrap",
+                  marginBottom: "0.5rem",
+                }}
+              >
                 <div>
-                  <span style={{ fontWeight: 800, fontSize: "0.95rem", color: "var(--color-text-heading)" }}>{String(item.title)}</span>
-                  <span style={{ marginLeft: "0.5rem", padding: "2px 8px", borderRadius: "12px", fontSize: "0.72rem", fontWeight: 700, background: `${statusColor(String(item.status))}18`, color: statusColor(String(item.status)) }}>
+                  <span
+                    style={{
+                      fontWeight: 800,
+                      fontSize: "0.95rem",
+                      color: "var(--color-text-heading)",
+                    }}
+                  >
+                    {String(item.title)}
+                  </span>
+                  <span
+                    style={{
+                      marginLeft: "0.5rem",
+                      padding: "2px 8px",
+                      borderRadius: "12px",
+                      fontSize: "0.72rem",
+                      fontWeight: 700,
+                      background: `${statusColor(String(item.status))}18`,
+                      color: statusColor(String(item.status)),
+                    }}
+                  >
                     {String(item.status).toUpperCase()}
                   </span>
                 </div>
-                <span style={{ fontSize: "0.75rem", color: "var(--color-text-muted)", whiteSpace: "nowrap" }}>
-                  {item.created_at ? new Date(String(item.created_at)).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }) : ""}
+                <span
+                  style={{
+                    fontSize: "0.75rem",
+                    color: "var(--color-text-muted)",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {item.created_at
+                    ? new Date(String(item.created_at)).toLocaleDateString(
+                        "en-GB",
+                        { day: "2-digit", month: "short", year: "numeric" },
+                      )
+                    : ""}
                 </span>
               </div>
-              <p style={{ margin: "0 0 0.625rem", color: "var(--color-text-body)", fontSize: "0.875rem", lineHeight: 1.6 }}>
+              <p
+                style={{
+                  margin: "0 0 0.625rem",
+                  color: "var(--color-text-body)",
+                  fontSize: "0.875rem",
+                  lineHeight: 1.6,
+                }}
+              >
                 {String(item.details)}
               </p>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "0.5rem" }}>
-                <span style={{ fontSize: "0.78rem", color: "var(--color-text-muted)" }}>
-                  {String(item.name || item.username || "Anonymous")} {item.email ? `— ${String(item.email)}` : ""}
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  flexWrap: "wrap",
+                  gap: "0.5rem",
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: "0.78rem",
+                    color: "var(--color-text-muted)",
+                  }}
+                >
+                  {String(item.name || item.username || "Anonymous")}{" "}
+                  {item.email ? `— ${String(item.email)}` : ""}
                   {item.locale ? ` · ${String(item.locale)}` : ""}
                 </span>
                 <div style={{ display: "flex", gap: "0.375rem" }}>
                   {item.status !== "read" && (
-                    <button onClick={() => onUpdateStatus(id, "read")} disabled={isUpdating}
-                      style={{ padding: "0.25rem 0.625rem", borderRadius: "6px", border: "1px solid #86efac", background: "transparent", color: "#16a34a", fontSize: "0.75rem", fontWeight: 600, cursor: isUpdating ? "not-allowed" : "pointer" }}>
+                    <button
+                      onClick={() => onUpdateStatus(id, "read")}
+                      disabled={isUpdating}
+                      style={{
+                        padding: "0.25rem 0.625rem",
+                        borderRadius: "6px",
+                        border: "1px solid #86efac",
+                        background: "transparent",
+                        color: "#16a34a",
+                        fontSize: "0.75rem",
+                        fontWeight: 600,
+                        cursor: isUpdating ? "not-allowed" : "pointer",
+                      }}
+                    >
                       Mark Read
                     </button>
                   )}
                   {item.status !== "archived" && (
-                    <button onClick={() => onUpdateStatus(id, "archived")} disabled={isUpdating}
-                      style={{ padding: "0.25rem 0.625rem", borderRadius: "6px", border: "1px solid var(--color-border)", background: "transparent", color: "var(--color-text-muted)", fontSize: "0.75rem", fontWeight: 600, cursor: isUpdating ? "not-allowed" : "pointer" }}>
+                    <button
+                      onClick={() => onUpdateStatus(id, "archived")}
+                      disabled={isUpdating}
+                      style={{
+                        padding: "0.25rem 0.625rem",
+                        borderRadius: "6px",
+                        border: "1px solid var(--color-border)",
+                        background: "transparent",
+                        color: "var(--color-text-muted)",
+                        fontSize: "0.75rem",
+                        fontWeight: 600,
+                        cursor: isUpdating ? "not-allowed" : "pointer",
+                      }}
+                    >
                       Archive
                     </button>
                   )}
@@ -4532,23 +5047,71 @@ function UserProfileDrilldown({ data }: { data: Record<string, unknown> }) {
   const transactions = (data.transactions ?? []) as Record<string, unknown>[];
   const auditHistory = (data.auditHistory ?? []) as Record<string, unknown>[];
   const fmtDate = (v: unknown) =>
-    v ? new Date(String(v)).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }) : "—";
+    v
+      ? new Date(String(v)).toLocaleDateString("en-GB", {
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
+        })
+      : "—";
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
       {/* User info */}
       <div>
-        <h3 style={{ margin: "0 0 0.75rem", fontSize: "1rem", fontWeight: 800 }}>Account</h3>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.5rem", fontSize: "0.875rem" }}>
+        <h3
+          style={{ margin: "0 0 0.75rem", fontSize: "1rem", fontWeight: 800 }}
+        >
+          Account
+        </h3>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: "0.5rem",
+            fontSize: "0.875rem",
+          }}
+        >
           {[
-            ["Name", user.name], ["Username", `@${user.username}`],
-            ["Email", user.email], ["Phone", user.phone],
-            ["KYC", user.kyc_status], ["Balance", `${Number(user.wallet_balance || 0).toLocaleString()} XAF`],
-            ["Joined", fmtDate(user.created_at)], ["Status", user.deleted_at ? "Deleted" : user.is_suspended ? "Suspended" : "Active"],
+            ["Name", user.name],
+            ["Username", `@${user.username}`],
+            ["Email", user.email],
+            ["Phone", user.phone],
+            ["KYC", user.kyc_status],
+            [
+              "Balance",
+              `${Number(user.wallet_balance || 0).toLocaleString()} XAF`,
+            ],
+            ["Joined", fmtDate(user.created_at)],
+            [
+              "Status",
+              user.deleted_at
+                ? "Deleted"
+                : user.is_suspended
+                  ? "Suspended"
+                  : "Active",
+            ],
           ].map(([k, v]) => (
-            <div key={String(k)} style={{ borderBottom: "1px solid var(--color-border,#e2e8f0)", paddingBottom: "0.375rem" }}>
-              <span style={{ fontWeight: 700, color: "var(--color-text-muted)", fontSize: "0.75rem", display: "block" }}>{String(k ?? "")}</span>
-              <span style={{ color: "var(--color-text-body)" }}>{String(v ?? "—")}</span>
+            <div
+              key={String(k)}
+              style={{
+                borderBottom: "1px solid var(--color-border,#e2e8f0)",
+                paddingBottom: "0.375rem",
+              }}
+            >
+              <span
+                style={{
+                  fontWeight: 700,
+                  color: "var(--color-text-muted)",
+                  fontSize: "0.75rem",
+                  display: "block",
+                }}
+              >
+                {String(k ?? "")}
+              </span>
+              <span style={{ color: "var(--color-text-body)" }}>
+                {String(v ?? "—")}
+              </span>
             </div>
           ))}
         </div>
@@ -4557,18 +5120,62 @@ function UserProfileDrilldown({ data }: { data: Record<string, unknown> }) {
       {/* Recent invoices */}
       {invoices.length > 0 && (
         <div>
-          <h3 style={{ margin: "0 0 0.625rem", fontSize: "0.95rem", fontWeight: 800 }}>Recent Invoices</h3>
-          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.8rem" }}>
-            <thead><tr style={{ borderBottom: "1px solid var(--color-border)" }}>
-              {["Title", "Amount", "Status", "Date"].map((h) => <th key={h} style={{ padding: "0.375rem 0.5rem", textAlign: "left", fontWeight: 700, color: "var(--color-text-muted)" }}>{h}</th>)}
-            </tr></thead>
+          <h3
+            style={{
+              margin: "0 0 0.625rem",
+              fontSize: "0.95rem",
+              fontWeight: 800,
+            }}
+          >
+            Recent Invoices
+          </h3>
+          <table
+            style={{
+              width: "100%",
+              borderCollapse: "collapse",
+              fontSize: "0.8rem",
+            }}
+          >
+            <thead>
+              <tr style={{ borderBottom: "1px solid var(--color-border)" }}>
+                {["Title", "Amount", "Status", "Date"].map((h) => (
+                  <th
+                    key={h}
+                    style={{
+                      padding: "0.375rem 0.5rem",
+                      textAlign: "left",
+                      fontWeight: 700,
+                      color: "var(--color-text-muted)",
+                    }}
+                  >
+                    {h}
+                  </th>
+                ))}
+              </tr>
+            </thead>
             <tbody>
               {invoices.map((inv) => (
-                <tr key={String(inv.id)} style={{ borderBottom: "1px solid var(--color-border)" }}>
-                  <td style={{ padding: "0.375rem 0.5rem" }}>{String(inv.title ?? "—")}</td>
-                  <td style={{ padding: "0.375rem 0.5rem", fontWeight: 600 }}>{Number(inv.amount || 0).toLocaleString()} XAF</td>
-                  <td style={{ padding: "0.375rem 0.5rem" }}>{String(inv.status ?? "—")}</td>
-                  <td style={{ padding: "0.375rem 0.5rem", color: "var(--color-text-muted)" }}>{fmtDate(inv.created_at)}</td>
+                <tr
+                  key={String(inv.id)}
+                  style={{ borderBottom: "1px solid var(--color-border)" }}
+                >
+                  <td style={{ padding: "0.375rem 0.5rem" }}>
+                    {String(inv.title ?? "—")}
+                  </td>
+                  <td style={{ padding: "0.375rem 0.5rem", fontWeight: 600 }}>
+                    {Number(inv.amount || 0).toLocaleString()} XAF
+                  </td>
+                  <td style={{ padding: "0.375rem 0.5rem" }}>
+                    {String(inv.status ?? "—")}
+                  </td>
+                  <td
+                    style={{
+                      padding: "0.375rem 0.5rem",
+                      color: "var(--color-text-muted)",
+                    }}
+                  >
+                    {fmtDate(inv.created_at)}
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -4579,18 +5186,62 @@ function UserProfileDrilldown({ data }: { data: Record<string, unknown> }) {
       {/* Recent transactions */}
       {transactions.length > 0 && (
         <div>
-          <h3 style={{ margin: "0 0 0.625rem", fontSize: "0.95rem", fontWeight: 800 }}>Recent Transactions</h3>
-          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.8rem" }}>
-            <thead><tr style={{ borderBottom: "1px solid var(--color-border)" }}>
-              {["Amount", "Type", "Status", "Date"].map((h) => <th key={h} style={{ padding: "0.375rem 0.5rem", textAlign: "left", fontWeight: 700, color: "var(--color-text-muted)" }}>{h}</th>)}
-            </tr></thead>
+          <h3
+            style={{
+              margin: "0 0 0.625rem",
+              fontSize: "0.95rem",
+              fontWeight: 800,
+            }}
+          >
+            Recent Transactions
+          </h3>
+          <table
+            style={{
+              width: "100%",
+              borderCollapse: "collapse",
+              fontSize: "0.8rem",
+            }}
+          >
+            <thead>
+              <tr style={{ borderBottom: "1px solid var(--color-border)" }}>
+                {["Amount", "Type", "Status", "Date"].map((h) => (
+                  <th
+                    key={h}
+                    style={{
+                      padding: "0.375rem 0.5rem",
+                      textAlign: "left",
+                      fontWeight: 700,
+                      color: "var(--color-text-muted)",
+                    }}
+                  >
+                    {h}
+                  </th>
+                ))}
+              </tr>
+            </thead>
             <tbody>
               {transactions.map((tx) => (
-                <tr key={String(tx.id)} style={{ borderBottom: "1px solid var(--color-border)" }}>
-                  <td style={{ padding: "0.375rem 0.5rem", fontWeight: 600 }}>{Number(tx.amount || 0).toLocaleString()} XAF</td>
-                  <td style={{ padding: "0.375rem 0.5rem" }}>{String(tx.type ?? "—")}</td>
-                  <td style={{ padding: "0.375rem 0.5rem" }}>{String(tx.status ?? "—")}</td>
-                  <td style={{ padding: "0.375rem 0.5rem", color: "var(--color-text-muted)" }}>{fmtDate(tx.created_at)}</td>
+                <tr
+                  key={String(tx.id)}
+                  style={{ borderBottom: "1px solid var(--color-border)" }}
+                >
+                  <td style={{ padding: "0.375rem 0.5rem", fontWeight: 600 }}>
+                    {Number(tx.amount || 0).toLocaleString()} XAF
+                  </td>
+                  <td style={{ padding: "0.375rem 0.5rem" }}>
+                    {String(tx.type ?? "—")}
+                  </td>
+                  <td style={{ padding: "0.375rem 0.5rem" }}>
+                    {String(tx.status ?? "—")}
+                  </td>
+                  <td
+                    style={{
+                      padding: "0.375rem 0.5rem",
+                      color: "var(--color-text-muted)",
+                    }}
+                  >
+                    {fmtDate(tx.created_at)}
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -4601,13 +5252,56 @@ function UserProfileDrilldown({ data }: { data: Record<string, unknown> }) {
       {/* Admin audit history */}
       {auditHistory.length > 0 && (
         <div>
-          <h3 style={{ margin: "0 0 0.625rem", fontSize: "0.95rem", fontWeight: 800 }}>Admin Actions</h3>
-          <div style={{ display: "flex", flexDirection: "column", gap: "0.375rem" }}>
+          <h3
+            style={{
+              margin: "0 0 0.625rem",
+              fontSize: "0.95rem",
+              fontWeight: 800,
+            }}
+          >
+            Admin Actions
+          </h3>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "0.375rem",
+            }}
+          >
             {auditHistory.map((e, i) => (
-              <div key={i} style={{ display: "flex", justifyContent: "space-between", padding: "0.375rem 0", borderBottom: "1px solid var(--color-border)", fontSize: "0.8rem" }}>
-                <span style={{ fontWeight: 600, color: "#2563eb" }}>{String(e.action ?? "").replace(/_/g, " ")}</span>
-                {e.detail != null && <span style={{ color: "var(--color-text-muted)", textAlign: "right", maxWidth: "55%" }}>{String(e.detail)}</span>}
-                <span style={{ color: "var(--color-text-muted)", whiteSpace: "nowrap", marginLeft: "0.5rem" }}>{fmtDate(e.created_at)}</span>
+              <div
+                key={i}
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  padding: "0.375rem 0",
+                  borderBottom: "1px solid var(--color-border)",
+                  fontSize: "0.8rem",
+                }}
+              >
+                <span style={{ fontWeight: 600, color: "#2563eb" }}>
+                  {String(e.action ?? "").replace(/_/g, " ")}
+                </span>
+                {e.detail != null && (
+                  <span
+                    style={{
+                      color: "var(--color-text-muted)",
+                      textAlign: "right",
+                      maxWidth: "55%",
+                    }}
+                  >
+                    {String(e.detail)}
+                  </span>
+                )}
+                <span
+                  style={{
+                    color: "var(--color-text-muted)",
+                    whiteSpace: "nowrap",
+                    marginLeft: "0.5rem",
+                  }}
+                >
+                  {fmtDate(e.created_at)}
+                </span>
               </div>
             ))}
           </div>

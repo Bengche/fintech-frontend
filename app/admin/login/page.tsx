@@ -132,7 +132,9 @@ export default function AdminLoginPage() {
             boxShadow: "0 8px 32px rgba(0,0,0,0.5)",
           }}
         >
-          <form onSubmit={step === "credentials" ? handleCredentials : handleOtp}>
+          <form
+            onSubmit={step === "credentials" ? handleCredentials : handleOtp}
+          >
             {step === "credentials" ? (
               <>
                 <div style={{ marginBottom: "1rem" }}>
@@ -208,7 +210,14 @@ export default function AdminLoginPage() {
               </>
             ) : (
               <div style={{ marginBottom: "1.25rem" }}>
-                <p style={{ color: "#94a3b8", fontSize: "0.875rem", marginBottom: "1rem", lineHeight: 1.6 }}>
+                <p
+                  style={{
+                    color: "#94a3b8",
+                    fontSize: "0.875rem",
+                    marginBottom: "1rem",
+                    lineHeight: 1.6,
+                  }}
+                >
                   Enter the 6-digit code from your authenticator app.
                 </p>
                 <label
@@ -230,7 +239,9 @@ export default function AdminLoginPage() {
                   type="text"
                   inputMode="numeric"
                   value={otp}
-                  onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                  onChange={(e) =>
+                    setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))
+                  }
                   placeholder="000000"
                   maxLength={6}
                   required
@@ -251,8 +262,21 @@ export default function AdminLoginPage() {
                 />
                 <button
                   type="button"
-                  onClick={() => { setStep("credentials"); setError(""); setOtp(""); }}
-                  style={{ marginTop: "0.625rem", background: "none", border: "none", color: "#94a3b8", fontSize: "0.8125rem", cursor: "pointer", textDecoration: "underline", padding: 0 }}
+                  onClick={() => {
+                    setStep("credentials");
+                    setError("");
+                    setOtp("");
+                  }}
+                  style={{
+                    marginTop: "0.625rem",
+                    background: "none",
+                    border: "none",
+                    color: "#94a3b8",
+                    fontSize: "0.8125rem",
+                    cursor: "pointer",
+                    textDecoration: "underline",
+                    padding: 0,
+                  }}
                 >
                   Back
                 </button>
@@ -293,7 +317,11 @@ export default function AdminLoginPage() {
                 transition: "background 0.15s",
               }}
             >
-              {loading ? t("login.submitting") : step === "otp" ? "Verify Code" : t("login.submit")}
+              {loading
+                ? t("login.submitting")
+                : step === "otp"
+                  ? "Verify Code"
+                  : t("login.submit")}
             </button>
           </form>
         </div>

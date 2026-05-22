@@ -231,16 +231,21 @@ function SelfieCaptureBox({
 
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
-          facingMode: "user",
-          width: { ideal: 1280 },
-          height: { ideal: 720 },
+          facingMode: { ideal: "user" },
+          width: { ideal: 640 },
+          height: { ideal: 480 },
         },
         audio: false,
       });
       streamRef.current = stream;
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
-        await videoRef.current.play();
+        // autoPlay attribute handles most browsers; manual play() is a fallback
+        try {
+          await videoRef.current.play();
+        } catch {
+          // autoPlay will handle it
+        }
       }
       setCameraOn(true);
       setPreview(null);
@@ -278,9 +283,11 @@ function SelfieCaptureBox({
     const video = videoRef.current;
     const canvas = canvasRef.current;
     if (!video || !canvas) return;
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    canvas.getContext("2d")?.drawImage(video, 0, 0);
+    const w = video.videoWidth || 640;
+    const h = video.videoHeight || 480;
+    canvas.width = w;
+    canvas.height = h;
+    canvas.getContext("2d")?.drawImage(video, 0, 0, w, h);
     canvas.toBlob(
       (blob) => {
         if (!blob) return;
@@ -336,16 +343,21 @@ function SelfieCaptureBox({
             borderRadius: "0.875rem",
             overflow: "hidden",
             background: "#000",
+            width: "100%",
+            aspectRatio: "4 / 3",
           }}
         >
           <video
             ref={videoRef}
             playsInline
+            autoPlay
             muted
             style={{
+              position: "absolute",
+              inset: 0,
               width: "100%",
+              height: "100%",
               display: "block",
-              maxHeight: "360px",
               objectFit: "cover",
             }}
           />
@@ -404,15 +416,20 @@ function SelfieCaptureBox({
             position: "relative",
             borderRadius: "0.875rem",
             overflow: "hidden",
+            width: "100%",
+            aspectRatio: "4 / 3",
+            background: "#000",
           }}
         >
           <img
             src={preview}
             alt="Selfie preview"
             style={{
+              position: "absolute",
+              inset: 0,
               width: "100%",
+              height: "100%",
               display: "block",
-              maxHeight: "360px",
               objectFit: "cover",
             }}
           />
