@@ -183,12 +183,18 @@ function SelfieCaptureBox({
   const [error, setError] = useState<string | null>(null);
   const [starting, setStarting] = useState(false);
 
-  // Revoke previous preview URL when it changes
+  // ─── CRITICAL FIX ─────────────────────────────────────────────────────────
+  // The video element only exists in the DOM after setCameraOn(true) triggers a
+  // re-render. So srcObject must be assigned in a useEffect that runs AFTER that
+  // re-render — NOT during the async startCamera function (where videoRef is null).
   useEffect(() => {
-    return () => {
-      if (preview) URL.revokeObjectURL(preview);
-    };
-  }, [preview]);
+    const video = videoRef.current;
+    if (!cameraOn || !video || !streamRef.current) return;
+    video.srcObject = streamRef.current;
+    video.play().catch(() => {
+      // autoPlay attribute handles browsers that block programmatic play()
+    });
+  }, [cameraOn]);
 
   // Stop stream on unmount
   useEffect(() => {
@@ -197,7 +203,7 @@ function SelfieCaptureBox({
     };
   }, []);
 
-  // Show existing capture as preview when file already set
+  // Show existing capture as preview when file prop is set externally
   useEffect(() => {
     if (file && !cameraOn) {
       const url = URL.createObjectURL(file);
@@ -210,7 +216,6 @@ function SelfieCaptureBox({
     setError(null);
     setStarting(true);
     try {
-      // Check current permission state before requesting
       let permState: PermissionState | null = null;
       try {
         const status = await navigator.permissions.query({
@@ -218,12 +223,12 @@ function SelfieCaptureBox({
         });
         permState = status.state;
       } catch {
-        // Permissions API not supported in this browser — proceed anyway
+        // Permissions API unsupported — proceed anyway
       }
 
       if (permState === "denied") {
         setError(
-          "Camera access has been blocked for this site. To fix this: tap the camera/lock icon in your browser's address bar → tap 'Reset permission' or 'Allow' → then reload this page.",
+          "Camera access has been blocked. Tap the lock/camera icon in your browser's address bar, set Camera to Allow, then reload the page.",
         );
         setStarting(false);
         return;
@@ -237,36 +242,24 @@ function SelfieCaptureBox({
         },
         audio: false,
       });
+
+      // Store stream in ref — useEffect above will assign it to the video element
+      // after setCameraOn(true) causes the <video> to mount in the DOM.
       streamRef.current = stream;
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        // autoPlay attribute handles most browsers; manual play() is a fallback
-        try {
-          await videoRef.current.play();
-        } catch {
-          // autoPlay will handle it
-        }
-      }
-      setCameraOn(true);
       setPreview(null);
+      setCameraOn(true); // triggers re-render → video mounts → useEffect fires
     } catch (err: unknown) {
       const name = err instanceof Error ? err.name : "";
       if (name === "NotAllowedError" || name === "PermissionDeniedError") {
         setError(
-          "Camera access was denied. Tap the camera or lock icon in your browser's address bar, set camera to 'Allow', then tap 'Open Camera' again.",
+          "Camera access was denied. Tap the camera or lock icon in your browser's address bar, set Camera to Allow, then tap Open Camera again.",
         );
       } else if (name === "NotFoundError" || name === "DevicesNotFoundError") {
-        setError(
-          "No camera was found on this device. Please use a device with a front-facing camera.",
-        );
+        setError("No camera found on this device. Please use a device with a front-facing camera.");
       } else if (name === "NotReadableError" || name === "TrackStartError") {
-        setError(
-          "Your camera is in use by another app. Please close it and try again.",
-        );
+        setError("Your camera is in use by another app. Please close it and try again.");
       } else {
-        setError(
-          "Could not start camera. Please ensure camera permissions are allowed for this site and try again.",
-        );
+        setError("Could not start camera. Please allow camera access and try again.");
       }
     } finally {
       setStarting(false);
@@ -276,6 +269,7 @@ function SelfieCaptureBox({
   const stopCamera = () => {
     streamRef.current?.getTracks().forEach((t) => t.stop());
     streamRef.current = null;
+    if (videoRef.current) videoRef.current.srcObject = null;
     setCameraOn(false);
   };
 
@@ -291,12 +285,12 @@ function SelfieCaptureBox({
     canvas.toBlob(
       (blob) => {
         if (!blob) return;
-        const file = new File([blob], `selfie_${Date.now()}.jpg`, {
+        const capturedFile = new File([blob], `selfie_${Date.now()}.jpg`, {
           type: "image/jpeg",
         });
-        const url = URL.createObjectURL(file);
+        const url = URL.createObjectURL(capturedFile);
         setPreview(url);
-        onChange(file);
+        onChange(capturedFile);
         stopCamera();
       },
       "image/jpeg",
@@ -305,6 +299,7 @@ function SelfieCaptureBox({
   };
 
   const retake = () => {
+    if (preview) URL.revokeObjectURL(preview);
     setPreview(null);
     startCamera();
   };
@@ -315,8 +310,7 @@ function SelfieCaptureBox({
         Live Selfie
       </label>
       <p className="kyc-form-hint">
-        Your camera will open to take a live photo. No uploads from gallery are
-        allowed.
+        Your camera will open to take a live photo. No uploads from gallery are allowed.
       </p>
 
       {error && (
@@ -325,195 +319,296 @@ function SelfieCaptureBox({
             background: "#fef2f2",
             border: "1px solid #fca5a5",
             borderRadius: "0.75rem",
-            padding: "0.75rem 1rem",
+            padding: "0.875rem 1rem",
             marginBottom: "0.75rem",
             fontSize: "0.84rem",
             color: "#991b1b",
+            lineHeight: 1.5,
           }}
         >
           {error}
         </div>
       )}
 
-      {/* Live camera view */}
+      {/* ── Trigger / preview tile (shown when camera is off) ── */}
+      {!cameraOn && (
+        <>
+          {preview ? (
+            /* Captured preview */
+            <div
+              style={{
+                position: "relative",
+                borderRadius: "1rem",
+                overflow: "hidden",
+                background: "#000",
+                width: "100%",
+                aspectRatio: "3 / 4",
+                maxHeight: "70vh",
+              }}
+            >
+              <img
+                src={preview}
+                alt="Selfie preview"
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  display: "block",
+                }}
+              />
+              {/* Success badge */}
+              <div
+                style={{
+                  position: "absolute",
+                  top: "1rem",
+                  left: "50%",
+                  transform: "translateX(-50%)",
+                  background: "rgba(22,163,74,0.92)",
+                  color: "#fff",
+                  borderRadius: "999px",
+                  padding: "0.35rem 1rem",
+                  fontSize: "0.78rem",
+                  fontWeight: 700,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.375rem",
+                  whiteSpace: "nowrap",
+                  backdropFilter: "blur(4px)",
+                }}
+              >
+                <CheckCircle2 size={14} /> Photo captured
+              </div>
+              <button
+                type="button"
+                onClick={retake}
+                style={{
+                  position: "absolute",
+                  bottom: "1.25rem",
+                  left: "50%",
+                  transform: "translateX(-50%)",
+                  background: "#fff",
+                  color: "#0f172a",
+                  border: "none",
+                  borderRadius: "999px",
+                  padding: "0.75rem 2rem",
+                  fontWeight: 700,
+                  fontSize: "0.95rem",
+                  cursor: "pointer",
+                  boxShadow: "0 4px 16px rgba(0,0,0,0.3)",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                Retake Photo
+              </button>
+            </div>
+          ) : (
+            /* Open-camera trigger */
+            <button
+              type="button"
+              onClick={startCamera}
+              disabled={starting}
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "0.75rem",
+                width: "100%",
+                minHeight: "180px",
+                border: "2px dashed var(--color-border)",
+                borderRadius: "1rem",
+                background: "var(--color-surface, #f8fafc)",
+                cursor: starting ? "wait" : "pointer",
+                padding: "2rem 1rem",
+                transition: "border-color 0.15s, background 0.15s",
+              }}
+            >
+              {starting ? (
+                <Loader2
+                  size={36}
+                  style={{
+                    color: "var(--color-primary)",
+                    animation: "spin 1s linear infinite",
+                  }}
+                />
+              ) : (
+                <div
+                  style={{
+                    width: "64px",
+                    height: "64px",
+                    borderRadius: "50%",
+                    background: "var(--color-primary, #0F1F3D)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Camera size={28} color="#fff" />
+                </div>
+              )}
+              <div style={{ textAlign: "center" }}>
+                <p style={{ margin: 0, fontWeight: 700, fontSize: "1rem", color: "var(--color-text-heading)" }}>
+                  {starting ? "Opening camera…" : "Open Camera"}
+                </p>
+                <p style={{ margin: "0.25rem 0 0", fontSize: "0.8rem", color: "var(--color-text-muted)" }}>
+                  A live photo will be taken — no gallery uploads
+                </p>
+              </div>
+            </button>
+          )}
+        </>
+      )}
+
+      {/* ── Full-screen camera overlay (shown while camera is active) ── */}
       {cameraOn && (
         <div
           style={{
-            position: "relative",
-            borderRadius: "0.875rem",
-            overflow: "hidden",
+            position: "fixed",
+            inset: 0,
+            zIndex: 1000,
             background: "#000",
-            width: "100%",
-            aspectRatio: "4 / 3",
+            display: "flex",
+            flexDirection: "column",
           }}
         >
+          {/* Video fills the screen */}
           <video
             ref={videoRef}
             playsInline
             autoPlay
             muted
             style={{
-              position: "absolute",
-              inset: 0,
+              flex: 1,
               width: "100%",
               height: "100%",
-              display: "block",
               objectFit: "cover",
+              display: "block",
             }}
           />
+
+          {/* Oval face guide overlay */}
           <div
             style={{
               position: "absolute",
-              bottom: "1rem",
-              left: 0,
-              right: 0,
+              inset: 0,
               display: "flex",
+              alignItems: "center",
               justifyContent: "center",
-              gap: "0.75rem",
+              pointerEvents: "none",
             }}
           >
-            <button
-              type="button"
-              onClick={capture}
+            <div
               style={{
-                background: "#fff",
-                color: "#0f172a",
-                border: "none",
-                borderRadius: "999px",
-                padding: "0.65rem 1.5rem",
+                width: "min(68vw, 280px)",
+                height: "min(88vw, 360px)",
+                borderRadius: "50%",
+                border: "3px solid rgba(255,255,255,0.85)",
+                boxShadow: "0 0 0 9999px rgba(0,0,0,0.45)",
+              }}
+            />
+          </div>
+
+          {/* Top bar */}
+          <div
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              padding: "env(safe-area-inset-top, 1rem) 1.25rem 1rem",
+              paddingTop: "max(env(safe-area-inset-top), 1.25rem)",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <span
+              style={{
+                color: "#fff",
                 fontWeight: 700,
-                fontSize: "0.9rem",
-                cursor: "pointer",
-                boxShadow: "0 2px 8px rgba(0,0,0,0.25)",
+                fontSize: "1rem",
+                textShadow: "0 1px 4px rgba(0,0,0,0.6)",
               }}
             >
-              Take Photo
-            </button>
+              Take Selfie
+            </span>
             <button
               type="button"
               onClick={stopCamera}
               style={{
-                background: "rgba(255,255,255,0.15)",
-                color: "#fff",
-                border: "1px solid rgba(255,255,255,0.3)",
+                background: "rgba(0,0,0,0.45)",
+                border: "none",
                 borderRadius: "999px",
-                padding: "0.65rem 1.25rem",
+                color: "#fff",
+                fontSize: "0.85rem",
                 fontWeight: 600,
-                fontSize: "0.9rem",
+                padding: "0.45rem 1rem",
                 cursor: "pointer",
+                backdropFilter: "blur(6px)",
               }}
             >
               Cancel
             </button>
           </div>
-        </div>
-      )}
 
-      {/* Captured preview */}
-      {preview && !cameraOn && (
-        <div
-          style={{
-            position: "relative",
-            borderRadius: "0.875rem",
-            overflow: "hidden",
-            width: "100%",
-            aspectRatio: "4 / 3",
-            background: "#000",
-          }}
-        >
-          <img
-            src={preview}
-            alt="Selfie preview"
-            style={{
-              position: "absolute",
-              inset: 0,
-              width: "100%",
-              height: "100%",
-              display: "block",
-              objectFit: "cover",
-            }}
-          />
+          {/* Instruction text */}
           <div
             style={{
               position: "absolute",
-              bottom: "1rem",
-              left: 0,
-              right: 0,
-              display: "flex",
-              justifyContent: "center",
+              top: "calc(max(env(safe-area-inset-top), 1.25rem) + 3rem)",
+              left: "50%",
+              transform: "translateX(-50%)",
+              textAlign: "center",
+              color: "rgba(255,255,255,0.85)",
+              fontSize: "0.82rem",
+              fontWeight: 500,
+              whiteSpace: "nowrap",
+              textShadow: "0 1px 4px rgba(0,0,0,0.7)",
             }}
           >
+            Fit your face inside the oval
+          </div>
+
+          {/* Bottom controls */}
+          <div
+            style={{
+              position: "absolute",
+              bottom: 0,
+              left: 0,
+              right: 0,
+              paddingBottom: "max(env(safe-area-inset-bottom), 2rem)",
+              paddingTop: "1.5rem",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              background: "linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 100%)",
+            }}
+          >
+            {/* Shutter button */}
             <button
               type="button"
-              onClick={retake}
+              onClick={capture}
+              aria-label="Take photo"
               style={{
+                width: "76px",
+                height: "76px",
+                borderRadius: "50%",
                 background: "#fff",
-                color: "#0f172a",
-                border: "none",
-                borderRadius: "999px",
-                padding: "0.65rem 1.5rem",
-                fontWeight: 700,
-                fontSize: "0.9rem",
+                border: "4px solid rgba(255,255,255,0.5)",
+                outline: "4px solid rgba(255,255,255,0.25)",
                 cursor: "pointer",
-                boxShadow: "0 2px 8px rgba(0,0,0,0.25)",
+                boxShadow: "0 4px 24px rgba(0,0,0,0.4)",
+                transition: "transform 0.1s",
+                flexShrink: 0,
               }}
-            >
-              Retake
-            </button>
+            />
           </div>
         </div>
       )}
 
-      {/* Initial state — no camera, no capture yet */}
-      {!cameraOn && !preview && (
-        <div
-          className="kyc-upload-box"
-          onClick={startCamera}
-          style={{ cursor: starting ? "wait" : "pointer" }}
-        >
-          <div className="kyc-upload-placeholder">
-            {starting ? (
-              <Loader2
-                size={28}
-                style={{
-                  color: "var(--color-text-muted)",
-                  marginBottom: "0.5rem",
-                  animation: "spin 1s linear infinite",
-                }}
-              />
-            ) : (
-              <Camera
-                size={28}
-                style={{
-                  color: "var(--color-text-muted)",
-                  marginBottom: "0.5rem",
-                }}
-              />
-            )}
-            <p
-              style={{
-                margin: 0,
-                fontSize: "0.875rem",
-                color: "var(--color-text-muted)",
-                fontWeight: 600,
-              }}
-            >
-              {starting ? "Starting camera…" : "Tap to open camera"}
-            </p>
-            <p
-              style={{
-                margin: "4px 0 0",
-                fontSize: "0.75rem",
-                color: "var(--color-text-muted)",
-              }}
-            >
-              A live photo will be taken — no gallery uploads
-            </p>
-          </div>
-        </div>
-      )}
-
-      {/* Hidden canvas for frame capture */}
+      {/* Hidden canvas for frame capture — always in DOM */}
       <canvas ref={canvasRef} style={{ display: "none" }} />
     </div>
   );
