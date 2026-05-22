@@ -255,11 +255,17 @@ function SelfieCaptureBox({
           "Camera access was denied. Tap the camera or lock icon in your browser's address bar, set Camera to Allow, then tap Open Camera again.",
         );
       } else if (name === "NotFoundError" || name === "DevicesNotFoundError") {
-        setError("No camera found on this device. Please use a device with a front-facing camera.");
+        setError(
+          "No camera found on this device. Please use a device with a front-facing camera.",
+        );
       } else if (name === "NotReadableError" || name === "TrackStartError") {
-        setError("Your camera is in use by another app. Please close it and try again.");
+        setError(
+          "Your camera is in use by another app. Please close it and try again.",
+        );
       } else {
-        setError("Could not start camera. Please allow camera access and try again.");
+        setError(
+          "Could not start camera. Please allow camera access and try again.",
+        );
       }
     } finally {
       setStarting(false);
@@ -281,7 +287,14 @@ function SelfieCaptureBox({
     const h = video.videoHeight || 480;
     canvas.width = w;
     canvas.height = h;
-    canvas.getContext("2d")?.drawImage(video, 0, 0, w, h);
+    // Flip canvas horizontally to un-mirror the image before saving,
+    // so the stored photo has correct (non-mirrored) orientation for KYC checks.
+    const ctx = canvas.getContext("2d");
+    if (ctx) {
+      ctx.translate(w, 0);
+      ctx.scale(-1, 1);
+      ctx.drawImage(video, 0, 0, w, h);
+    }
     canvas.toBlob(
       (blob) => {
         if (!blob) return;
@@ -310,7 +323,8 @@ function SelfieCaptureBox({
         Live Selfie
       </label>
       <p className="kyc-form-hint">
-        Your camera will open to take a live photo. No uploads from gallery are allowed.
+        Your camera will open to take a live photo. No uploads from gallery are
+        allowed.
       </p>
 
       {error && (
@@ -449,10 +463,23 @@ function SelfieCaptureBox({
                 </div>
               )}
               <div style={{ textAlign: "center" }}>
-                <p style={{ margin: 0, fontWeight: 700, fontSize: "1rem", color: "var(--color-text-heading)" }}>
+                <p
+                  style={{
+                    margin: 0,
+                    fontWeight: 700,
+                    fontSize: "1rem",
+                    color: "var(--color-text-heading)",
+                  }}
+                >
                   {starting ? "Opening camera…" : "Open Camera"}
                 </p>
-                <p style={{ margin: "0.25rem 0 0", fontSize: "0.8rem", color: "var(--color-text-muted)" }}>
+                <p
+                  style={{
+                    margin: "0.25rem 0 0",
+                    fontSize: "0.8rem",
+                    color: "var(--color-text-muted)",
+                  }}
+                >
                   A live photo will be taken — no gallery uploads
                 </p>
               </div>
@@ -485,6 +512,9 @@ function SelfieCaptureBox({
               height: "100%",
               objectFit: "cover",
               display: "block",
+              // Mirror horizontally so movement matches a mirror — natural for selfies
+              transform: "scaleX(-1)",
+              transition: "transform 0.05s linear",
             }}
           />
 
@@ -583,7 +613,8 @@ function SelfieCaptureBox({
               display: "flex",
               justifyContent: "center",
               alignItems: "center",
-              background: "linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 100%)",
+              background:
+                "linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 100%)",
             }}
           >
             {/* Shutter button */}
