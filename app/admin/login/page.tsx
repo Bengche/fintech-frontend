@@ -13,15 +13,45 @@ export default function AdminLoginPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [step, setStep] = useState<"credentials" | "otp">("credentials");
+  const [tempToken, setTempToken] = useState("");
+  const [otp, setOtp] = useState("");
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleCredentials = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+    try {
+      const res = await axios.post(
+        `${API_URL}/admin/login`,
+        { email, password },
+        { withCredentials: true },
+      );
+      if (res.data.require2fa) {
+        setTempToken(res.data.tempToken);
+        setStep("otp");
+      } else {
+        router.push("/admin/dashboard");
+      }
+    } catch (err: unknown) {
+      const message =
+        axios.isAxiosError(err) && err.response?.data?.message
+          ? err.response.data.message
+          : t("login.error");
+      setError(message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setLoading(true);
     try {
       await axios.post(
-        `${API_URL}/admin/login`,
-        { email, password },
+        `${API_URL}/admin/2fa/login-verify`,
+        { tempToken, otp },
         { withCredentials: true },
       );
       router.push("/admin/dashboard");
@@ -29,7 +59,7 @@ export default function AdminLoginPage() {
       const message =
         axios.isAxiosError(err) && err.response?.data?.message
           ? err.response.data.message
-          : t("login.error");
+          : "Invalid OTP code. Please try again.";
       setError(message);
     } finally {
       setLoading(false);
@@ -102,78 +132,132 @@ export default function AdminLoginPage() {
             boxShadow: "0 8px 32px rgba(0,0,0,0.5)",
           }}
         >
-          <form onSubmit={handleSubmit}>
-            <div style={{ marginBottom: "1rem" }}>
-              <label
-                htmlFor="admin-email"
-                style={{
-                  display: "block",
-                  fontSize: "0.6875rem",
-                  fontWeight: 600,
-                  color: "#94a3b8",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.05em",
-                  marginBottom: "0.375rem",
-                }}
-              >
-                {t("login.emailLabel")}
-              </label>
-              <input
-                id="admin-email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="admin@fonlok.com"
-                required
-                style={{
-                  width: "100%",
-                  backgroundColor: "#0d1929",
-                  border: "1px solid rgba(255,255,255,0.12)",
-                  color: "#ffffff",
-                  borderRadius: "var(--radius-sm)",
-                  padding: "0.625rem 0.875rem",
-                  fontSize: "0.9375rem",
-                  outline: "none",
-                  boxSizing: "border-box",
-                }}
-              />
-            </div>
-
-            <div style={{ marginBottom: "1.25rem" }}>
-              <label
-                htmlFor="admin-password"
-                style={{
-                  display: "block",
-                  fontSize: "0.6875rem",
-                  fontWeight: 600,
-                  color: "#94a3b8",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.05em",
-                  marginBottom: "0.375rem",
-                }}
-              >
-                {t("login.passwordLabel")}
-              </label>
-              <input
-                id="admin-password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022"
-                required
-                style={{
-                  width: "100%",
-                  backgroundColor: "#0d1929",
-                  border: "1px solid rgba(255,255,255,0.12)",
-                  color: "#ffffff",
-                  borderRadius: "var(--radius-sm)",
-                  padding: "0.625rem 0.875rem",
-                  fontSize: "0.9375rem",
-                  outline: "none",
-                  boxSizing: "border-box",
-                }}
-              />
-            </div>
+          <form onSubmit={step === "credentials" ? handleCredentials : handleOtp}>
+            {step === "credentials" ? (
+              <>
+                <div style={{ marginBottom: "1rem" }}>
+                  <label
+                    htmlFor="admin-email"
+                    style={{
+                      display: "block",
+                      fontSize: "0.6875rem",
+                      fontWeight: 600,
+                      color: "#94a3b8",
+                      textTransform: "uppercase",
+                      letterSpacing: "0.05em",
+                      marginBottom: "0.375rem",
+                    }}
+                  >
+                    {t("login.emailLabel")}
+                  </label>
+                  <input
+                    id="admin-email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="admin@fonlok.com"
+                    required
+                    style={{
+                      width: "100%",
+                      backgroundColor: "#0d1929",
+                      border: "1px solid rgba(255,255,255,0.12)",
+                      color: "#ffffff",
+                      borderRadius: "var(--radius-sm)",
+                      padding: "0.625rem 0.875rem",
+                      fontSize: "0.9375rem",
+                      outline: "none",
+                      boxSizing: "border-box",
+                    }}
+                  />
+                </div>
+                <div style={{ marginBottom: "1.25rem" }}>
+                  <label
+                    htmlFor="admin-password"
+                    style={{
+                      display: "block",
+                      fontSize: "0.6875rem",
+                      fontWeight: 600,
+                      color: "#94a3b8",
+                      textTransform: "uppercase",
+                      letterSpacing: "0.05em",
+                      marginBottom: "0.375rem",
+                    }}
+                  >
+                    {t("login.passwordLabel")}
+                  </label>
+                  <input
+                    id="admin-password"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••"
+                    required
+                    style={{
+                      width: "100%",
+                      backgroundColor: "#0d1929",
+                      border: "1px solid rgba(255,255,255,0.12)",
+                      color: "#ffffff",
+                      borderRadius: "var(--radius-sm)",
+                      padding: "0.625rem 0.875rem",
+                      fontSize: "0.9375rem",
+                      outline: "none",
+                      boxSizing: "border-box",
+                    }}
+                  />
+                </div>
+              </>
+            ) : (
+              <div style={{ marginBottom: "1.25rem" }}>
+                <p style={{ color: "#94a3b8", fontSize: "0.875rem", marginBottom: "1rem", lineHeight: 1.6 }}>
+                  Enter the 6-digit code from your authenticator app.
+                </p>
+                <label
+                  htmlFor="admin-otp"
+                  style={{
+                    display: "block",
+                    fontSize: "0.6875rem",
+                    fontWeight: 600,
+                    color: "#94a3b8",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.05em",
+                    marginBottom: "0.375rem",
+                  }}
+                >
+                  Authenticator Code
+                </label>
+                <input
+                  id="admin-otp"
+                  type="text"
+                  inputMode="numeric"
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                  placeholder="000000"
+                  maxLength={6}
+                  required
+                  autoFocus
+                  style={{
+                    width: "100%",
+                    backgroundColor: "#0d1929",
+                    border: "1px solid rgba(255,255,255,0.12)",
+                    color: "#ffffff",
+                    borderRadius: "var(--radius-sm)",
+                    padding: "0.625rem 0.875rem",
+                    fontSize: "1.5rem",
+                    outline: "none",
+                    boxSizing: "border-box",
+                    letterSpacing: "0.35em",
+                    textAlign: "center",
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={() => { setStep("credentials"); setError(""); setOtp(""); }}
+                  style={{ marginTop: "0.625rem", background: "none", border: "none", color: "#94a3b8", fontSize: "0.8125rem", cursor: "pointer", textDecoration: "underline", padding: 0 }}
+                >
+                  Back
+                </button>
+              </div>
+            )}
 
             {error && (
               <div
@@ -209,7 +293,7 @@ export default function AdminLoginPage() {
                 transition: "background 0.15s",
               }}
             >
-              {loading ? t("login.submitting") : t("login.submit")}
+              {loading ? t("login.submitting") : step === "otp" ? "Verify Code" : t("login.submit")}
             </button>
           </form>
         </div>
