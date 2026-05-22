@@ -1234,7 +1234,6 @@ function ChangePasswordForm() {
 
   return (
     <Section title={t("password.sectionTitle")}>
-      <Feedback msg={msg} />
       <form className="settings-form" onSubmit={handleSubmit}>
         <div
           className="settings-password-grid"
@@ -1281,6 +1280,7 @@ function ChangePasswordForm() {
             </div>
           ))}
         </div>
+        <Feedback msg={msg} />
         <button type="submit" className="btn-primary" disabled={loading}>
           {loading ? t("password.saving") : t("password.save")}
         </button>
@@ -1731,8 +1731,6 @@ function DeleteAccountSection() {
               {t("delete.modalBodyConfirm")}
             </p>
 
-            <Feedback msg={msg} />
-
             <form className="settings-form" onSubmit={handleDelete}>
               <div
                 className="settings-field"
@@ -1753,6 +1751,7 @@ function DeleteAccountSection() {
                 />
               </div>
 
+              <Feedback msg={msg} />
               <div
                 className="settings-modal-actions"
                 style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap" }}
