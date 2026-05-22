@@ -233,19 +233,22 @@ export default function SellerProfilePage() {
       year: "numeric",
     });
 
-  const renderStars = (rating: number) =>
-    Array.from({ length: 5 }, (_, i) => (
-      <Star
-        key={i}
-        size={16}
-        fill={i < Math.round(rating) ? "var(--color-accent)" : "transparent"}
-        stroke={
-          i < Math.round(rating)
-            ? "var(--color-accent)"
-            : "var(--color-border-strong)"
-        }
-      />
-    ));
+  const renderStars = (rating: number) => (
+    <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: "2px" }}>
+      {Array.from({ length: 5 }, (_, i) => (
+        <Star
+          key={i}
+          size={14}
+          fill={i < Math.round(rating) ? "var(--color-accent)" : "transparent"}
+          stroke={
+            i < Math.round(rating)
+              ? "var(--color-accent)"
+              : "var(--color-border-strong)"
+          }
+        />
+      ))}
+    </div>
+  );
 
   const disputeRate =
     completedCount >= 5
@@ -924,58 +927,117 @@ export default function SellerProfilePage() {
                 <div
                   key={review.id}
                   className="card seller-review-card"
-                  style={{ padding: "1.125rem", position: "relative" }}
+                  style={{ padding: "1rem 1.125rem", position: "relative" }}
                 >
-                  {/* Pinned indicator */}
-                  {review.pinned && (
-                    <div
-                      style={{
-                        position: "absolute",
-                        top: "0.75rem",
-                        right: "0.875rem",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "0.25rem",
-                        color: "var(--color-accent)",
-                        fontSize: "0.72rem",
-                        fontWeight: 700,
-                      }}
-                    >
-                      <Pin size={12} />
-                    </div>
-                  )}
+                  {/* Card header: avatar + name/stars block + date */}
                   <div
-                    className="seller-review-top"
                     style={{
                       display: "flex",
-                      justifyContent: "space-between",
+                      flexDirection: "row",
                       alignItems: "flex-start",
-                      flexWrap: "wrap",
-                      gap: "0.5rem",
-                      marginBottom: "0.375rem",
+                      gap: "0.75rem",
+                      marginBottom: "0.625rem",
                     }}
                   >
-                    <p
+                    {/* Avatar circle */}
+                    <div
                       style={{
+                        flexShrink: 0,
+                        width: "36px",
+                        height: "36px",
+                        borderRadius: "50%",
+                        background: "var(--color-mist)",
+                        border: "1px solid var(--color-border)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontSize: "0.875rem",
                         fontWeight: 700,
-                        margin: 0,
-                        color: "var(--color-text-heading)",
+                        color: "var(--color-text-muted)",
+                        textTransform: "uppercase",
                       }}
                     >
-                      {review.reviewer_name}
-                    </p>
+                      {(review.reviewer_name || "A").charAt(0)}
+                    </div>
+
+                    {/* Name + stars (flex-1 so it fills remaining space) */}
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div
+                        style={{
+                          display: "flex",
+                          flexDirection: "row",
+                          alignItems: "center",
+                          flexWrap: "wrap",
+                          gap: "0.4rem",
+                          marginBottom: "0.2rem",
+                        }}
+                      >
+                        <span
+                          style={{
+                            fontWeight: 700,
+                            fontSize: "0.9rem",
+                            color: "var(--color-text-heading)",
+                            whiteSpace: "nowrap",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            maxWidth: "180px",
+                          }}
+                        >
+                          {review.reviewer_name}
+                        </span>
+                        {review.pinned && (
+                          <span
+                            style={{
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: "0.2rem",
+                              fontSize: "0.68rem",
+                              fontWeight: 700,
+                              color: "var(--color-accent)",
+                              background: "rgba(var(--color-accent-rgb, 59,130,246),0.08)",
+                              border: "1px solid rgba(var(--color-accent-rgb, 59,130,246),0.2)",
+                              borderRadius: "999px",
+                              padding: "0.1rem 0.45rem",
+                            }}
+                          >
+                            <Pin size={10} />
+                            {t("pinned")}
+                          </span>
+                        )}
+                      </div>
+                      {/* Stars row — always horizontal */}
+                      <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: "0.4rem" }}>
+                        {renderStars(review.rating)}
+                        <span
+                          style={{
+                            fontSize: "0.72rem",
+                            fontWeight: 700,
+                            color: review.rating >= 4 ? "#16a34a" : "#dc2626",
+                            background: review.rating >= 4 ? "rgba(22,163,74,0.08)" : "rgba(220,38,38,0.08)",
+                            border: `1px solid ${review.rating >= 4 ? "rgba(22,163,74,0.2)" : "rgba(220,38,38,0.2)"}`,
+                            borderRadius: "999px",
+                            padding: "0.1rem 0.45rem",
+                          }}
+                        >
+                          {review.rating >= 4 ? t("positiveLabel") : t("negativeLabel")}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Date — right-aligned, never wraps away from header */}
                     <span
                       style={{
-                        fontSize: "0.8125rem",
+                        flexShrink: 0,
+                        fontSize: "0.75rem",
                         color: "var(--color-text-muted)",
+                        whiteSpace: "nowrap",
+                        paddingTop: "0.1rem",
                       }}
                     >
                       {formatDate(review.created_at)}
                     </span>
                   </div>
-                  <div style={{ marginBottom: "0.5rem" }}>
-                    {renderStars(review.rating)}
-                  </div>
+
                   {/* Invoice name tag */}
                   {review.show_invoice_name && review.invoice_name && (
                     <div
@@ -997,15 +1059,20 @@ export default function SellerProfilePage() {
                       {t("invoiceTag")}: {review.invoice_name}
                     </div>
                   )}
-                  <p
-                    style={{
-                      margin: 0,
-                      color: "var(--color-text-body)",
-                      lineHeight: 1.6,
-                    }}
-                  >
-                    {review.comment}
-                  </p>
+
+                  {/* Comment */}
+                  {review.comment && (
+                    <p
+                      style={{
+                        margin: 0,
+                        color: "var(--color-text-body)",
+                        lineHeight: 1.6,
+                        fontSize: "0.875rem",
+                      }}
+                    >
+                      {review.comment}
+                    </p>
+                  )}
 
                   {/* Seller reply */}
                   {review.seller_reply && (
@@ -1028,10 +1095,7 @@ export default function SellerProfilePage() {
                       >
                         <MessageSquare
                           size={12}
-                          style={{
-                            marginRight: "0.3rem",
-                            verticalAlign: "middle",
-                          }}
+                          style={{ marginRight: "0.3rem", verticalAlign: "middle" }}
                         />
                         {t("sellerReply")}
                       </p>
@@ -1073,10 +1137,7 @@ export default function SellerProfilePage() {
                     >
                       <button
                         className="btn-ghost"
-                        style={{
-                          fontSize: "0.78rem",
-                          padding: "0.25rem 0.6rem",
-                        }}
+                        style={{ fontSize: "0.78rem", padding: "0.25rem 0.6rem" }}
                         disabled={pinLoading[review.id]}
                         onClick={() => togglePin(review.id, !!review.pinned)}
                       >
@@ -1086,10 +1147,7 @@ export default function SellerProfilePage() {
                       {!review.seller_reply && (
                         <button
                           className="btn-ghost"
-                          style={{
-                            fontSize: "0.78rem",
-                            padding: "0.25rem 0.6rem",
-                          }}
+                          style={{ fontSize: "0.78rem", padding: "0.25rem 0.6rem" }}
                           onClick={() =>
                             setReplyOpen((prev) => ({
                               ...prev,
@@ -1105,68 +1163,45 @@ export default function SellerProfilePage() {
                   )}
 
                   {/* Reply form */}
-                  {isOwnProfile &&
-                    replyOpen[review.id] &&
-                    !review.seller_reply && (
-                      <div style={{ marginTop: "0.75rem" }}>
-                        <textarea
-                          className="input"
-                          placeholder={t("replyPlaceholder")}
-                          value={replyDraft[review.id] || ""}
-                          onChange={(e) =>
-                            setReplyDraft((prev) => ({
-                              ...prev,
-                              [review.id]: e.target.value,
-                            }))
+                  {isOwnProfile && replyOpen[review.id] && !review.seller_reply && (
+                    <div style={{ marginTop: "0.75rem" }}>
+                      <textarea
+                        className="input"
+                        placeholder={t("replyPlaceholder")}
+                        value={replyDraft[review.id] || ""}
+                        onChange={(e) =>
+                          setReplyDraft((prev) => ({
+                            ...prev,
+                            [review.id]: e.target.value,
+                          }))
+                        }
+                        maxLength={800}
+                        style={{ minHeight: "80px", resize: "vertical", fontSize: "0.875rem" }}
+                      />
+                      <div style={{ display: "flex", gap: "0.5rem", marginTop: "0.5rem" }}>
+                        <button
+                          className="btn-primary"
+                          style={{ fontSize: "0.8rem", padding: "0.35rem 0.875rem" }}
+                          disabled={
+                            replySubmitting[review.id] ||
+                            !(replyDraft[review.id] || "").trim()
                           }
-                          maxLength={800}
-                          style={{
-                            minHeight: "80px",
-                            resize: "vertical",
-                            fontSize: "0.875rem",
-                          }}
-                        />
-                        <div
-                          style={{
-                            display: "flex",
-                            gap: "0.5rem",
-                            marginTop: "0.5rem",
-                          }}
+                          onClick={() => submitReply(review.id)}
                         >
-                          <button
-                            className="btn-primary"
-                            style={{
-                              fontSize: "0.8rem",
-                              padding: "0.35rem 0.875rem",
-                            }}
-                            disabled={
-                              replySubmitting[review.id] ||
-                              !(replyDraft[review.id] || "").trim()
-                            }
-                            onClick={() => submitReply(review.id)}
-                          >
-                            {replySubmitting[review.id]
-                              ? "..."
-                              : t("submitReply")}
-                          </button>
-                          <button
-                            className="btn-ghost"
-                            style={{
-                              fontSize: "0.8rem",
-                              padding: "0.35rem 0.875rem",
-                            }}
-                            onClick={() =>
-                              setReplyOpen((prev) => ({
-                                ...prev,
-                                [review.id]: false,
-                              }))
-                            }
-                          >
-                            {t("cancelReply")}
-                          </button>
-                        </div>
+                          {replySubmitting[review.id] ? "..." : t("submitReply")}
+                        </button>
+                        <button
+                          className="btn-ghost"
+                          style={{ fontSize: "0.8rem", padding: "0.35rem 0.875rem" }}
+                          onClick={() =>
+                            setReplyOpen((prev) => ({ ...prev, [review.id]: false }))
+                          }
+                        >
+                          {t("cancelReply")}
+                        </button>
                       </div>
-                    )}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
