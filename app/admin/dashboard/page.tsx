@@ -112,7 +112,8 @@ type TabKey =
   | "stuck"
   | "kyc"
   | "verify"
-  | "controls";
+  | "controls"
+  | "suspensions";
 
 // ─── Main Component ────────────────────────────────────────────────────────────
 export default function AdminDashboard() {
@@ -132,6 +133,7 @@ export default function AdminDashboard() {
     { key: "kyc", label: "KYC" },
     { key: "verify", label: "Verify Receipt" },
     { key: "controls", label: t("dashboard.tabControls") },
+    { key: "suspensions", label: "Suspensions" },
   ];
 
   // Auth state: null = checking, true = ok, false = not authed
@@ -158,6 +160,16 @@ export default function AdminDashboard() {
     null,
   );
   const [kycNoteById, setKycNoteById] = useState<Record<number, string>>({});
+
+  // Suspension tab state
+  const [suspensions, setSuspensions] = useState<SectionState>(initTab());
+  const [suspensionFilter, setSuspensionFilter] = useState<
+    "all" | "appeal_pending" | "permanent" | "temporary"
+  >("all");
+  const [suspActionLoadingId, setSuspActionLoadingId] = useState<
+    number | null
+  >(null);
+  const [suspNoteById, setSuspNoteById] = useState<Record<number, string>>({});
 
   // ── Platform Controls state ───────────────────────────────────────────────
   interface PlatformSettings {
@@ -252,6 +264,10 @@ export default function AdminDashboard() {
         referrals: { setter: setReferrals, endpoint: "referrals" },
         messages: { setter: setBroadcasts, endpoint: "broadcasts" },
         kyc: { setter: setKyc, endpoint: `kyc?status=${kycFilter}` },
+        suspensions: {
+          setter: setSuspensions,
+          endpoint: `suspensions?filter=${suspensionFilter}`,
+        },
       };
 
       if (!config[tab]) return;
@@ -284,7 +300,7 @@ export default function AdminDashboard() {
         setter((prev) => ({ ...prev, loading: false, error: msg }));
       }
     },
-    [kycFilter, t],
+    [kycFilter, suspensionFilter, t],
   );
 
   // ── 4. Load data when switching tabs (only if not already loaded) ────────────
@@ -294,7 +310,8 @@ export default function AdminDashboard() {
       activeTab === "overview" ||
       activeTab === "kyc" ||
       activeTab === "verify" ||
-      activeTab === "controls"
+      activeTab === "controls" ||
+      activeTab === "suspensions"
     )
       return;
     const tabState = {
@@ -319,6 +336,12 @@ export default function AdminDashboard() {
     if (!authed || activeTab !== "kyc") return;
     loadTab("kyc", false, 0);
   }, [activeTab, authed, kycFilter, loadTab]);
+
+  // Reload Suspensions list when opening the tab or switching filter
+  useEffect(() => {
+    if (!authed || activeTab !== "suspensions") return;
+    loadTab("suspensions", false, 0);
+  }, [activeTab, authed, suspensionFilter, loadTab]);
 
   // ── 5. Debounced user search for the direct-message picker ────────────────────
   useEffect(() => {
@@ -1828,7 +1851,25 @@ export default function AdminDashboard() {
           </TabSection>
         )}
 
-        {/* ─────────────────────── VERIFY RECEIPT TAB ─────────────────────── */}
+        {/* ─────────────────────── SUSPENSIONS TAB ──────────────────────── */}
+        {activeTab === "suspensions" && (
+          <SuspensionsAdminTab
+            data={suspensions.data}
+            loading={suspensions.loading}
+            error={suspensions.error}
+            hasMore={suspensions.hasMore}
+            filter={suspensionFilter}
+            setFilter={setSuspensionFilter}
+            onLoadMore={() => loadTab("suspensions", true, suspensions.page)}
+            onReload={() => loadTab("suspensions", false, 0)}
+            actionLoadingId={suspActionLoadingId}
+            setActionLoadingId={setSuspActionLoadingId}
+            noteById={suspNoteById}
+            setNoteById={setSuspNoteById}
+          />
+        )}
+
+        {/* ─────────────────────── KYC TAB ─────────────────────────────────── */}
         {activeTab === "kyc" && (
           <KycAdminTab
             data={kyc.data}
@@ -2371,6 +2412,468 @@ export default function AdminDashboard() {
         )}
       </main>
     </div>
+  );
+}
+
+// ─── Admin Suspensions Component ─────────────────────────────────────────────
+function SuspensionsAdminTab({
+  data,
+  loading,
+  error,
+  hasMore,
+  filter,
+  setFilter,
+  onLoadMore,
+  onReload,
+  actionLoadingId,
+  setActionLoadingId,
+  noteById,
+  setNoteById,
+}: {
+  data: Record<string, RowValue>[];
+  loading: boolean;
+  error: string;
+  hasMore: boolean;
+  filter: "all" | "appeal_pending" | "permanent" | "temporary";
+  setFilter: React.Dispatch<
+    React.SetStateAction<"all" | "appeal_pending" | "permanent" | "temporary">
+  >;
+  onLoadMore: () => void;
+  onReload: () => void;
+  actionLoadingId: number | null;
+  setActionLoadingId: React.Dispatch<React.SetStateAction<number | null>>;
+  noteById: Record<number, string>;
+  setNoteById: React.Dispatch<React.SetStateAction<Record<number, string>>>;
+}) {
+  const [actionMsg, setActionMsg] = useState("");
+  const [actionErr, setActionErr] = useState("");
+
+  const suspensionPill = (row: Record<string, RowValue>) => {
+    const isPermanent = !row.suspended_until;
+    return (
+      <span
+        style={{
+          background: isPermanent
+            ? "rgba(220,38,38,0.08)"
+            : "rgba(245,158,11,0.12)",
+          border: isPermanent
+            ? "1px solid rgba(220,38,38,0.24)"
+            : "1px solid rgba(245,158,11,0.32)",
+          color: isPermanent ? "#991b1b" : "#92400e",
+          borderRadius: "999px",
+          padding: "0.2rem 0.65rem",
+          fontSize: "0.75rem",
+          fontWeight: 800,
+        }}
+      >
+        {isPermanent ? "Permanent" : "Temporary"}
+      </span>
+    );
+  };
+
+  const appealPill = (status: RowValue) => {
+    const map: Record<
+      string,
+      { bg: string; bd: string; cl: string; label: string }
+    > = {
+      pending: {
+        bg: "rgba(245,158,11,0.12)",
+        bd: "rgba(245,158,11,0.32)",
+        cl: "#92400e",
+        label: "Appeal Pending",
+      },
+      accepted: {
+        bg: "rgba(22,163,74,0.1)",
+        bd: "rgba(22,163,74,0.3)",
+        cl: "#166534",
+        label: "Appeal Accepted",
+      },
+      declined: {
+        bg: "rgba(220,38,38,0.08)",
+        bd: "rgba(220,38,38,0.24)",
+        cl: "#991b1b",
+        label: "Appeal Declined",
+      },
+      none: {
+        bg: "rgba(100,116,139,0.08)",
+        bd: "rgba(100,116,139,0.2)",
+        cl: "#475569",
+        label: "No Appeal",
+      },
+    };
+    const s = map[String(status ?? "none")] ?? map.none;
+    return (
+      <span
+        style={{
+          background: s.bg,
+          border: `1px solid ${s.bd}`,
+          color: s.cl,
+          borderRadius: "999px",
+          padding: "0.2rem 0.65rem",
+          fontSize: "0.75rem",
+          fontWeight: 800,
+        }}
+      >
+        {s.label}
+      </span>
+    );
+  };
+
+  const doAction = async (
+    id: number,
+    action: "unsuspend" | "appeal/accept" | "appeal/decline",
+  ) => {
+    setActionMsg("");
+    setActionErr("");
+    setActionLoadingId(id);
+    try {
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000"}/admin/users/${id}/${action}`,
+        action === "appeal/decline" ? { note: noteById[id] || "" } : {},
+        { withCredentials: true },
+      );
+      const msgMap: Record<string, string> = {
+        unsuspend: "Account reactivated and user notified.",
+        "appeal/accept": "Appeal accepted, account reinstated and user notified.",
+        "appeal/decline": "Appeal declined and user notified.",
+      };
+      setActionMsg(msgMap[action] ?? "Done.");
+      onReload();
+    } catch (err: unknown) {
+      setActionErr(
+        axios.isAxiosError(err) && err.response?.data?.message
+          ? err.response.data.message
+          : "Action failed.",
+      );
+    } finally {
+      setActionLoadingId(null);
+    }
+  };
+
+  const FILTERS: { key: "all" | "appeal_pending" | "permanent" | "temporary"; label: string }[] = [
+    { key: "all", label: "All" },
+    { key: "appeal_pending", label: "Pending Appeals" },
+    { key: "permanent", label: "Permanent" },
+    { key: "temporary", label: "Temporary" },
+  ];
+
+  return (
+    <section
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: "1rem",
+        background: "var(--color-surface,#fff)",
+        borderRadius: "12px",
+        padding: "1rem",
+        boxShadow: "0 1px 4px rgba(0,0,0,0.07)",
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          gap: "0.75rem",
+          flexWrap: "wrap",
+        }}
+      >
+        <div>
+          <h3 style={{ margin: 0, fontSize: "1.05rem", fontWeight: 800 }}>
+            Account Suspensions
+          </h3>
+          <p
+            style={{
+              margin: "4px 0 0",
+              fontSize: "0.84rem",
+              color: "var(--color-text-muted)",
+            }}
+          >
+            Manage suspended accounts, review appeals, and reinstate users.
+          </p>
+        </div>
+        <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+          {FILTERS.map((f) => (
+            <button
+              key={f.key}
+              onClick={() => setFilter(f.key)}
+              style={{
+                border:
+                  filter === f.key
+                    ? "1px solid var(--color-primary,#0F1F3D)"
+                    : "1px solid var(--color-border,#e2e8f0)",
+                background:
+                  filter === f.key ? "var(--color-primary,#0F1F3D)" : "#fff",
+                color:
+                  filter === f.key
+                    ? "#fff"
+                    : "var(--color-text-heading,#0f172a)",
+                borderRadius: "999px",
+                padding: "0.35rem 0.75rem",
+                fontWeight: 700,
+                fontSize: "0.77rem",
+                cursor: "pointer",
+              }}
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {actionMsg && <div className="alert alert-success">{actionMsg}</div>}
+      {actionErr && <div className="alert alert-danger">{actionErr}</div>}
+      {error && <div className="alert alert-danger">{error}</div>}
+
+      {loading && data.length === 0 && (
+        <p style={{ color: "var(--color-text-muted)", fontSize: "0.88rem" }}>
+          Loading...
+        </p>
+      )}
+
+      {!loading && data.length === 0 && (
+        <p style={{ color: "var(--color-text-muted)", fontSize: "0.88rem" }}>
+          No suspended accounts found.
+        </p>
+      )}
+
+      {data.map((row) => {
+        const id = Number(row.id);
+        const isLoading = actionLoadingId === id;
+        const hasPendingAppeal = row.appeal_status === "pending";
+
+        return (
+          <div
+            key={id}
+            style={{
+              border: "1px solid var(--color-border,#e2e8f0)",
+              borderRadius: "10px",
+              padding: "1rem",
+              display: "flex",
+              flexDirection: "column",
+              gap: "0.75rem",
+              background: "#fafafa",
+            }}
+          >
+            {/* User info row */}
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "flex-start",
+                flexWrap: "wrap",
+                gap: "0.5rem",
+              }}
+            >
+              <div>
+                <div
+                  style={{ fontWeight: 800, fontSize: "0.95rem", color: "#0f172a" }}
+                >
+                  {String(row.name || "—")}
+                  {row.username && (
+                    <span
+                      style={{
+                        fontWeight: 500,
+                        color: "#64748b",
+                        marginLeft: "0.4rem",
+                        fontSize: "0.85rem",
+                      }}
+                    >
+                      @{String(row.username)}
+                    </span>
+                  )}
+                </div>
+                <div style={{ fontSize: "0.82rem", color: "#64748b", marginTop: "2px" }}>
+                  {String(row.email || "—")}
+                </div>
+              </div>
+              <div style={{ display: "flex", gap: "0.4rem", flexWrap: "wrap", alignItems: "center" }}>
+                {suspensionPill(row)}
+                {appealPill(row.appeal_status)}
+              </div>
+            </div>
+
+            {/* Suspension details */}
+            <div
+              style={{
+                fontSize: "0.83rem",
+                color: "#475569",
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))",
+                gap: "0.35rem 1rem",
+              }}
+            >
+              <div>
+                <span style={{ fontWeight: 700 }}>Suspended:</span>{" "}
+                {row.suspended_at
+                  ? new Date(String(row.suspended_at)).toLocaleDateString(
+                      "en-GB",
+                      { day: "2-digit", month: "short", year: "numeric" },
+                    )
+                  : "—"}
+              </div>
+              {row.suspended_until && (
+                <div>
+                  <span style={{ fontWeight: 700 }}>Until:</span>{" "}
+                  {new Date(String(row.suspended_until)).toLocaleDateString(
+                    "en-GB",
+                    { day: "2-digit", month: "short", year: "numeric" },
+                  )}
+                </div>
+              )}
+              {row.suspension_reason && (
+                <div style={{ gridColumn: "1 / -1" }}>
+                  <span style={{ fontWeight: 700 }}>Reason:</span>{" "}
+                  {String(row.suspension_reason)}
+                </div>
+              )}
+            </div>
+
+            {/* Appeal text if present */}
+            {row.appeal_text && (
+              <div
+                style={{
+                  background: "#f1f5f9",
+                  borderRadius: "8px",
+                  padding: "0.65rem 0.85rem",
+                  fontSize: "0.83rem",
+                  color: "#334155",
+                  lineHeight: 1.6,
+                  borderLeft: "3px solid #94a3b8",
+                }}
+              >
+                <div
+                  style={{
+                    fontWeight: 700,
+                    fontSize: "0.78rem",
+                    color: "#64748b",
+                    marginBottom: "4px",
+                  }}
+                >
+                  USER APPEAL
+                </div>
+                {String(row.appeal_text)}
+              </div>
+            )}
+
+            {/* Admin note input for decline */}
+            {hasPendingAppeal && (
+              <div>
+                <label
+                  style={{
+                    fontSize: "0.78rem",
+                    fontWeight: 700,
+                    color: "#64748b",
+                    display: "block",
+                    marginBottom: "4px",
+                  }}
+                >
+                  Decline note (optional, visible to user)
+                </label>
+                <input
+                  type="text"
+                  value={noteById[id] ?? ""}
+                  onChange={(e) =>
+                    setNoteById((prev) => ({ ...prev, [id]: e.target.value }))
+                  }
+                  placeholder="Reason for declining the appeal..."
+                  style={{
+                    width: "100%",
+                    padding: "0.4rem 0.65rem",
+                    borderRadius: "6px",
+                    border: "1px solid var(--color-border,#e2e8f0)",
+                    fontSize: "0.83rem",
+                    outline: "none",
+                    boxSizing: "border-box",
+                  }}
+                />
+              </div>
+            )}
+
+            {/* Action buttons */}
+            <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+              <button
+                disabled={isLoading}
+                onClick={() => doAction(id, "unsuspend")}
+                style={{
+                  background: "#166534",
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: "6px",
+                  padding: "0.4rem 0.85rem",
+                  fontWeight: 700,
+                  fontSize: "0.82rem",
+                  cursor: isLoading ? "not-allowed" : "pointer",
+                  opacity: isLoading ? 0.6 : 1,
+                }}
+              >
+                {isLoading ? "..." : "Reactivate"}
+              </button>
+              {hasPendingAppeal && (
+                <>
+                  <button
+                    disabled={isLoading}
+                    onClick={() => doAction(id, "appeal/accept")}
+                    style={{
+                      background: "#0369a1",
+                      color: "#fff",
+                      border: "none",
+                      borderRadius: "6px",
+                      padding: "0.4rem 0.85rem",
+                      fontWeight: 700,
+                      fontSize: "0.82rem",
+                      cursor: isLoading ? "not-allowed" : "pointer",
+                      opacity: isLoading ? 0.6 : 1,
+                    }}
+                  >
+                    {isLoading ? "..." : "Accept Appeal"}
+                  </button>
+                  <button
+                    disabled={isLoading}
+                    onClick={() => doAction(id, "appeal/decline")}
+                    style={{
+                      background: "#991b1b",
+                      color: "#fff",
+                      border: "none",
+                      borderRadius: "6px",
+                      padding: "0.4rem 0.85rem",
+                      fontWeight: 700,
+                      fontSize: "0.82rem",
+                      cursor: isLoading ? "not-allowed" : "pointer",
+                      opacity: isLoading ? 0.6 : 1,
+                    }}
+                  >
+                    {isLoading ? "..." : "Decline Appeal"}
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+        );
+      })}
+
+      {hasMore && (
+        <button
+          onClick={onLoadMore}
+          disabled={loading}
+          style={{
+            alignSelf: "center",
+            marginTop: "0.5rem",
+            padding: "0.5rem 1.5rem",
+            background: "var(--color-primary,#0F1F3D)",
+            color: "#fff",
+            border: "none",
+            borderRadius: "8px",
+            fontWeight: 700,
+            fontSize: "0.85rem",
+            cursor: loading ? "not-allowed" : "pointer",
+            opacity: loading ? 0.6 : 1,
+          }}
+        >
+          {loading ? "Loading..." : "Load More"}
+        </button>
+      )}
+    </section>
   );
 }
 

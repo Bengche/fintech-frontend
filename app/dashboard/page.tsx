@@ -71,6 +71,24 @@ export default function Dashboard() {
   const [payError, setPayError] = useState("");
   const [payLoading, setPayLoading] = useState(false);
 
+  // Suspension state
+  const [suspension, setSuspension] = useState<{
+    is_suspended: boolean;
+    suspended_until: string | null;
+    suspension_reason: string | null;
+    suspended_at: string | null;
+    appeal_status: "none" | "pending" | "accepted" | "declined";
+    appeal_text: string | null;
+    appeal_at: string | null;
+    appeal_admin_note: string | null;
+    isActive: boolean;
+  } | null>(null);
+  const [showAppealModal, setShowAppealModal] = useState(false);
+  const [appealText, setAppealText] = useState("");
+  const [appealLoading, setAppealLoading] = useState(false);
+  const [appealSuccess, setAppealSuccess] = useState("");
+  const [appealError, setAppealError] = useState("");
+
   useEffect(() => {
     const loadOnboarding = async () => {
       try {
@@ -86,6 +104,45 @@ export default function Dashboard() {
     };
     loadOnboarding();
   }, []);
+
+  useEffect(() => {
+    axios
+      .get(`${API_URL}/user/suspension-status`, { withCredentials: true })
+      .then((r) => setSuspension(r.data))
+      .catch(() => setSuspension(null));
+  }, []);
+
+  const submitAppeal = async () => {
+    if (appealText.trim().length < 20) {
+      setAppealError("Your appeal must be at least 20 characters.");
+      return;
+    }
+    setAppealLoading(true);
+    setAppealError("");
+    setAppealSuccess("");
+    try {
+      const res = await axios.post(
+        `${API_URL}/user/appeal`,
+        { text: appealText.trim() },
+        { withCredentials: true },
+      );
+      setAppealSuccess(res.data.message || "Appeal submitted.");
+      setAppealText("");
+      // Refresh suspension status
+      const updated = await axios.get(`${API_URL}/user/suspension-status`, {
+        withCredentials: true,
+      });
+      setSuspension(updated.data);
+    } catch (err: unknown) {
+      setAppealError(
+        axios.isAxiosError(err) && err.response?.data?.message
+          ? err.response.data.message
+          : "Failed to submit appeal. Please try again.",
+      );
+    } finally {
+      setAppealLoading(false);
+    }
+  };
 
   useEffect(() => {
     setActiveTab(getTabFromSearchParams(searchParams));
@@ -158,6 +215,286 @@ export default function Dashboard() {
         }}
       >
         {/* â”€â”€ Escrow balance â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+        {/* ── Suspension banner ──────────────────────────────────────────── */}
+        {suspension?.isActive && (
+          <div
+            style={{
+              background: "rgba(220,38,38,0.06)",
+              border: "1px solid rgba(220,38,38,0.3)",
+              borderLeft: "4px solid #dc2626",
+              borderRadius: "0.5rem",
+              padding: "1rem 1.25rem",
+              marginBottom: "1.25rem",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "flex-start",
+                gap: "1rem",
+                flexWrap: "wrap",
+              }}
+            >
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <p
+                  style={{
+                    fontWeight: 800,
+                    color: "#991b1b",
+                    margin: "0 0 0.35rem",
+                    fontSize: "1rem",
+                  }}
+                >
+                  Your account has been suspended
+                </p>
+                {suspension.suspension_reason && (
+                  <p
+                    style={{
+                      fontSize: "0.88rem",
+                      color: "#7f1d1d",
+                      margin: "0 0 0.35rem",
+                      lineHeight: 1.5,
+                    }}
+                  >
+                    Reason: {suspension.suspension_reason}
+                  </p>
+                )}
+                {suspension.suspended_until ? (
+                  <p
+                    style={{
+                      fontSize: "0.83rem",
+                      color: "#9a3412",
+                      margin: "0 0 0.35rem",
+                    }}
+                  >
+                    Suspended until:{" "}
+                    {new Date(suspension.suspended_until).toLocaleDateString(
+                      "en-GB",
+                      { day: "2-digit", month: "short", year: "numeric" },
+                    )}
+                  </p>
+                ) : (
+                  <p
+                    style={{ fontSize: "0.83rem", color: "#9a3412", margin: "0 0 0.35rem" }}
+                  >
+                    This suspension is permanent.
+                  </p>
+                )}
+                {suspension.appeal_status === "none" && (
+                  <p style={{ fontSize: "0.83rem", color: "#6b7280", margin: 0 }}>
+                    You may appeal this decision if you believe it was made in error.
+                  </p>
+                )}
+                {suspension.appeal_status === "pending" && (
+                  <p style={{ fontSize: "0.83rem", color: "#92400e", margin: 0, fontWeight: 700 }}>
+                    Your appeal is under review. We will notify you by email.
+                  </p>
+                )}
+                {suspension.appeal_status === "declined" && (
+                  <p style={{ fontSize: "0.83rem", color: "#991b1b", margin: 0 }}>
+                    Your appeal was declined.
+                    {suspension.appeal_admin_note && (
+                      <span> Note: {suspension.appeal_admin_note}</span>
+                    )}
+                  </p>
+                )}
+              </div>
+              {(suspension.appeal_status === "none" ||
+                suspension.appeal_status === "declined") && (
+                <button
+                  onClick={() => {
+                    setShowAppealModal(true);
+                    setAppealSuccess("");
+                    setAppealError("");
+                  }}
+                  style={{
+                    background: "#0F1F3D",
+                    color: "#fff",
+                    border: "none",
+                    borderRadius: "8px",
+                    padding: "0.5rem 1.1rem",
+                    fontWeight: 700,
+                    fontSize: "0.85rem",
+                    cursor: "pointer",
+                    flexShrink: 0,
+                  }}
+                >
+                  Submit Appeal
+                </button>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Appeal modal */}
+        {showAppealModal && (
+          <div
+            style={{
+              position: "fixed",
+              inset: 0,
+              background: "rgba(0,0,0,0.45)",
+              zIndex: 1000,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: "1rem",
+            }}
+            onClick={(e) => {
+              if (e.target === e.currentTarget) setShowAppealModal(false);
+            }}
+          >
+            <div
+              style={{
+                background: "#fff",
+                borderRadius: "14px",
+                padding: "1.5rem",
+                maxWidth: "500px",
+                width: "100%",
+                boxShadow: "0 8px 32px rgba(0,0,0,0.18)",
+              }}
+            >
+              <h3
+                style={{
+                  margin: "0 0 0.5rem",
+                  fontSize: "1.1rem",
+                  fontWeight: 800,
+                  color: "#0f172a",
+                }}
+              >
+                Appeal Suspension
+              </h3>
+              <p
+                style={{
+                  fontSize: "0.85rem",
+                  color: "#64748b",
+                  margin: "0 0 1rem",
+                  lineHeight: 1.5,
+                }}
+              >
+                Explain why you believe your account should be reinstated. Provide as much detail as possible. Our team will review your appeal within 1&ndash;3 business days.
+              </p>
+              {appealSuccess ? (
+                <div style={{ textAlign: "center", padding: "1rem 0" }}>
+                  <p
+                    style={{
+                      color: "#166534",
+                      fontWeight: 700,
+                      fontSize: "0.95rem",
+                      marginBottom: "1rem",
+                    }}
+                  >
+                    {appealSuccess}
+                  </p>
+                  <button
+                    onClick={() => setShowAppealModal(false)}
+                    style={{
+                      background: "#0F1F3D",
+                      color: "#fff",
+                      border: "none",
+                      borderRadius: "8px",
+                      padding: "0.5rem 1.25rem",
+                      fontWeight: 700,
+                      fontSize: "0.88rem",
+                      cursor: "pointer",
+                    }}
+                  >
+                    Close
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <textarea
+                    value={appealText}
+                    onChange={(e) => setAppealText(e.target.value)}
+                    rows={5}
+                    placeholder="Describe your situation in detail..."
+                    style={{
+                      width: "100%",
+                      padding: "0.65rem 0.8rem",
+                      borderRadius: "8px",
+                      border: "1px solid #e2e8f0",
+                      fontSize: "0.88rem",
+                      lineHeight: 1.6,
+                      resize: "vertical",
+                      outline: "none",
+                      boxSizing: "border-box",
+                      fontFamily: "inherit",
+                    }}
+                  />
+                  <p
+                    style={{
+                      fontSize: "0.77rem",
+                      color: appealText.trim().length < 20 ? "#dc2626" : "#64748b",
+                      margin: "0.35rem 0 0.75rem",
+                    }}
+                  >
+                    {appealText.trim().length} / 2000 characters (minimum 20)
+                  </p>
+                  {appealError && (
+                    <p
+                      style={{
+                        color: "#dc2626",
+                        fontSize: "0.83rem",
+                        margin: "0 0 0.75rem",
+                      }}
+                    >
+                      {appealError}
+                    </p>
+                  )}
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: "0.6rem",
+                      justifyContent: "flex-end",
+                    }}
+                  >
+                    <button
+                      onClick={() => setShowAppealModal(false)}
+                      style={{
+                        background: "transparent",
+                        border: "1px solid #e2e8f0",
+                        borderRadius: "8px",
+                        padding: "0.5rem 1rem",
+                        fontWeight: 600,
+                        fontSize: "0.85rem",
+                        cursor: "pointer",
+                        color: "#475569",
+                      }}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={submitAppeal}
+                      disabled={
+                        appealLoading || appealText.trim().length < 20
+                      }
+                      style={{
+                        background: "#0F1F3D",
+                        color: "#fff",
+                        border: "none",
+                        borderRadius: "8px",
+                        padding: "0.5rem 1.25rem",
+                        fontWeight: 700,
+                        fontSize: "0.85rem",
+                        cursor:
+                          appealLoading || appealText.trim().length < 20
+                            ? "not-allowed"
+                            : "pointer",
+                        opacity:
+                          appealLoading || appealText.trim().length < 20
+                            ? 0.6
+                            : 1,
+                      }}
+                    >
+                      {appealLoading ? "Submitting..." : "Submit Appeal"}
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Notice banner */}
         <div
           style={{

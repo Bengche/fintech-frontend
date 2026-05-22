@@ -487,13 +487,28 @@ function RegisterForm() {
             {registerMessageError && (
               <div
                 className="alert alert-danger"
-                style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "0.75rem" }}
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "flex-start",
+                  gap: "0.75rem",
+                }}
               >
                 <span>{registerMessageError}</span>
                 <button
                   type="button"
                   onClick={() => setRegisterMessageError("")}
-                  style={{ background: "none", border: "none", cursor: "pointer", padding: 0, lineHeight: 1, fontSize: "1.1rem", color: "inherit", opacity: 0.7, flexShrink: 0 }}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    padding: 0,
+                    lineHeight: 1,
+                    fontSize: "1.1rem",
+                    color: "inherit",
+                    opacity: 0.7,
+                    flexShrink: 0,
+                  }}
                   aria-label="Dismiss"
                 >
                   ×

@@ -213,7 +213,9 @@ function SelfieCaptureBox({
       // Check current permission state before requesting
       let permState: PermissionState | null = null;
       try {
-        const status = await navigator.permissions.query({ name: "camera" as PermissionName });
+        const status = await navigator.permissions.query({
+          name: "camera" as PermissionName,
+        });
         permState = status.state;
       } catch {
         // Permissions API not supported in this browser — proceed anyway
@@ -228,7 +230,11 @@ function SelfieCaptureBox({
       }
 
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "user", width: { ideal: 1280 }, height: { ideal: 720 } },
+        video: {
+          facingMode: "user",
+          width: { ideal: 1280 },
+          height: { ideal: 720 },
+        },
         audio: false,
       });
       streamRef.current = stream;
@@ -245,11 +251,17 @@ function SelfieCaptureBox({
           "Camera access was denied. Tap the camera or lock icon in your browser's address bar, set camera to 'Allow', then tap 'Open Camera' again.",
         );
       } else if (name === "NotFoundError" || name === "DevicesNotFoundError") {
-        setError("No camera was found on this device. Please use a device with a front-facing camera.");
+        setError(
+          "No camera was found on this device. Please use a device with a front-facing camera.",
+        );
       } else if (name === "NotReadableError" || name === "TrackStartError") {
-        setError("Your camera is in use by another app. Please close it and try again.");
+        setError(
+          "Your camera is in use by another app. Please close it and try again.",
+        );
       } else {
-        setError("Could not start camera. Please ensure camera permissions are allowed for this site and try again.");
+        setError(
+          "Could not start camera. Please ensure camera permissions are allowed for this site and try again.",
+        );
       }
     } finally {
       setStarting(false);
@@ -272,7 +284,9 @@ function SelfieCaptureBox({
     canvas.toBlob(
       (blob) => {
         if (!blob) return;
-        const file = new File([blob], `selfie_${Date.now()}.jpg`, { type: "image/jpeg" });
+        const file = new File([blob], `selfie_${Date.now()}.jpg`, {
+          type: "image/jpeg",
+        });
         const url = URL.createObjectURL(file);
         setPreview(url);
         onChange(file);
@@ -290,36 +304,92 @@ function SelfieCaptureBox({
 
   return (
     <div className="kyc-form-row">
-      <label className="kyc-form-label kyc-form-label--required">Live Selfie</label>
-      <p className="kyc-form-hint">Your camera will open to take a live photo. No uploads from gallery are allowed.</p>
+      <label className="kyc-form-label kyc-form-label--required">
+        Live Selfie
+      </label>
+      <p className="kyc-form-hint">
+        Your camera will open to take a live photo. No uploads from gallery are
+        allowed.
+      </p>
 
       {error && (
-        <div style={{ background: "#fef2f2", border: "1px solid #fca5a5", borderRadius: "0.75rem", padding: "0.75rem 1rem", marginBottom: "0.75rem", fontSize: "0.84rem", color: "#991b1b" }}>
+        <div
+          style={{
+            background: "#fef2f2",
+            border: "1px solid #fca5a5",
+            borderRadius: "0.75rem",
+            padding: "0.75rem 1rem",
+            marginBottom: "0.75rem",
+            fontSize: "0.84rem",
+            color: "#991b1b",
+          }}
+        >
           {error}
         </div>
       )}
 
       {/* Live camera view */}
       {cameraOn && (
-        <div style={{ position: "relative", borderRadius: "0.875rem", overflow: "hidden", background: "#000" }}>
+        <div
+          style={{
+            position: "relative",
+            borderRadius: "0.875rem",
+            overflow: "hidden",
+            background: "#000",
+          }}
+        >
           <video
             ref={videoRef}
             playsInline
             muted
-            style={{ width: "100%", display: "block", maxHeight: "360px", objectFit: "cover" }}
+            style={{
+              width: "100%",
+              display: "block",
+              maxHeight: "360px",
+              objectFit: "cover",
+            }}
           />
-          <div style={{ position: "absolute", bottom: "1rem", left: 0, right: 0, display: "flex", justifyContent: "center", gap: "0.75rem" }}>
+          <div
+            style={{
+              position: "absolute",
+              bottom: "1rem",
+              left: 0,
+              right: 0,
+              display: "flex",
+              justifyContent: "center",
+              gap: "0.75rem",
+            }}
+          >
             <button
               type="button"
               onClick={capture}
-              style={{ background: "#fff", color: "#0f172a", border: "none", borderRadius: "999px", padding: "0.65rem 1.5rem", fontWeight: 700, fontSize: "0.9rem", cursor: "pointer", boxShadow: "0 2px 8px rgba(0,0,0,0.25)" }}
+              style={{
+                background: "#fff",
+                color: "#0f172a",
+                border: "none",
+                borderRadius: "999px",
+                padding: "0.65rem 1.5rem",
+                fontWeight: 700,
+                fontSize: "0.9rem",
+                cursor: "pointer",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.25)",
+              }}
             >
               Take Photo
             </button>
             <button
               type="button"
               onClick={stopCamera}
-              style={{ background: "rgba(255,255,255,0.15)", color: "#fff", border: "1px solid rgba(255,255,255,0.3)", borderRadius: "999px", padding: "0.65rem 1.25rem", fontWeight: 600, fontSize: "0.9rem", cursor: "pointer" }}
+              style={{
+                background: "rgba(255,255,255,0.15)",
+                color: "#fff",
+                border: "1px solid rgba(255,255,255,0.3)",
+                borderRadius: "999px",
+                padding: "0.65rem 1.25rem",
+                fontWeight: 600,
+                fontSize: "0.9rem",
+                cursor: "pointer",
+              }}
             >
               Cancel
             </button>
@@ -329,13 +399,47 @@ function SelfieCaptureBox({
 
       {/* Captured preview */}
       {preview && !cameraOn && (
-        <div style={{ position: "relative", borderRadius: "0.875rem", overflow: "hidden" }}>
-          <img src={preview} alt="Selfie preview" style={{ width: "100%", display: "block", maxHeight: "360px", objectFit: "cover" }} />
-          <div style={{ position: "absolute", bottom: "1rem", left: 0, right: 0, display: "flex", justifyContent: "center" }}>
+        <div
+          style={{
+            position: "relative",
+            borderRadius: "0.875rem",
+            overflow: "hidden",
+          }}
+        >
+          <img
+            src={preview}
+            alt="Selfie preview"
+            style={{
+              width: "100%",
+              display: "block",
+              maxHeight: "360px",
+              objectFit: "cover",
+            }}
+          />
+          <div
+            style={{
+              position: "absolute",
+              bottom: "1rem",
+              left: 0,
+              right: 0,
+              display: "flex",
+              justifyContent: "center",
+            }}
+          >
             <button
               type="button"
               onClick={retake}
-              style={{ background: "#fff", color: "#0f172a", border: "none", borderRadius: "999px", padding: "0.65rem 1.5rem", fontWeight: 700, fontSize: "0.9rem", cursor: "pointer", boxShadow: "0 2px 8px rgba(0,0,0,0.25)" }}
+              style={{
+                background: "#fff",
+                color: "#0f172a",
+                border: "none",
+                borderRadius: "999px",
+                padding: "0.65rem 1.5rem",
+                fontWeight: 700,
+                fontSize: "0.9rem",
+                cursor: "pointer",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.25)",
+              }}
             >
               Retake
             </button>
@@ -352,14 +456,40 @@ function SelfieCaptureBox({
         >
           <div className="kyc-upload-placeholder">
             {starting ? (
-              <Loader2 size={28} style={{ color: "var(--color-text-muted)", marginBottom: "0.5rem", animation: "spin 1s linear infinite" }} />
+              <Loader2
+                size={28}
+                style={{
+                  color: "var(--color-text-muted)",
+                  marginBottom: "0.5rem",
+                  animation: "spin 1s linear infinite",
+                }}
+              />
             ) : (
-              <Camera size={28} style={{ color: "var(--color-text-muted)", marginBottom: "0.5rem" }} />
+              <Camera
+                size={28}
+                style={{
+                  color: "var(--color-text-muted)",
+                  marginBottom: "0.5rem",
+                }}
+              />
             )}
-            <p style={{ margin: 0, fontSize: "0.875rem", color: "var(--color-text-muted)", fontWeight: 600 }}>
+            <p
+              style={{
+                margin: 0,
+                fontSize: "0.875rem",
+                color: "var(--color-text-muted)",
+                fontWeight: 600,
+              }}
+            >
               {starting ? "Starting camera…" : "Tap to open camera"}
             </p>
-            <p style={{ margin: "4px 0 0", fontSize: "0.75rem", color: "var(--color-text-muted)" }}>
+            <p
+              style={{
+                margin: "4px 0 0",
+                fontSize: "0.75rem",
+                color: "var(--color-text-muted)",
+              }}
+            >
               A live photo will be taken — no gallery uploads
             </p>
           </div>
@@ -1024,10 +1154,7 @@ export default function KycPage() {
                   </ul>
                 </div>
 
-                <SelfieCaptureBox
-                  file={selfie}
-                  onChange={setSelfie}
-                />
+                <SelfieCaptureBox file={selfie} onChange={setSelfie} />
               </div>
             )}
 
