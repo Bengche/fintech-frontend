@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState, useCallback, useRef } from "react";
+import { Fragment, useEffect, useState, useCallback, useRef } from "react";
 import { useTranslations } from "next-intl";
 import axios from "axios";
 import { useRouter } from "next/navigation";
@@ -223,6 +223,13 @@ export default function AdminDashboard() {
   );
   const [userActionMsg, setUserActionMsg] = useState("");
   const [userActionErr, setUserActionErr] = useState("");
+
+  // Users tab — suspend form state
+  const [suspendFormUserId, setSuspendFormUserId] = useState<number | null>(null);
+  const [suspendReason, setSuspendReason] = useState("");
+  const [suspendType, setSuspendType] = useState<"permanent" | "temporary">("temporary");
+  const [suspendDays, setSuspendDays] = useState("7");
+  const [suspendSubmitting, setSuspendSubmitting] = useState(false);
 
   // ── Platform Controls state ───────────────────────────────────────────────
   interface PlatformSettings {
@@ -483,6 +490,46 @@ export default function AdminDashboard() {
   const handleLogout = async () => {
     await axios.post(`${API_URL}/admin/logout`, {}, { withCredentials: true });
     router.push("/admin/login");
+  };
+
+  // ── 7b. Suspend user ─────────────────────────────────────────────────────────
+  const submitSuspend = async (userId: number) => {
+    setUserActionMsg("");
+    setUserActionErr("");
+    if (!suspendReason.trim()) {
+      setUserActionErr("Suspension reason is required.");
+      return;
+    }
+    if (suspendType === "temporary" && (isNaN(Number(suspendDays)) || Number(suspendDays) < 1)) {
+      setUserActionErr("Enter a valid number of days (minimum 1).");
+      return;
+    }
+    setSuspendSubmitting(true);
+    try {
+      const res = await axios.post(
+        `${API_URL}/admin/users/${userId}/suspend`,
+        {
+          reason: suspendReason.trim(),
+          type: suspendType,
+          duration_days: suspendType === "temporary" ? Number(suspendDays) : undefined,
+        },
+        { withCredentials: true },
+      );
+      setUserActionMsg(res.data.message ?? "User suspended successfully.");
+      setSuspendFormUserId(null);
+      setSuspendReason("");
+      setSuspendType("temporary");
+      setSuspendDays("7");
+      loadTab("users", false, 0);
+    } catch (err: unknown) {
+      setUserActionErr(
+        axios.isAxiosError(err) && err.response?.data?.message
+          ? err.response.data.message
+          : "Failed to suspend user.",
+      );
+    } finally {
+      setSuspendSubmitting(false);
+    }
   };
 
   // ── 8. Platform Controls ─────────────────────────────────────────────────────
@@ -1240,10 +1287,11 @@ export default function AdminDashboard() {
                 {users.data.map((u) => {
                   const uid = Number(u.id);
                   const isDeleting = userDeleteLoadingId === uid;
+                  const showSuspendForm = suspendFormUserId === uid;
                   return (
+                    <Fragment key={String(u.id)}>
                     <tr
-                      key={String(u.id)}
-                      style={{ borderBottom: "1px solid var(--color-border)" }}
+                      style={{ borderBottom: showSuspendForm ? "none" : "1px solid var(--color-border)" }}
                     >
                       <Td bold>{u.name}</Td>
                       <Td muted>@{u.username}</Td>
@@ -1254,6 +1302,7 @@ export default function AdminDashboard() {
                       <Td mono>{u.referral_code ?? "—"}</Td>
                       <Td muted>{fmtDate(u.createdat)}</Td>
                       <Td>
+                        <div style={{ display: "flex", gap: "0.3rem", flexWrap: "wrap" }}>
                         <button
                           disabled={isDeleting}
                           onClick={async () => {
@@ -1300,6 +1349,29 @@ export default function AdminDashboard() {
                           {isDeleting ? "..." : "Delete"}
                         </button>
                         <button
+                          onClick={() => {
+                            setSuspendFormUserId(showSuspendForm ? null : uid);
+                            setSuspendReason("");
+                            setSuspendType("temporary");
+                            setSuspendDays("7");
+                            setUserActionMsg("");
+                            setUserActionErr("");
+                          }}
+                          style={{
+                            background: showSuspendForm ? "#64748b" : "#d97706",
+                            color: "#fff",
+                            border: "none",
+                            borderRadius: "6px",
+                            padding: "0.3rem 0.7rem",
+                            fontWeight: 700,
+                            fontSize: "0.76rem",
+                            cursor: "pointer",
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          {showSuspendForm ? "Cancel" : "Suspend"}
+                        </button>
+                        <button
                           onClick={() => setProfileUserId(uid)}
                           style={{
                             background: "#0F1F3D",
@@ -1311,13 +1383,75 @@ export default function AdminDashboard() {
                             fontSize: "0.76rem",
                             cursor: "pointer",
                             whiteSpace: "nowrap",
-                            marginLeft: "0.375rem",
                           }}
                         >
                           Profile
                         </button>
+                        </div>
                       </Td>
                     </tr>
+                    {showSuspendForm && (
+                      <tr style={{ borderBottom: "1px solid var(--color-border)" }}>
+                        <td colSpan={9} style={{ padding: "0.75rem 1rem", background: "#fffbeb" }}>
+                          <div style={{ display: "flex", flexWrap: "wrap", gap: "0.75rem", alignItems: "flex-end" }}>
+                            <div style={{ flex: "1 1 220px" }}>
+                              <label style={{ display: "block", fontSize: "0.78rem", fontWeight: 700, color: "#92400e", marginBottom: "3px" }}>
+                                Reason <span style={{ color: "#ef4444" }}>*</span>
+                              </label>
+                              <input
+                                type="text"
+                                value={suspendReason}
+                                onChange={(e) => setSuspendReason(e.target.value)}
+                                placeholder="e.g. Violation of terms of service"
+                                style={{ width: "100%", padding: "0.4rem 0.6rem", borderRadius: "6px", border: "1px solid #d97706", fontSize: "0.83rem", boxSizing: "border-box" }}
+                              />
+                            </div>
+                            <div style={{ flex: "0 0 130px" }}>
+                              <label style={{ display: "block", fontSize: "0.78rem", fontWeight: 700, color: "#92400e", marginBottom: "3px" }}>Type</label>
+                              <select
+                                value={suspendType}
+                                onChange={(e) => setSuspendType(e.target.value as "permanent" | "temporary")}
+                                style={{ width: "100%", padding: "0.4rem 0.6rem", borderRadius: "6px", border: "1px solid #d97706", fontSize: "0.83rem", background: "#fff" }}
+                              >
+                                <option value="temporary">Temporary</option>
+                                <option value="permanent">Permanent</option>
+                              </select>
+                            </div>
+                            {suspendType === "temporary" && (
+                              <div style={{ flex: "0 0 110px" }}>
+                                <label style={{ display: "block", fontSize: "0.78rem", fontWeight: 700, color: "#92400e", marginBottom: "3px" }}>Days</label>
+                                <input
+                                  type="number"
+                                  min="1"
+                                  value={suspendDays}
+                                  onChange={(e) => setSuspendDays(e.target.value)}
+                                  style={{ width: "100%", padding: "0.4rem 0.6rem", borderRadius: "6px", border: "1px solid #d97706", fontSize: "0.83rem", boxSizing: "border-box" }}
+                                />
+                              </div>
+                            )}
+                            <button
+                              disabled={suspendSubmitting}
+                              onClick={() => submitSuspend(uid)}
+                              style={{
+                                background: "#d97706",
+                                color: "#fff",
+                                border: "none",
+                                borderRadius: "6px",
+                                padding: "0.45rem 1rem",
+                                fontWeight: 700,
+                                fontSize: "0.83rem",
+                                cursor: suspendSubmitting ? "not-allowed" : "pointer",
+                                opacity: suspendSubmitting ? 0.6 : 1,
+                                whiteSpace: "nowrap",
+                              }}
+                            >
+                              {suspendSubmitting ? "Suspending…" : "Confirm Suspend"}
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                    </Fragment>
                   );
                 })}
               </tbody>
