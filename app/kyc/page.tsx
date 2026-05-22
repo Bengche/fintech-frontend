@@ -167,6 +167,183 @@ function ImageUploadBox({
   );
 }
 
+// ── Live Selfie Capture Component ─────────────────────────────────────────────
+function SelfieCaptureBox({
+  file,
+  onChange,
+}: {
+  file: File | null;
+  onChange: (f: File) => void;
+}) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const [preview, setPreview] = useState<string | null>(null);
+  const [cameraOn, setCameraOn] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [starting, setStarting] = useState(false);
+
+  // Revoke previous preview URL when it changes
+  useEffect(() => {
+    return () => {
+      if (preview) URL.revokeObjectURL(preview);
+    };
+  }, [preview]);
+
+  // Stop stream on unmount
+  useEffect(() => {
+    return () => {
+      streamRef.current?.getTracks().forEach((t) => t.stop());
+    };
+  }, []);
+
+  // Show existing capture as preview when file already set
+  useEffect(() => {
+    if (file && !cameraOn) {
+      const url = URL.createObjectURL(file);
+      setPreview(url);
+      return () => URL.revokeObjectURL(url);
+    }
+  }, [file, cameraOn]);
+
+  const startCamera = async () => {
+    setError(null);
+    setStarting(true);
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: "user", width: { ideal: 1280 }, height: { ideal: 720 } },
+        audio: false,
+      });
+      streamRef.current = stream;
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        await videoRef.current.play();
+      }
+      setCameraOn(true);
+      setPreview(null);
+    } catch {
+      setError("Camera access denied. Please allow camera permissions in your browser and try again.");
+    } finally {
+      setStarting(false);
+    }
+  };
+
+  const stopCamera = () => {
+    streamRef.current?.getTracks().forEach((t) => t.stop());
+    streamRef.current = null;
+    setCameraOn(false);
+  };
+
+  const capture = () => {
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+    if (!video || !canvas) return;
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    canvas.getContext("2d")?.drawImage(video, 0, 0);
+    canvas.toBlob(
+      (blob) => {
+        if (!blob) return;
+        const file = new File([blob], `selfie_${Date.now()}.jpg`, { type: "image/jpeg" });
+        const url = URL.createObjectURL(file);
+        setPreview(url);
+        onChange(file);
+        stopCamera();
+      },
+      "image/jpeg",
+      0.92,
+    );
+  };
+
+  const retake = () => {
+    setPreview(null);
+    startCamera();
+  };
+
+  return (
+    <div className="kyc-form-row">
+      <label className="kyc-form-label kyc-form-label--required">Live Selfie</label>
+      <p className="kyc-form-hint">Your camera will open to take a live photo. No uploads from gallery are allowed.</p>
+
+      {error && (
+        <div style={{ background: "#fef2f2", border: "1px solid #fca5a5", borderRadius: "0.75rem", padding: "0.75rem 1rem", marginBottom: "0.75rem", fontSize: "0.84rem", color: "#991b1b" }}>
+          {error}
+        </div>
+      )}
+
+      {/* Live camera view */}
+      {cameraOn && (
+        <div style={{ position: "relative", borderRadius: "0.875rem", overflow: "hidden", background: "#000" }}>
+          <video
+            ref={videoRef}
+            playsInline
+            muted
+            style={{ width: "100%", display: "block", maxHeight: "360px", objectFit: "cover" }}
+          />
+          <div style={{ position: "absolute", bottom: "1rem", left: 0, right: 0, display: "flex", justifyContent: "center", gap: "0.75rem" }}>
+            <button
+              type="button"
+              onClick={capture}
+              style={{ background: "#fff", color: "#0f172a", border: "none", borderRadius: "999px", padding: "0.65rem 1.5rem", fontWeight: 700, fontSize: "0.9rem", cursor: "pointer", boxShadow: "0 2px 8px rgba(0,0,0,0.25)" }}
+            >
+              Take Photo
+            </button>
+            <button
+              type="button"
+              onClick={stopCamera}
+              style={{ background: "rgba(255,255,255,0.15)", color: "#fff", border: "1px solid rgba(255,255,255,0.3)", borderRadius: "999px", padding: "0.65rem 1.25rem", fontWeight: 600, fontSize: "0.9rem", cursor: "pointer" }}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Captured preview */}
+      {preview && !cameraOn && (
+        <div style={{ position: "relative", borderRadius: "0.875rem", overflow: "hidden" }}>
+          <img src={preview} alt="Selfie preview" style={{ width: "100%", display: "block", maxHeight: "360px", objectFit: "cover" }} />
+          <div style={{ position: "absolute", bottom: "1rem", left: 0, right: 0, display: "flex", justifyContent: "center" }}>
+            <button
+              type="button"
+              onClick={retake}
+              style={{ background: "#fff", color: "#0f172a", border: "none", borderRadius: "999px", padding: "0.65rem 1.5rem", fontWeight: 700, fontSize: "0.9rem", cursor: "pointer", boxShadow: "0 2px 8px rgba(0,0,0,0.25)" }}
+            >
+              Retake
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Initial state — no camera, no capture yet */}
+      {!cameraOn && !preview && (
+        <div
+          className="kyc-upload-box"
+          onClick={startCamera}
+          style={{ cursor: starting ? "wait" : "pointer" }}
+        >
+          <div className="kyc-upload-placeholder">
+            {starting ? (
+              <Loader2 size={28} style={{ color: "var(--color-text-muted)", marginBottom: "0.5rem", animation: "spin 1s linear infinite" }} />
+            ) : (
+              <Camera size={28} style={{ color: "var(--color-text-muted)", marginBottom: "0.5rem" }} />
+            )}
+            <p style={{ margin: 0, fontSize: "0.875rem", color: "var(--color-text-muted)", fontWeight: 600 }}>
+              {starting ? "Starting camera…" : "Tap to open camera"}
+            </p>
+            <p style={{ margin: "4px 0 0", fontSize: "0.75rem", color: "var(--color-text-muted)" }}>
+              A live photo will be taken — no gallery uploads
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Hidden canvas for frame capture */}
+      <canvas ref={canvasRef} style={{ display: "none" }} />
+    </div>
+  );
+}
+
 // ── Step Progress Bar ─────────────────────────────────────────────────────────
 function StepBar({ step, total }: { step: number; total: number }) {
   const t = useTranslations("Kyc");
@@ -819,12 +996,9 @@ export default function KycPage() {
                   </ul>
                 </div>
 
-                <ImageUploadBox
-                  label={t("fieldSelfie")}
-                  hint={t("hintSelfie")}
+                <SelfieCaptureBox
                   file={selfie}
                   onChange={setSelfie}
-                  required
                 />
               </div>
             )}
