@@ -228,7 +228,9 @@ export default function InvoicePage() {
     }
   };
 
-  const isPaid = invoiceStats.status === "paid";
+  const isPaid = ["paid", "delivered", "completed", "refunded"].includes(
+    invoiceStats.status,
+  );
   const isExpired = invoiceStats.status === "expired";
   const isDisabled = isPaid || isExpired || payLoading;
   const sellerName =
@@ -237,13 +239,16 @@ export default function InvoicePage() {
     ? `${invoiceStats.amount.toLocaleString()} ${invoiceStats.currency}`
     : "-";
 
-  const statusBadgeClass = isPaid
-    ? "badge badge-success"
-    : isExpired
-      ? "badge badge-danger"
-      : invoiceStats.status === "delivered"
-        ? "badge badge-info"
-        : "badge badge-warning";
+  const statusBadgeClass =
+    invoiceStats.status === "paid" ||
+    invoiceStats.status === "completed" ||
+    invoiceStats.status === "refunded"
+      ? "badge badge-success"
+      : isExpired
+        ? "badge badge-danger"
+        : invoiceStats.status === "delivered"
+          ? "badge badge-info"
+          : "badge badge-warning";
 
   return (
     <div style={{ minHeight: "100vh", backgroundColor: "var(--color-cloud)" }}>
@@ -1269,7 +1274,13 @@ export default function InvoicePage() {
                         color: "#14532d",
                       }}
                     >
-                      {t("alreadyPaid")}
+                      {invoiceStats.status === "refunded"
+                        ? "This invoice has been refunded"
+                        : invoiceStats.status === "completed"
+                          ? "This invoice is complete"
+                          : invoiceStats.status === "delivered"
+                            ? "Payment received — awaiting release"
+                            : t("alreadyPaid")}
                     </p>
                     <p
                       style={{
@@ -1279,7 +1290,9 @@ export default function InvoicePage() {
                         lineHeight: 1.5,
                       }}
                     >
-                      This invoice has already been paid. The payment fields below are disabled to prevent a duplicate transaction.
+                      {invoiceStats.status === "refunded"
+                        ? "A refund has been processed for this invoice. No further payment is required."
+                        : "This invoice has already been paid. The payment fields below are disabled to prevent a duplicate transaction."}
                     </p>
                   </div>
                 </div>
@@ -1336,17 +1349,17 @@ export default function InvoicePage() {
                   />
                 </div>
                 {!isPaid && (
-                <p
-                  style={{
-                    marginTop: "0.3rem",
-                    fontSize: "0.8rem",
-                    color: "var(--color-danger)",
-                    lineHeight: 1.5,
-                    fontWeight: 500,
-                  }}
-                >
-                  {t("momoHint")}
-                </p>
+                  <p
+                    style={{
+                      marginTop: "0.3rem",
+                      fontSize: "0.8rem",
+                      color: "var(--color-danger)",
+                      lineHeight: 1.5,
+                      fontWeight: 500,
+                    }}
+                  >
+                    {t("momoHint")}
+                  </p>
                 )}
               </div>
 
@@ -1373,16 +1386,16 @@ export default function InvoicePage() {
                   }}
                 />
                 {!isPaid && (
-                <p
-                  style={{
-                    marginTop: "0.3rem",
-                    fontSize: "0.8rem",
-                    color: "var(--color-text-muted)",
-                    lineHeight: 1.5,
-                  }}
-                >
-                  {t("emailHint")}
-                </p>
+                  <p
+                    style={{
+                      marginTop: "0.3rem",
+                      fontSize: "0.8rem",
+                      color: "var(--color-text-muted)",
+                      lineHeight: 1.5,
+                    }}
+                  >
+                    {t("emailHint")}
+                  </p>
                 )}
               </div>
 
@@ -1464,6 +1477,10 @@ export default function InvoicePage() {
               >
                 {payLoading ? (
                   <InlineSpinner />
+                ) : invoiceStats.status === "refunded" ? (
+                  "Invoice Refunded"
+                ) : invoiceStats.status === "completed" ? (
+                  "Invoice Completed"
                 ) : isPaid ? (
                   "Payment Already Made"
                 ) : (
