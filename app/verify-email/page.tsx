@@ -476,7 +476,7 @@ function VerifyEmailPage() {
                     onChange={handleChange}
                     onKeyDown={handleKeyDown}
                     onPaste={handlePaste}
-                    disabled={isLoading || status === "success"}
+                    disabled={isLoading}
                   />
                 ))}
               </div>
