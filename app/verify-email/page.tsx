@@ -81,6 +81,7 @@ function VerifyEmailPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const rawEmail = searchParams.get("email") || "";
+  const urlCode = searchParams.get("code") || "";
 
   const [digits, setDigits] = useState(["", "", "", "", "", ""]);
   const [status, setStatus] = useState<
@@ -95,11 +96,45 @@ function VerifyEmailPage() {
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const cooldownRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const countdownRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  // Prevent double-firing the auto-verify from the URL code
+  const autoVerifiedRef = useRef(false);
 
-  // Auto-focus first input on mount
+  // Auto-focus first input on mount (skip when auto-verifying from link)
   useEffect(() => {
-    setTimeout(() => inputRefs.current[0]?.focus(), 80);
-  }, []);
+    if (!urlCode) {
+      setTimeout(() => inputRefs.current[0]?.focus(), 80);
+    }
+  }, [urlCode]);
+
+  // Auto-verify when code arrives via email link (?code=XXXXXX)
+  useEffect(() => {
+    if (!urlCode || autoVerifiedRef.current) return;
+    const cleaned = urlCode.replace(/\D/g, "").slice(0, 6);
+    if (cleaned.length !== 6) return;
+    autoVerifiedRef.current = true;
+    // Fill the digit boxes visually, then verify
+    setDigits(cleaned.split(""));
+    setStatus("verifying");
+    setErrorMsg("");
+    Axios.post(`${API}/auth/verify-email`, { email: rawEmail, otp: cleaned })
+      .then(() => setStatus("success"))
+      .catch((err: unknown) => {
+        const data = (err as { response?: { data?: { code?: string; message?: string } } })
+          ?.response?.data;
+        if (data?.code === "OTP_EXPIRED") {
+          setStatus("expired");
+          setErrorMsg(data.message || "Your verification link has expired.");
+        } else {
+          setStatus("error");
+          setErrorMsg(
+            data?.message || "Verification failed. Please enter the code manually.",
+          );
+          setDigits(["", "", "", "", "", ""]);
+          setTimeout(() => inputRefs.current[0]?.focus(), 80);
+        }
+      });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [urlCode, rawEmail]);
 
   // Start post-success countdown
   useEffect(() => {
@@ -396,14 +431,16 @@ function VerifyEmailPage() {
           ) : (
             /* ── Verification form ──────────────────────────────── */
             <>
-              {/* Icon */}
+              {/* Icon — spinner when auto-verifying from link */}
               <div
                 style={{
                   width: 64,
                   height: 64,
                   borderRadius: "50%",
                   background:
-                    "linear-gradient(135deg, rgba(15,31,61,0.07), rgba(245,158,11,0.18))",
+                    isLoading && urlCode
+                      ? "linear-gradient(135deg, rgba(15,31,61,0.06), rgba(245,158,11,0.14))"
+                      : "linear-gradient(135deg, rgba(15,31,61,0.07), rgba(245,158,11,0.18))",
                   border: "1.5px solid rgba(15,31,61,0.1)",
                   display: "flex",
                   alignItems: "center",
@@ -411,19 +448,33 @@ function VerifyEmailPage() {
                   margin: "0 auto 1.25rem",
                 }}
               >
-                <svg
-                  width="30"
-                  height="30"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="var(--color-primary)"
-                  strokeWidth="1.8"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <rect x="2" y="4" width="20" height="16" rx="2" />
-                  <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
-                </svg>
+                {isLoading && urlCode ? (
+                  <span
+                    style={{
+                      width: 28,
+                      height: 28,
+                      border: "3px solid rgba(15,31,61,0.15)",
+                      borderTopColor: "var(--color-primary)",
+                      borderRadius: "50%",
+                      animation: "spin 0.7s linear infinite",
+                      display: "inline-block",
+                    }}
+                  />
+                ) : (
+                  <svg
+                    width="30"
+                    height="30"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="var(--color-primary)"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <rect x="2" y="4" width="20" height="16" rx="2" />
+                    <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+                  </svg>
+                )}
               </div>
 
               <h1
@@ -436,7 +487,7 @@ function VerifyEmailPage() {
                   letterSpacing: "-0.02em",
                 }}
               >
-                Verify your email
+                {isLoading && urlCode ? "Verifying your email..." : "Verify your email"}
               </h1>
               <p
                 style={{
@@ -447,15 +498,21 @@ function VerifyEmailPage() {
                   textAlign: "center",
                 }}
               >
-                We sent a 6-digit code to{" "}
-                {rawEmail ? (
-                  <strong style={{ color: "var(--color-text-body)" }}>
-                    {rawEmail}
-                  </strong>
+                {isLoading && urlCode ? (
+                  "Please wait while we confirm your email address."
                 ) : (
-                  "your email address"
+                  <>
+                    We sent a 6-digit code to{" "}
+                    {rawEmail ? (
+                      <strong style={{ color: "var(--color-text-body)" }}>
+                        {rawEmail}
+                      </strong>
+                    ) : (
+                      "your email address"
+                    )}
+                    . Enter it below to complete your registration.
+                  </>
                 )}
-                . Enter it below to complete your registration.
               </p>
 
               {/* OTP digit row */}

@@ -14,6 +14,8 @@ function RegisterForm() {
   const [image, setImage] = useState<File | null>(null);
   const [registerMessageError, setRegisterMessageError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [submittedEmail, setSubmittedEmail] = useState("");
   const searchParams = useSearchParams();
 
   const [formData, setFormData] = useState({
@@ -59,10 +61,12 @@ function RegisterForm() {
     }
     try {
       await Axios.post(`${API}/auth/register`, newFormData);
-      // Redirect to the email verification page with the (masked) email
-      router.push(
-        `/verify-email?email=${encodeURIComponent(formData.email)}`,
-      );
+      setSubmittedEmail(formData.email);
+      setSubmitted(true);
+      // Redirect to verify-email after a brief success moment
+      setTimeout(() => {
+        router.push(`/verify-email?email=${encodeURIComponent(formData.email)}`);
+      }, 2800);
     } catch (error: unknown) {
       const message =
         (error as { response?: { data?: { message?: string } } })?.response
@@ -124,6 +128,127 @@ function RegisterForm() {
     if (parts.length === 2) return `${parts[0]} and ${parts[1]}`;
     return `${parts[0]}, ${parts[1]} and ${parts[2]}`;
   })();
+
+  // ── Success interstitial ───────────────────────────────────────────────────
+  if (submitted) {
+    return (
+      <div
+        style={{
+          minHeight: "100vh",
+          backgroundColor: "var(--color-cloud)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "2rem 1.25rem",
+        }}
+      >
+        <div style={{ width: "100%", maxWidth: "440px", textAlign: "center" }}>
+          <Link
+            href="/"
+            style={{
+              fontSize: "1.75rem",
+              fontWeight: 800,
+              color: "var(--color-primary)",
+              letterSpacing: "-0.03em",
+              textDecoration: "none",
+              display: "block",
+              marginBottom: "1.75rem",
+            }}
+          >
+            Fonlok
+          </Link>
+          <div className="card" style={{ padding: "clamp(1.75rem, 6vw, 2.5rem)" }}>
+            {/* Animated envelope icon */}
+            <div
+              style={{
+                width: 72,
+                height: 72,
+                borderRadius: "50%",
+                background:
+                  "linear-gradient(135deg, rgba(15,31,61,0.07), rgba(245,158,11,0.22))",
+                border: "1.5px solid rgba(245,158,11,0.35)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                margin: "0 auto 1.25rem",
+              }}
+            >
+              <svg
+                width="32"
+                height="32"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="var(--color-primary)"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <rect x="2" y="4" width="20" height="16" rx="2" />
+                <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+              </svg>
+            </div>
+
+            <h1
+              style={{
+                fontSize: "clamp(1.2rem, 4vw, 1.5rem)",
+                fontWeight: 800,
+                color: "var(--color-text-heading)",
+                margin: "0 0 0.6rem",
+                letterSpacing: "-0.02em",
+              }}
+            >
+              Account created successfully
+            </h1>
+            <p
+              style={{
+                color: "var(--color-text-muted)",
+                fontSize: "0.9375rem",
+                lineHeight: 1.65,
+                margin: "0 0 1.5rem",
+              }}
+            >
+              We sent a verification code to{" "}
+              <strong style={{ color: "var(--color-text-body)" }}>
+                {submittedEmail}
+              </strong>
+              . Taking you there now...
+            </p>
+
+            {/* Animated progress bar */}
+            <div
+              style={{
+                height: 4,
+                background: "var(--color-mist)",
+                borderRadius: 99,
+                overflow: "hidden",
+              }}
+            >
+              <div
+                style={{
+                  height: "100%",
+                  background: "var(--color-primary)",
+                  borderRadius: 99,
+                  animation: "fillBar 2.8s linear forwards",
+                }}
+              />
+            </div>
+            <p
+              style={{
+                marginTop: "0.75rem",
+                fontSize: "0.8rem",
+                color: "var(--color-text-muted)",
+              }}
+            >
+              Redirecting to email verification...
+            </p>
+          </div>
+        </div>
+        <style>{`
+          @keyframes fillBar { from { width: 0%; } to { width: 100%; } }
+        `}</style>
+      </div>
+    );
+  }
 
   return (
     <div
