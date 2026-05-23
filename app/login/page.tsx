@@ -62,9 +62,15 @@ export default function Login() {
 
       finalizeLogin(response);
     } catch (error: unknown) {
+      const data = (error as { response?: { data?: { code?: string; message?: string; email?: string } } })
+        ?.response?.data;
+      if (data?.code === "EMAIL_NOT_VERIFIED") {
+        const emailParam = data.email || formData.email;
+        router.push(`/verify-email?email=${encodeURIComponent(emailParam)}`);
+        return;
+      }
       const message =
-        (error as { response?: { data?: { message?: string } } })?.response
-          ?.data?.message ||
+        data?.message ||
         "Login failed. Please check your credentials and try again.";
       setLoginError(message);
     } finally {

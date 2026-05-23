@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect, Suspense } from "react";
 import Axios from "axios";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { haptic } from "@/hooks/useHaptic";
@@ -10,8 +10,8 @@ const API = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
 
 function RegisterForm() {
   const t = useTranslations("Register");
+  const router = useRouter();
   const [image, setImage] = useState<File | null>(null);
-  const [registerMessageSuccess, setRegisterMessageSuccess] = useState("");
   const [registerMessageError, setRegisterMessageError] = useState("");
   const [loading, setLoading] = useState(false);
   const searchParams = useSearchParams();
@@ -59,8 +59,10 @@ function RegisterForm() {
     }
     try {
       await Axios.post(`${API}/auth/register`, newFormData);
-      setRegisterMessageSuccess(t("success"));
-      setTimeout(() => setRegisterMessageSuccess(""), 6000);
+      // Redirect to the email verification page with the (masked) email
+      router.push(
+        `/verify-email?email=${encodeURIComponent(formData.email)}`,
+      );
     } catch (error: unknown) {
       const message =
         (error as { response?: { data?: { message?: string } } })?.response
@@ -479,11 +481,6 @@ function RegisterForm() {
               </p>
             </div>
 
-            {registerMessageSuccess && (
-              <div className="alert alert-success">
-                {registerMessageSuccess}
-              </div>
-            )}
             {registerMessageError && (
               <div
                 className="alert alert-danger"
