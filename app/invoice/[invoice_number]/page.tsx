@@ -1174,18 +1174,8 @@ export default function InvoicePage() {
           </div>
         )}
 
-        {/* Already paid */}
-        {isPaid && (
-          <div
-            className="alert alert-success"
-            style={{ marginBottom: "1.25rem" }}
-          >
-            {t("alreadyPaid")}
-          </div>
-        )}
-
-        {/* Payment form — only show if invoice is payable */}
-        {!isPaid && !isExpired && (
+        {/* Payment form — always visible; inputs disabled when invoice is no longer payable */}
+        {!isExpired && (
           <div className="card" style={{ marginBottom: "1.25rem" }}>
             <div
               style={{
@@ -1240,9 +1230,69 @@ export default function InvoicePage() {
             <div
               style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
             >
+              {/* ── Already-paid notice (shown instead of fields being interactable) ── */}
+              {isPaid && (
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "flex-start",
+                    gap: "0.875rem",
+                    padding: "1rem 1.125rem",
+                    borderRadius: "var(--radius-sm)",
+                    background: "#f0fdf4",
+                    border: "1.5px solid #86efac",
+                  }}
+                >
+                  <span
+                    style={{
+                      flexShrink: 0,
+                      width: "2rem",
+                      height: "2rem",
+                      borderRadius: "50%",
+                      background: "#16a34a",
+                      color: "#fff",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontSize: "1rem",
+                      fontWeight: 700,
+                    }}
+                  >
+                    ✓
+                  </span>
+                  <div>
+                    <p
+                      style={{
+                        margin: "0 0 0.25rem",
+                        fontWeight: 700,
+                        fontSize: "0.9375rem",
+                        color: "#14532d",
+                      }}
+                    >
+                      {t("alreadyPaid")}
+                    </p>
+                    <p
+                      style={{
+                        margin: 0,
+                        fontSize: "0.83rem",
+                        color: "#166534",
+                        lineHeight: 1.5,
+                      }}
+                    >
+                      This invoice has already been paid. The payment fields below are disabled to prevent a duplicate transaction.
+                    </p>
+                  </div>
+                </div>
+              )}
+
               {/* MoMo number */}
               <div>
-                <label className="label">{t("momoLabel")}</label>
+                <label
+                  className="label"
+                  style={isPaid ? { opacity: 0.5 } : undefined}
+                >
+                  {t("momoLabel")}
+                </label>
                 <div style={{ display: "flex", alignItems: "stretch" }}>
                   <span
                     style={{
@@ -1256,6 +1306,7 @@ export default function InvoicePage() {
                       fontWeight: 600,
                       display: "flex",
                       alignItems: "center",
+                      opacity: isPaid ? 0.5 : 1,
                     }}
                   >
                     +237
@@ -1268,16 +1319,23 @@ export default function InvoicePage() {
                     inputMode="numeric"
                     maxLength={9}
                     value={phoneNumber}
+                    disabled={isPaid}
+                    readOnly={isPaid}
                     onChange={(e) =>
+                      !isPaid &&
                       setPhoneNumber(
                         e.target.value.replace(/\D/g, "").slice(0, 9),
                       )
                     }
                     style={{
                       borderRadius: "0 var(--radius-sm) var(--radius-sm) 0",
+                      opacity: isPaid ? 0.5 : 1,
+                      cursor: isPaid ? "not-allowed" : undefined,
+                      backgroundColor: isPaid ? "var(--color-mist)" : undefined,
                     }}
                   />
                 </div>
+                {!isPaid && (
                 <p
                   style={{
                     marginTop: "0.3rem",
@@ -1289,18 +1347,32 @@ export default function InvoicePage() {
                 >
                   {t("momoHint")}
                 </p>
+                )}
               </div>
 
               {/* Email */}
               <div>
-                <label className="label">{t("emailLabel")}</label>
+                <label
+                  className="label"
+                  style={isPaid ? { opacity: 0.5 } : undefined}
+                >
+                  {t("emailLabel")}
+                </label>
                 <input
                   className="input"
                   type="email"
                   placeholder="you@example.com"
                   value={payerEmail}
-                  onChange={(e) => setPayerEmail(e.target.value)}
+                  disabled={isPaid}
+                  readOnly={isPaid}
+                  onChange={(e) => !isPaid && setPayerEmail(e.target.value)}
+                  style={{
+                    opacity: isPaid ? 0.5 : 1,
+                    cursor: isPaid ? "not-allowed" : undefined,
+                    backgroundColor: isPaid ? "var(--color-mist)" : undefined,
+                  }}
                 />
+                {!isPaid && (
                 <p
                   style={{
                     marginTop: "0.3rem",
@@ -1311,6 +1383,7 @@ export default function InvoicePage() {
                 >
                   {t("emailHint")}
                 </p>
+                )}
               </div>
 
               {/* Fees notice */}
@@ -1381,13 +1454,21 @@ export default function InvoicePage() {
                   justifyContent: "center",
                   padding: "0.8125rem",
                   fontSize: "1rem",
+                  opacity: isPaid ? 0.45 : 1,
+                  cursor: isPaid ? "not-allowed" : undefined,
                 }}
                 onClick={(e) => {
                   e.preventDefault();
                   if (!isDisabled) setShowEmailConfirm(true);
                 }}
               >
-                {payLoading ? <InlineSpinner /> : t("payNow")}
+                {payLoading ? (
+                  <InlineSpinner />
+                ) : isPaid ? (
+                  "Payment Already Made"
+                ) : (
+                  t("payNow")
+                )}
               </button>
             </div>
           </div>

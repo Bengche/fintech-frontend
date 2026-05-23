@@ -235,6 +235,14 @@ export default function AdminDashboard() {
   const [suspendDays, setSuspendDays] = useState("7");
   const [suspendSubmitting, setSuspendSubmitting] = useState(false);
 
+  // ── Admin manual release / refund state ──────────────────────────────────
+  const [stuckActionInvNum, setStuckActionInvNum] = useState<string | null>(null);
+  const [stuckActionType, setStuckActionType] = useState<"release" | "refund" | null>(null);
+  const [stuckAdminNote, setStuckAdminNote] = useState("");
+  const [stuckSubmitting, setStuckSubmitting] = useState(false);
+  const [stuckActionMsg, setStuckActionMsg] = useState("");
+  const [stuckActionErr, setStuckActionErr] = useState("");
+
   // ── Platform Controls state ───────────────────────────────────────────────
   interface PlatformSettings {
     maintenanceMode: boolean;
@@ -537,6 +545,40 @@ export default function AdminDashboard() {
       );
     } finally {
       setSuspendSubmitting(false);
+    }
+  };
+
+  // ── 7c. Admin manual release / refund ────────────────────────────────────────
+  const submitStuckAction = async (
+    invoicenumber: string,
+    action: "release" | "refund",
+  ) => {
+    setStuckActionMsg("");
+    setStuckActionErr("");
+    if (!stuckAdminNote.trim() || stuckAdminNote.trim().length < 5) {
+      setStuckActionErr("An admin note of at least 5 characters is required.");
+      return;
+    }
+    setStuckSubmitting(true);
+    try {
+      const res = await axios.post(
+        `${API_URL}/admin/invoices/${invoicenumber}/${action}`,
+        { admin_note: stuckAdminNote.trim() },
+        { withCredentials: true },
+      );
+      setStuckActionMsg(res.data.message ?? `Action completed successfully.`);
+      setStuckActionInvNum(null);
+      setStuckActionType(null);
+      setStuckAdminNote("");
+      loadTab("stuck", false, 0);
+    } catch (err: unknown) {
+      setStuckActionErr(
+        axios.isAxiosError(err) && err.response?.data?.message
+          ? err.response.data.message
+          : `Failed to ${action === "release" ? "release funds" : "process refund"}.`,
+      );
+    } finally {
+      setStuckSubmitting(false);
     }
   };
 
@@ -1779,48 +1821,304 @@ export default function AdminDashboard() {
                   <Th>{t("dashboard.colStatus")}</Th>
                   <Th>{t("dashboard.colPaidAt")}</Th>
                   <Th>{t("dashboard.colDeliveredAt")}</Th>
+                  <Th>Admin Action</Th>
                 </tr>
               </thead>
               <tbody>
-                {stuck.data.map((inv) => (
-                  <tr
-                    key={String(inv.id)}
-                    style={{ borderBottom: "1px solid var(--color-border)" }}
-                  >
-                    <Td mono>{inv.invoicenumber}</Td>
-                    <Td>{inv.invoicename}</Td>
-                    <Td>
-                      <span
-                        style={{
-                          fontWeight: 600,
-                          color: "var(--color-text-heading)",
-                        }}
-                      >
-                        {inv.seller_name}
-                      </span>
-                      <span
-                        style={{
-                          display: "block",
-                          color: "var(--color-text-muted)",
-                          fontSize: "0.75rem",
-                        }}
-                      >
-                        {inv.seller_email}
-                      </span>
-                    </Td>
-                    <Td muted>{inv.clientemail}</Td>
-                    <Td bold>{fmtXAF(inv.amount)}</Td>
-                    <Td>
-                      <span className={statusBadge(inv.status)}>
-                        {String(inv.status)}
-                      </span>
-                    </Td>
-                    <Td muted>{fmtDate(inv.paid_at)}</Td>
-                    <Td muted>
-                      {inv.delivered_at ? fmtDate(inv.delivered_at) : "—"}
-                    </Td>
+                {stuckActionMsg && (
+                  <tr>
+                    <td
+                      colSpan={9}
+                      style={{
+                        padding: "0.65rem 1rem",
+                        background: "#f0fdf4",
+                        color: "#166534",
+                        fontSize: "0.85rem",
+                        fontWeight: 600,
+                        borderBottom: "1px solid var(--color-border)",
+                      }}
+                    >
+                      {stuckActionMsg}
+                    </td>
                   </tr>
-                ))}
+                )}
+                {stuckActionErr && (
+                  <tr>
+                    <td
+                      colSpan={9}
+                      style={{
+                        padding: "0.65rem 1rem",
+                        background: "#fef2f2",
+                        color: "#991b1b",
+                        fontSize: "0.85rem",
+                        fontWeight: 600,
+                        borderBottom: "1px solid var(--color-border)",
+                      }}
+                    >
+                      {stuckActionErr}
+                    </td>
+                  </tr>
+                )}
+                {stuck.data.map((inv) => {
+                  const isActiveRow = stuckActionInvNum === String(inv.invoicenumber);
+                  return (
+                    <Fragment key={String(inv.id)}>
+                    <tr
+                      style={{ borderBottom: isActiveRow ? "none" : "1px solid var(--color-border)" }}
+                    >
+                      <Td mono>{inv.invoicenumber}</Td>
+                      <Td>{inv.invoicename}</Td>
+                      <Td>
+                        <span
+                          style={{
+                            fontWeight: 600,
+                            color: "var(--color-text-heading)",
+                          }}
+                        >
+                          {inv.seller_name}
+                        </span>
+                        <span
+                          style={{
+                            display: "block",
+                            color: "var(--color-text-muted)",
+                            fontSize: "0.75rem",
+                          }}
+                        >
+                          {inv.seller_email}
+                        </span>
+                      </Td>
+                      <Td muted>{inv.clientemail}</Td>
+                      <Td bold>{fmtXAF(inv.amount)}</Td>
+                      <Td>
+                        <span className={statusBadge(inv.status)}>
+                          {String(inv.status)}
+                        </span>
+                      </Td>
+                      <Td muted>{fmtDate(inv.paid_at)}</Td>
+                      <Td muted>
+                        {inv.delivered_at ? fmtDate(inv.delivered_at) : "—"}
+                      </Td>
+                      <Td>
+                        <div style={{ display: "flex", gap: "0.3rem", flexWrap: "wrap" }}>
+                          <button
+                            onClick={() => {
+                              const invNum = String(inv.invoicenumber);
+                              if (isActiveRow && stuckActionType === "release") {
+                                setStuckActionInvNum(null);
+                                setStuckActionType(null);
+                              } else {
+                                setStuckActionInvNum(invNum);
+                                setStuckActionType("release");
+                                setStuckAdminNote("");
+                                setStuckActionMsg("");
+                                setStuckActionErr("");
+                              }
+                            }}
+                            style={{
+                              background:
+                                isActiveRow && stuckActionType === "release"
+                                  ? "#64748b"
+                                  : "#16a34a",
+                              color: "#fff",
+                              border: "none",
+                              borderRadius: "6px",
+                              padding: "0.3rem 0.65rem",
+                              fontWeight: 700,
+                              fontSize: "0.75rem",
+                              cursor: "pointer",
+                              whiteSpace: "nowrap",
+                            }}
+                          >
+                            {isActiveRow && stuckActionType === "release"
+                              ? "Cancel"
+                              : "Release Funds"}
+                          </button>
+                          <button
+                            onClick={() => {
+                              const invNum = String(inv.invoicenumber);
+                              if (isActiveRow && stuckActionType === "refund") {
+                                setStuckActionInvNum(null);
+                                setStuckActionType(null);
+                              } else {
+                                setStuckActionInvNum(invNum);
+                                setStuckActionType("refund");
+                                setStuckAdminNote("");
+                                setStuckActionMsg("");
+                                setStuckActionErr("");
+                              }
+                            }}
+                            style={{
+                              background:
+                                isActiveRow && stuckActionType === "refund"
+                                  ? "#64748b"
+                                  : "#b45309",
+                              color: "#fff",
+                              border: "none",
+                              borderRadius: "6px",
+                              padding: "0.3rem 0.65rem",
+                              fontWeight: 700,
+                              fontSize: "0.75rem",
+                              cursor: "pointer",
+                              whiteSpace: "nowrap",
+                            }}
+                          >
+                            {isActiveRow && stuckActionType === "refund"
+                              ? "Cancel"
+                              : "Refund Buyer"}
+                          </button>
+                        </div>
+                      </Td>
+                    </tr>
+                    {isActiveRow && stuckActionType && (
+                      <tr style={{ borderBottom: "1px solid var(--color-border)" }}>
+                        <td
+                          colSpan={9}
+                          style={{
+                            padding: "1rem 1.25rem",
+                            background:
+                              stuckActionType === "release"
+                                ? "#f0fdf4"
+                                : "#fffbeb",
+                          }}
+                        >
+                          <p
+                            style={{
+                              margin: "0 0 0.5rem",
+                              fontWeight: 700,
+                              fontSize: "0.9rem",
+                              color:
+                                stuckActionType === "release"
+                                  ? "#14532d"
+                                  : "#78350f",
+                            }}
+                          >
+                            {stuckActionType === "release"
+                              ? `Release funds to seller — Invoice ${String(inv.invoicenumber)}`
+                              : `Refund buyer — Invoice ${String(inv.invoicenumber)}`}
+                          </p>
+                          <p
+                            style={{
+                              margin: "0 0 0.75rem",
+                              fontSize: "0.82rem",
+                              color: "#475569",
+                              lineHeight: 1.5,
+                            }}
+                          >
+                            {stuckActionType === "release"
+                              ? `This will disburse the escrowed amount (minus the 2% platform fee) to the seller's registered Mobile Money number. This action is irreversible.`
+                              : `This will send a refund (minus the 2% platform fee) to the buyer's registered Mobile Money number. This action is irreversible.`}
+                          </p>
+                          <div
+                            style={{
+                              display: "flex",
+                              flexWrap: "wrap",
+                              gap: "0.75rem",
+                              alignItems: "flex-end",
+                            }}
+                          >
+                            <div style={{ flex: "1 1 280px" }}>
+                              <label
+                                style={{
+                                  display: "block",
+                                  fontSize: "0.78rem",
+                                  fontWeight: 700,
+                                  color:
+                                    stuckActionType === "release"
+                                      ? "#166534"
+                                      : "#92400e",
+                                  marginBottom: "4px",
+                                }}
+                              >
+                                Reason / Admin Note{" "}
+                                <span style={{ color: "#ef4444" }}>*</span>
+                              </label>
+                              <textarea
+                                rows={2}
+                                value={stuckAdminNote}
+                                onChange={(e) =>
+                                  setStuckAdminNote(e.target.value)
+                                }
+                                placeholder="e.g. Buyer unresponsive for 30+ days after multiple contact attempts."
+                                style={{
+                                  width: "100%",
+                                  padding: "0.45rem 0.65rem",
+                                  borderRadius: "6px",
+                                  border: `1px solid ${stuckActionType === "release" ? "#16a34a" : "#d97706"}`,
+                                  fontSize: "0.83rem",
+                                  resize: "vertical",
+                                  boxSizing: "border-box",
+                                  fontFamily: "inherit",
+                                }}
+                              />
+                            </div>
+                            <div
+                              style={{
+                                display: "flex",
+                                gap: "0.5rem",
+                                alignItems: "center",
+                                flexShrink: 0,
+                              }}
+                            >
+                              <button
+                                disabled={stuckSubmitting}
+                                onClick={() =>
+                                  submitStuckAction(
+                                    String(inv.invoicenumber),
+                                    stuckActionType,
+                                  )
+                                }
+                                style={{
+                                  background:
+                                    stuckActionType === "release"
+                                      ? "#16a34a"
+                                      : "#b45309",
+                                  color: "#fff",
+                                  border: "none",
+                                  borderRadius: "6px",
+                                  padding: "0.5rem 1.1rem",
+                                  fontWeight: 700,
+                                  fontSize: "0.83rem",
+                                  cursor: stuckSubmitting
+                                    ? "not-allowed"
+                                    : "pointer",
+                                  opacity: stuckSubmitting ? 0.6 : 1,
+                                  whiteSpace: "nowrap",
+                                }}
+                              >
+                                {stuckSubmitting
+                                  ? "Processing…"
+                                  : stuckActionType === "release"
+                                  ? "Confirm Release"
+                                  : "Confirm Refund"}
+                              </button>
+                              <button
+                                onClick={() => {
+                                  setStuckActionInvNum(null);
+                                  setStuckActionType(null);
+                                  setStuckAdminNote("");
+                                }}
+                                style={{
+                                  background: "none",
+                                  border: "1px solid var(--color-border)",
+                                  borderRadius: "6px",
+                                  padding: "0.5rem 0.9rem",
+                                  fontWeight: 600,
+                                  fontSize: "0.83rem",
+                                  cursor: "pointer",
+                                  whiteSpace: "nowrap",
+                                  color: "var(--color-text-muted)",
+                                }}
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                    </Fragment>
+                  );
+                })}
               </tbody>
             </table>
           </TabSection>
