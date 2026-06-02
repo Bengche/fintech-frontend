@@ -26,7 +26,7 @@ export default function SiteHeader() {
   const { user_id, setUser_id, setUsername } = useAuth();
   const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const { openKila, kilaUnread } = useKila();
+  const { openKila } = useKila();
 
   const NAV_LINKS = [
     { href: "/how-it-works", label: t("nav.howItWorks") },
@@ -191,20 +191,18 @@ export default function SiteHeader() {
               <circle cx="15" cy="10" r="1.2" fill="#F59E0B" />
             </svg>
             Ask Kila
-            {kilaUnread && (
-              <span
-                style={{
-                  position: "absolute",
-                  top: 2,
-                  right: 2,
-                  width: 7,
-                  height: 7,
-                  borderRadius: "50%",
-                  background: "#EF4444",
-                  border: "2px solid var(--color-primary)",
-                }}
-              />
-            )}
+            <span
+              style={{
+                position: "absolute",
+                top: 2,
+                right: 2,
+                width: 7,
+                height: 7,
+                borderRadius: "50%",
+                background: "#22C55E",
+                border: "2px solid var(--color-primary)",
+              }}
+            />
           </button>
           {/* Language toggle */}
           <button
@@ -292,20 +290,18 @@ export default function SiteHeader() {
               <circle cx="15" cy="10" r="1.2" fill="#F59E0B" />
             </svg>
             Ask Kila
-            {kilaUnread && (
-              <span
-                style={{
-                  position: "absolute",
-                  top: 2,
-                  right: 2,
-                  width: 7,
-                  height: 7,
-                  borderRadius: "50%",
-                  background: "#EF4444",
-                  border: "2px solid var(--color-primary)",
-                }}
-              />
-            )}
+            <span
+              style={{
+                position: "absolute",
+                top: 2,
+                right: 2,
+                width: 7,
+                height: 7,
+                borderRadius: "50%",
+                background: "#22C55E",
+                border: "2px solid var(--color-primary)",
+              }}
+            />
           </button>
           <button
             onClick={() => setMobileOpen(!mobileOpen)}

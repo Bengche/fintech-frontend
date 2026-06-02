@@ -182,23 +182,24 @@ export default async function LandingPage() {
                 </div>
 
                 {/* Payment method logos */}
-                <div style={{ marginTop: "1.25rem" }}>
+                <div style={{ marginTop: "1.5rem" }}>
                   <div
                     style={{
                       display: "inline-flex",
                       alignItems: "center",
-                      background: "rgba(255,255,255,0.10)",
-                      borderRadius: "10px",
-                      padding: "6px 10px",
+                      background: "rgba(255,255,255,0.95)",
+                      borderRadius: "12px",
+                      padding: "8px 14px",
+                      boxShadow: "0 2px 12px rgba(0,0,0,0.18)",
                     }}
                   >
                     <Image
                       src="/momo.jpg"
                       alt="MTN Mobile Money and Orange Money"
-                      width={200}
-                      height={56}
+                      width={240}
+                      height={68}
                       style={{
-                        height: "36px",
+                        height: "clamp(44px, 6vw, 56px)",
                         width: "auto",
                         borderRadius: "6px",
                         display: "block",

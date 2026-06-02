@@ -60,7 +60,7 @@ export default function Navbar() {
 
   const locale = useLocale();
   const notifData = useNotifications();
-  const { openKila, kilaUnread } = useKila();
+  const { openKila } = useKila();
 
   const switchLocale = () => {
     const other = locale === "en" ? "fr" : "en";
@@ -277,20 +277,18 @@ export default function Navbar() {
                     <circle cx="15" cy="10" r="1.2" fill="#F59E0B" />
                   </svg>
                   Ask Kila
-                  {kilaUnread && (
-                    <span
-                      style={{
-                        position: "absolute",
-                        top: 2,
-                        right: 2,
-                        width: 7,
-                        height: 7,
-                        borderRadius: "50%",
-                        background: "#EF4444",
-                        border: "2px solid rgba(10,20,50,0.9)",
-                      }}
-                    />
-                  )}
+                  <span
+                    style={{
+                      position: "absolute",
+                      top: 2,
+                      right: 2,
+                      width: 7,
+                      height: 7,
+                      borderRadius: "50%",
+                      background: "#22C55E",
+                      border: "2px solid rgba(10,20,50,0.9)",
+                    }}
+                  />
                 </button>
                 <NotificationBell
                   notifications={notifData.notifications}
@@ -422,20 +420,18 @@ export default function Navbar() {
                 <circle cx="15" cy="10" r="1.2" fill="#F59E0B" />
               </svg>
               Ask Kila
-              {kilaUnread && (
-                <span
-                  style={{
-                    position: "absolute",
-                    top: 2,
-                    right: 2,
-                    width: 7,
-                    height: 7,
-                    borderRadius: "50%",
-                    background: "#EF4444",
-                    border: "2px solid rgba(10,20,50,0.9)",
-                  }}
-                />
-              )}
+              <span
+                style={{
+                  position: "absolute",
+                  top: 2,
+                  right: 2,
+                  width: 7,
+                  height: 7,
+                  borderRadius: "50%",
+                  background: "#22C55E",
+                  border: "2px solid rgba(10,20,50,0.9)",
+                }}
+              />
             </button>
             {/* Hamburger / X */}
             <button
