@@ -30,9 +30,9 @@ async function getPlatformStats(): Promise<{
 }
 
 function formatXaf(xaf: number): string {
-  if (xaf >= 1_000_000) return `${(xaf / 1_000_000).toFixed(1)}M+`;
-  if (xaf >= 1_000) return `${Math.round(xaf / 1_000)}K+`;
-  return `${xaf.toLocaleString()}+`;
+  if (xaf >= 1_000_000) return `${(xaf / 1_000_000).toFixed(1)}M`;
+  if (xaf >= 1_000) return `${Math.round(xaf / 1_000)}K`;
+  return xaf.toLocaleString();
 }
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -249,7 +249,8 @@ export default async function LandingPage() {
                           lineHeight: 1.1,
                         }}
                       >
-                        {formatXaf(platformStats.totalXaf)}
+                        {formatXaf(platformStats.totalXaf)}{" "}
+                        <span style={{ fontSize: "0.8rem", fontWeight: 700, opacity: 0.85 }}>XAF</span>
                       </p>
                       <p
                         style={{
@@ -261,7 +262,7 @@ export default async function LandingPage() {
                           letterSpacing: "0.06em",
                         }}
                       >
-                        XAF secured
+                        Secured
                       </p>
                     </div>
                   </div>

@@ -61,10 +61,13 @@ export default function LayoutShell({
             flexDirection: "column",
           }}
         >
-          {/* Top navbar — visible only on mobile/tablet (lg: hidden) */}
-          <div className="lg:hidden">
-            <Navbar />
-          </div>
+          {/* Top navbar — visible only on mobile/tablet (lg: hidden).
+              Suppressed on pages that render their own top nav (e.g. homepage). */}
+          {!CUSTOM_NAV_PATHS.includes(pathname) && (
+            <div className="lg:hidden">
+              <Navbar />
+            </div>
+          )}
 
           <main
             style={{
@@ -79,8 +82,8 @@ export default function LayoutShell({
             {children}
           </main>
 
-          {/* Footer hidden on lg+ (sidebar already anchors the brand) */}
-          <div className="hidden lg:block">
+          {/* Footer — shown on all screen sizes */}
+          <div>
             <SiteFooter />
           </div>
         </div>
