@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { usePathname } from "next/navigation";
+import { useKila } from "@/context/KilaContext";
 
 // ── Types ────────────────────────────────────────────────────────────────────
 interface Message {
@@ -49,10 +50,6 @@ const STYLES = `
     0%, 100% { transform: scale(1); }
     30%      { transform: scale(1.4); }
   }
-  @keyframes kila-proactive {
-    from { opacity: 0; transform: translateY(12px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
 
   /* Mobile: full-screen chat panel */
   @media (max-width: 640px) {
@@ -67,10 +64,6 @@ const STYLES = `
       height: 100dvh !important;
       border-radius: 0 !important;
     }
-    /* Hide FAB when chat is open — header already has a close button */
-    .kila-fab--open {
-      display: none !important;
-    }
   }
 
   .kila-msg-text a { color: #F59E0B; text-decoration: underline; }
@@ -82,21 +75,6 @@ const STYLES = `
   .kila-send:active { transform: scale(0.94); }
   .kila-chip:hover  { background: #FEF3C7 !important; border-color: #F59E0B !important; color: #92400E !important; }
   .kila-btn-close:hover { background: rgba(255,255,255,0.15) !important; }
-  .kila-fab:hover   { transform: scale(1.07); box-shadow: 0 8px 28px rgba(245,158,11,0.5) !important; }
-
-  /*
-   * Bottom-nav clearance (screens below lg = 1024px).
-   * The mobile bottom nav is ~3.5rem (56px) + safe-area-inset-bottom.
-   * Raise the FAB and proactive bubble to sit visually above it.
-   */
-  @media (max-width: 1023px) {
-    .kila-fab {
-      bottom: calc(3.5rem + env(safe-area-inset-bottom, 0px) + 1rem) !important;
-    }
-    .kila-proactive-bubble {
-      bottom: calc(3.5rem + env(safe-area-inset-bottom, 0px) + 5.5rem) !important;
-    }
-  }
 `;
 
 // ── Simple markdown renderer (bold + line breaks only) ───────────────────────
@@ -109,14 +87,11 @@ function renderMarkdown(text: string): string {
 // ── Component ────────────────────────────────────────────────────────────────
 export default function AiChatWidget() {
   const pathname = usePathname();
-  const [open, setOpen] = useState(false);
+  const { kilaOpen, closeKila, setKilaUnread } = useKila();
   const [closing, setClosing] = useState(false);
   const [messages, setMessages] = useState<Message[]>([WELCOME]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-  const [unread, setUnread] = useState(false);
-  const [pulse, setPulse] = useState(false);
-  const [proactive, setProactive] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -127,51 +102,34 @@ export default function AiChatWidget() {
     setIsLoggedIn(!!localStorage.getItem("token"));
   }, []);
 
-  // ── Proactive bubble: show after 20s on landing/marketing pages ────────────
+  // Proactive unread hint: after 20s on marketing pages, light up the navbar button
   useEffect(() => {
-    const marketingPages = [
-      "/",
-      "/home",
-      "/about",
-      "/pricing",
-      "/how-it-works",
-    ];
+    const marketingPages = ["/", "/home", "/about", "/pricing", "/how-it-works"];
     if (marketingPages.includes(pathname)) {
       const t = setTimeout(() => {
-        if (!open) {
-          setProactive(true);
-          setPulse(true);
-        }
+        if (!kilaOpen) setKilaUnread(true);
       }, 20000);
       return () => clearTimeout(t);
     }
-  }, [pathname, open]);
+  }, [pathname, kilaOpen, setKilaUnread]);
 
   // ── Auto-scroll ────────────────────────────────────────────────────────────
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, loading]);
 
-  // ── Focus input when panel opens ───────────────────────────────────────────
+  // Focus input when panel opens
   useEffect(() => {
-    if (open) {
+    if (kilaOpen) {
       setTimeout(() => inputRef.current?.focus(), 150);
-      setUnread(false);
-      setProactive(false);
-      setPulse(false);
     }
-  }, [open]);
+  }, [kilaOpen]);
 
-  // ── Open/close with animation ──────────────────────────────────────────────
-  const openChat = () => {
-    setClosing(false);
-    setOpen(true);
-  };
-
+  // Close with animation
   const closeChat = () => {
     setClosing(true);
     setTimeout(() => {
-      setOpen(false);
+      closeKila();
       setClosing(false);
     }, 320);
   };
@@ -218,7 +176,7 @@ export default function AiChatWidget() {
           id: nextId(),
         };
         setMessages((prev) => [...prev, aiMsg]);
-        if (!open) setUnread(true);
+        if (!kilaOpen) setKilaUnread(true);
       } catch {
         setMessages((prev) => [
           ...prev,
@@ -233,7 +191,7 @@ export default function AiChatWidget() {
         setLoading(false);
       }
     },
-    [messages, loading, pathname, isLoggedIn, open],
+    [messages, loading, pathname, isLoggedIn, kilaOpen, setKilaUnread],
   );
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -244,22 +202,23 @@ export default function AiChatWidget() {
   };
 
   const showSuggestions = messages.length === 1 && !loading;
+  const open = kilaOpen;
 
-  // ── Render ─────────────────────────────────────────────────────────────────
+  // Render
   return (
     <>
       <style>{STYLES}</style>
 
-      {/* ── Chat panel ─────────────────────────────────────────────────────── */}
+      {/* Chat panel */}
       {(open || closing) && (
         <div
           className="kila-panel"
           style={{
             position: "fixed",
-            bottom: 100,
-            right: 24,
-            width: 380,
-            maxHeight: 560,
+            top: 70,
+            right: 20,
+            width: 390,
+            maxHeight: "calc(100dvh - 86px)",
             background: "#fff",
             borderRadius: 18,
             boxShadow:
@@ -609,124 +568,7 @@ export default function AiChatWidget() {
         </div>
       )}
 
-      {/* ── Proactive bubble ───────────────────────────────────────────────── */}
-      {proactive && !open && (
-        <div
-          className="kila-proactive-bubble"
-          style={{
-            position: "fixed",
-            bottom: 112,
-            right: 90,
-            background: "#fff",
-            borderRadius: 12,
-            padding: "10px 14px",
-            boxShadow: "0 8px 24px rgba(15,31,61,0.15)",
-            fontSize: 13,
-            color: "#0F1F3D",
-            fontWeight: 500,
-            zIndex: 1099,
-            animation: "kila-proactive 0.4s ease",
-            display: "flex",
-            alignItems: "center",
-            gap: 10,
-            maxWidth: 230,
-          }}
-        >
-          <span>👋 Have questions about Fonlok?</span>
-          <button
-            onClick={() => setProactive(false)}
-            style={{
-              background: "none",
-              border: "none",
-              color: "#94A3B8",
-              cursor: "pointer",
-              fontSize: 14,
-              padding: 0,
-              flexShrink: 0,
-            }}
-          >
-            ✕
-          </button>
-          {/* Speech bubble tail */}
-          <div
-            style={{
-              position: "absolute",
-              bottom: 14,
-              right: -7,
-              width: 14,
-              height: 14,
-              background: "#fff",
-              transform: "rotate(45deg)",
-              boxShadow: "2px -2px 4px rgba(0,0,0,0.06)",
-            }}
-          />
-        </div>
-      )}
 
-      {/* ── Floating action button ─────────────────────────────────────────── */}
-      <button
-        className={`kila-fab${open ? " kila-fab--open" : ""}`}
-        onClick={open ? closeChat : openChat}
-        style={{
-          position: "fixed",
-          bottom: 28,
-          right: 28,
-          width: 58,
-          height: 58,
-          borderRadius: "50%",
-          background: "linear-gradient(135deg, #F59E0B 0%, #D97706 100%)",
-          border: "none",
-          cursor: "pointer",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          boxShadow: "0 6px 20px rgba(245,158,11,0.45)",
-          zIndex: 1100,
-          transition: "all 0.2s ease",
-          animation: pulse ? "kila-pulse 1.8s ease-out infinite" : "none",
-        }}
-        aria-label={open ? "Close AI assistant" : "Open AI assistant"}
-      >
-        {open ? (
-          // X icon when open
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-            <path
-              d="M18 6L6 18M6 6l12 12"
-              stroke="#fff"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-            />
-          </svg>
-        ) : (
-          // Chat sparkle icon when closed
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <path
-              d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
-              fill="rgba(255,255,255,0.9)"
-            />
-            <circle cx="9" cy="10" r="1.2" fill="#F59E0B" />
-            <circle cx="12" cy="10" r="1.2" fill="#F59E0B" />
-            <circle cx="15" cy="10" r="1.2" fill="#F59E0B" />
-          </svg>
-        )}
-
-        {/* Unread badge */}
-        {unread && !open && (
-          <span
-            style={{
-              position: "absolute",
-              top: 4,
-              right: 4,
-              width: 12,
-              height: 12,
-              borderRadius: "50%",
-              background: "#EF4444",
-              border: "2px solid #fff",
-              animation: "kila-badge 0.6s ease",
-            }}
-          />
-        )}
-      </button>
     </>
   );
 }

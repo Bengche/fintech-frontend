@@ -8,6 +8,7 @@ import { useAuth } from "@/context/UserContext";
 import { InlineSpinner } from "@/app/components/Spinner";
 import { useTranslations } from "next-intl";
 import { BRAND } from "@/config/brand";
+import MomoLogos from "@/app/components/MomoLogos";
 import {
   ShieldCheck,
   ShieldAlert,
@@ -1298,6 +1299,13 @@ export default function InvoicePage() {
                 </div>
               )}
 
+              {/* Payment method logos */}
+              {!isPaid && (
+                <div style={{ marginBottom: "0.25rem" }}>
+                  <MomoLogos theme="light" size="sm" />
+                </div>
+              )}
+
               {/* MoMo number */}
               <div>
                 <label
@@ -1743,6 +1751,114 @@ export default function InvoicePage() {
           </button>
         </div>
       )}
+
+      {/* Rate this seller — shown to buyers after payment */}
+      {(invoiceStats.status === "delivered" ||
+        invoiceStats.status === "completed") &&
+        invoiceStats.seller_username &&
+        Number(currentUserId) !== Number(invoiceStats.userid) && (
+          <div
+            className="card"
+            style={{
+              marginBottom: "1.25rem",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: "1rem",
+              flexWrap: "wrap",
+              padding: "1.25rem",
+              borderLeft: "4px solid var(--color-accent)",
+            }}
+          >
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <p
+                style={{
+                  margin: "0 0 0.25rem",
+                  fontWeight: 700,
+                  fontSize: "0.9375rem",
+                  color: "var(--color-text-heading)",
+                }}
+              >
+                How was your experience?
+              </p>
+              <p
+                style={{
+                  margin: 0,
+                  fontSize: "0.85rem",
+                  color: "var(--color-text-muted)",
+                  lineHeight: 1.5,
+                }}
+              >
+                Leave a review for @{invoiceStats.seller_username} so other
+                buyers know what to expect.
+              </p>
+            </div>
+            <a
+              href={`/review/${invoiceStats.seller_username}/${invoiceStats.invoicenumber}`}
+              className="btn-accent"
+              style={{
+                flexShrink: 0,
+                fontSize: "0.875rem",
+                padding: "0.6rem 1.25rem",
+                textDecoration: "none",
+              }}
+            >
+              Leave a review
+            </a>
+          </div>
+        )}
+
+      {/* Create account CTA — shown to guests after payment */}
+      {(invoiceStats.status === "paid" ||
+        invoiceStats.status === "delivered" ||
+        invoiceStats.status === "completed") &&
+        !currentUserId && (
+          <div
+            className="card"
+            style={{
+              marginBottom: "1.25rem",
+              padding: "1.5rem",
+              background:
+                "linear-gradient(135deg, rgba(15,31,61,0.97), rgba(15,31,61,0.90))",
+              color: "#fff",
+              border: "none",
+            }}
+          >
+            <p
+              style={{
+                margin: "0 0 0.25rem",
+                fontWeight: 800,
+                fontSize: "1.0625rem",
+                color: "var(--color-accent)",
+              }}
+            >
+              You just paid safely with Fonlok.
+            </p>
+            <p
+              style={{
+                margin: "0 0 1.25rem",
+                fontSize: "0.875rem",
+                color: "rgba(255,255,255,0.72)",
+                lineHeight: 1.6,
+              }}
+            >
+              Create a free account to send your own secure invoices, track
+              transactions, and get paid without the risk.
+            </p>
+            <a
+              href={`/register${payerEmail ? `?email=${encodeURIComponent(payerEmail)}` : ""}`}
+              className="btn-accent"
+              style={{
+                display: "inline-flex",
+                fontSize: "0.9375rem",
+                padding: "0.7rem 1.5rem",
+                textDecoration: "none",
+              }}
+            >
+              Create a free account
+            </a>
+          </div>
+        )}
 
       {/* Resend confirmation email — seller only, shown when buyer action is pending */}
       {currentUserId === invoiceStats.userid &&

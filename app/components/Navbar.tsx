@@ -9,6 +9,7 @@ import FonlokLogo from "./FonlokLogo";
 import RequestFeatureButton from "./RequestFeatureButton";
 import { useNotifications } from "@/hooks/useNotifications";
 import { useTranslations, useLocale } from "next-intl";
+import { useKila } from "@/context/KilaContext";
 import { haptic } from "@/hooks/useHaptic";
 import { startTransition } from "react";
 import {
@@ -59,6 +60,7 @@ export default function Navbar() {
 
   const locale = useLocale();
   const notifData = useNotifications();
+  const { openKila, kilaUnread } = useKila();
 
   const switchLocale = () => {
     const other = locale === "en" ? "fr" : "en";
@@ -234,6 +236,51 @@ export default function Navbar() {
                   <NavLink href={`/seller/${username}`}>{t("profile")}</NavLink>
                 )}
                 <NavLink href="/settings">{t("settings")}</NavLink>
+                {/* Ask Kila button */}
+                <button
+                  onClick={openKila}
+                  aria-label="Open Kila AI assistant"
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "0.4rem",
+                    padding: "0.38rem 0.875rem",
+                    borderRadius: "999px",
+                    background: "rgba(245,158,11,0.15)",
+                    color: "#FCD34D",
+                    border: "1.5px solid rgba(245,158,11,0.4)",
+                    fontWeight: 700,
+                    fontSize: "0.8125rem",
+                    cursor: "pointer",
+                    position: "relative",
+                    transition: "background 0.15s, border-color 0.15s",
+                    whiteSpace: "nowrap",
+                  }}
+                  onMouseEnter={(e) => {
+                    const b = e.currentTarget as HTMLButtonElement;
+                    b.style.background = "rgba(245,158,11,0.28)";
+                    b.style.borderColor = "rgba(245,158,11,0.7)";
+                  }}
+                  onMouseLeave={(e) => {
+                    const b = e.currentTarget as HTMLButtonElement;
+                    b.style.background = "rgba(245,158,11,0.15)";
+                    b.style.borderColor = "rgba(245,158,11,0.4)";
+                  }}
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" fill="rgba(252,211,77,0.9)" />
+                    <circle cx="9" cy="10" r="1.2" fill="#F59E0B" />
+                    <circle cx="12" cy="10" r="1.2" fill="#F59E0B" />
+                    <circle cx="15" cy="10" r="1.2" fill="#F59E0B" />
+                  </svg>
+                  Ask Kila
+                  {kilaUnread && (
+                    <span style={{
+                      position: "absolute", top: 2, right: 2, width: 7, height: 7,
+                      borderRadius: "50%", background: "#EF4444", border: "2px solid rgba(10,20,50,0.9)",
+                    }} />
+                  )}
+                </button>
                 <NotificationBell
                   notifications={notifData.notifications}
                   unreadCount={notifData.unreadCount}
@@ -332,8 +379,42 @@ export default function Navbar() {
           {/* ── Mobile right controls ──────────────────────── */}
           <div
             className="flex md:hidden"
-            style={{ alignItems: "center", gap: "0.25rem" }}
+            style={{ alignItems: "center", gap: "0.375rem" }}
           >
+            {/* Ask Kila mobile button */}
+            <button
+              onClick={openKila}
+              aria-label="Open Kila AI assistant"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "0.3rem",
+                padding: "0.35rem 0.65rem",
+                borderRadius: "999px",
+                background: "rgba(245,158,11,0.15)",
+                color: "#FCD34D",
+                border: "1.5px solid rgba(245,158,11,0.4)",
+                fontWeight: 700,
+                fontSize: "0.72rem",
+                cursor: "pointer",
+                position: "relative",
+                whiteSpace: "nowrap",
+              }}
+            >
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" fill="rgba(252,211,77,0.9)" />
+                <circle cx="9" cy="10" r="1.2" fill="#F59E0B" />
+                <circle cx="12" cy="10" r="1.2" fill="#F59E0B" />
+                <circle cx="15" cy="10" r="1.2" fill="#F59E0B" />
+              </svg>
+              Ask Kila
+              {kilaUnread && (
+                <span style={{
+                  position: "absolute", top: 2, right: 2, width: 7, height: 7,
+                  borderRadius: "50%", background: "#EF4444", border: "2px solid rgba(10,20,50,0.9)",
+                }} />
+              )}
+            </button>
             {/* Hamburger / X */}
             <button
               onClick={() => {

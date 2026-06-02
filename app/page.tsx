@@ -11,7 +11,21 @@ import Image from "next/image";
 import SiteHeader from "./components/SiteHeader";
 import BenefitsSlider from "./components/BenefitsSlider";
 import HeroStatsTabs from "./components/HeroStatsTabs";
+import MomoLogos from "./components/MomoLogos";
 import { getTranslations } from "next-intl/server";
+
+async function getPlatformStats(): Promise<{ dealCount: number; totalXaf: number }> {
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000"}/invoice/platform-stats`,
+      { next: { revalidate: 300 } }, // re-fetch every 5 minutes
+    );
+    if (!res.ok) return { dealCount: 0, totalXaf: 0 };
+    return res.json();
+  } catch {
+    return { dealCount: 0, totalXaf: 0 };
+  }
+}
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("Landing.meta");
@@ -57,7 +71,10 @@ const orgSchema = {
 };
 
 export default async function LandingPage() {
-  const t = await getTranslations("Landing");
+  const [t, platformStats] = await Promise.all([
+    getTranslations("Landing"),
+    getPlatformStats(),
+  ]);
   return (
     <>
       <script
@@ -156,7 +173,82 @@ export default async function LandingPage() {
                   </Link>
                 </div>
 
-                {/* â”€â”€ Selling-point tabs â”€â”€ */}
+                {/* Payment method logos */}
+                <div style={{ marginTop: "1.25rem" }}>
+                  <MomoLogos theme="dark" size="md" />
+                </div>
+
+                {/* Live platform stats */}
+                {platformStats.dealCount > 0 && (
+                  <div
+                    style={{
+                      marginTop: "1.5rem",
+                      display: "flex",
+                      flexWrap: "wrap",
+                      gap: "1.25rem",
+                    }}
+                  >
+                    <div>
+                      <p
+                        style={{
+                          margin: 0,
+                          fontSize: "1.375rem",
+                          fontWeight: 900,
+                          color: "#ffffff",
+                          lineHeight: 1.1,
+                        }}
+                      >
+                        {platformStats.dealCount.toLocaleString()}+
+                      </p>
+                      <p
+                        style={{
+                          margin: "0.2rem 0 0",
+                          fontSize: "0.75rem",
+                          color: "rgba(255,255,255,0.55)",
+                          fontWeight: 600,
+                          textTransform: "uppercase",
+                          letterSpacing: "0.06em",
+                        }}
+                      >
+                        Deals completed
+                      </p>
+                    </div>
+                    <div
+                      style={{
+                        width: "1px",
+                        background: "rgba(255,255,255,0.15)",
+                        alignSelf: "stretch",
+                      }}
+                    />
+                    <div>
+                      <p
+                        style={{
+                          margin: 0,
+                          fontSize: "1.375rem",
+                          fontWeight: 900,
+                          color: "var(--color-accent)",
+                          lineHeight: 1.1,
+                        }}
+                      >
+                        {(platformStats.totalXaf / 1_000_000).toFixed(1)}M+
+                      </p>
+                      <p
+                        style={{
+                          margin: "0.2rem 0 0",
+                          fontSize: "0.75rem",
+                          color: "rgba(255,255,255,0.55)",
+                          fontWeight: 600,
+                          textTransform: "uppercase",
+                          letterSpacing: "0.06em",
+                        }}
+                      >
+                        XAF secured
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Selling-point tabs */}
                 <HeroStatsTabs
                   tabs={[
                     {

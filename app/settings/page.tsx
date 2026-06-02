@@ -1403,8 +1403,8 @@ function PasskeySection() {
 
   return (
     <Section
-      title="Biometrics & Passkeys"
-      subtitle="Sign in with your device biometrics — fingerprint, Face ID, or Windows Hello. No password required."
+      title="Face ID / Fingerprint Login"
+      subtitle="Sign in instantly with your fingerprint, Face ID, or Windows Hello — no password needed."
     >
       {listLoading ? (
         <div

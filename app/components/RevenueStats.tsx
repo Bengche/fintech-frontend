@@ -11,6 +11,12 @@ interface StatsData {
   deliveredInvoices: number;
   totalRevenue: number;
   totalSpent: number;
+  // Enhanced analytics
+  conversionRate?: number;
+  last10Total?: number;
+  last10Paid?: number;
+  avgDealSize?: number;
+  topBuyer?: { buyer_email: string; total_paid: number } | null;
 }
 
 function StatCard({
@@ -285,6 +291,158 @@ export default function RevenueStats() {
               </p>
             </div>
           </div>
+
+          {/* Analytics section */}
+          {(stats.conversionRate !== undefined ||
+            stats.avgDealSize !== undefined ||
+            stats.topBuyer !== undefined) && (
+            <>
+              <p
+                style={{
+                  fontWeight: 700,
+                  fontSize: "0.8125rem",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.05em",
+                  color: "var(--color-text-muted)",
+                  margin: "1.25rem 0 0.75rem",
+                }}
+              >
+                Analytics
+              </p>
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))",
+                  gap: "0.75rem",
+                }}
+              >
+                {stats.conversionRate !== undefined && (
+                  <div
+                    style={{
+                      padding: "1rem",
+                      backgroundColor: "var(--color-mist)",
+                      border: "1px solid var(--color-border)",
+                      borderRadius: "var(--radius-sm)",
+                    }}
+                  >
+                    <p
+                      style={{
+                        fontSize: "0.75rem",
+                        color: "var(--color-text-muted)",
+                        margin: "0 0 0.375rem",
+                      }}
+                    >
+                      Conversion rate
+                    </p>
+                    <p
+                      style={{
+                        fontSize: "1.25rem",
+                        fontWeight: 800,
+                        color: "var(--color-text-heading)",
+                        margin: 0,
+                      }}
+                    >
+                      {stats.conversionRate}%
+                    </p>
+                    <p
+                      style={{
+                        fontSize: "0.72rem",
+                        color: "var(--color-text-muted)",
+                        margin: "0.25rem 0 0",
+                      }}
+                    >
+                      of last {stats.last10Total ?? 10} invoices paid
+                    </p>
+                  </div>
+                )}
+
+                {stats.avgDealSize !== undefined && stats.avgDealSize > 0 && (
+                  <div
+                    style={{
+                      padding: "1rem",
+                      backgroundColor: "var(--color-mist)",
+                      border: "1px solid var(--color-border)",
+                      borderRadius: "var(--radius-sm)",
+                    }}
+                  >
+                    <p
+                      style={{
+                        fontSize: "0.75rem",
+                        color: "var(--color-text-muted)",
+                        margin: "0 0 0.375rem",
+                      }}
+                    >
+                      Avg. deal size
+                    </p>
+                    <p
+                      style={{
+                        fontSize: "1.125rem",
+                        fontWeight: 800,
+                        color: "var(--color-text-heading)",
+                        margin: 0,
+                      }}
+                    >
+                      {stats.avgDealSize.toLocaleString()} XAF
+                    </p>
+                    <p
+                      style={{
+                        fontSize: "0.72rem",
+                        color: "var(--color-text-muted)",
+                        margin: "0.25rem 0 0",
+                      }}
+                    >
+                      Across completed invoices
+                    </p>
+                  </div>
+                )}
+
+                {stats.topBuyer && (
+                  <div
+                    style={{
+                      padding: "1rem",
+                      backgroundColor: "var(--color-mist)",
+                      border: "1px solid var(--color-border)",
+                      borderRadius: "var(--radius-sm)",
+                    }}
+                  >
+                    <p
+                      style={{
+                        fontSize: "0.75rem",
+                        color: "var(--color-text-muted)",
+                        margin: "0 0 0.375rem",
+                      }}
+                    >
+                      Top buyer
+                    </p>
+                    <p
+                      style={{
+                        fontSize: "0.9375rem",
+                        fontWeight: 700,
+                        color: "var(--color-primary)",
+                        margin: 0,
+                        wordBreak: "break-all",
+                      }}
+                    >
+                      {/* Mask email: show first 3 chars + *** + domain */}
+                      {stats.topBuyer.buyer_email.replace(
+                        /^(.{3})(.*)(@.+)$/,
+                        (_, a, _b, c) => `${a}***${c}`,
+                      )}
+                    </p>
+                    <p
+                      style={{
+                        fontSize: "0.72rem",
+                        color: "var(--color-text-muted)",
+                        margin: "0.25rem 0 0",
+                      }}
+                    >
+                      {stats.topBuyer.total_paid.toLocaleString()} XAF total
+                    </p>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
         </div>
       )}
     </div>

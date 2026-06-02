@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import SiteHeader from "../components/SiteHeader";
+import PricingCalculator from "../components/PricingCalculator";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("Pricing.meta");
@@ -24,15 +25,6 @@ export async function generateMetadata(): Promise<Metadata> {
     alternates: { canonical: "https://fonlok.com/pricing" },
   };
 }
-
-const FEE_EXAMPLES = [
-  { amount: "5,000 XAF", fee: "150 XAF", receives: "4,850 XAF" },
-  { amount: "10,000 XAF", fee: "300 XAF", receives: "9,700 XAF" },
-  { amount: "25,000 XAF", fee: "750 XAF", receives: "24,250 XAF" },
-  { amount: "50,000 XAF", fee: "1,500 XAF", receives: "48,500 XAF" },
-  { amount: "100,000 XAF", fee: "3,000 XAF", receives: "97,000 XAF" },
-  { amount: "500,000 XAF", fee: "15,000 XAF", receives: "485,000 XAF" },
-];
 
 export default async function PricingPage() {
   const t = await getTranslations("Pricing");
@@ -357,80 +349,11 @@ export default async function PricingPage() {
                 marginBottom: "2rem",
               }}
             >
-              {t("examples.description")}
+              Enter any amount to see exactly what you pay and receive.
             </p>
 
-            <div style={{ overflowX: "auto" }}>
-              <table
-                style={{
-                  width: "100%",
-                  borderCollapse: "collapse",
-                  fontSize: "0.9375rem",
-                }}
-              >
-                <thead>
-                  <tr style={{ backgroundColor: "var(--color-mist)" }}>
-                    {([0, 1, 2] as const).map((i) => (
-                      <th
-                        key={i}
-                        style={{
-                          padding: "0.875rem 1rem",
-                          textAlign: "left",
-                          fontWeight: 700,
-                          fontSize: "0.875rem",
-                          color: "var(--color-text-heading)",
-                          borderBottom: "1px solid var(--color-border)",
-                        }}
-                      >
-                        {t(`examples.col${i}`)}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {FEE_EXAMPLES.map((row, i) => (
-                    <tr
-                      key={row.amount}
-                      style={{
-                        backgroundColor:
-                          i % 2 === 0
-                            ? "var(--color-white)"
-                            : "var(--color-cloud)",
-                      }}
-                    >
-                      <td
-                        style={{
-                          padding: "0.875rem 1rem",
-                          color: "var(--color-text-body)",
-                          borderBottom: "1px solid var(--color-border)",
-                        }}
-                      >
-                        {row.amount}
-                      </td>
-                      <td
-                        style={{
-                          padding: "0.875rem 1rem",
-                          color: "var(--color-danger)",
-                          fontWeight: 600,
-                          borderBottom: "1px solid var(--color-border)",
-                        }}
-                      >
-                        {row.fee}
-                      </td>
-                      <td
-                        style={{
-                          padding: "0.875rem 1rem",
-                          color: "var(--color-success)",
-                          fontWeight: 600,
-                          borderBottom: "1px solid var(--color-border)",
-                        }}
-                      >
-                        {row.receives}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <div className="card" style={{ padding: "1.75rem" }}>
+              <PricingCalculator />
             </div>
           </div>
         </section>

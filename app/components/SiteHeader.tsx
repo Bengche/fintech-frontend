@@ -16,6 +16,7 @@ import { useAuth } from "@/context/UserContext";
 import FonlokLogo from "./FonlokLogo";
 import axios from "axios";
 import { useTranslations, useLocale } from "next-intl";
+import { useKila } from "@/context/KilaContext";
 
 const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
 
@@ -25,6 +26,7 @@ export default function SiteHeader() {
   const { user_id, setUser_id, setUsername } = useAuth();
   const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { openKila, kilaUnread } = useKila();
 
   const NAV_LINKS = [
     { href: "/how-it-works", label: t("nav.howItWorks") },
@@ -152,6 +154,43 @@ export default function SiteHeader() {
               </Link>
             </>
           )}
+          {/* Ask Kila AI button */}
+          <button
+            onClick={openKila}
+            aria-label="Open Kila AI assistant"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "0.4rem",
+              padding: "0.42rem 0.9rem",
+              borderRadius: "999px",
+              background: "var(--color-primary)",
+              color: "#fff",
+              border: "none",
+              fontWeight: 700,
+              fontSize: "0.8125rem",
+              cursor: "pointer",
+              position: "relative",
+              transition: "opacity 0.15s",
+              whiteSpace: "nowrap",
+            }}
+            onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.opacity = "0.85"; }}
+            onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.opacity = "1"; }}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" fill="rgba(255,255,255,0.9)" />
+              <circle cx="9" cy="10" r="1.2" fill="#F59E0B" />
+              <circle cx="12" cy="10" r="1.2" fill="#F59E0B" />
+              <circle cx="15" cy="10" r="1.2" fill="#F59E0B" />
+            </svg>
+            Ask Kila
+            {kilaUnread && (
+              <span style={{
+                position: "absolute", top: 2, right: 2, width: 7, height: 7,
+                borderRadius: "50%", background: "#EF4444", border: "2px solid var(--color-primary)",
+              }} />
+            )}
+          </button>
           {/* Language toggle */}
           <button
             onClick={switchLocale}
@@ -204,56 +243,90 @@ export default function SiteHeader() {
           </button>
         </div>
 
-        {/* Mobile hamburger button — visible on mobile only */}
-        <button
-          className="md:hidden"
-          onClick={() => setMobileOpen(!mobileOpen)}
-          aria-label={mobileOpen ? t("mobile.closeMenu") : t("mobile.openMenu")}
-          aria-expanded={mobileOpen}
-          style={{
-            background: "none",
-            border: "none",
-            cursor: "pointer",
-            padding: "0.25rem",
-            display: "flex",
-            flexDirection: "column",
-            gap: "5px",
-            width: "28px",
-          }}
-        >
-          <span
+        {/* Mobile right controls: Ask Kila + hamburger */}
+        <div className="md:hidden" style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+          <button
+            onClick={openKila}
+            aria-label="Open Kila AI assistant"
             style={{
-              height: "2px",
-              backgroundColor: "var(--color-text-heading)",
-              borderRadius: "2px",
-              display: "block",
-              transition: "transform 0.2s",
-              transform: mobileOpen ? "translateY(7px) rotate(45deg)" : "none",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "0.35rem",
+              padding: "0.38rem 0.75rem",
+              borderRadius: "999px",
+              background: "var(--color-primary)",
+              color: "#fff",
+              border: "none",
+              fontWeight: 700,
+              fontSize: "0.75rem",
+              cursor: "pointer",
+              position: "relative",
+              whiteSpace: "nowrap",
             }}
-          />
-          <span
+          >
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" fill="rgba(255,255,255,0.9)" />
+              <circle cx="9" cy="10" r="1.2" fill="#F59E0B" />
+              <circle cx="12" cy="10" r="1.2" fill="#F59E0B" />
+              <circle cx="15" cy="10" r="1.2" fill="#F59E0B" />
+            </svg>
+            Ask Kila
+            {kilaUnread && (
+              <span style={{
+                position: "absolute", top: 2, right: 2, width: 7, height: 7,
+                borderRadius: "50%", background: "#EF4444", border: "2px solid var(--color-primary)",
+              }} />
+            )}
+          </button>
+          <button
+            onClick={() => setMobileOpen(!mobileOpen)}
+            aria-label={mobileOpen ? t("mobile.closeMenu") : t("mobile.openMenu")}
+            aria-expanded={mobileOpen}
             style={{
-              height: "2px",
-              backgroundColor: "var(--color-text-heading)",
-              borderRadius: "2px",
-              display: "block",
-              opacity: mobileOpen ? 0 : 1,
-              transition: "opacity 0.2s",
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              padding: "0.25rem",
+              display: "flex",
+              flexDirection: "column",
+              gap: "5px",
+              width: "28px",
             }}
-          />
-          <span
-            style={{
-              height: "2px",
-              backgroundColor: "var(--color-text-heading)",
-              borderRadius: "2px",
-              display: "block",
-              transition: "transform 0.2s",
-              transform: mobileOpen
-                ? "translateY(-7px) rotate(-45deg)"
-                : "none",
-            }}
-          />
-        </button>
+          >
+            <span
+              style={{
+                height: "2px",
+                backgroundColor: "var(--color-text-heading)",
+                borderRadius: "2px",
+                display: "block",
+                transition: "transform 0.2s",
+                transform: mobileOpen ? "translateY(7px) rotate(45deg)" : "none",
+              }}
+            />
+            <span
+              style={{
+                height: "2px",
+                backgroundColor: "var(--color-text-heading)",
+                borderRadius: "2px",
+                display: "block",
+                opacity: mobileOpen ? 0 : 1,
+                transition: "opacity 0.2s",
+              }}
+            />
+            <span
+              style={{
+                height: "2px",
+                backgroundColor: "var(--color-text-heading)",
+                borderRadius: "2px",
+                display: "block",
+                transition: "transform 0.2s",
+                transform: mobileOpen
+                  ? "translateY(-7px) rotate(-45deg)"
+                  : "none",
+              }}
+            />
+          </button>
+        </div>
       </div>
 
       {/* ── Mobile dropdown menu ──────────────────────────────────── */}

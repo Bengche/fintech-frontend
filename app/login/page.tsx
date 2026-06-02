@@ -62,8 +62,13 @@ export default function Login() {
 
       finalizeLogin(response);
     } catch (error: unknown) {
-      const data = (error as { response?: { data?: { code?: string; message?: string; email?: string } } })
-        ?.response?.data;
+      const data = (
+        error as {
+          response?: {
+            data?: { code?: string; message?: string; email?: string };
+          };
+        }
+      )?.response?.data;
       if (data?.code === "EMAIL_NOT_VERIFIED") {
         const emailParam = data.email || formData.email;
         router.push(`/verify-email?email=${encodeURIComponent(emailParam)}`);

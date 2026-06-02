@@ -65,7 +65,9 @@ function RegisterForm() {
       setSubmitted(true);
       // Redirect to verify-email after a brief success moment
       setTimeout(() => {
-        router.push(`/verify-email?email=${encodeURIComponent(formData.email)}`);
+        router.push(
+          `/verify-email?email=${encodeURIComponent(formData.email)}`,
+        );
       }, 2800);
     } catch (error: unknown) {
       const message =
@@ -157,7 +159,10 @@ function RegisterForm() {
           >
             Fonlok
           </Link>
-          <div className="card" style={{ padding: "clamp(1.75rem, 6vw, 2.5rem)" }}>
+          <div
+            className="card"
+            style={{ padding: "clamp(1.75rem, 6vw, 2.5rem)" }}
+          >
             {/* Animated envelope icon */}
             <div
               style={{

@@ -1,11 +1,5 @@
 "use client";
-import {
-  useState,
-  useEffect,
-  useRef,
-  useCallback,
-  Suspense,
-} from "react";
+import { useState, useEffect, useRef, useCallback, Suspense } from "react";
 import Axios from "axios";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
@@ -88,9 +82,9 @@ function VerifyEmailPage() {
     "idle" | "verifying" | "success" | "error" | "expired"
   >("idle");
   const [errorMsg, setErrorMsg] = useState("");
-  const [resendStatus, setResendStatus] = useState<
-    "idle" | "sending" | "sent"
-  >("idle");
+  const [resendStatus, setResendStatus] = useState<"idle" | "sending" | "sent">(
+    "idle",
+  );
   const [resendCooldown, setResendCooldown] = useState(0);
   const [countdown, setCountdown] = useState(REDIRECT_DELAY);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
@@ -119,21 +113,23 @@ function VerifyEmailPage() {
     Axios.post(`${API}/auth/verify-email`, { email: rawEmail, otp: cleaned })
       .then(() => setStatus("success"))
       .catch((err: unknown) => {
-        const data = (err as { response?: { data?: { code?: string; message?: string } } })
-          ?.response?.data;
+        const data = (
+          err as { response?: { data?: { code?: string; message?: string } } }
+        )?.response?.data;
         if (data?.code === "OTP_EXPIRED") {
           setStatus("expired");
           setErrorMsg(data.message || "Your verification link has expired.");
         } else {
           setStatus("error");
           setErrorMsg(
-            data?.message || "Verification failed. Please enter the code manually.",
+            data?.message ||
+              "Verification failed. Please enter the code manually.",
           );
           setDigits(["", "", "", "", "", ""]);
           setTimeout(() => inputRefs.current[0]?.focus(), 80);
         }
       });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [urlCode, rawEmail]);
 
   // Start post-success countdown
@@ -172,28 +168,25 @@ function VerifyEmailPage() {
     };
   }, [resendCooldown]);
 
-  const handleChange = useCallback(
-    (index: number, val: string) => {
-      if (!val) {
-        setDigits((prev) => {
-          const next = [...prev];
-          next[index] = "";
-          return next;
-        });
-        return;
-      }
-      const digit = val.slice(-1);
+  const handleChange = useCallback((index: number, val: string) => {
+    if (!val) {
       setDigits((prev) => {
         const next = [...prev];
-        next[index] = digit;
+        next[index] = "";
         return next;
       });
-      if (index < 5) {
-        setTimeout(() => inputRefs.current[index + 1]?.focus(), 0);
-      }
-    },
-    [],
-  );
+      return;
+    }
+    const digit = val.slice(-1);
+    setDigits((prev) => {
+      const next = [...prev];
+      next[index] = digit;
+      return next;
+    });
+    if (index < 5) {
+      setTimeout(() => inputRefs.current[index + 1]?.focus(), 0);
+    }
+  }, []);
 
   const handleKeyDown = useCallback(
     (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -219,7 +212,10 @@ function VerifyEmailPage() {
   const handlePaste = useCallback(
     (e: React.ClipboardEvent<HTMLInputElement>) => {
       e.preventDefault();
-      const text = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6);
+      const text = e.clipboardData
+        .getData("text")
+        .replace(/\D/g, "")
+        .slice(0, 6);
       if (!text) return;
       const next = ["", "", "", "", "", ""];
       for (let i = 0; i < text.length; i++) next[i] = text[i];
@@ -242,16 +238,15 @@ function VerifyEmailPage() {
       });
       setStatus("success");
     } catch (err: unknown) {
-      const data = (err as { response?: { data?: { code?: string; message?: string } } })
-        ?.response?.data;
+      const data = (
+        err as { response?: { data?: { code?: string; message?: string } } }
+      )?.response?.data;
       if (data?.code === "OTP_EXPIRED") {
         setStatus("expired");
         setErrorMsg(data.message || "Your code has expired.");
       } else {
         setStatus("error");
-        setErrorMsg(
-          data?.message || "Verification failed. Please try again.",
-        );
+        setErrorMsg(data?.message || "Verification failed. Please try again.");
         // Shake and clear on wrong code
         setDigits(["", "", "", "", "", ""]);
         setTimeout(() => inputRefs.current[0]?.focus(), 60);
@@ -320,7 +315,10 @@ function VerifyEmailPage() {
           </Link>
         </div>
 
-        <div className="card" style={{ padding: "clamp(1.5rem, 5vw, 2.25rem)" }}>
+        <div
+          className="card"
+          style={{ padding: "clamp(1.5rem, 5vw, 2.25rem)" }}
+        >
           {/* ── Success state ─────────────────────────────────────── */}
           {status === "success" ? (
             <div style={{ textAlign: "center" }}>
@@ -371,8 +369,8 @@ function VerifyEmailPage() {
                   margin: "0 0 1.75rem",
                 }}
               >
-                Your account is now fully active. Welcome to Fonlok — check
-                your inbox for a welcome email with next steps.
+                Your account is now fully active. Welcome to Fonlok — check your
+                inbox for a welcome email with next steps.
               </p>
 
               {/* Countdown bar */}
@@ -423,7 +421,11 @@ function VerifyEmailPage() {
               <button
                 className="btn-accent"
                 onClick={() => router.push("/login")}
-                style={{ width: "100%", justifyContent: "center", padding: "0.75rem" }}
+                style={{
+                  width: "100%",
+                  justifyContent: "center",
+                  padding: "0.75rem",
+                }}
               >
                 Sign in now
               </button>
@@ -487,7 +489,9 @@ function VerifyEmailPage() {
                   letterSpacing: "-0.02em",
                 }}
               >
-                {isLoading && urlCode ? "Verifying your email..." : "Verify your email"}
+                {isLoading && urlCode
+                  ? "Verifying your email..."
+                  : "Verify your email"}
               </h1>
               <p
                 style={{
@@ -563,7 +567,14 @@ function VerifyEmailPage() {
                 }}
               >
                 {isLoading ? (
-                  <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "0.5rem" }}>
+                  <span
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: "0.5rem",
+                    }}
+                  >
                     <span
                       style={{
                         width: 16,
@@ -610,7 +621,9 @@ function VerifyEmailPage() {
                     <button
                       type="button"
                       onClick={handleResend}
-                      disabled={resendCooldown > 0 || resendStatus === "sending"}
+                      disabled={
+                        resendCooldown > 0 || resendStatus === "sending"
+                      }
                       style={{
                         background: "none",
                         border: "none",
@@ -652,8 +665,8 @@ function VerifyEmailPage() {
                   lineHeight: 1.6,
                 }}
               >
-                Check your spam folder if you don&apos;t see the email within
-                a couple of minutes.
+                Check your spam folder if you don&apos;t see the email within a
+                couple of minutes.
               </p>
             </>
           )}
@@ -671,7 +684,10 @@ function VerifyEmailPage() {
           >
             <Link
               href="/register"
-              style={{ color: "var(--color-text-muted)", textDecoration: "underline" }}
+              style={{
+                color: "var(--color-text-muted)",
+                textDecoration: "underline",
+              }}
             >
               Back to registration
             </Link>
