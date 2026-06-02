@@ -31,8 +31,7 @@ export default function Article() {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Article",
-    headline:
-      "Paying with MTN MoMo or Orange Money — How to Stay Safe",
+    headline: "Paying with MTN MoMo or Orange Money — How to Stay Safe",
     datePublished: "2025-02-03",
     dateModified: "2025-02-03",
     author: { "@type": "Organization", name: "Fonlok" },
@@ -123,10 +122,10 @@ export default function Article() {
             }}
           >
             <p>
-              MTN Mobile Money and Orange Money have transformed how Cameroonians
-              pay for things. You no longer need a bank account to send or
-              receive money. But the same convenience that makes MoMo powerful
-              also makes it a target for fraud.
+              MTN Mobile Money and Orange Money have transformed how
+              Cameroonians pay for things. You no longer need a bank account to
+              send or receive money. But the same convenience that makes MoMo
+              powerful also makes it a target for fraud.
             </p>
             <p>
               This guide explains the most common MoMo scams and the specific
@@ -145,11 +144,12 @@ export default function Article() {
               The Core Problem with Direct MoMo Transfers
             </h2>
             <p>
-              When you send money to a phone number, it is gone immediately.
-              MTN and Orange Money transactions are irreversible once completed.
-              There is no &quot;charge-back&quot; mechanism, no buyer protection,
-              and no dispute resolution process. If you send to the wrong person
-              — or a scammer — recovering your money is extremely difficult.
+              When you send money to a phone number, it is gone immediately. MTN
+              and Orange Money transactions are irreversible once completed.
+              There is no &quot;charge-back&quot; mechanism, no buyer
+              protection, and no dispute resolution process. If you send to the
+              wrong person — or a scammer — recovering your money is extremely
+              difficult.
             </p>
 
             <h2
@@ -213,9 +213,9 @@ export default function Article() {
             </h3>
             <p>
               In buyer-seller disputes, scammers routinely fake MoMo
-              confirmation screenshots. These can look completely genuine.
-              Never accept a screenshot as proof of payment. Always check your
-              own transaction history or MoMo balance in real time.
+              confirmation screenshots. These can look completely genuine. Never
+              accept a screenshot as proof of payment. Always check your own
+              transaction history or MoMo balance in real time.
             </p>
 
             <h2

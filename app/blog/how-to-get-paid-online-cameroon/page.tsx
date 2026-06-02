@@ -30,8 +30,7 @@ export default function Article() {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Article",
-    headline:
-      "How to Get Paid Online in Cameroon Without Getting Scammed",
+    headline: "How to Get Paid Online in Cameroon Without Getting Scammed",
     datePublished: "2025-02-12",
     dateModified: "2025-02-12",
     author: { "@type": "Organization", name: "Fonlok" },
@@ -123,13 +122,13 @@ export default function Article() {
             <p>
               Getting paid online in Cameroon is harder than it should be. Banks
               are slow and expensive. International platforms like PayPal have
-              limited support. And direct MoMo transfers put you at risk of
-              fake payment proofs and non-paying clients.
+              limited support. And direct MoMo transfers put you at risk of fake
+              payment proofs and non-paying clients.
             </p>
             <p>
-              This guide covers every option available to Cameroonian freelancers
-              and small businesses, and explains why escrow is the safest and
-              most professional choice.
+              This guide covers every option available to Cameroonian
+              freelancers and small businesses, and explains why escrow is the
+              safest and most professional choice.
             </p>
 
             <h2
@@ -145,8 +144,8 @@ export default function Article() {
             </h2>
             <p>
               Asking a client to send you money via MoMo before you do the work
-              immediately creates friction. Legitimate clients do not want to pay
-              someone they just met. And if they do pay, you have no way to
+              immediately creates friction. Legitimate clients do not want to
+              pay someone they just met. And if they do pay, you have no way to
               guarantee they will not dispute the transfer later or claim
               non-delivery.
             </p>
@@ -215,8 +214,8 @@ export default function Article() {
             </h2>
             <p>
               Sending a Fonlok payment link instead of your personal MoMo number
-              signals professionalism. Your client sees a structured invoice with
-              your business name, the amount, the description, and a secure
+              signals professionalism. Your client sees a structured invoice
+              with your business name, the amount, the description, and a secure
               payment form. It removes the awkwardness of asking for money and
               builds trust before the first payment arrives.
             </p>

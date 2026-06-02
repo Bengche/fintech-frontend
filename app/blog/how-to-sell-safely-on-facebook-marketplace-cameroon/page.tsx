@@ -123,10 +123,10 @@ export default function Article() {
           >
             <p>
               Facebook Marketplace and Facebook groups are the most popular
-              places to buy and sell in Cameroon. Millions of transactions happen
-              every week — but so do thousands of scams. As a seller, you are
-              particularly exposed: you hold the product and the buyer holds the
-              money.
+              places to buy and sell in Cameroon. Millions of transactions
+              happen every week — but so do thousands of scams. As a seller, you
+              are particularly exposed: you hold the product and the buyer holds
+              the money.
             </p>
 
             <h2
@@ -163,8 +163,8 @@ export default function Article() {
               Before you agree to any deal, check the buyer&apos;s Facebook
               profile. Look for: a profile created more than 6 months ago, real
               photos over time, mutual friends or connections, and a history of
-              comments in local groups. Newly created accounts with no
-              activity are a major red flag.
+              comments in local groups. Newly created accounts with no activity
+              are a major red flag.
             </p>
 
             <h2
@@ -188,8 +188,8 @@ export default function Article() {
                 phone after the transfer
               </li>
               <li>
-                Using a secure escrow service like Fonlok that holds the
-                payment in trust until you confirm delivery
+                Using a secure escrow service like Fonlok that holds the payment
+                in trust until you confirm delivery
               </li>
             </ul>
 

@@ -142,8 +142,12 @@ export default function Article() {
             </p>
             <p>Here is what happens step by step:</p>
             <ol style={{ paddingLeft: "1.5rem", margin: "0.75rem 0" }}>
-              <li>The buyer sends payment to the escrow service (not the seller).</li>
-              <li>The seller sees the payment is confirmed and ships the product.</li>
+              <li>
+                The buyer sends payment to the escrow service (not the seller).
+              </li>
+              <li>
+                The seller sees the payment is confirmed and ships the product.
+              </li>
               <li>The buyer receives the product and confirms delivery.</li>
               <li>The escrow service releases the payment to the seller.</li>
             </ol>
@@ -212,7 +216,9 @@ export default function Article() {
               <li>Freelance and service contracts</li>
               <li>Domain names, digital files, and software</li>
               <li>Milestone-based projects (pay in instalments)</li>
-              <li>Any deal between two parties who need a neutral holding account</li>
+              <li>
+                Any deal between two parties who need a neutral holding account
+              </li>
             </ul>
 
             <div

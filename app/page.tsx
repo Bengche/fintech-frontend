@@ -11,10 +11,12 @@ import Image from "next/image";
 import SiteHeader from "./components/SiteHeader";
 import BenefitsSlider from "./components/BenefitsSlider";
 import HeroStatsTabs from "./components/HeroStatsTabs";
-import MomoLogos from "./components/MomoLogos";
 import { getTranslations } from "next-intl/server";
 
-async function getPlatformStats(): Promise<{ dealCount: number; totalXaf: number }> {
+async function getPlatformStats(): Promise<{
+  dealCount: number;
+  totalXaf: number;
+}> {
   try {
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000"}/invoice/platform-stats`,
@@ -25,6 +27,12 @@ async function getPlatformStats(): Promise<{ dealCount: number; totalXaf: number
   } catch {
     return { dealCount: 0, totalXaf: 0 };
   }
+}
+
+function formatXaf(xaf: number): string {
+  if (xaf >= 1_000_000) return `${(xaf / 1_000_000).toFixed(1)}M+`;
+  if (xaf >= 1_000) return `${Math.round(xaf / 1_000)}K+`;
+  return `${xaf.toLocaleString()}+`;
 }
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -90,7 +98,7 @@ export default async function LandingPage() {
           className="lp-hero"
           style={{
             backgroundColor: "var(--color-primary)",
-            padding: "5rem 1.5rem",
+            padding: "5rem 0",
           }}
         >
           <div className="page-wrapper">
@@ -175,7 +183,28 @@ export default async function LandingPage() {
 
                 {/* Payment method logos */}
                 <div style={{ marginTop: "1.25rem" }}>
-                  <MomoLogos theme="dark" size="md" />
+                  <div
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      background: "rgba(255,255,255,0.10)",
+                      borderRadius: "10px",
+                      padding: "6px 10px",
+                    }}
+                  >
+                    <Image
+                      src="/momo.jpg"
+                      alt="MTN Mobile Money and Orange Money"
+                      width={200}
+                      height={56}
+                      style={{
+                        height: "36px",
+                        width: "auto",
+                        borderRadius: "6px",
+                        display: "block",
+                      }}
+                    />
+                  </div>
                 </div>
 
                 {/* Live platform stats */}
@@ -230,7 +259,7 @@ export default async function LandingPage() {
                           lineHeight: 1.1,
                         }}
                       >
-                        {(platformStats.totalXaf / 1_000_000).toFixed(1)}M+
+                        {formatXaf(platformStats.totalXaf)}
                       </p>
                       <p
                         style={{
@@ -369,7 +398,7 @@ export default async function LandingPage() {
           className="lp-section"
           style={{
             backgroundColor: "var(--color-cloud)",
-            padding: "5rem 1.5rem",
+            padding: "5rem 0",
           }}
         >
           <div className="page-wrapper">
@@ -470,7 +499,7 @@ export default async function LandingPage() {
           className="lp-section"
           style={{
             backgroundColor: "var(--color-white)",
-            padding: "5rem 1.5rem",
+            padding: "5rem 0",
           }}
         >
           <div className="page-wrapper">
@@ -508,7 +537,7 @@ export default async function LandingPage() {
           className="lp-section"
           style={{
             backgroundColor: "var(--color-mist)",
-            padding: "5rem 1.5rem",
+            padding: "5rem 0",
             textAlign: "center",
           }}
         >
@@ -633,7 +662,7 @@ export default async function LandingPage() {
           style={{
             background:
               "linear-gradient(135deg, #0F1F3D 0%, #1a2f4a 60%, #0F1F3D 100%)",
-            padding: "5rem 1.5rem",
+            padding: "5rem 0",
             textAlign: "center",
           }}
         >
@@ -707,7 +736,7 @@ export default async function LandingPage() {
           className="lp-section"
           style={{
             backgroundColor: "var(--color-primary)",
-            padding: "5rem 1.5rem",
+            padding: "5rem 0",
             textAlign: "center",
           }}
         >

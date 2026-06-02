@@ -422,7 +422,6 @@ export default async function PricingPage() {
           </div>
         </section>
       </main>
-
     </>
   );
 }

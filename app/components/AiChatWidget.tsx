@@ -104,7 +104,13 @@ export default function AiChatWidget() {
 
   // Proactive unread hint: after 20s on marketing pages, light up the navbar button
   useEffect(() => {
-    const marketingPages = ["/", "/home", "/about", "/pricing", "/how-it-works"];
+    const marketingPages = [
+      "/",
+      "/home",
+      "/about",
+      "/pricing",
+      "/how-it-works",
+    ];
     if (marketingPages.includes(pathname)) {
       const t = setTimeout(() => {
         if (!kilaOpen) setKilaUnread(true);
@@ -567,8 +573,6 @@ export default function AiChatWidget() {
           </div>
         </div>
       )}
-
-
     </>
   );
 }

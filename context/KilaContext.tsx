@@ -26,7 +26,10 @@ export function KilaProvider({ children }: { children: React.ReactNode }) {
     <KilaContext.Provider
       value={{
         kilaOpen,
-        openKila: () => { setKilaOpen(true); setKilaUnread(false); },
+        openKila: () => {
+          setKilaOpen(true);
+          setKilaUnread(false);
+        },
         closeKila: () => setKilaOpen(false),
         kilaUnread,
         setKilaUnread,

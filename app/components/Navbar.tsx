@@ -268,17 +268,28 @@ export default function Navbar() {
                   }}
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" fill="rgba(252,211,77,0.9)" />
+                    <path
+                      d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+                      fill="rgba(252,211,77,0.9)"
+                    />
                     <circle cx="9" cy="10" r="1.2" fill="#F59E0B" />
                     <circle cx="12" cy="10" r="1.2" fill="#F59E0B" />
                     <circle cx="15" cy="10" r="1.2" fill="#F59E0B" />
                   </svg>
                   Ask Kila
                   {kilaUnread && (
-                    <span style={{
-                      position: "absolute", top: 2, right: 2, width: 7, height: 7,
-                      borderRadius: "50%", background: "#EF4444", border: "2px solid rgba(10,20,50,0.9)",
-                    }} />
+                    <span
+                      style={{
+                        position: "absolute",
+                        top: 2,
+                        right: 2,
+                        width: 7,
+                        height: 7,
+                        borderRadius: "50%",
+                        background: "#EF4444",
+                        border: "2px solid rgba(10,20,50,0.9)",
+                      }}
+                    />
                   )}
                 </button>
                 <NotificationBell
@@ -402,17 +413,28 @@ export default function Navbar() {
               }}
             >
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
-                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" fill="rgba(252,211,77,0.9)" />
+                <path
+                  d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+                  fill="rgba(252,211,77,0.9)"
+                />
                 <circle cx="9" cy="10" r="1.2" fill="#F59E0B" />
                 <circle cx="12" cy="10" r="1.2" fill="#F59E0B" />
                 <circle cx="15" cy="10" r="1.2" fill="#F59E0B" />
               </svg>
               Ask Kila
               {kilaUnread && (
-                <span style={{
-                  position: "absolute", top: 2, right: 2, width: 7, height: 7,
-                  borderRadius: "50%", background: "#EF4444", border: "2px solid rgba(10,20,50,0.9)",
-                }} />
+                <span
+                  style={{
+                    position: "absolute",
+                    top: 2,
+                    right: 2,
+                    width: 7,
+                    height: 7,
+                    borderRadius: "50%",
+                    background: "#EF4444",
+                    border: "2px solid rgba(10,20,50,0.9)",
+                  }}
+                />
               )}
             </button>
             {/* Hamburger / X */}

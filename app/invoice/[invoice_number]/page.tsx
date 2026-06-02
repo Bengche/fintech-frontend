@@ -8,7 +8,7 @@ import { useAuth } from "@/context/UserContext";
 import { InlineSpinner } from "@/app/components/Spinner";
 import { useTranslations } from "next-intl";
 import { BRAND } from "@/config/brand";
-import MomoLogos from "@/app/components/MomoLogos";
+import Image from "next/image";
 import {
   ShieldCheck,
   ShieldAlert,
@@ -1302,7 +1302,18 @@ export default function InvoicePage() {
               {/* Payment method logos */}
               {!isPaid && (
                 <div style={{ marginBottom: "0.25rem" }}>
-                  <MomoLogos theme="light" size="sm" />
+                  <Image
+                    src="/momo.jpg"
+                    alt="MTN Mobile Money and Orange Money"
+                    width={160}
+                    height={44}
+                    style={{
+                      height: "28px",
+                      width: "auto",
+                      borderRadius: "4px",
+                      display: "block",
+                    }}
+                  />
                 </div>
               )}
 

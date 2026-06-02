@@ -876,7 +876,8 @@ a:hover {
   /* ── Hero ─────────────────────────────────────────────────── */
   /* Tighter vertical padding on small screens */
   .lp-hero {
-    padding: 2.75rem 1.25rem 3rem !important;
+    padding-top: 2.75rem !important;
+    padding-bottom: 3rem !important;
   }
 
   /* Hero image — mobile only: show below hero, hide from inside hero */
@@ -916,7 +917,8 @@ a:hover {
   /* ── Content sections ────────────────────────────────────── */
   /* All sections: reduce 5rem → 2.75rem vertical padding */
   .lp-section {
-    padding: 2.75rem 1.25rem !important;
+    padding-top: 2.75rem !important;
+    padding-bottom: 2.75rem !important;
   }
 
   /* Section heading groups: tighter bottom margin */

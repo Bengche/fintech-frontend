@@ -22,8 +22,7 @@ export const metadata: Metadata = {
     type: "article",
   },
   alternates: {
-    canonical:
-      "https://fonlok.com/blog/how-to-avoid-online-scams-in-cameroon",
+    canonical: "https://fonlok.com/blog/how-to-avoid-online-scams-in-cameroon",
   },
 };
 
@@ -42,8 +41,7 @@ export default function Article() {
     },
     mainEntityOfPage: {
       "@type": "WebPage",
-      "@id":
-        "https://fonlok.com/blog/how-to-avoid-online-scams-in-cameroon",
+      "@id": "https://fonlok.com/blog/how-to-avoid-online-scams-in-cameroon",
     },
   };
 
@@ -158,7 +156,10 @@ export default function Article() {
             <p>
               <strong>What to do:</strong> Never send payment to someone you
               have not verified. Use an escrow service like{" "}
-              <Link href="/" style={{ color: "var(--color-primary)", fontWeight: 600 }}>
+              <Link
+                href="/"
+                style={{ color: "var(--color-primary)", fontWeight: 600 }}
+              >
                 Fonlok
               </Link>{" "}
               so your money is held safely until you confirm you received what
@@ -252,10 +253,9 @@ export default function Article() {
               refund if delivery fails. Neither side has to trust a stranger.
             </p>
             <p>
-              Fonlok is Cameroon&apos;s dedicated escrow platform, built for
-              MTN Mobile Money and Orange Money. Every transaction is protected
-              from the moment payment is made until the buyer confirms
-              satisfaction.
+              Fonlok is Cameroon&apos;s dedicated escrow platform, built for MTN
+              Mobile Money and Orange Money. Every transaction is protected from
+              the moment payment is made until the buyer confirms satisfaction.
             </p>
 
             <div

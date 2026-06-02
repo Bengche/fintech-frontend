@@ -174,21 +174,36 @@ export default function SiteHeader() {
               transition: "opacity 0.15s",
               whiteSpace: "nowrap",
             }}
-            onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.opacity = "0.85"; }}
-            onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.opacity = "1"; }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLButtonElement).style.opacity = "0.85";
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLButtonElement).style.opacity = "1";
+            }}
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" fill="rgba(255,255,255,0.9)" />
+              <path
+                d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+                fill="rgba(255,255,255,0.9)"
+              />
               <circle cx="9" cy="10" r="1.2" fill="#F59E0B" />
               <circle cx="12" cy="10" r="1.2" fill="#F59E0B" />
               <circle cx="15" cy="10" r="1.2" fill="#F59E0B" />
             </svg>
             Ask Kila
             {kilaUnread && (
-              <span style={{
-                position: "absolute", top: 2, right: 2, width: 7, height: 7,
-                borderRadius: "50%", background: "#EF4444", border: "2px solid var(--color-primary)",
-              }} />
+              <span
+                style={{
+                  position: "absolute",
+                  top: 2,
+                  right: 2,
+                  width: 7,
+                  height: 7,
+                  borderRadius: "50%",
+                  background: "#EF4444",
+                  border: "2px solid var(--color-primary)",
+                }}
+              />
             )}
           </button>
           {/* Language toggle */}
@@ -244,7 +259,10 @@ export default function SiteHeader() {
         </div>
 
         {/* Mobile right controls: Ask Kila + hamburger */}
-        <div className="md:hidden" style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+        <div
+          className="md:hidden"
+          style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}
+        >
           <button
             onClick={openKila}
             aria-label="Open Kila AI assistant"
@@ -265,22 +283,35 @@ export default function SiteHeader() {
             }}
           >
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
-              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" fill="rgba(255,255,255,0.9)" />
+              <path
+                d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+                fill="rgba(255,255,255,0.9)"
+              />
               <circle cx="9" cy="10" r="1.2" fill="#F59E0B" />
               <circle cx="12" cy="10" r="1.2" fill="#F59E0B" />
               <circle cx="15" cy="10" r="1.2" fill="#F59E0B" />
             </svg>
             Ask Kila
             {kilaUnread && (
-              <span style={{
-                position: "absolute", top: 2, right: 2, width: 7, height: 7,
-                borderRadius: "50%", background: "#EF4444", border: "2px solid var(--color-primary)",
-              }} />
+              <span
+                style={{
+                  position: "absolute",
+                  top: 2,
+                  right: 2,
+                  width: 7,
+                  height: 7,
+                  borderRadius: "50%",
+                  background: "#EF4444",
+                  border: "2px solid var(--color-primary)",
+                }}
+              />
             )}
           </button>
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
-            aria-label={mobileOpen ? t("mobile.closeMenu") : t("mobile.openMenu")}
+            aria-label={
+              mobileOpen ? t("mobile.closeMenu") : t("mobile.openMenu")
+            }
             aria-expanded={mobileOpen}
             style={{
               background: "none",
@@ -300,7 +331,9 @@ export default function SiteHeader() {
                 borderRadius: "2px",
                 display: "block",
                 transition: "transform 0.2s",
-                transform: mobileOpen ? "translateY(7px) rotate(45deg)" : "none",
+                transform: mobileOpen
+                  ? "translateY(7px) rotate(45deg)"
+                  : "none",
               }}
             />
             <span

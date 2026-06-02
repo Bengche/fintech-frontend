@@ -35,7 +35,9 @@ export default function PricingCalculator() {
         >
           Invoice amount (XAF)
         </label>
-        <div style={{ display: "flex", alignItems: "stretch", maxWidth: "320px" }}>
+        <div
+          style={{ display: "flex", alignItems: "stretch", maxWidth: "320px" }}
+        >
           <span
             style={{
               padding: "0.625rem 0.875rem",
