@@ -37,6 +37,7 @@ export default function CreateInvoice({
   const [isSavingTemplate, setIsSavingTemplate] = useState(false);
   const [sellerLogo, setSellerLogo] = useState<File | null>(null);
   const [sellerLogoPreview, setSellerLogoPreview] = useState<string>("");
+  const [sellerBrandName, setSellerBrandName] = useState("");
 
   useEffect(() => {
     return () => {
@@ -106,6 +107,7 @@ export default function CreateInvoice({
     setSaveTemplateSuccess("");
     setSellerLogo(null);
     setSellerLogoPreview("");
+    setSellerBrandName("");
   };
 
   const closeModal = () => {
@@ -117,6 +119,7 @@ export default function CreateInvoice({
     setTemplateName("");
     setSellerLogo(null);
     setSellerLogoPreview("");
+    setSellerBrandName("");
   };
 
   const handleLogoChange = (file: File | null) => {
@@ -169,6 +172,7 @@ export default function CreateInvoice({
         payload.append("milestones", JSON.stringify(milestones));
       }
       if (sellerLogo) payload.append("seller_logo", sellerLogo);
+      if (sellerBrandName.trim()) payload.append("seller_brand_name", sellerBrandName.trim());
 
       const response = await Axios.post(`${API}/invoice/create`, payload, {
         headers: { "Content-Type": "multipart/form-data" },
@@ -570,12 +574,47 @@ export default function CreateInvoice({
                     style={{
                       fontSize: "0.78rem",
                       color: "var(--color-text-muted)",
-                      margin: "0 0 0.5rem",
+                      margin: "0 0 0.75rem",
                       lineHeight: 1.5,
                     }}
                   >
                     {t("create.brandingHint")}
                   </p>
+
+                  {/* Brand name */}
+                  <div style={{ marginBottom: "0.75rem" }}>
+                    <label
+                      className="label"
+                      htmlFor="seller_brand_name"
+                      style={{ fontSize: "0.8rem", marginBottom: "0.3rem" }}
+                    >
+                      Brand / Business Name{" "}
+                      <span style={{ fontWeight: 400, color: "var(--color-text-muted)" }}>
+                        (optional)
+                      </span>
+                    </label>
+                    <input
+                      className="input"
+                      id="seller_brand_name"
+                      type="text"
+                      placeholder="e.g. Acme Supplies"
+                      maxLength={80}
+                      value={sellerBrandName}
+                      onChange={(e) => setSellerBrandName(e.target.value)}
+                    />
+                  </div>
+
+                  {/* Logo upload */}
+                  <label
+                    className="label"
+                    htmlFor="seller_logo"
+                    style={{ fontSize: "0.8rem", marginBottom: "0.3rem" }}
+                  >
+                    Business Logo{" "}
+                    <span style={{ fontWeight: 400, color: "var(--color-text-muted)" }}>
+                      (optional)
+                    </span>
+                  </label>
                   <input
                     id="seller_logo"
                     type="file"

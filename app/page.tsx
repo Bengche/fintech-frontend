@@ -250,7 +250,15 @@ export default async function LandingPage() {
                         }}
                       >
                         {formatXaf(platformStats.totalXaf)}{" "}
-                        <span style={{ fontSize: "0.8rem", fontWeight: 700, opacity: 0.85 }}>XAF</span>
+                        <span
+                          style={{
+                            fontSize: "0.8rem",
+                            fontWeight: 700,
+                            opacity: 0.85,
+                          }}
+                        >
+                          XAF
+                        </span>
                       </p>
                       <p
                         style={{
