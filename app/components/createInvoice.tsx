@@ -172,7 +172,8 @@ export default function CreateInvoice({
         payload.append("milestones", JSON.stringify(milestones));
       }
       if (sellerLogo) payload.append("seller_logo", sellerLogo);
-      if (sellerBrandName.trim()) payload.append("seller_brand_name", sellerBrandName.trim());
+      if (sellerBrandName.trim())
+        payload.append("seller_brand_name", sellerBrandName.trim());
 
       const response = await Axios.post(`${API}/invoice/create`, payload, {
         headers: { "Content-Type": "multipart/form-data" },
@@ -589,7 +590,12 @@ export default function CreateInvoice({
                       style={{ fontSize: "0.8rem", marginBottom: "0.3rem" }}
                     >
                       Brand / Business Name{" "}
-                      <span style={{ fontWeight: 400, color: "var(--color-text-muted)" }}>
+                      <span
+                        style={{
+                          fontWeight: 400,
+                          color: "var(--color-text-muted)",
+                        }}
+                      >
                         (optional)
                       </span>
                     </label>
@@ -611,7 +617,12 @@ export default function CreateInvoice({
                     style={{ fontSize: "0.8rem", marginBottom: "0.3rem" }}
                   >
                     Business Logo{" "}
-                    <span style={{ fontWeight: 400, color: "var(--color-text-muted)" }}>
+                    <span
+                      style={{
+                        fontWeight: 400,
+                        color: "var(--color-text-muted)",
+                      }}
+                    >
                       (optional)
                     </span>
                   </label>

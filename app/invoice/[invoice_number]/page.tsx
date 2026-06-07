@@ -444,23 +444,24 @@ export default function InvoicePage() {
                     {invoiceStats.seller_brand_name || t("sellerBrandLabel")}
                   </span>
                 )}
-                {!invoiceStats.seller_logo_url && invoiceStats.seller_brand_name && (
-                  <span
-                    style={{
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: "0.35rem",
-                      borderRadius: "999px",
-                      padding: "0.2rem 0.6rem",
-                      fontSize: "0.7rem",
-                      fontWeight: 700,
-                      background: "rgba(255,255,255,0.14)",
-                      border: "1px solid rgba(255,255,255,0.2)",
-                    }}
-                  >
-                    {invoiceStats.seller_brand_name}
-                  </span>
-                )}
+                {!invoiceStats.seller_logo_url &&
+                  invoiceStats.seller_brand_name && (
+                    <span
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "0.35rem",
+                        borderRadius: "999px",
+                        padding: "0.2rem 0.6rem",
+                        fontSize: "0.7rem",
+                        fontWeight: 700,
+                        background: "rgba(255,255,255,0.14)",
+                        border: "1px solid rgba(255,255,255,0.2)",
+                      }}
+                    >
+                      {invoiceStats.seller_brand_name}
+                    </span>
+                  )}
               </div>
               <p
                 style={{
