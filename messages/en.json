@@ -1544,6 +1544,8 @@
     "milestoneSellerActionTitle": "Your next action",
     "milestoneSellerActionBody": "Click \"Mark as Done\" on a milestone once you have completed that stage of the work. The buyer will immediately receive an email with a one-click link to release your payment for that milestone.",
     "releasePayment": "Release Funds",
+    "releaseConfirmTitle": "Confirm Payment Release",
+    "releaseConfirmBody": "You are about to release {amount} XAF for \"${label}\". This action cannot be undone. Only release funds if you are satisfied with the work delivered for this milestone.",
     "releaseConfirm": "Yes, Release Funds",
     "releaseCancel": "Cancel",
     "releaseSuccess": "Funds released successfully. The seller has been notified.",

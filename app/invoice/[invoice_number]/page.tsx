@@ -1096,54 +1096,65 @@ export default function InvoicePage() {
                             !isSeller &&
                             (currentUserId ? (
                               releaseConfirmId === m.id ? (
-                                <>
-                                  <button
-                                    onClick={() => releaseMilestoneAsUser(m.id)}
-                                    disabled={releaseLoading}
-                                    style={{
-                                      flex: "1 1 auto",
-                                      minHeight: "2.5rem",
-                                      padding: "0.5rem 1rem",
-                                      borderRadius: "var(--radius-sm)",
-                                      border: "2px solid #16a34a",
-                                      backgroundColor: "#16a34a",
-                                      color: "#fff",
-                                      fontWeight: 700,
-                                      fontSize: "0.875rem",
-                                      cursor: releaseLoading
-                                        ? "not-allowed"
-                                        : "pointer",
-                                      opacity: releaseLoading ? 0.6 : 1,
-                                      display: "flex",
-                                      alignItems: "center",
-                                      justifyContent: "center",
-                                      gap: "0.375rem",
-                                    }}
-                                  >
-                                    {releaseLoading ? (
-                                      <InlineSpinner size="xs" />
-                                    ) : (
-                                      t("releaseConfirm")
-                                    )}
-                                  </button>
-                                  <button
-                                    onClick={() => setReleaseConfirmId(null)}
-                                    style={{
-                                      flex: "1 1 auto",
-                                      minHeight: "2.5rem",
-                                      padding: "0.5rem 1rem",
-                                      borderRadius: "var(--radius-sm)",
-                                      border: "1px solid var(--color-border)",
-                                      backgroundColor: "transparent",
-                                      color: "var(--color-text-muted)",
-                                      fontWeight: 600,
-                                      fontSize: "0.875rem",
-                                      cursor: "pointer",
-                                    }}
-                                  >
-                                    {t("releaseCancel")}
-                                  </button>
-                                </>
+                                <div
+                                  style={{
+                                    marginTop: "0.75rem",
+                                    padding: "0.875rem 1rem",
+                                    backgroundColor: "#fffbeb",
+                                    border: "1px solid #fcd34d",
+                                    borderRadius: "var(--radius-md)",
+                                    width: "100%",
+                                  }}
+                                >
+                                  <p style={{ margin: "0 0 0.25rem", fontWeight: 700, fontSize: "0.875rem", color: "#92400e" }}>
+                                    {t("releaseConfirmTitle")}
+                                  </p>
+                                  <p style={{ margin: "0 0 0.875rem", fontSize: "0.8125rem", color: "#b45309", lineHeight: 1.5 }}>
+                                    {t("releaseConfirmBody", { amount: Number(m.amount).toLocaleString(), label: m.label })}
+                                  </p>
+                                  <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+                                    <button
+                                      onClick={() => releaseMilestoneAsUser(m.id)}
+                                      disabled={releaseLoading}
+                                      style={{
+                                        flex: "1 1 auto",
+                                        minHeight: "2.5rem",
+                                        padding: "0.5rem 1rem",
+                                        borderRadius: "var(--radius-sm)",
+                                        border: "2px solid #16a34a",
+                                        backgroundColor: "#16a34a",
+                                        color: "#fff",
+                                        fontWeight: 700,
+                                        fontSize: "0.875rem",
+                                        cursor: releaseLoading ? "not-allowed" : "pointer",
+                                        opacity: releaseLoading ? 0.6 : 1,
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        gap: "0.375rem",
+                                      }}
+                                    >
+                                      {releaseLoading ? <InlineSpinner size="xs" /> : t("releaseConfirm")}
+                                    </button>
+                                    <button
+                                      onClick={() => setReleaseConfirmId(null)}
+                                      style={{
+                                        flex: "1 1 auto",
+                                        minHeight: "2.5rem",
+                                        padding: "0.5rem 1rem",
+                                        borderRadius: "var(--radius-sm)",
+                                        border: "1px solid var(--color-border)",
+                                        backgroundColor: "transparent",
+                                        color: "var(--color-text-muted)",
+                                        fontWeight: 600,
+                                        fontSize: "0.875rem",
+                                        cursor: "pointer",
+                                      }}
+                                    >
+                                      {t("releaseCancel")}
+                                    </button>
+                                  </div>
+                                </div>
                               ) : (
                                 <button
                                   onClick={() => setReleaseConfirmId(m.id)}

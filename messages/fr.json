@@ -1544,6 +1544,8 @@
     "milestoneSellerActionTitle": "Votre prochaine action",
     "milestoneSellerActionBody": "Cliquez sur \"Marquer comme fait\" dès que vous avez terminé cette étape. L'acheteur recevra immédiatement un e-mail avec un lien pour libérer votre paiement pour cette étape.",
     "releasePayment": "Libérer les fonds",
+    "releaseConfirmTitle": "Confirmer la libération du paiement",
+    "releaseConfirmBody": "Vous êtes sur le point de libérer {amount} XAF pour \"{label}\". Cette action est irréversible. Ne libérez les fonds que si vous êtes satisfait du travail livré pour cette étape.",
     "releaseConfirm": "Oui, libérer les fonds",
     "releaseCancel": "Annuler",
     "releaseSuccess": "Fonds libérés avec succès. Le vendeur a été notifié.",
