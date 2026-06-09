@@ -38,6 +38,9 @@ export default function BuyerChatPage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [uploadProgress, setUploadProgress] = useState<number>(0);
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [errorMessage, setErrorMessage] = useState("");
   const [isAccessDenied, setIsAccessDenied] = useState(false);
 
@@ -159,22 +162,56 @@ export default function BuyerChatPage() {
 
   // Upload a file
   const uploadFile = async () => {
-    if (!selectedFile) return;
+    if (!selectedFile || uploadProgress < 100) return;
 
     const formData = new FormData();
     formData.append("file", selectedFile);
     formData.append("sender_type", "buyer");
     formData.append("token", token || "");
 
+    setIsUploading(true);
     try {
-      await Axios.post(`${API}/chat/upload/${invoice_number}`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
+      await new Promise<void>((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", `${API}/chat/upload/${invoice_number}`);
+        xhr.upload.onprogress = (e) => {
+          if (e.lengthComputable) {
+            setUploadProgress(Math.round((e.loaded / e.total) * 100));
+          }
+        };
+        xhr.onload = () => (xhr.status >= 200 && xhr.status < 300 ? resolve() : reject(new Error(xhr.statusText)));
+        xhr.onerror = () => reject(new Error("Network error"));
+        xhr.send(formData);
       });
       setSelectedFile(null);
+      setUploadProgress(0);
+      if (fileInputRef.current) fileInputRef.current.value = "";
       fetchMessages();
     } catch {
       setErrorMessage(t("errorUpload"));
+    } finally {
+      setIsUploading(false);
     }
+  };
+
+  // Simulate "readiness" progress when a file is selected (reads the file locally)
+  const handleFileSelect = (file: File | null) => {
+    setSelectedFile(file);
+    setUploadProgress(0);
+    if (!file) return;
+    // Read file to simulate checking readiness — increments to 100 quickly
+    const reader = new FileReader();
+    let fakeProgress = 0;
+    const tick = setInterval(() => {
+      fakeProgress = Math.min(fakeProgress + Math.floor(Math.random() * 18) + 8, 99);
+      setUploadProgress(fakeProgress);
+    }, 80);
+    reader.onload = () => {
+      clearInterval(tick);
+      setUploadProgress(100);
+    };
+    reader.onerror = () => clearInterval(tick);
+    reader.readAsArrayBuffer(file);
   };
 
   // Show an error page if the token is missing or invalid
@@ -460,19 +497,99 @@ export default function BuyerChatPage() {
         )}
 
         {/* File upload */}
-        <div className="flex items-center gap-2 px-3 pb-2 border-t border-gray-200 pt-2">
+        <div className="px-3 pb-3 border-t border-gray-200 pt-3">
+          {/* Hidden real file input */}
           <input
+            ref={fileInputRef}
             type="file"
-            onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
-            className="text-sm"
+            className="hidden"
+            onChange={(e) => handleFileSelect(e.target.files?.[0] || null)}
           />
-          {selectedFile && (
+
+          {!selectedFile ? (
+            /* Pick-file button */
             <button
-              onClick={uploadFile}
-              className="bg-gray-600 text-white text-sm rounded p-1"
+              onClick={() => fileInputRef.current?.click()}
+              className="flex items-center gap-2 w-full justify-center border-2 border-dashed border-gray-300 hover:border-blue-400 hover:bg-blue-50 text-gray-500 hover:text-blue-600 rounded-lg py-2.5 text-sm font-medium transition-all duration-200 active:scale-95"
             >
-              {t("uploadBtn")}
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+              </svg>
+              <span>{t("attachFile")}</span>
             </button>
+          ) : (
+            /* File selected — show name, progress, upload button */
+            <div className="rounded-lg border border-gray-200 bg-gray-50 p-3 space-y-2">
+              {/* File info row */}
+              <div className="flex items-center gap-2 min-w-0">
+                <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 shrink-0 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <span className="text-xs text-gray-700 font-medium truncate flex-1 min-w-0">
+                  {selectedFile.name}
+                </span>
+                <span className="text-xs text-gray-400 shrink-0">
+                  {(selectedFile.size / 1024).toFixed(0)} KB
+                </span>
+                {/* Cancel */}
+                <button
+                  onClick={() => { setSelectedFile(null); setUploadProgress(0); if (fileInputRef.current) fileInputRef.current.value = ""; }}
+                  className="shrink-0 text-gray-400 hover:text-red-500 transition-colors ml-1"
+                  aria-label="Remove file"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              {/* Progress bar */}
+              <div className="w-full bg-gray-200 rounded-full h-1.5 overflow-hidden">
+                <div
+                  className="h-1.5 rounded-full transition-all duration-150"
+                  style={{
+                    width: `${uploadProgress}%`,
+                    backgroundColor: uploadProgress < 100 ? "#f59e0b" : "#22c55e",
+                  }}
+                />
+              </div>
+              <p className="text-xs font-medium" style={{ color: uploadProgress < 100 ? "#b45309" : "#15803d" }}>
+                {isUploading
+                  ? `${t("uploading")}… ${uploadProgress}%`
+                  : uploadProgress < 100
+                  ? `${t("preparingFile")} ${uploadProgress}%`
+                  : `✓ ${t("readyToUpload")}`}
+              </p>
+
+              {/* Upload button — disabled until 100% ready */}
+              <button
+                onClick={uploadFile}
+                disabled={uploadProgress < 100 || isUploading}
+                className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-sm font-semibold transition-all duration-200 active:scale-95 disabled:cursor-not-allowed"
+                style={{
+                  backgroundColor: uploadProgress < 100 || isUploading ? "#e5e7eb" : "#1d4ed8",
+                  color: uploadProgress < 100 || isUploading ? "#9ca3af" : "#ffffff",
+                  boxShadow: uploadProgress === 100 && !isUploading ? "0 1px 3px rgba(29,78,216,0.4)" : "none",
+                }}
+              >
+                {isUploading ? (
+                  <>
+                    <svg className="w-4 h-4 animate-spin shrink-0" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
+                    </svg>
+                    {t("uploading")}…
+                  </>
+                ) : (
+                  <>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                    </svg>
+                    {uploadProgress < 100 ? t("uploadBtn") : t("uploadBtn")}
+                  </>
+                )}
+              </button>
+            </div>
           )}
         </div>
 
