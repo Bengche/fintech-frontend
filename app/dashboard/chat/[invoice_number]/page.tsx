@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useState, useEffect, useRef } from "react";
 import Axios from "axios";
 import { useParams, useRouter } from "next/navigation";
@@ -119,17 +119,17 @@ export default function SellerChatPage() {
     <div
       style={{
         minHeight: "100vh",
-        backgroundColor: "var(--color-cloud)",
+        backgroundColor: "#f8fafc",
         display: "flex",
         flexDirection: "column",
       }}
     >
-      {/* ── Header ──────────────────────────────────────────────────────── */}
+      {/* â”€â”€ Header â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <div
         style={{
-          backgroundColor: "var(--color-white)",
-          borderBottom: "1px solid var(--color-border)",
-          padding: "0.875rem 1.25rem",
+          backgroundColor: "#fff",
+          borderBottom: "1px solid #e2e8f0",
+          padding: "0.75rem 1rem",
           display: "flex",
           alignItems: "center",
           gap: "0.75rem",
@@ -146,58 +146,61 @@ export default function SellerChatPage() {
             cursor: "pointer",
             display: "flex",
             alignItems: "center",
-            color: "var(--color-text-muted)",
-            padding: "0.25rem",
-            borderRadius: "var(--radius-sm)",
+            color: "#64748b",
+            padding: "0.375rem",
+            borderRadius: "0.5rem",
+            flexShrink: 0,
           }}
+          aria-label="Back to dashboard"
         >
           <ArrowLeft size={20} />
         </button>
-        <MessageSquare size={18} color="var(--color-primary)" />
-        <div>
-          <p
-            style={{
-              margin: 0,
-              fontWeight: 700,
-              fontSize: "0.9375rem",
-              color: "var(--color-text-heading)",
-            }}
-          >
+        <div
+          style={{
+            width: "36px",
+            height: "36px",
+            borderRadius: "50%",
+            backgroundColor: "var(--color-primary, #2563eb)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexShrink: 0,
+          }}
+        >
+          <MessageSquare size={18} color="#fff" />
+        </div>
+        <div style={{ minWidth: 0, flex: 1 }}>
+          <p style={{ margin: 0, fontWeight: 700, fontSize: "0.9375rem", color: "#1e293b", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
             Chat with Buyer
           </p>
-          <p
-            style={{
-              margin: 0,
-              fontSize: "0.75rem",
-              color: "var(--color-text-muted)",
-            }}
-          >
+          <p style={{ margin: 0, fontSize: "0.75rem", color: "#94a3b8" }}>
             Invoice #{invoice_number}
           </p>
         </div>
       </div>
 
-      {/* ── Body ────────────────────────────────────────────────────────── */}
+      {/* â”€â”€ Body â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <div
         style={{
           flex: 1,
           maxWidth: "680px",
           width: "100%",
-          margin: "1.25rem auto",
-          padding: "0 1rem",
+          margin: "0 auto",
+          padding: "1rem 0.75rem",
           display: "flex",
           flexDirection: "column",
           gap: "1rem",
+          boxSizing: "border-box",
         }}
       >
         {/* Chat card */}
         <div
           style={{
-            border: "1px solid var(--color-border)",
-            borderRadius: "var(--radius-md)",
-            backgroundColor: "var(--color-white)",
+            border: "1px solid #e2e8f0",
+            borderRadius: "1rem",
+            backgroundColor: "#fff",
             overflow: "hidden",
-            boxShadow: "var(--shadow-card)",
+            boxShadow: "0 1px 3px rgba(0,0,0,0.07)",
             display: "flex",
             flexDirection: "column",
           }}
@@ -205,45 +208,29 @@ export default function SellerChatPage() {
           {/* Messages area */}
           <div
             style={{
-              height: "calc(100vh - 320px)",
-              minHeight: "280px",
+              maxHeight: "60vh",
+              minHeight: "300px",
               overflowY: "auto",
               overflowX: "hidden",
               padding: "1rem",
               display: "flex",
               flexDirection: "column",
-              gap: "0.625rem",
-              backgroundColor: "var(--color-cloud)",
+              gap: "0.75rem",
+              backgroundColor: "#f8fafc",
             }}
           >
             {chatExists === false ? (
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  height: "100%",
-                  gap: "0.5rem",
-                  color: "var(--color-text-muted)",
-                }}
-              >
-                <MessageSquare size={32} opacity={0.35} />
-                <p style={{ margin: 0, fontSize: "0.875rem" }}>
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100%", gap: "0.75rem", padding: "3rem 1rem", color: "#94a3b8", textAlign: "center" }}>
+                <MessageSquare size={36} style={{ opacity: 0.3 }} />
+                <p style={{ margin: 0, fontSize: "0.875rem", lineHeight: 1.5 }}>
                   Chat opens once the buyer completes payment.
                 </p>
               </div>
             ) : messages.length === 0 ? (
-              <p
-                style={{
-                  textAlign: "center",
-                  color: "var(--color-text-muted)",
-                  fontSize: "0.875rem",
-                  marginTop: "3rem",
-                }}
-              >
-                {t("empty")}
-              </p>
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100%", gap: "0.75rem", padding: "3rem 1rem", color: "#94a3b8", textAlign: "center" }}>
+                <MessageSquare size={36} style={{ opacity: 0.3 }} />
+                <p style={{ margin: 0, fontSize: "0.875rem" }}>{t("empty")}</p>
+              </div>
             ) : null}
 
             {messages.map((msg) => {
@@ -256,100 +243,45 @@ export default function SellerChatPage() {
                   style={{
                     display: "flex",
                     flexDirection: "column",
-                    maxWidth: isSystem || isModerator ? "90%" : "72%",
-                    minWidth: 0,
-                    alignSelf:
-                      isSystem || isModerator
-                        ? "center"
-                        : isSeller
-                          ? "flex-end"
-                          : "flex-start",
-                    wordBreak: "break-word",
-                    overflowWrap: "break-word",
+                    alignItems: isSystem || isModerator ? "center" : isSeller ? "flex-end" : "flex-start",
                   }}
                 >
+                  {/* Sender label */}
+                  <span style={{ fontSize: "0.6875rem", color: "#94a3b8", fontWeight: 600, marginBottom: "0.25rem", paddingLeft: "0.25rem", paddingRight: "0.25rem" }}>
+                    {isSystem ? "âš ï¸ System" : isModerator ? "ðŸ›¡ï¸ Moderator" : isSeller ? t("youSeller") : `Buyer (${msg.sender_email})`}
+                  </span>
+
+                  {/* Bubble */}
                   <div
                     style={{
-                      backgroundColor: isSystem
-                        ? "#fef3c7"
-                        : isModerator
-                          ? "#eff6ff"
-                          : isSeller
-                            ? "var(--color-primary)"
-                            : "var(--color-white)",
-                      color: isSeller
-                        ? "var(--color-white)"
-                        : "var(--color-text-body)",
-                      border: isSystem
-                        ? "1px solid #f59e0b"
-                        : isModerator
-                          ? "1px solid #93c5fd"
-                          : isSeller
-                            ? "none"
-                            : "1px solid var(--color-border)",
-                      borderRadius: "var(--radius-md)",
+                      maxWidth: "85%",
+                      backgroundColor: isSystem ? "#fef3c7" : isModerator ? "#eff6ff" : isSeller ? "var(--color-primary, #2563eb)" : "#f1f5f9",
+                      color: isSeller ? "#fff" : "#1e293b",
+                      border: isSystem ? "1px solid #f59e0b" : isModerator ? "1px solid #93c5fd" : "none",
+                      borderRadius: isSeller ? "18px 18px 4px 18px" : isSystem || isModerator ? "14px" : "18px 18px 18px 4px",
                       padding: "0.625rem 0.875rem",
                       fontSize: "0.9rem",
+                      lineHeight: 1.5,
                       wordBreak: "break-word",
                       overflowWrap: "break-word",
                     }}
                   >
-                    <p
-                      style={{
-                        fontSize: "0.6875rem",
-                        marginBottom: "0.25rem",
-                        opacity: 0.65,
-                        fontWeight: 600,
-                        margin: "0 0 0.25rem",
-                      }}
-                    >
-                      {isSystem
-                        ? "⚠️ System"
-                        : isModerator
-                          ? "🛡️ Moderator"
-                          : isSeller
-                            ? t("youSeller")
-                            : `Buyer (${msg.sender_email})`}
-                    </p>
-                    {msg.message && (
-                      <p
-                        style={{
-                          margin: 0,
-                          lineHeight: 1.5,
-                          wordBreak: "break-word",
-                          overflowWrap: "break-word",
-                        }}
-                      >
-                        {msg.message}
-                      </p>
-                    )}
+                    {msg.message && <p style={{ margin: 0 }}>{msg.message}</p>}
                     {msg.file_url && (
                       <a
                         href={msg.file_url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        style={{
-                          color: isSeller ? "#93c5fd" : "var(--color-primary)",
-                          fontSize: "0.8125rem",
-                          textDecoration: "underline",
-                        }}
+                        style={{ color: isSeller ? "#bfdbfe" : "#2563eb", fontSize: "0.8125rem", textDecoration: "underline" }}
                       >
                         {t("viewFile")}
                       </a>
                     )}
                   </div>
-                  <span
-                    style={{
-                      fontSize: "0.6875rem",
-                      color: "var(--color-text-muted)",
-                      marginTop: "0.2rem",
-                      textAlign: isSeller ? "right" : "left",
-                    }}
-                  >
-                    {new Date(msg.created_at).toLocaleTimeString([], {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
+
+                  {/* Timestamp */}
+                  <span style={{ fontSize: "0.6875rem", color: "#94a3b8", marginTop: "0.2rem", paddingLeft: "0.25rem", paddingRight: "0.25rem" }}>
+                    {new Date(msg.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                   </span>
                 </div>
               );
@@ -357,86 +289,62 @@ export default function SellerChatPage() {
             <div ref={bottomOfChat} />
           </div>
 
-          {/* Error */}
+          {/* Error banner */}
           {errorMessage && (
-            <div
-              className="alert alert-danger"
-              style={{ margin: "0", borderRadius: 0, fontSize: "0.8125rem" }}
-            >
+            <div style={{ margin: "0 0.75rem 0.5rem", padding: "0.625rem 0.875rem", backgroundColor: "#fef2f2", border: "1px solid #fecaca", borderRadius: "0.75rem", fontSize: "0.8125rem", color: "#dc2626", fontWeight: 500 }}>
               {errorMessage}
             </div>
           )}
 
-          {/* Input area — only when chat exists */}
+          {/* Input area â€” only when chat exists */}
           {chatExists !== false && (
             <>
               {/* File attachment row */}
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "0.5rem",
-                  padding: "0.5rem 0.875rem",
-                  borderTop: "1px solid var(--color-border)",
-                  backgroundColor: "var(--color-mist)",
-                }}
-              >
+              <div style={{ padding: "0.625rem 0.875rem", borderTop: "1px solid #f1f5f9", backgroundColor: "#f8fafc" }}>
                 <label
                   style={{
                     display: "flex",
                     alignItems: "center",
-                    gap: "0.35rem",
+                    gap: "0.375rem",
                     fontSize: "0.8125rem",
-                    color: "var(--color-text-muted)",
+                    color: selectedFile ? "#1e293b" : "#94a3b8",
                     cursor: "pointer",
+                    padding: "0.375rem 0.625rem",
+                    border: "1.5px dashed #e2e8f0",
+                    borderRadius: "0.75rem",
+                    transition: "border-color 0.15s",
                   }}
                 >
-                  <Paperclip size={14} />
+                  <Paperclip size={14} style={{ flexShrink: 0 }} />
+                  <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flex: 1, minWidth: 0 }}>
+                    {selectedFile ? selectedFile.name : t("attachFile")}
+                  </span>
                   <input
                     type="file"
-                    onChange={(e) =>
-                      setSelectedFile(e.target.files?.[0] || null)
-                    }
+                    onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
                     style={{ display: "none" }}
                   />
-                  {selectedFile ? selectedFile.name : t("attachFile")}
+                  {selectedFile && (
+                    <button
+                      onClick={(e) => { e.preventDefault(); uploadFile(); }}
+                      className="btn-primary"
+                      style={{ fontSize: "0.75rem", padding: "0.2rem 0.625rem", flexShrink: 0 }}
+                    >
+                      {t("upload")}
+                    </button>
+                  )}
                 </label>
-                {selectedFile && (
-                  <button
-                    onClick={uploadFile}
-                    className="btn-primary"
-                    style={{
-                      fontSize: "0.75rem",
-                      padding: "0.25rem 0.625rem",
-                    }}
-                  >
-                    {t("upload")}
-                  </button>
-                )}
               </div>
 
               {/* Message input row */}
-              <div
-                style={{
-                  borderTop: "1px solid var(--color-border)",
-                  padding: "0.75rem 0.875rem 0.4rem",
-                }}
-              >
-                <div
-                  style={{
-                    display: "flex",
-                    gap: "0.5rem",
-                    alignItems: "flex-end",
-                  }}
-                >
+              <div style={{ borderTop: "1px solid #f1f5f9", padding: "0.75rem 0.875rem 0.5rem" }}>
+                <div style={{ display: "flex", gap: "0.5rem", alignItems: "flex-end" }}>
                   <textarea
                     placeholder={t("messagePlaceholder")}
                     value={newMessage}
                     maxLength={1500}
-                    rows={2}
-                    onChange={(e) =>
-                      setNewMessage(e.target.value.slice(0, 1500))
-                    }
+                    rows={3}
+                    onChange={(e) => setNewMessage(e.target.value.slice(0, 1500))}
                     onKeyDown={(e) => {
                       if (e.key === "Enter" && !e.shiftKey) {
                         e.preventDefault();
@@ -449,7 +357,10 @@ export default function SellerChatPage() {
                       resize: "none",
                       paddingTop: "0.625rem",
                       paddingBottom: "0.625rem",
-                      lineHeight: "1.4",
+                      lineHeight: "1.5",
+                      fontSize: "16px",
+                      minHeight: "72px",
+                      borderRadius: "0.75rem",
                     }}
                   />
                   <button
@@ -457,41 +368,26 @@ export default function SellerChatPage() {
                     disabled={isSending}
                     className="btn-primary"
                     style={{
-                      padding: "0.625rem 1rem",
+                      width: "44px",
+                      height: "44px",
+                      padding: 0,
                       display: "flex",
                       alignItems: "center",
-                      gap: "0.375rem",
+                      justifyContent: "center",
                       flexShrink: 0,
+                      borderRadius: "0.75rem",
                     }}
+                    aria-label={t("send")}
                   >
-                    <Send size={15} />
-                    {isSending ? "" : t("send")}
+                    <Send size={16} />
                   </button>
                 </div>
-                {/* Character counter */}
                 {newMessage.length >= 1500 ? (
-                  <p
-                    style={{
-                      fontSize: "0.6875rem",
-                      marginTop: "0.25rem",
-                      color: "#dc2626",
-                      fontWeight: 600,
-                    }}
-                  >
+                  <p style={{ fontSize: "0.6875rem", marginTop: "0.25rem", color: "#dc2626", fontWeight: 600 }}>
                     {t("charLimitReached")}
                   </p>
                 ) : (
-                  <p
-                    style={{
-                      fontSize: "0.6875rem",
-                      marginTop: "0.25rem",
-                      textAlign: "right",
-                      color:
-                        newMessage.length >= 1200
-                          ? "#d97706"
-                          : "var(--color-text-muted)",
-                    }}
-                  >
+                  <p style={{ fontSize: "0.6875rem", marginTop: "0.25rem", textAlign: "right", color: newMessage.length >= 1200 ? "#d97706" : "#94a3b8" }}>
                     {newMessage.length} / 1,500
                   </p>
                 )}
@@ -505,21 +401,14 @@ export default function SellerChatPage() {
           <div
             style={{
               padding: "1rem",
-              border: "1px solid var(--color-border)",
-              borderRadius: "var(--radius-md)",
-              backgroundColor: "var(--color-white)",
-              boxShadow: "var(--shadow-card)",
+              border: "1px solid #e2e8f0",
+              borderRadius: "1rem",
+              backgroundColor: "#fff",
+              boxShadow: "0 1px 3px rgba(0,0,0,0.07)",
             }}
           >
-            <p
-              style={{
-                margin: "0 0 0.625rem",
-                fontSize: "0.875rem",
-                color: "var(--color-text-muted)",
-              }}
-            >
-              If there is a problem with this order, you can open a dispute and
-              an admin will review the chat.
+            <p style={{ margin: "0 0 0.75rem", fontSize: "0.875rem", color: "#64748b", lineHeight: 1.5 }}>
+              If there is a problem with this order, you can open a dispute and an admin will review the chat.
             </p>
             <DisputeButton
               invoice_number={invoice_number}
@@ -528,6 +417,9 @@ export default function SellerChatPage() {
             />
           </div>
         )}
+
+        {/* Bottom spacer for mobile */}
+        <div style={{ height: "1rem" }} />
       </div>
     </div>
   );
