@@ -363,7 +363,9 @@ export default function ChatWindow({ invoice_number }: ChatWindowProps) {
                     alignItems: "center",
                     gap: "0.375rem",
                     fontSize: "0.8125rem",
-                    color: selectedFile ? "var(--color-text-body)" : "var(--color-text-muted)",
+                    color: selectedFile
+                      ? "var(--color-text-body)"
+                      : "var(--color-text-muted)",
                     cursor: "pointer",
                     padding: "0.375rem 0.625rem",
                     border: "1.5px dashed var(--color-border)",
@@ -372,19 +374,36 @@ export default function ChatWindow({ invoice_number }: ChatWindowProps) {
                   }}
                 >
                   <Paperclip size={14} style={{ flexShrink: 0 }} />
-                  <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flex: 1, minWidth: 0 }}>
+                  <span
+                    style={{
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                      flex: 1,
+                      minWidth: 0,
+                    }}
+                  >
                     {selectedFile ? selectedFile.name : t("attachFile")}
                   </span>
                   <input
                     type="file"
-                    onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
+                    onChange={(e) =>
+                      setSelectedFile(e.target.files?.[0] || null)
+                    }
                     style={{ display: "none" }}
                   />
                   {selectedFile && (
                     <button
-                      onClick={(e) => { e.preventDefault(); uploadFile(); }}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        uploadFile();
+                      }}
                       className="btn-primary"
-                      style={{ fontSize: "0.75rem", padding: "0.2rem 0.625rem", flexShrink: 0 }}
+                      style={{
+                        fontSize: "0.75rem",
+                        padding: "0.2rem 0.625rem",
+                        flexShrink: 0,
+                      }}
                     >
                       {t("upload")}
                     </button>
@@ -399,7 +418,13 @@ export default function ChatWindow({ invoice_number }: ChatWindowProps) {
                   padding: "0.625rem 0.75rem 0.5rem",
                 }}
               >
-                <div style={{ display: "flex", gap: "0.5rem", alignItems: "flex-end" }}>
+                <div
+                  style={{
+                    display: "flex",
+                    gap: "0.5rem",
+                    alignItems: "flex-end",
+                  }}
+                >
                   <textarea
                     placeholder={t("messagePlaceholder")}
                     value={newMessage}
@@ -419,7 +444,7 @@ export default function ChatWindow({ invoice_number }: ChatWindowProps) {
                       paddingTop: "0.5rem",
                       paddingBottom: "0.5rem",
                       lineHeight: "1.5",
-                      fontSize: "16px", /* prevents iOS zoom */
+                      fontSize: "16px" /* prevents iOS zoom */,
                       minHeight: "72px",
                     }}
                   />
@@ -443,11 +468,28 @@ export default function ChatWindow({ invoice_number }: ChatWindowProps) {
                   </button>
                 </div>
                 {newMessage.length >= 1500 ? (
-                  <p style={{ fontSize: "0.6875rem", marginTop: "0.25rem", color: "#dc2626", fontWeight: 600 }}>
+                  <p
+                    style={{
+                      fontSize: "0.6875rem",
+                      marginTop: "0.25rem",
+                      color: "#dc2626",
+                      fontWeight: 600,
+                    }}
+                  >
                     {t("charLimitReached")}
                   </p>
                 ) : (
-                  <p style={{ fontSize: "0.6875rem", marginTop: "0.25rem", textAlign: "right", color: newMessage.length >= 1200 ? "#d97706" : "var(--color-text-muted)" }}>
+                  <p
+                    style={{
+                      fontSize: "0.6875rem",
+                      marginTop: "0.25rem",
+                      textAlign: "right",
+                      color:
+                        newMessage.length >= 1200
+                          ? "#d97706"
+                          : "var(--color-text-muted)",
+                    }}
+                  >
                     {newMessage.length} / 1,500
                   </p>
                 )}

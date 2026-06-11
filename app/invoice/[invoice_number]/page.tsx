@@ -1106,15 +1106,40 @@ export default function InvoicePage() {
                                     width: "100%",
                                   }}
                                 >
-                                  <p style={{ margin: "0 0 0.25rem", fontWeight: 700, fontSize: "0.875rem", color: "#92400e" }}>
+                                  <p
+                                    style={{
+                                      margin: "0 0 0.25rem",
+                                      fontWeight: 700,
+                                      fontSize: "0.875rem",
+                                      color: "#92400e",
+                                    }}
+                                  >
                                     {t("releaseConfirmTitle")}
                                   </p>
-                                  <p style={{ margin: "0 0 0.875rem", fontSize: "0.8125rem", color: "#b45309", lineHeight: 1.5 }}>
-                                    {t("releaseConfirmBody", { amount: Number(m.amount).toLocaleString(), label: m.label })}
+                                  <p
+                                    style={{
+                                      margin: "0 0 0.875rem",
+                                      fontSize: "0.8125rem",
+                                      color: "#b45309",
+                                      lineHeight: 1.5,
+                                    }}
+                                  >
+                                    {t("releaseConfirmBody", {
+                                      amount: Number(m.amount).toLocaleString(),
+                                      label: m.label,
+                                    })}
                                   </p>
-                                  <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+                                  <div
+                                    style={{
+                                      display: "flex",
+                                      gap: "0.5rem",
+                                      flexWrap: "wrap",
+                                    }}
+                                  >
                                     <button
-                                      onClick={() => releaseMilestoneAsUser(m.id)}
+                                      onClick={() =>
+                                        releaseMilestoneAsUser(m.id)
+                                      }
                                       disabled={releaseLoading}
                                       style={{
                                         flex: "1 1 auto",
@@ -1126,7 +1151,9 @@ export default function InvoicePage() {
                                         color: "#fff",
                                         fontWeight: 700,
                                         fontSize: "0.875rem",
-                                        cursor: releaseLoading ? "not-allowed" : "pointer",
+                                        cursor: releaseLoading
+                                          ? "not-allowed"
+                                          : "pointer",
                                         opacity: releaseLoading ? 0.6 : 1,
                                         display: "flex",
                                         alignItems: "center",
@@ -1134,7 +1161,11 @@ export default function InvoicePage() {
                                         gap: "0.375rem",
                                       }}
                                     >
-                                      {releaseLoading ? <InlineSpinner size="xs" /> : t("releaseConfirm")}
+                                      {releaseLoading ? (
+                                        <InlineSpinner size="xs" />
+                                      ) : (
+                                        t("releaseConfirm")
+                                      )}
                                     </button>
                                     <button
                                       onClick={() => setReleaseConfirmId(null)}
