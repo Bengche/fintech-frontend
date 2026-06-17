@@ -398,13 +398,7 @@ function PartyRow({
   );
 }
 
-function VerifiedPanel({
-  inv,
-  code,
-}: {
-  inv: InvoiceDetails;
-  code: string;
-}) {
+function VerifiedPanel({ inv, code }: { inv: InvoiceDetails; code: string }) {
   const navy = "#0F1F3D";
   const amber = "#F59E0B";
   const hasBuyer = inv.buyer_name || inv.buyer_email || inv.buyer_phone;
@@ -881,9 +875,7 @@ function VerifiedPanel({
               </div>
             </div>
             <div style={{ textAlign: "right" }}>
-              <div
-                style={{ fontSize: 11, color: "#64748b", lineHeight: 1.7 }}
-              >
+              <div style={{ fontSize: 11, color: "#64748b", lineHeight: 1.7 }}>
                 Verified {verifiedAt}
                 <br />
                 <a
@@ -979,4 +971,3 @@ function NotVerifiedPanel({ message }: { message: string }) {
     </div>
   );
 }
-

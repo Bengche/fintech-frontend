@@ -11,6 +11,7 @@ import Image from "next/image";
 import SiteHeader from "./components/SiteHeader";
 import BenefitsSlider from "./components/BenefitsSlider";
 import HeroStatsTabs from "./components/HeroStatsTabs";
+import TrustpilotWidget from "./components/TrustpilotWidget";
 import { getTranslations } from "next-intl/server";
 
 async function getPlatformStats(): Promise<{
@@ -729,7 +730,96 @@ export default async function LandingPage() {
           </div>
         </section>
 
-        {/* â”€â”€ FINAL CTA â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+        {/* ── TRUSTPILOT — REVIEW COLLECTOR ──────────────────────────────────── */}
+        <section
+          aria-label="Customer reviews"
+          className="lp-section"
+          style={{
+            backgroundColor: "var(--color-cloud)",
+            padding: "5rem 0",
+            textAlign: "center",
+          }}
+        >
+          <div className="page-wrapper" style={{ maxWidth: "680px" }}>
+            {/* Section badge */}
+            <p
+              style={{
+                display: "inline-block",
+                fontSize: "0.8125rem",
+                fontWeight: 700,
+                letterSpacing: "0.1em",
+                textTransform: "uppercase",
+                color: "var(--color-accent)",
+                marginBottom: "1rem",
+              }}
+            >
+              Verified Reviews
+            </p>
+
+            <h2
+              style={{
+                fontSize: "clamp(1.5rem, 3vw, 2rem)",
+                fontWeight: 800,
+                color: "var(--color-primary)",
+                marginBottom: "0.75rem",
+                lineHeight: 1.25,
+              }}
+            >
+              Trusted by Real Users
+            </h2>
+
+            <p
+              style={{
+                fontSize: "1rem",
+                color: "var(--color-text-muted)",
+                maxWidth: "480px",
+                margin: "0 auto 2.5rem",
+                lineHeight: 1.75,
+              }}
+            >
+              Hundreds of buyers and sellers across Cameroon rely on Fonlok
+              every day. If you&apos;ve used our platform, share your experience
+              and help others make confident decisions.
+            </p>
+
+            {/* Trustpilot Review Collector widget */}
+            <div
+              style={{
+                width: "100%",
+                maxWidth: "560px",
+                margin: "0 auto",
+              }}
+            >
+              <TrustpilotWidget />
+            </div>
+
+            {/* Supplementary link */}
+            <p
+              style={{
+                marginTop: "1.5rem",
+                fontSize: "0.875rem",
+                color: "var(--color-text-muted)",
+              }}
+            >
+              Want to read what others are saying?{" "}
+              <a
+                href="https://www.trustpilot.com/review/fonlok.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  color: "var(--color-primary)",
+                  fontWeight: 600,
+                  textDecoration: "underline",
+                  textUnderlineOffset: "3px",
+                }}
+              >
+                View all reviews on Trustpilot
+              </a>
+            </p>
+          </div>
+        </section>
+
+        {/* ── FINAL CTA ─────────────────────────────────────────────────────── */}
         <section
           aria-label="Call to action"
           className="lp-section"

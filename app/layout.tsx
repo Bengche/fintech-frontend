@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 import { AuthProvider } from "../context/UserContext";
 import { KilaProvider } from "../context/KilaContext";
@@ -136,6 +137,11 @@ export default async function RootLayout({
         <PwaRegister />
         {/* Cross-browser install prompt (Android native + iOS guide) */}
         <PwaInstallBanner />
+        {/* Trustpilot widget bootstrap — loaded after page is interactive */}
+        <Script
+          src="https://widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js"
+          strategy="afterInteractive"
+        />
       </body>
     </html>
   );
