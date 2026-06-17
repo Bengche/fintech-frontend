@@ -13,11 +13,9 @@ export default function TrustpilotWidget() {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (
-      typeof window !== "undefined" &&
-      (window as Window & { Trustpilot?: { loadFromElement: (el: Element | null, force?: boolean) => void } }).Trustpilot
-    ) {
-      (window as Window & { Trustpilot: { loadFromElement: (el: Element | null, force?: boolean) => void } }).Trustpilot.loadFromElement(ref.current, true);
+    const tp = (window as unknown as { Trustpilot?: { loadFromElement: (el: Element | null, force?: boolean) => void } }).Trustpilot;
+    if (tp) {
+      tp.loadFromElement(ref.current, true);
     }
   }, []);
 
