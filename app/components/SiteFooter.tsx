@@ -81,6 +81,7 @@ export default function SiteFooter() {
               { href: "/how-it-works", label: t("links.howItWorks") },
               { href: "/pricing", label: t("links.pricing") },
               { href: "/faq", label: t("links.faq") },
+              { href: "/developers", label: t("links.developers") },
               ...(user_id
                 ? [{ href: "/dashboard", label: t("links.dashboard") }]
                 : [{ href: "/register", label: t("links.createAccount") }]),

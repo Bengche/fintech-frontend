@@ -5,7 +5,8 @@
       "howItWorks": "Comment ça marche",
       "pricing": "Tarifs",
       "faq": "FAQ",
-      "contact": "Contact"
+      "contact": "Contact",
+      "developers": "Développeurs"
     },
     "auth": {
       "signIn": "Se connecter",
@@ -44,7 +45,8 @@
       "terms": "Conditions d'utilisation",
       "privacy": "Politique de confidentialité",
       "termsShort": "Conditions",
-      "privacyShort": "Confidentialité"
+      "privacyShort": "Confidentialité",
+      "developers": "Sandbox développeurs"
     },
     "copyright": "© {year} Fonlok. Tous droits réservés. Fabriqué au Cameroun.",
     "builtBy": "Conçu avec ❤ par"

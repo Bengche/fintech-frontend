@@ -5,7 +5,8 @@
       "howItWorks": "How it works",
       "pricing": "Pricing",
       "faq": "FAQ",
-      "contact": "Contact"
+      "contact": "Contact",
+      "developers": "Developers"
     },
     "auth": {
       "signIn": "Sign in",
@@ -44,7 +45,8 @@
       "terms": "Terms of service",
       "privacy": "Privacy policy",
       "termsShort": "Terms",
-      "privacyShort": "Privacy"
+      "privacyShort": "Privacy",
+      "developers": "Developer sandbox"
     },
     "copyright": "© {year} Fonlok. All rights reserved. Made in Cameroon.",
     "builtBy": "Built with ❤ by"

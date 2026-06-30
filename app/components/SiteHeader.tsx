@@ -33,6 +33,7 @@ export default function SiteHeader() {
     { href: "/pricing", label: t("nav.pricing") },
     { href: "/faq", label: t("nav.faq") },
     { href: "/contact", label: t("nav.contact") },
+    { href: "/developers", label: t("nav.developers") },
   ];
 
   const handleLogout = async () => {
