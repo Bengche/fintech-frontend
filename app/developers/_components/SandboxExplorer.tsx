@@ -1655,7 +1655,7 @@ export default function SandboxExplorer() {
           </div>
 
           {/* ── Right: code + response ──────────────────────────────────────── */}
-          <div className="explorer-right-panel">
+          <div className="explorer-right-panel" style={{ minWidth: 0 }}>
             {/* Code tabs */}
             <div
               style={{
@@ -1712,6 +1712,8 @@ export default function SandboxExplorer() {
                   whiteSpace: "pre",
                   maxHeight: "280px",
                   overflowY: "auto",
+                  maxWidth: "100%",
+                  boxSizing: "border-box",
                 }}
               >
                 {codes[codeTab]}
@@ -1786,6 +1788,8 @@ export default function SandboxExplorer() {
                   overflowY: "auto",
                   minHeight: "80px",
                   color: "#ABB2BF",
+                  maxWidth: "100%",
+                  boxSizing: "border-box",
                 }}
               >
                 {response ? (
@@ -1832,6 +1836,8 @@ export default function SandboxExplorer() {
                     overflowX: "auto",
                     maxHeight: "280px",
                     overflowY: "auto",
+                    maxWidth: "100%",
+                    boxSizing: "border-box",
                   }}
                 >
                   <span
@@ -1849,6 +1855,24 @@ export default function SandboxExplorer() {
       <style>{`
         @keyframes spin { to { transform: rotate(360deg); } }
 
+        /* Prevent horizontal overflow on all screen sizes */
+        .sandbox-outer {
+          width: 100%;
+          max-width: 100%;
+          min-width: 0;
+          box-sizing: border-box;
+        }
+        .explorer-right-panel {
+          min-width: 0;
+          max-width: 100%;
+        }
+        .explorer-code-block,
+        .explorer-response-block,
+        .explorer-sample-block {
+          max-width: 100%;
+          box-sizing: border-box;
+        }
+
         /* Desktop: sidebar visible, right panel indented */
         @media (min-width: 769px) {
           .sandbox-outer { min-height: 600px; }
@@ -1863,6 +1887,8 @@ export default function SandboxExplorer() {
           .sandbox-detail-panel {
             padding-left: 0;
             padding-top: 1.25rem;
+            min-width: 0;
+            width: 100%;
           }
           .sandbox-key-bar {
             align-items: stretch;
@@ -1874,6 +1900,16 @@ export default function SandboxExplorer() {
           .explorer-grid {
             grid-template-columns: 1fr !important;
             gap: 1rem !important;
+          }
+          .explorer-right-panel {
+            width: 100%;
+            max-width: 100%;
+            overflow: hidden;
+          }
+          .explorer-code-block,
+          .explorer-response-block,
+          .explorer-sample-block {
+            width: 100%;
           }
           .code-tabs-row {
             overflow-x: auto;

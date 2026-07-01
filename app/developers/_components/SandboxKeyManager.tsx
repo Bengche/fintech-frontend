@@ -65,10 +65,9 @@ export default function SandboxKeyManager() {
       const res = await axios.get(`${API_URL}/dev/keys`);
       setKeys(res.data.keys);
     } catch (err: unknown) {
-      const msg =
-        axios.isAxiosError(err)
-          ? err.response?.data?.message || "Failed to load keys."
-          : err instanceof Error
+      const msg = axios.isAxiosError(err)
+        ? err.response?.data?.message || "Failed to load keys."
+        : err instanceof Error
           ? err.message
           : "Failed to load keys.";
       setError(msg);
@@ -102,8 +101,8 @@ export default function SandboxKeyManager() {
         axios.isAxiosError(err)
           ? err.response?.data?.message || "Failed to create key."
           : err instanceof Error
-          ? err.message
-          : "Failed to create key.",
+            ? err.message
+            : "Failed to create key.",
       );
     } finally {
       setCreating(false);
@@ -127,8 +126,8 @@ export default function SandboxKeyManager() {
         axios.isAxiosError(err)
           ? err.response?.data?.message || "Failed to revoke key."
           : err instanceof Error
-          ? err.message
-          : "Failed to revoke key.",
+            ? err.message
+            : "Failed to revoke key.",
       );
     } finally {
       setRevoking(null);
@@ -334,7 +333,10 @@ export default function SandboxKeyManager() {
             flexWrap: "wrap",
           }}
         >
-          <div className="sandbox-keys-input-wrap" style={{ flex: 1, minWidth: "220px" }}>
+          <div
+            className="sandbox-keys-input-wrap"
+            style={{ flex: 1, minWidth: "220px" }}
+          >
             <input
               type="text"
               value={newLabel}
