@@ -222,15 +222,15 @@ export default function DevelopersPage() {
                   display: "inline-flex",
                   alignItems: "center",
                   gap: "0.375rem",
-                  background: "rgba(245,158,11,0.15)",
-                  border: "1px solid rgba(245,158,11,0.4)",
+                  // background: "rgba(245,158,11,0.15)",
+                  // border: "1px solid rgba(245,158,11,0.4)",
                   color: "#FCD34D",
                   fontSize: "0.75rem",
                   fontWeight: 700,
                   letterSpacing: "0.08em",
                   textTransform: "uppercase",
                   padding: "0.3rem 0.75rem",
-                  borderRadius: "999px",
+                  // borderRadius: "999px",
                 }}
               >
                 <svg
@@ -238,7 +238,10 @@ export default function DevelopersPage() {
                   height="11"
                   viewBox="0 0 24 24"
                   fill="currentColor"
-                ></svg>
+                >
+                  <circle cx="12" cy="12" r="10" opacity="0.25" />
+                  <circle cx="12" cy="12" r="5" />
+                </svg>
                 Sandbox environment
               </span>
             </div>
