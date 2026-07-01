@@ -1655,7 +1655,7 @@ export default function SandboxExplorer() {
           </div>
 
           {/* ── Right: code + response ──────────────────────────────────────── */}
-          <div>
+          <div className="explorer-right-panel">
             {/* Code tabs */}
             <div
               style={{
@@ -1665,6 +1665,7 @@ export default function SandboxExplorer() {
               }}
             >
               <div
+                className="code-tabs-row"
                 style={{
                   display: "flex",
                   borderBottom: "1px solid rgba(255,255,255,0.08)",
@@ -1674,6 +1675,7 @@ export default function SandboxExplorer() {
                   <button
                     key={tab}
                     onClick={() => setCodeTab(tab)}
+                    className="code-tab-btn"
                     style={{
                       padding: "0.5rem 1rem",
                       background: "none",
@@ -1698,6 +1700,7 @@ export default function SandboxExplorer() {
                 ))}
               </div>
               <pre
+                className="explorer-code-block"
                 style={{
                   margin: 0,
                   padding: "1.25rem",
@@ -1725,6 +1728,7 @@ export default function SandboxExplorer() {
               }}
             >
               <div
+                className="response-header-row"
                 style={{
                   padding: "0.5rem 1.25rem",
                   borderBottom: "1px solid rgba(255,255,255,0.08)",
@@ -1770,6 +1774,7 @@ export default function SandboxExplorer() {
                 )}
               </div>
               <pre
+                className="explorer-response-block"
                 style={{
                   margin: 0,
                   padding: "1.25rem",
@@ -1815,6 +1820,7 @@ export default function SandboxExplorer() {
                   Sample response
                 </p>
                 <pre
+                  className="explorer-sample-block"
                   style={{
                     margin: 0,
                     padding: "1.25rem",
@@ -1867,12 +1873,32 @@ export default function SandboxExplorer() {
           }
           .explorer-grid {
             grid-template-columns: 1fr !important;
+            gap: 1rem !important;
+          }
+          .code-tabs-row {
+            overflow-x: auto;
+            white-space: nowrap;
+            scrollbar-width: thin;
+          }
+          .code-tab-btn {
+            flex-shrink: 0;
+          }
+          .response-header-row {
+            flex-wrap: wrap;
+            row-gap: 0.35rem;
           }
         }
         @media (max-width: 480px) {
           .sandbox-key-bar {
             gap: 0.5rem;
             padding: 0.625rem 0.75rem;
+          }
+          .explorer-code-block,
+          .explorer-response-block,
+          .explorer-sample-block {
+            padding: 0.875rem !important;
+            font-size: 0.72rem !important;
+            line-height: 1.55 !important;
           }
         }
       `}</style>
