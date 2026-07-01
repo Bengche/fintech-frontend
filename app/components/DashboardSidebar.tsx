@@ -45,6 +45,7 @@ import {
   Settings,
   LogOut,
   Globe,
+  Code2,
 } from "lucide-react";
 import FonlokLogo from "./FonlokLogo";
 import NotificationBell from "./NotificationBell";
@@ -397,6 +398,16 @@ export default function DashboardSidebar() {
               </Link>
             );
           })}
+
+          <Link
+            href="/developers"
+            className={`sidebar-item${pathname.startsWith("/developers") ? " sidebar-item--active" : ""}`}
+          >
+            <span className="sidebar-icon">
+              <Code2 size={17} strokeWidth={1.8} />
+            </span>
+            {t("developers")}
+          </Link>
 
           <RequestFeatureButton variant="sidebar" />
 

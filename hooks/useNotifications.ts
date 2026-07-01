@@ -15,6 +15,7 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import axios from "axios";
+import { useAuth } from "@/context/UserContext";
 
 const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
 
@@ -42,6 +43,7 @@ function urlBase64ToUint8Array(base64String: string): Uint8Array {
 }
 
 export function useNotifications() {
+  const { user_id, authLoading } = useAuth();
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -138,13 +140,18 @@ export function useNotifications() {
   }, []);
 
   // ── On mount: fetch, set up push, then poll every 30s ───────────────────────
+  // Wait for auth to resolve before making any requests. This ensures the
+  // Axios Bearer-token interceptor (registered in AuthProvider.useEffect) is
+  // attached, and that we don't fire unauthenticated requests on mount.
   useEffect(() => {
+    if (authLoading || !user_id) return;
+
     fetchNotifications();
     setupPush();
 
     const interval = setInterval(fetchNotifications, 30_000);
     return () => clearInterval(interval);
-  }, [fetchNotifications, setupPush]);
+  }, [fetchNotifications, setupPush, authLoading, user_id]);
 
   return {
     notifications,

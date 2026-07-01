@@ -11,6 +11,7 @@
  */
 
 import { useState, useEffect, useCallback } from "react";
+import axios from "axios";
 import { useAuth } from "@/context/UserContext";
 import Link from "next/link";
 
@@ -61,14 +62,16 @@ export default function SandboxKeyManager() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`${API_URL}/dev/keys`, {
-        credentials: "include",
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Failed to load keys.");
-      setKeys(data.keys);
+      const res = await axios.get(`${API_URL}/dev/keys`);
+      setKeys(res.data.keys);
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Failed to load keys.");
+      const msg =
+        axios.isAxiosError(err)
+          ? err.response?.data?.message || "Failed to load keys."
+          : err instanceof Error
+          ? err.message
+          : "Failed to load keys.";
+      setError(msg);
     } finally {
       setLoading(false);
     }
@@ -84,20 +87,23 @@ export default function SandboxKeyManager() {
     setCreating(true);
     setCreateError(null);
     try {
-      const res = await fetch(`${API_URL}/dev/keys`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ label: newLabel.trim() }),
+      const res = await axios.post(`${API_URL}/dev/keys`, {
+        label: newLabel.trim(),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Failed to create key.");
-      setRevealedKey({ id: data.id, key: data.key, label: data.label });
+      setRevealedKey({
+        id: res.data.id,
+        key: res.data.key,
+        label: res.data.label,
+      });
       setNewLabel("");
       fetchKeys();
     } catch (err: unknown) {
       setCreateError(
-        err instanceof Error ? err.message : "Failed to create key.",
+        axios.isAxiosError(err)
+          ? err.response?.data?.message || "Failed to create key."
+          : err instanceof Error
+          ? err.message
+          : "Failed to create key.",
       );
     } finally {
       setCreating(false);
@@ -114,15 +120,16 @@ export default function SandboxKeyManager() {
     }
     setRevoking(keyId);
     try {
-      const res = await fetch(`${API_URL}/dev/keys/${keyId}`, {
-        method: "DELETE",
-        credentials: "include",
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Failed to revoke key.");
+      await axios.delete(`${API_URL}/dev/keys/${keyId}`);
       fetchKeys();
     } catch (err: unknown) {
-      alert(err instanceof Error ? err.message : "Failed to revoke key.");
+      alert(
+        axios.isAxiosError(err)
+          ? err.response?.data?.message || "Failed to revoke key."
+          : err instanceof Error
+          ? err.message
+          : "Failed to revoke key.",
+      );
     } finally {
       setRevoking(null);
     }
