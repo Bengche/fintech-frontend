@@ -1046,6 +1046,22 @@ export default function SandboxExplorer() {
     ms: number;
   } | null>(null);
 
+  // ── Copy state ────────────────────────────────────────────────────────────
+  const [copiedCode, setCopiedCode] = useState(false);
+  const [copiedPath, setCopiedPath] = useState(false);
+  const [copiedResponse, setCopiedResponse] = useState(false);
+  const [copiedSample, setCopiedSample] = useState(false);
+
+  const copyText = useCallback(
+    (text: string, setter: (v: boolean) => void) => {
+      navigator.clipboard.writeText(text).then(() => {
+        setter(true);
+        setTimeout(() => setter(false), 2000);
+      });
+    },
+    [],
+  );
+
   const endpoint = ENDPOINTS.find((e) => e.id === selectedId)!;
 
   const handleSelect = useCallback((id: string) => {
@@ -1420,6 +1436,7 @@ export default function SandboxExplorer() {
               padding: "0.3rem 0.75rem",
               borderRadius: "6px",
               letterSpacing: "0.04em",
+              flexShrink: 0,
             }}
           >
             {endpoint.method}
@@ -1433,10 +1450,50 @@ export default function SandboxExplorer() {
               wordBreak: "break-all",
               overflowWrap: "break-word",
               minWidth: 0,
+              flex: 1,
             }}
           >
             {endpoint.path}
           </code>
+          <button
+            type="button"
+            onClick={() =>
+              copyText(
+                `${DOCS_API_URL}${endpoint.path}`,
+                setCopiedPath,
+              )
+            }
+            title="Copy full URL"
+            style={{
+              background: "none",
+              border: "1px solid var(--color-border)",
+              borderRadius: "6px",
+              cursor: "pointer",
+              padding: "0.25rem 0.5rem",
+              fontSize: "0.6875rem",
+              fontWeight: 600,
+              color: copiedPath
+                ? "#16A34A"
+                : "var(--color-text-muted)",
+              display: "flex",
+              alignItems: "center",
+              gap: "0.3rem",
+              flexShrink: 0,
+              transition: "color 0.15s",
+            }}
+          >
+            {copiedPath ? (
+              <>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}><polyline points="20 6 9 17 4 12" /></svg>
+                Copied
+              </>
+            ) : (
+              <>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>
+                Copy URL
+              </>
+            )}
+          </button>
         </div>
         <p
           style={{
@@ -1668,36 +1725,70 @@ export default function SandboxExplorer() {
                 className="code-tabs-row"
                 style={{
                   display: "flex",
+                  alignItems: "center",
                   borderBottom: "1px solid rgba(255,255,255,0.08)",
                 }}
               >
-                {(["curl", "javascript", "python"] as CodeTab[]).map((tab) => (
-                  <button
-                    key={tab}
-                    onClick={() => setCodeTab(tab)}
-                    className="code-tab-btn"
-                    style={{
-                      padding: "0.5rem 1rem",
-                      background: "none",
-                      border: "none",
-                      borderBottom:
-                        codeTab === tab
-                          ? "2px solid var(--color-accent)"
-                          : "2px solid transparent",
-                      color: codeTab === tab ? "#fff" : "rgba(255,255,255,0.4)",
-                      fontSize: "0.78125rem",
-                      fontWeight: codeTab === tab ? 700 : 400,
-                      cursor: "pointer",
-                      letterSpacing: "0.04em",
-                    }}
-                  >
-                    {tab === "curl"
-                      ? "cURL"
-                      : tab === "javascript"
-                        ? "JavaScript"
-                        : "Python"}
-                  </button>
-                ))}
+                <div style={{ display: "flex", flex: 1 }}>
+                  {(["curl", "javascript", "python"] as CodeTab[]).map((tab) => (
+                    <button
+                      key={tab}
+                      onClick={() => setCodeTab(tab)}
+                      className="code-tab-btn"
+                      style={{
+                        padding: "0.5rem 1rem",
+                        background: "none",
+                        border: "none",
+                        borderBottom:
+                          codeTab === tab
+                            ? "2px solid var(--color-accent)"
+                            : "2px solid transparent",
+                        color: codeTab === tab ? "#fff" : "rgba(255,255,255,0.4)",
+                        fontSize: "0.78125rem",
+                        fontWeight: codeTab === tab ? 700 : 400,
+                        cursor: "pointer",
+                        letterSpacing: "0.04em",
+                      }}
+                    >
+                      {tab === "curl"
+                        ? "cURL"
+                        : tab === "javascript"
+                          ? "JavaScript"
+                          : "Python"}
+                    </button>
+                  ))}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => copyText(codes[codeTab], setCopiedCode)}
+                  title="Copy code"
+                  style={{
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    padding: "0.375rem 0.75rem",
+                    fontSize: "0.6875rem",
+                    fontWeight: 600,
+                    color: copiedCode ? "#4ADE80" : "rgba(255,255,255,0.4)",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.3rem",
+                    flexShrink: 0,
+                    transition: "color 0.15s",
+                  }}
+                >
+                  {copiedCode ? (
+                    <>
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}><polyline points="20 6 9 17 4 12" /></svg>
+                      Copied!
+                    </>
+                  ) : (
+                    <>
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>
+                      Copy
+                    </>
+                  )}
+                </button>
               </div>
               <pre
                 className="explorer-code-block"
@@ -1774,6 +1865,46 @@ export default function SandboxExplorer() {
                     </span>
                   </>
                 )}
+                {response && (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      copyText(
+                        JSON.stringify(response.data, null, 2),
+                        setCopiedResponse,
+                      )
+                    }
+                    title="Copy response"
+                    style={{
+                      marginLeft: "auto",
+                      background: "none",
+                      border: "none",
+                      cursor: "pointer",
+                      padding: "0.2rem 0.5rem",
+                      fontSize: "0.6875rem",
+                      fontWeight: 600,
+                      color: copiedResponse
+                        ? "#4ADE80"
+                        : "rgba(255,255,255,0.4)",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "0.3rem",
+                      transition: "color 0.15s",
+                    }}
+                  >
+                    {copiedResponse ? (
+                      <>
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}><polyline points="20 6 9 17 4 12" /></svg>
+                        Copied!
+                      </>
+                    ) : (
+                      <>
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>
+                        Copy
+                      </>
+                    )}
+                  </button>
+                )}
               </div>
               <pre
                 className="explorer-response-block"
@@ -1811,18 +1942,66 @@ export default function SandboxExplorer() {
             {/* Sample response (shown only before first request) */}
             {!response && (
               <div style={{ marginTop: "1rem" }}>
-                <p
+                <div
                   style={{
-                    fontSize: "0.6875rem",
-                    fontWeight: 700,
-                    color: "var(--color-text-muted)",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.07em",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.5rem",
                     marginBottom: "0.5rem",
                   }}
                 >
-                  Sample response
-                </p>
+                  <p
+                    style={{
+                      fontSize: "0.6875rem",
+                      fontWeight: 700,
+                      color: "var(--color-text-muted)",
+                      textTransform: "uppercase",
+                      letterSpacing: "0.07em",
+                      margin: 0,
+                      flex: 1,
+                    }}
+                  >
+                    Sample response
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      copyText(
+                        JSON.stringify(endpoint.sampleResponse, null, 2),
+                        setCopiedSample,
+                      )
+                    }
+                    title="Copy sample response"
+                    style={{
+                      background: "none",
+                      border: "1px solid var(--color-border)",
+                      borderRadius: "6px",
+                      cursor: "pointer",
+                      padding: "0.2rem 0.5rem",
+                      fontSize: "0.6875rem",
+                      fontWeight: 600,
+                      color: copiedSample
+                        ? "#16A34A"
+                        : "var(--color-text-muted)",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "0.3rem",
+                      transition: "color 0.15s",
+                    }}
+                  >
+                    {copiedSample ? (
+                      <>
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}><polyline points="20 6 9 17 4 12" /></svg>
+                        Copied!
+                      </>
+                    ) : (
+                      <>
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>
+                        Copy
+                      </>
+                    )}
+                  </button>
+                </div>
                 <pre
                   className="explorer-sample-block"
                   style={{
