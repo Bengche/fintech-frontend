@@ -15,7 +15,18 @@
 
 import { useState, useCallback } from "react";
 
+// API_URL is used for live "Send request" calls — points to the real backend.
 const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
+
+// DOCS_API_URL is used only in generated code snippets (cURL, JS, Python).
+// It defaults to the canonical public API base so that docs show a clean URL
+// rather than a raw infrastructure URL (e.g. a Railway subdomain).
+// Set NEXT_PUBLIC_API_DOCS_BASE_URL in your frontend env if your public API
+// domain differs from NEXT_PUBLIC_API_BASE_URL.
+const DOCS_API_URL =
+  process.env.NEXT_PUBLIC_API_DOCS_BASE_URL ||
+  process.env.NEXT_PUBLIC_API_BASE_URL ||
+  "https://api.fonlok.com";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -62,8 +73,27 @@ const ENDPOINTS: Endpoint[] = [
       key_label: "Local development",
       message:
         "The Fonlok sandbox is live. No real transactions will be processed.",
-      timestamp: "2026-06-30T12:00:00.000Z",
+      timestamp: "2026-07-01T12:00:00.000Z",
       _sandbox: true,
+    },
+  },
+  {
+    id: "token",
+    group: "Connectivity",
+    method: "POST",
+    path: "/sandbox/token",
+    summary: "Get a simulated access token",
+    description:
+      "Real MTN and Orange MoMo APIs require a Basic-auth token request before any API call. This endpoint returns a fake but realistic Bearer token so you can test your token-fetching and refresh logic without real credentials. The token grants no real access anywhere.",
+    params: [],
+    sampleResponse: {
+      object: "sandbox_token",
+      access_token: "access_a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4",
+      token_type: "Bearer",
+      expires_in: 3600,
+      scope: "profile payments",
+      _sandbox: true,
+      _note: "This token is simulated. It grants no access to real MTN or Orange APIs.",
     },
   },
   {
@@ -487,13 +517,303 @@ const ENDPOINTS: Endpoint[] = [
     },
   },
   {
+    id: "momo-status",
+    group: "MoMo (standalone)",
+    method: "GET",
+    path: "/sandbox/momo/:reference/status",
+    summary: "Check transaction status",
+    description:
+      "Polls the current status of any sandbox MoMo transaction (charge or withdrawal) by its reference. Use this for polling-based integrations that check status after initiating a payment instead of relying on webhooks.",
+    params: [
+      {
+        name: "reference",
+        in: "path",
+        type: "string",
+        required: true,
+        description: "The reference returned when you initiated the charge or withdrawal.",
+        placeholder: "ref_test_e5f6g7h8i9j0k1l2",
+      },
+    ],
+    sampleResponse: {
+      object: "sandbox_transaction_status",
+      id: "txn_test_d4e5f6g7h8i9j0k1",
+      type: "charge",
+      direction: "inbound",
+      amount: 5000,
+      currency: "XAF",
+      provider: "MTN",
+      phone_number: "237670000000",
+      description: null,
+      status: "success",
+      reference: "ref_test_e5f6g7h8i9j0k1l2",
+      created_at: "2026-07-01T12:00:00.000Z",
+      updated_at: "2026-07-01T12:01:00.000Z",
+      _sandbox: true,
+    },
+  },
+  {
+    id: "momo-withdraw",
+    group: "MoMo (standalone)",
+    method: "POST",
+    path: "/sandbox/momo/withdraw",
+    summary: "Simulate a withdrawal/payout",
+    description:
+      "Simulates sending money FROM your application TO a phone number. This is the disbursement API — the reverse of a charge. Use cases: paying out sellers, sending refunds, distributing commissions. Both MTN and Orange are supported. Confirm or fail with the standard /confirm and /fail endpoints.",
+    params: [
+      {
+        name: "phone_number",
+        in: "body",
+        type: "string",
+        required: true,
+        description: "The recipient phone number in international format.",
+        placeholder: "237660000000",
+      },
+      {
+        name: "amount",
+        in: "body",
+        type: "number",
+        required: true,
+        description: "Amount to disburse in XAF.",
+        placeholder: "15000",
+      },
+      {
+        name: "description",
+        in: "body",
+        type: "string",
+        required: false,
+        description: "Optional label (e.g. payout reference, seller name).",
+        placeholder: "Seller payout — Invoice #1042",
+      },
+    ],
+    sampleResponse: {
+      object: "sandbox_withdrawal",
+      transaction_id: "txn_test_f6g7h8i9j0k1l2m3",
+      reference: "ref_test_g7h8i9j0k1l2m3n4",
+      amount: 15000,
+      currency: "XAF",
+      provider: "ORANGE",
+      phone_number: "237660000000",
+      description: "Seller payout — Invoice #1042",
+      direction: "outbound",
+      status: "pending",
+      message: "Sandbox: A simulated ORANGE disbursement of 15000 XAF to 237660000000 is pending. No real money moved.",
+      _sandbox: true,
+      _next_steps: {
+        confirm: "POST /sandbox/momo/ref_test_g7h8i9j0k1l2m3n4/confirm",
+        fail: "POST /sandbox/momo/ref_test_g7h8i9j0k1l2m3n4/fail",
+        status: "GET /sandbox/momo/ref_test_g7h8i9j0k1l2m3n4/status",
+      },
+    },
+  },
+  {
+    id: "momo-webhook",
+    group: "MoMo (standalone)",
+    method: "POST",
+    path: "/sandbox/momo/webhook/simulate",
+    summary: "Fire a simulated webhook",
+    description:
+      "Sends a simulated MoMo payment notification to your own callback URL. Use this to test your webhook handler end-to-end — the sandbox makes a real HTTP POST to your endpoint with a realistic payload. The format parameter lets you choose the MTN, Orange, or generic Fonlok payload shape. Your callback URL must be a publicly reachable address (internal network addresses are not accepted).",
+    params: [
+      {
+        name: "reference",
+        in: "body",
+        type: "string",
+        required: true,
+        description: "The transaction reference to base the webhook on.",
+        placeholder: "ref_test_e5f6g7h8i9j0k1l2",
+      },
+      {
+        name: "callback_url",
+        in: "body",
+        type: "string",
+        required: true,
+        description: "Your publicly reachable webhook endpoint URL.",
+        placeholder: "https://your-app.com/webhooks/momo",
+      },
+      {
+        name: "format",
+        in: "body",
+        type: "select",
+        required: false,
+        description: "Payload shape to use. Defaults to generic.",
+        options: ["generic", "mtn", "orange"],
+      },
+    ],
+    sampleResponse: {
+      object: "sandbox_webhook_delivery",
+      status: "delivered",
+      callback_url: "https://your-app.com/webhooks/momo",
+      format: "mtn",
+      response_http_status: 200,
+      payload_sent: {
+        financialTransactionId: "txn_test_d4e5f6g7h8i9j0k1",
+        externalId: "ref_test_e5f6g7h8i9j0k1l2",
+        amount: "5000",
+        currency: "XAF",
+        payer: { partyIdType: "MSISDN", partyId: "237670000000" },
+        status: "SUCCESSFUL",
+        _sandbox: true,
+      },
+      _sandbox: true,
+    },
+  },
+  // ── Airtime ────────────────────────────────────────────────────────────────
+  {
+    id: "airtime-topup",
+    group: "Airtime",
+    method: "POST",
+    path: "/sandbox/airtime/topup",
+    summary: "Simulate an airtime top-up",
+    description:
+      "Simulates crediting airtime to a Cameroonian phone number. Useful for apps that offer airtime as a reward, cashback, or service. Supports both MTN and Orange. Amount must be between 100 and 50,000 XAF. No real airtime is credited.",
+    params: [
+      {
+        name: "phone_number",
+        in: "body",
+        type: "string",
+        required: true,
+        description: "The recipient phone number.",
+        placeholder: "237670000000",
+      },
+      {
+        name: "amount",
+        in: "body",
+        type: "number",
+        required: true,
+        description: "Airtime amount in XAF (100–50,000).",
+        placeholder: "500",
+      },
+      {
+        name: "description",
+        in: "body",
+        type: "string",
+        required: false,
+        description: "Optional label (e.g. reward reference).",
+        placeholder: "Loyalty reward",
+      },
+    ],
+    sampleResponse: {
+      object: "sandbox_airtime_topup",
+      transaction_id: "txn_test_h8i9j0k1l2m3n4o5",
+      reference: "ref_test_i9j0k1l2m3n4o5p6",
+      amount: 500,
+      currency: "XAF",
+      provider: "MTN",
+      phone_number: "237670000000",
+      description: "Loyalty reward",
+      status: "pending",
+      message: "Sandbox: A simulated MTN airtime top-up of 500 XAF to 237670000000 is pending. No real airtime will be credited.",
+      _sandbox: true,
+      _next_steps: {
+        confirm: "POST /sandbox/airtime/ref_test_i9j0k1l2m3n4o5p6/confirm",
+        fail: "POST /sandbox/airtime/ref_test_i9j0k1l2m3n4o5p6/fail",
+        status: "GET /sandbox/airtime/ref_test_i9j0k1l2m3n4o5p6/status",
+      },
+    },
+  },
+  {
+    id: "airtime-confirm",
+    group: "Airtime",
+    method: "POST",
+    path: "/sandbox/airtime/:reference/confirm",
+    summary: "Confirm an airtime top-up",
+    description: "Marks a pending sandbox airtime top-up as successful.",
+    params: [
+      {
+        name: "reference",
+        in: "path",
+        type: "string",
+        required: true,
+        description: "The reference returned from the top-up initiation.",
+        placeholder: "ref_test_i9j0k1l2m3n4o5p6",
+      },
+    ],
+    sampleResponse: {
+      object: "sandbox_airtime_topup",
+      id: "txn_test_h8i9j0k1l2m3n4o5",
+      amount: 500,
+      currency: "XAF",
+      provider: "MTN",
+      phone_number: "237670000000",
+      status: "success",
+      reference: "ref_test_i9j0k1l2m3n4o5p6",
+      _sandbox: true,
+      message: "Sandbox: Airtime top-up confirmed. No real airtime was credited.",
+    },
+  },
+  {
+    id: "airtime-fail",
+    group: "Airtime",
+    method: "POST",
+    path: "/sandbox/airtime/:reference/fail",
+    summary: "Fail an airtime top-up",
+    description: "Marks a pending sandbox airtime top-up as failed. Simulates a network error, invalid number, or provider refusal.",
+    params: [
+      {
+        name: "reference",
+        in: "path",
+        type: "string",
+        required: true,
+        description: "The reference to fail.",
+        placeholder: "ref_test_i9j0k1l2m3n4o5p6",
+      },
+      {
+        name: "reason",
+        in: "body",
+        type: "string",
+        required: false,
+        description: "Optional failure reason.",
+        placeholder: "Invalid phone number.",
+      },
+    ],
+    sampleResponse: {
+      object: "sandbox_airtime_topup",
+      id: "txn_test_h8i9j0k1l2m3n4o5",
+      status: "failed",
+      failure_reason: "Invalid phone number.",
+      _sandbox: true,
+      message: "Sandbox: Airtime top-up failed.",
+    },
+  },
+  {
+    id: "airtime-status",
+    group: "Airtime",
+    method: "GET",
+    path: "/sandbox/airtime/:reference/status",
+    summary: "Check airtime top-up status",
+    description: "Returns the current status of a sandbox airtime top-up by its reference.",
+    params: [
+      {
+        name: "reference",
+        in: "path",
+        type: "string",
+        required: true,
+        description: "The airtime top-up reference.",
+        placeholder: "ref_test_i9j0k1l2m3n4o5p6",
+      },
+    ],
+    sampleResponse: {
+      object: "sandbox_airtime_status",
+      id: "txn_test_h8i9j0k1l2m3n4o5",
+      type: "airtime",
+      amount: 500,
+      currency: "XAF",
+      provider: "MTN",
+      phone_number: "237670000000",
+      description: "Loyalty reward",
+      status: "success",
+      reference: "ref_test_i9j0k1l2m3n4o5p6",
+      _sandbox: true,
+    },
+  },
+  {
     id: "list-transactions",
     group: "Transactions",
     method: "GET",
     path: "/sandbox/transactions",
     summary: "List test transactions",
     description:
-      "Returns a paginated list of all sandbox transactions created with this API key. Includes both invoice-linked payments and standalone MoMo charges.",
+      "Returns a paginated list of all sandbox transactions created with this API key. Includes invoice-linked payments, standalone MoMo charges, withdrawals, and airtime top-ups.",
     params: [
       {
         name: "limit",
@@ -598,7 +918,7 @@ function generateCode(
   values: Record<string, string>,
 ): Record<CodeTab, string> {
   const key = apiKey || "sk_test_your_key_here";
-  const url = resolveUrl(endpoint.path, values, API_URL);
+  const url = resolveUrl(endpoint.path, values, DOCS_API_URL);
   const bodyParams = endpoint.params.filter(
     (p) => p.in === "body" && values[p.name],
   );
@@ -695,7 +1015,7 @@ function highlightJson(value: unknown): string {
 
 // ── Groups ────────────────────────────────────────────────────────────────────
 
-const GROUPS = ["Connectivity", "Invoices", "Payments", "MoMo (standalone)", "Transactions"];
+const GROUPS = ["Connectivity", "Invoices", "Payments", "MoMo (standalone)", "Airtime", "Transactions"];
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
@@ -823,7 +1143,7 @@ export default function SandboxExplorer() {
     : null;
 
   return (
-    <div style={{ display: "flex", gap: 0, minHeight: "600px" }}>
+    <div style={{ display: "flex", gap: 0 }} className="sandbox-outer">
       {/* ── Left sidebar: endpoint list ─────────────────────────────────────── */}
       <aside
         style={{
@@ -947,9 +1267,8 @@ export default function SandboxExplorer() {
         style={{
           flex: 1,
           minWidth: 0,
-          paddingLeft: "2rem",
         }}
-        className="md:pl-8 pl-0"
+        className="sandbox-detail-panel"
       >
         {/* API key bar */}
         <div
@@ -1084,6 +1403,9 @@ export default function SandboxExplorer() {
               fontFamily: "monospace",
               color: "var(--color-text-heading)",
               fontWeight: 600,
+              wordBreak: "break-all",
+              overflowWrap: "break-word",
+              minWidth: 0,
             }}
           >
             {endpoint.path}
@@ -1494,8 +1816,25 @@ export default function SandboxExplorer() {
 
       <style>{`
         @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Desktop: sidebar visible, right panel indented */
+        @media (min-width: 769px) {
+          .sandbox-outer { min-height: 600px; }
+          .sandbox-detail-panel { padding-left: 2rem; }
+        }
+
+        /* Mobile: stack everything vertically, no left gap */
         @media (max-width: 768px) {
-          .explorer-grid { grid-template-columns: 1fr !important; }
+          .sandbox-outer {
+            flex-direction: column;
+          }
+          .sandbox-detail-panel {
+            padding-left: 0;
+            padding-top: 1.25rem;
+          }
+          .explorer-grid {
+            grid-template-columns: 1fr !important;
+          }
         }
       `}</style>
     </div>

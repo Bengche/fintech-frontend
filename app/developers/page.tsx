@@ -52,8 +52,8 @@ const OVERVIEW_CARDS = [
         <path d="M7 11V7a5 5 0 0 1 10 0v4" />
       </svg>
     ),
-    title: "Isolated from production",
-    body: "Sandbox invoices, payments, and transactions are stored in dedicated tables that are completely separate from live data. Your production database is never touched.",
+    title: "Completely isolated",
+    body: "Sandbox invoices, payments, and transactions are stored in a dedicated environment, fully separated from Fonlok's live platform. Nothing you do in the sandbox can affect real users or real money.",
   },
   {
     icon: (
@@ -70,7 +70,7 @@ const OVERVIEW_CARDS = [
       </svg>
     ),
     title: "Deterministic test flows",
-    body: "Payments stay pending until you explicitly confirm or fail them. This lets you test success paths, failure paths, and timeout scenarios independently and repeatably.",
+    body: "Payments stay in a pending state until you explicitly confirm or fail them. This means you can test the happy path (successful payment), the failure path (declined), and edge cases — one at a time, as many times as you need.",
   },
   {
     icon: (
@@ -87,7 +87,7 @@ const OVERVIEW_CARDS = [
       </svg>
     ),
     title: "Full API fidelity",
-    body: "The sandbox uses the same request and response shapes as the production API. Code you write against the sandbox requires no changes to run in production — just swap the key.",
+    body: "The sandbox uses exactly the same request and response format as the live Fonlok API. When you are ready to go live, you only need to replace your sandbox key with a live key — your code stays the same.",
   },
   {
     icon: (
@@ -103,7 +103,7 @@ const OVERVIEW_CARDS = [
       </svg>
     ),
     title: "Authenticated with scoped keys",
-    body: "Each sandbox key (sk_test_*) is tied to your account and can be revoked independently. Keys are stored as SHA-256 hashes — the full value is shown once and never stored again.",
+    body: "Each sandbox key (sk_test_*) is tied to your Fonlok account and can be revoked at any time. The full key is shown once at creation — copy it immediately, as it cannot be retrieved afterwards.",
   },
   {
     icon: (
@@ -141,7 +141,7 @@ const OVERVIEW_CARDS = [
       </svg>
     ),
     title: "Error responses match production",
-    body: "Validation errors, 404s, and rate limit responses use exactly the same shape in the sandbox and in production. Your error-handling code works identically in both environments.",
+    body: "Validation errors, not-found responses, and rate limit responses look exactly the same in the sandbox as they do in production. Error handling you build in testing will work identically when you go live.",
   },
 ];
 
@@ -153,23 +153,23 @@ const QUICK_START_STEPS = [
   },
   {
     n: "02",
-    title: "Ping the sandbox",
-    body: "Paste your key into the explorer below and run GET /sandbox/ping. A 200 response with status: \"ok\" confirms your key is valid and the sandbox is reachable.",
+    title: "Verify your key",
+    body: "Paste your key into the explorer below and send a GET /sandbox/ping request. If you receive back {\"status\": \"ok\"}, your key is working correctly and you are ready to continue.",
   },
   {
     n: "03",
     title: "Create a test invoice",
-    body: "Call POST /sandbox/invoices with a title, amount, and seller email. Note the invoice id (inv_test_...) returned — you'll need it in the next step.",
+    body: "Call POST /sandbox/invoices with a title, amount, and seller email. The response includes an invoice_id (it looks like inv_test_abc123) — copy it, you will need it in the next step.",
   },
   {
     n: "04",
     title: "Simulate a payment",
-    body: "Call POST /sandbox/payments/initiate with the invoice id and a Cameroonian phone number (237XXXXXXXXX). This returns a reference.",
+    body: "Call POST /sandbox/payments/initiate, passing the invoice_id from step 3 and a Cameroonian mobile number (format: 237XXXXXXXXX). The response includes a payment reference — a unique ID for this payment attempt.",
   },
   {
     n: "05",
     title: "Confirm or fail the payment",
-    body: "Call POST /sandbox/payments/{reference}/confirm to simulate a successful payment, or /fail to simulate a declined prompt. The linked invoice status updates automatically.",
+    body: "Call POST /sandbox/payments/{reference}/confirm to simulate the customer approving the payment, or POST /sandbox/payments/{reference}/fail to simulate a rejection. The invoice status updates automatically to reflect the outcome.",
   },
 ];
 
@@ -181,8 +181,16 @@ export default function DevelopersPage() {
       <SiteHeader />
 
       <main>
+        {/* ── Responsive overrides ─────────────────────────────────────── */}
+        <style>{`
+          @media (max-width: 768px) {
+            .dev-section { padding-top: 3rem !important; padding-bottom: 3rem !important; }
+          }
+        `}</style>
+
         {/* ── Hero ─────────────────────────────────────────────────────────── */}
         <section
+          className="dev-section"
           style={{
             background: "var(--color-primary)",
             padding: "5rem 1.5rem 4rem",
@@ -241,7 +249,7 @@ export default function DevelopersPage() {
                 marginBottom: "2rem",
               }}
             >
-              The Fonlok sandbox gives you a full-fidelity, isolated API environment to test every payment flow before going live. No real money moves. No production data is touched.
+              The Fonlok sandbox gives you a complete, isolated environment to test every payment and escrow flow before going live. No real money moves. Nothing on Fonlok&apos;s live platform is ever affected.
             </p>
             <div style={{ display: "flex", gap: "0.875rem", flexWrap: "wrap" }}>
               <a
@@ -306,8 +314,7 @@ export default function DevelopersPage() {
         </div>
 
         {/* ── Overview ─────────────────────────────────────────────────────── */}
-        <section
-          style={{
+        <section          className="dev-section"          style={{
             background: "var(--color-cloud)",
             padding: "5rem 1.5rem",
             borderBottom: "1px solid var(--color-border)",
@@ -395,6 +402,7 @@ export default function DevelopersPage() {
 
         {/* ── Authentication ─────────────────────────────────────────────────── */}
         <section
+          className="dev-section"
           style={{
             padding: "5rem 1.5rem",
             borderBottom: "1px solid var(--color-border)",
@@ -420,8 +428,8 @@ export default function DevelopersPage() {
                 marginBottom: "2rem",
               }}
             >
-              All sandbox requests are authenticated with a Bearer token. Pass
-              your sandbox key in the{" "}
+              Every sandbox request must include your API key. You pass it as a
+              Bearer token in the{" "}
               <code
                 style={{
                   fontFamily: "monospace",
@@ -433,7 +441,9 @@ export default function DevelopersPage() {
               >
                 Authorization
               </code>{" "}
-              header on every request.
+              HTTP header on every request. This is a standard pattern used by
+              most APIs — it tells the server which account the request belongs
+              to, without embedding credentials in the URL.
             </p>
 
             <div
@@ -464,6 +474,8 @@ export default function DevelopersPage() {
                   fontSize: "0.875rem",
                   color: "#ABB2BF",
                   lineHeight: 1.8,
+                  overflowX: "auto",
+                  whiteSpace: "pre",
                 }}
               >
                 <span style={{ color: "#61AFEF" }}>Authorization</span>
@@ -476,7 +488,7 @@ export default function DevelopersPage() {
               style={{
                 marginTop: "1.5rem",
                 display: "grid",
-                gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
+                gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
                 gap: "1rem",
               }}
             >
@@ -485,7 +497,7 @@ export default function DevelopersPage() {
                   label: "Key format",
                   value: "sk_test_ + 32 hex chars (40 chars total)",
                 },
-                { label: "Key storage", value: "SHA-256 hash only — never stored in plain text" },
+                { label: "Key security", value: "Shown once at creation — cannot be retrieved afterwards" },
                 { label: "Key scope", value: "Sandbox-only, per-user, independently revocable" },
                 { label: "Rate limit", value: "60 requests / minute per key" },
               ].map((item) => (
@@ -526,6 +538,7 @@ export default function DevelopersPage() {
 
         {/* ── Quick start ───────────────────────────────────────────────────── */}
         <section
+          className="dev-section"
           style={{
             background: "var(--color-cloud)",
             padding: "5rem 1.5rem",
@@ -625,6 +638,7 @@ export default function DevelopersPage() {
         {/* ── API explorer ─────────────────────────────────────────────────── */}
         <section
           id="explorer"
+          className="dev-section"
           style={{ padding: "5rem 1.5rem", scrollMarginTop: "72px" }}
         >
           <div className="page-wrapper">
@@ -699,6 +713,7 @@ export default function DevelopersPage() {
         {/* ── API key management ────────────────────────────────────────────── */}
         <section
           id="keys"
+          className="dev-section"
           style={{
             background: "var(--color-cloud)",
             padding: "5rem 1.5rem",
@@ -739,7 +754,7 @@ export default function DevelopersPage() {
                 >
                   sk_test_
                 </code>{" "}
-                and only work against the sandbox. They carry no access to live transactions, real payouts, or production user data.
+                and only work in the sandbox environment. They cannot be used to access live payments, real payouts, or any user data on Fonlok&apos;s live platform.
               </p>
             </div>
 
@@ -749,6 +764,7 @@ export default function DevelopersPage() {
 
         {/* ── FAQ ──────────────────────────────────────────────────────────── */}
         <section
+          className="dev-section"
           style={{
             padding: "5rem 1.5rem",
             borderTop: "1px solid var(--color-border)",
@@ -775,20 +791,20 @@ export default function DevelopersPage() {
             >
               {[
                 {
-                  q: "Does the sandbox share a database with production?",
-                  a: "No. The sandbox uses dedicated tables (sandbox_invoices, sandbox_transactions, sandbox_api_keys) that are entirely separate from production tables. A bug in your sandbox integration cannot affect real users or live payments.",
+                  q: "Can sandbox activity affect the live Fonlok platform?",
+                  a: "No. The sandbox runs in a completely isolated environment. Anything you do during testing — including errors — has no effect on real Fonlok users, live transactions, or real money.",
                 },
                 {
-                  q: "Are sandbox API keys valid in production?",
-                  a: "No. Keys prefixed with sk_test_ are rejected by all production routes. You will need a separate live key (not yet publicly available) to process real payments.",
+                  q: "Can I use a sandbox key to make real payments?",
+                  a: "No. Keys prefixed with sk_test_ are only accepted in the sandbox. They are automatically rejected by Fonlok's live platform. Processing real payments requires a separate live API key, available to approved integration partners.",
                 },
                 {
                   q: "Do sandbox transactions expire or get cleaned up?",
-                  a: "Sandbox data is retained until your key is revoked. When you revoke a key, all invoices and transactions associated with it are automatically deleted via a database cascade.",
+                  a: "Sandbox data is kept for as long as your key remains active. When you revoke a key, all test invoices and transactions associated with it are permanently removed.",
                 },
                 {
-                  q: "Is there a webhook I can test against?",
-                  a: "Webhook simulation is not yet available in the public sandbox. You can simulate all payment state changes (confirm, fail) using the direct sandbox endpoints. Webhook support is on the roadmap.",
+                  q: "Can I test webhooks in the sandbox?",
+                  a: "Yes. Use the POST /sandbox/momo/webhook/simulate endpoint to fire a real HTTP POST to any callback URL you provide. This lets you verify that your server handles incoming Fonlok payment notifications correctly before going live.",
                 },
                 {
                   q: "Can I use the sandbox in my CI/CD pipeline?",
