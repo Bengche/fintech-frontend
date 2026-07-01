@@ -24,6 +24,7 @@ import {
   Globe,
   LogIn,
   UserPlus,
+  Code2,
   X,
 } from "lucide-react";
 
@@ -236,6 +237,7 @@ export default function Navbar() {
                   <NavLink href={`/seller/${username}`}>{t("profile")}</NavLink>
                 )}
                 <NavLink href="/settings">{t("settings")}</NavLink>
+                <NavLink href="/developers">{t("developers")}</NavLink>
                 {/* Ask Kila button */}
                 <button
                   onClick={openKila}
@@ -364,6 +366,7 @@ export default function Navbar() {
             ) : (
               <>
                 <NavLink href="/verify">Verify Receipt</NavLink>
+                <NavLink href="/developers">{t("developers")}</NavLink>
                 <RequestFeatureButton variant="nav" />
                 <NavLink href="/login">{t("signIn")}</NavLink>
                 <Link
@@ -662,6 +665,12 @@ export default function Navbar() {
                   >
                     {t("settings")}
                   </MobItem>
+                  <MobItem
+                    href="/developers"
+                    icon={<Code2 size={15} strokeWidth={2} />}
+                  >
+                    {t("developers")}
+                  </MobItem>
 
                   <RequestFeatureButton variant="mobile" />
 
@@ -715,6 +724,12 @@ export default function Navbar() {
                     icon={<BadgeCheck size={15} strokeWidth={2} />}
                   >
                     Verify Receipt
+                  </MobItem>
+                  <MobItem
+                    href="/developers"
+                    icon={<Code2 size={15} strokeWidth={2} />}
+                  >
+                    {t("developers")}
                   </MobItem>
                   <RequestFeatureButton variant="mobile" />
                   <div className="nav-mob-divider" />

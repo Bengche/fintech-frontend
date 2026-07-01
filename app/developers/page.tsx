@@ -115,23 +115,6 @@ const OVERVIEW_CARDS = [
         stroke="currentColor"
         strokeWidth={1.75}
       >
-        <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z" />
-        <polyline points="13 2 13 9 20 9" />
-      </svg>
-    ),
-    title: "Predictable rate limits",
-    body: "The sandbox allows 60 requests per minute per API key — well above what a human or a CI pipeline needs, but low enough to protect shared infrastructure from runaway scripts.",
-  },
-  {
-    icon: (
-      <svg
-        width="22"
-        height="22"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-        strokeWidth={1.75}
-      >
         <line x1="8" y1="6" x2="21" y2="6" />
         <line x1="8" y1="12" x2="21" y2="12" />
         <line x1="8" y1="18" x2="21" y2="18" />
@@ -140,8 +123,8 @@ const OVERVIEW_CARDS = [
         <line x1="3" y1="18" x2="3.01" y2="18" />
       </svg>
     ),
-    title: "Error responses match production",
-    body: "Validation errors, not-found responses, and rate limit responses look exactly the same in the sandbox as they do in production. Error handling you build in testing will work identically when you go live.",
+    title: "Consistent error responses",
+    body: "Validation errors, not-found responses, and other error types use the same structure across all endpoints. Error handling you build during testing will work correctly when you go live.",
   },
 ];
 
@@ -183,8 +166,18 @@ export default function DevelopersPage() {
       <main>
         {/* ── Responsive overrides ─────────────────────────────────────── */}
         <style>{`
+          /* Sections contain a page-wrapper that already provides horizontal
+             padding. Without this override the two stack and content appears
+             pinched into a narrow centre strip on mobile. */
+          .dev-section {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+          }
           @media (max-width: 768px) {
-            .dev-section { padding-top: 3rem !important; padding-bottom: 3rem !important; }
+            .dev-section {
+              padding-top: 3rem !important;
+              padding-bottom: 3rem !important;
+            }
           }
         `}</style>
 
@@ -314,7 +307,9 @@ export default function DevelopersPage() {
         </div>
 
         {/* ── Overview ─────────────────────────────────────────────────────── */}
-        <section          className="dev-section"          style={{
+        <section
+          className="dev-section"
+          style={{
             background: "var(--color-cloud)",
             padding: "5rem 1.5rem",
             borderBottom: "1px solid var(--color-border)",
@@ -498,8 +493,7 @@ export default function DevelopersPage() {
                   value: "sk_test_ + 32 hex chars (40 chars total)",
                 },
                 { label: "Key security", value: "Shown once at creation — cannot be retrieved afterwards" },
-                { label: "Key scope", value: "Sandbox-only, per-user, independently revocable" },
-                { label: "Rate limit", value: "60 requests / minute per key" },
+                { label: "Key scope", value: "Sandbox-only, tied to your account, independently revocable" },
               ].map((item) => (
                 <div
                   key={item.label}
@@ -808,7 +802,7 @@ export default function DevelopersPage() {
                 },
                 {
                   q: "Can I use the sandbox in my CI/CD pipeline?",
-                  a: "Yes. Create a key labelled for your pipeline (e.g. \"GitHub Actions\") and store it as a secret in your CI environment. The sandbox rate limit of 60 requests per minute is well above what a typical test suite needs.",
+                  a: "Yes. Create a key labelled for your pipeline (e.g. \"GitHub Actions\") and store it as a secret in your CI environment. The sandbox is designed to handle automated test suites without issues.",
                 },
                 {
                   q: "How do I report a bug in the sandbox API?",
