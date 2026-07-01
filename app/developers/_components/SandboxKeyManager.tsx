@@ -145,6 +145,7 @@ export default function SandboxKeyManager() {
   if (!user_id) {
     return (
       <div
+        className="sandbox-keys-guest"
         style={{
           background: "var(--color-mist)",
           border: "1px solid var(--color-border)",
@@ -163,6 +164,7 @@ export default function SandboxKeyManager() {
           Sign in to create and manage your sandbox API keys.
         </p>
         <div
+          className="sandbox-keys-guest-actions"
           style={{ display: "flex", gap: "0.75rem", justifyContent: "center" }}
         >
           <Link href="/login" className="btn-primary">
@@ -177,7 +179,7 @@ export default function SandboxKeyManager() {
   }
 
   return (
-    <div>
+    <div className="sandbox-keys-root">
       {/* ── New key revealed ────────────────────────────────────────────────── */}
       {revealedKey && (
         <div
@@ -278,6 +280,7 @@ export default function SandboxKeyManager() {
 
       {/* ── Create form ─────────────────────────────────────────────────────── */}
       <form
+        className="sandbox-keys-form"
         onSubmit={handleCreate}
         style={{
           background: "var(--color-white)",
@@ -298,6 +301,7 @@ export default function SandboxKeyManager() {
           Create a new sandbox key
         </p>
         <div
+          className="sandbox-keys-form-row"
           style={{
             display: "flex",
             gap: "0.75rem",
@@ -305,7 +309,7 @@ export default function SandboxKeyManager() {
             flexWrap: "wrap",
           }}
         >
-          <div style={{ flex: 1, minWidth: "220px" }}>
+          <div className="sandbox-keys-input-wrap" style={{ flex: 1, minWidth: "220px" }}>
             <input
               type="text"
               value={newLabel}
@@ -397,25 +401,30 @@ export default function SandboxKeyManager() {
                   textAlign: "left",
                 }}
               >
-                {["Label", "Key prefix", "Created", "Last used", "Requests", ""].map(
-                  (h) => (
-                    <th
-                      key={h}
-                      style={{
-                        padding: "0.625rem 1rem",
-                        fontWeight: 700,
-                        fontSize: "0.78125rem",
-                        color: "var(--color-text-muted)",
-                        textTransform: "uppercase",
-                        letterSpacing: "0.05em",
-                        borderBottom: "1px solid var(--color-border)",
-                        whiteSpace: "nowrap",
-                      }}
-                    >
-                      {h}
-                    </th>
-                  ),
-                )}
+                {[
+                  "Label",
+                  "Key prefix",
+                  "Created",
+                  "Last used",
+                  "Requests",
+                  "",
+                ].map((h) => (
+                  <th
+                    key={h}
+                    style={{
+                      padding: "0.625rem 1rem",
+                      fontWeight: 700,
+                      fontSize: "0.78125rem",
+                      color: "var(--color-text-muted)",
+                      textTransform: "uppercase",
+                      letterSpacing: "0.05em",
+                      borderBottom: "1px solid var(--color-border)",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {h}
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody>
@@ -571,6 +580,26 @@ export default function SandboxKeyManager() {
           </div>
         </details>
       )}
+
+      <style>{`
+        @media (max-width: 640px) {
+          .sandbox-keys-guest {
+            padding: 1.5rem !important;
+          }
+          .sandbox-keys-guest-actions {
+            flex-direction: column;
+          }
+          .sandbox-keys-form {
+            padding: 1rem !important;
+          }
+          .sandbox-keys-form-row {
+            align-items: stretch !important;
+          }
+          .sandbox-keys-input-wrap {
+            min-width: 0 !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }

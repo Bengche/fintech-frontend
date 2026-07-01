@@ -137,7 +137,7 @@ const QUICK_START_STEPS = [
   {
     n: "02",
     title: "Verify your key",
-    body: "Paste your key into the explorer below and send a GET /sandbox/ping request. If you receive back {\"status\": \"ok\"}, your key is working correctly and you are ready to continue.",
+    body: 'Paste your key into the explorer below and send a GET /sandbox/ping request. If you receive back {"status": "ok"}, your key is working correctly and you are ready to continue.',
   },
   {
     n: "03",
@@ -163,7 +163,7 @@ export default function DevelopersPage() {
     <>
       <SiteHeader />
 
-      <main>
+      <main className="developers-page">
         {/* ── Responsive overrides ─────────────────────────────────────── */}
         <style>{`
           /* Sections contain a page-wrapper that already provides horizontal
@@ -173,10 +173,36 @@ export default function DevelopersPage() {
             padding-left: 0 !important;
             padding-right: 0 !important;
           }
+          .developers-page .page-wrapper {
+            padding-left: 1rem;
+            padding-right: 1rem;
+          }
           @media (max-width: 768px) {
             .dev-section {
               padding-top: 3rem !important;
               padding-bottom: 3rem !important;
+            }
+            .dev-banner {
+              flex-wrap: wrap;
+              justify-content: flex-start;
+              text-align: left;
+            }
+            .dev-overview-grid {
+              grid-template-columns: 1fr !important;
+              gap: 1rem !important;
+            }
+            .dev-quick-step {
+              flex-direction: column;
+              gap: 0.875rem !important;
+            }
+            .dev-faq-item {
+              padding: 1rem !important;
+            }
+          }
+          @media (max-width: 480px) {
+            .developers-page .page-wrapper {
+              padding-left: 0.875rem;
+              padding-right: 0.875rem;
             }
           }
         `}</style>
@@ -231,7 +257,9 @@ export default function DevelopersPage() {
             >
               Build on Fonlok.
               <br />
-              <span style={{ color: "var(--color-accent)" }}>Test without limits.</span>
+              <span style={{ color: "var(--color-accent)" }}>
+                Test without limits.
+              </span>
             </h1>
             <p
               style={{
@@ -242,7 +270,10 @@ export default function DevelopersPage() {
                 marginBottom: "2rem",
               }}
             >
-              The Fonlok sandbox gives you a complete, isolated environment to test every payment and escrow flow before going live. No real money moves. Nothing on Fonlok&apos;s live platform is ever affected.
+              The Fonlok sandbox gives you a complete, isolated environment to
+              test every payment and escrow flow before going live. No real
+              money moves. Nothing on Fonlok&apos;s live platform is ever
+              affected.
             </p>
             <div style={{ display: "flex", gap: "0.875rem", flexWrap: "wrap" }}>
               <a
@@ -274,6 +305,7 @@ export default function DevelopersPage() {
 
         {/* ── Sandbox notice banner ─────────────────────────────────────────── */}
         <div
+          className="dev-banner"
           style={{
             background: "#FFFBEB",
             borderBottom: "1px solid #FDE68A",
@@ -301,8 +333,9 @@ export default function DevelopersPage() {
             <line x1="12" y1="17" x2="12.01" y2="17" />
           </svg>
           <span>
-            <strong>Sandbox only.</strong> This environment does not process real
-            payments. No real MTN or Orange Money transactions will be initiated.
+            <strong>Sandbox only.</strong> This environment does not process
+            real payments. No real MTN or Orange Money transactions will be
+            initiated.
           </span>
         </div>
 
@@ -339,6 +372,7 @@ export default function DevelopersPage() {
               Everything you need to know before writing your first API call.
             </p>
             <div
+              className="dev-overview-grid"
               style={{
                 display: "grid",
                 gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
@@ -475,7 +509,9 @@ export default function DevelopersPage() {
               >
                 <span style={{ color: "#61AFEF" }}>Authorization</span>
                 <span style={{ color: "#ABB2BF" }}>: </span>
-                <span style={{ color: "#98C379" }}>Bearer sk_test_a1b2c3d4...</span>
+                <span style={{ color: "#98C379" }}>
+                  Bearer sk_test_a1b2c3d4...
+                </span>
               </pre>
             </div>
 
@@ -492,8 +528,16 @@ export default function DevelopersPage() {
                   label: "Key format",
                   value: "sk_test_ + 32 hex chars (40 chars total)",
                 },
-                { label: "Key security", value: "Shown once at creation — cannot be retrieved afterwards" },
-                { label: "Key scope", value: "Sandbox-only, tied to your account, independently revocable" },
+                {
+                  label: "Key security",
+                  value:
+                    "Shown once at creation — cannot be retrieved afterwards",
+                },
+                {
+                  label: "Key scope",
+                  value:
+                    "Sandbox-only, tied to your account, independently revocable",
+                },
               ].map((item) => (
                 <div
                   key={item.label}
@@ -573,6 +617,7 @@ export default function DevelopersPage() {
             >
               {QUICK_START_STEPS.map((step) => (
                 <li
+                  className="dev-quick-step"
                   key={step.n}
                   style={{
                     display: "flex",
@@ -748,7 +793,9 @@ export default function DevelopersPage() {
                 >
                   sk_test_
                 </code>{" "}
-                and only work in the sandbox environment. They cannot be used to access live payments, real payouts, or any user data on Fonlok&apos;s live platform.
+                and only work in the sandbox environment. They cannot be used to
+                access live payments, real payouts, or any user data on
+                Fonlok&apos;s live platform.
               </p>
             </div>
 
@@ -802,14 +849,15 @@ export default function DevelopersPage() {
                 },
                 {
                   q: "Can I use the sandbox in my CI/CD pipeline?",
-                  a: "Yes. Create a key labelled for your pipeline (e.g. \"GitHub Actions\") and store it as a secret in your CI environment. The sandbox is designed to handle automated test suites without issues.",
+                  a: 'Yes. Create a key labelled for your pipeline (e.g. "GitHub Actions") and store it as a secret in your CI environment. The sandbox is designed to handle automated test suites without issues.',
                 },
                 {
                   q: "How do I report a bug in the sandbox API?",
-                  a: "Reach us at support@fonlok.com with the subject line \"Sandbox API issue\". Include the endpoint, your request body, and the response you received.",
+                  a: 'Reach us at support@fonlok.com with the subject line "Sandbox API issue". Include the endpoint, your request body, and the response you received.',
                 },
               ].map(({ q, a }) => (
                 <details
+                  className="dev-faq-item"
                   key={q}
                   style={{
                     background: "#fff",

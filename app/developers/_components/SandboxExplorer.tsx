@@ -93,7 +93,8 @@ const ENDPOINTS: Endpoint[] = [
       expires_in: 3600,
       scope: "profile payments",
       _sandbox: true,
-      _note: "This token is simulated. It grants no access to real MTN or Orange APIs.",
+      _note:
+        "This token is simulated. It grants no access to real MTN or Orange APIs.",
     },
   },
   {
@@ -530,7 +531,8 @@ const ENDPOINTS: Endpoint[] = [
         in: "path",
         type: "string",
         required: true,
-        description: "The reference returned when you initiated the charge or withdrawal.",
+        description:
+          "The reference returned when you initiated the charge or withdrawal.",
         placeholder: "ref_test_e5f6g7h8i9j0k1l2",
       },
     ],
@@ -596,7 +598,8 @@ const ENDPOINTS: Endpoint[] = [
       description: "Seller payout — Invoice #1042",
       direction: "outbound",
       status: "pending",
-      message: "Sandbox: A simulated ORANGE disbursement of 15000 XAF to 237660000000 is pending. No real money moved.",
+      message:
+        "Sandbox: A simulated ORANGE disbursement of 15000 XAF to 237660000000 is pending. No real money moved.",
       _sandbox: true,
       _next_steps: {
         confirm: "POST /sandbox/momo/ref_test_g7h8i9j0k1l2m3n4/confirm",
@@ -702,7 +705,8 @@ const ENDPOINTS: Endpoint[] = [
       phone_number: "237670000000",
       description: "Loyalty reward",
       status: "pending",
-      message: "Sandbox: A simulated MTN airtime top-up of 500 XAF to 237670000000 is pending. No real airtime will be credited.",
+      message:
+        "Sandbox: A simulated MTN airtime top-up of 500 XAF to 237670000000 is pending. No real airtime will be credited.",
       _sandbox: true,
       _next_steps: {
         confirm: "POST /sandbox/airtime/ref_test_i9j0k1l2m3n4o5p6/confirm",
@@ -738,7 +742,8 @@ const ENDPOINTS: Endpoint[] = [
       status: "success",
       reference: "ref_test_i9j0k1l2m3n4o5p6",
       _sandbox: true,
-      message: "Sandbox: Airtime top-up confirmed. No real airtime was credited.",
+      message:
+        "Sandbox: Airtime top-up confirmed. No real airtime was credited.",
     },
   },
   {
@@ -747,7 +752,8 @@ const ENDPOINTS: Endpoint[] = [
     method: "POST",
     path: "/sandbox/airtime/:reference/fail",
     summary: "Fail an airtime top-up",
-    description: "Marks a pending sandbox airtime top-up as failed. Simulates a network error, invalid number, or provider refusal.",
+    description:
+      "Marks a pending sandbox airtime top-up as failed. Simulates a network error, invalid number, or provider refusal.",
     params: [
       {
         name: "reference",
@@ -781,7 +787,8 @@ const ENDPOINTS: Endpoint[] = [
     method: "GET",
     path: "/sandbox/airtime/:reference/status",
     summary: "Check airtime top-up status",
-    description: "Returns the current status of a sandbox airtime top-up by its reference.",
+    description:
+      "Returns the current status of a sandbox airtime top-up by its reference.",
     params: [
       {
         name: "reference",
@@ -1015,7 +1022,14 @@ function highlightJson(value: unknown): string {
 
 // ── Groups ────────────────────────────────────────────────────────────────────
 
-const GROUPS = ["Connectivity", "Invoices", "Payments", "MoMo (standalone)", "Airtime", "Transactions"];
+const GROUPS = [
+  "Connectivity",
+  "Invoices",
+  "Payments",
+  "MoMo (standalone)",
+  "Airtime",
+  "Transactions",
+];
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
@@ -1121,7 +1135,9 @@ export default function SandboxExplorer() {
         data: {
           error: "network_error",
           message:
-            err instanceof Error ? err.message : "Request failed. Check CORS and that the backend is running.",
+            err instanceof Error
+              ? err.message
+              : "Request failed. Check CORS and that the backend is running.",
         },
         ms: Date.now() - t0,
       });
@@ -1237,7 +1253,10 @@ export default function SandboxExplorer() {
       </aside>
 
       {/* ── Mobile endpoint selector ─────────────────────────────────────────── */}
-      <div className="md:hidden" style={{ width: "100%", marginBottom: "1rem" }}>
+      <div
+        className="md:hidden"
+        style={{ width: "100%", marginBottom: "1rem" }}
+      >
         <select
           value={selectedId}
           onChange={(e) => handleSelect(e.target.value)}
@@ -1272,6 +1291,7 @@ export default function SandboxExplorer() {
       >
         {/* API key bar */}
         <div
+          className="sandbox-key-bar"
           style={{
             display: "flex",
             alignItems: "center",
@@ -1295,6 +1315,7 @@ export default function SandboxExplorer() {
             Sandbox key
           </span>
           <div
+            className="sandbox-key-input-wrap"
             style={{
               flex: 1,
               minWidth: "200px",
@@ -1382,7 +1403,13 @@ export default function SandboxExplorer() {
 
         {/* Endpoint header */}
         <div
-          style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "0.75rem", flexWrap: "wrap" }}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "0.75rem",
+            marginBottom: "0.75rem",
+            flexWrap: "wrap",
+          }}
         >
           <span
             style={{
@@ -1591,7 +1618,9 @@ export default function SandboxExplorer() {
                 width: "100%",
                 padding: "0.7rem 1.5rem",
                 borderRadius: "8px",
-                background: loading ? "var(--color-primary-hover)" : "var(--color-primary)",
+                background: loading
+                  ? "var(--color-primary-hover)"
+                  : "var(--color-primary)",
                 color: "#fff",
                 fontWeight: 700,
                 fontSize: "0.9375rem",
@@ -1653,10 +1682,7 @@ export default function SandboxExplorer() {
                         codeTab === tab
                           ? "2px solid var(--color-accent)"
                           : "2px solid transparent",
-                      color:
-                        codeTab === tab
-                          ? "#fff"
-                          : "rgba(255,255,255,0.4)",
+                      color: codeTab === tab ? "#fff" : "rgba(255,255,255,0.4)",
                       fontSize: "0.78125rem",
                       fontWeight: codeTab === tab ? 700 : 400,
                       cursor: "pointer",
@@ -1832,8 +1858,21 @@ export default function SandboxExplorer() {
             padding-left: 0;
             padding-top: 1.25rem;
           }
+          .sandbox-key-bar {
+            align-items: stretch;
+          }
+          .sandbox-key-input-wrap {
+            min-width: 0 !important;
+            width: 100%;
+          }
           .explorer-grid {
             grid-template-columns: 1fr !important;
+          }
+        }
+        @media (max-width: 480px) {
+          .sandbox-key-bar {
+            gap: 0.5rem;
+            padding: 0.625rem 0.75rem;
           }
         }
       `}</style>
