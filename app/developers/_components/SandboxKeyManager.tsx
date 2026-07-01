@@ -36,7 +36,7 @@ function formatDate(iso: string | null): string {
 }
 
 export default function SandboxKeyManager() {
-  const { user_id } = useAuth();
+  const { user_id, authLoading } = useAuth();
 
   const [keys, setKeys] = useState<SandboxKey[]>([]);
   const [loading, setLoading] = useState(true);
@@ -141,6 +141,24 @@ export default function SandboxKeyManager() {
 
   const activeKeys = keys.filter((k) => !k.revoked_at);
   const revokedKeys = keys.filter((k) => k.revoked_at);
+
+  if (authLoading) {
+    return (
+      <div
+        style={{
+          background: "var(--color-mist)",
+          border: "1px solid var(--color-border)",
+          borderRadius: "12px",
+          padding: "2.5rem",
+          textAlign: "center",
+          color: "var(--color-text-muted)",
+          fontSize: "0.9rem",
+        }}
+      >
+        Loading…
+      </div>
+    );
+  }
 
   if (!user_id) {
     return (
