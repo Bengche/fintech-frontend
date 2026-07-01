@@ -222,12 +222,13 @@ export default function Navbar() {
 
           {/* ── Desktop links ──────────────────────────────── */}
           <div
-            style={{ alignItems: "center", gap: "0.25rem" }}
+            style={{ alignItems: "center", gap: "0.125rem" }}
             className="hidden md:flex"
           >
             {user_id ? (
               <>
                 <NavLink href="/dashboard">{t("dashboard")}</NavLink>
+                <NavLink href="/developers">{t("developers")}</NavLink>
                 <NavLink href="/transactions">{t("transactions")}</NavLink>
                 <NavLink href="/purchases">{t("myPurchases")}</NavLink>
                 <NavLink href="/referral">{t("referral")}</NavLink>
@@ -237,7 +238,6 @@ export default function Navbar() {
                   <NavLink href={`/seller/${username}`}>{t("profile")}</NavLink>
                 )}
                 <NavLink href="/settings">{t("settings")}</NavLink>
-                <NavLink href="/developers">{t("developers")}</NavLink>
                 {/* Ask Kila button */}
                 <button
                   onClick={openKila}
@@ -816,13 +816,14 @@ function NavLink({
     <Link
       href={href}
       style={{
-        padding: "0.4rem 0.85rem",
+        padding: "0.4rem 0.55rem",
         borderRadius: "var(--radius-sm)",
         color: "rgba(255,255,255,0.75)",
         fontWeight: 500,
-        fontSize: "0.9rem",
+        fontSize: "0.875rem",
         textDecoration: "none",
         transition: "color 0.15s,background-color 0.15s",
+        whiteSpace: "nowrap",
       }}
       onMouseEnter={(e) => {
         (e.currentTarget as HTMLAnchorElement).style.color = "#fff";
