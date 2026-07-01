@@ -1052,15 +1052,12 @@ export default function SandboxExplorer() {
   const [copiedResponse, setCopiedResponse] = useState(false);
   const [copiedSample, setCopiedSample] = useState(false);
 
-  const copyText = useCallback(
-    (text: string, setter: (v: boolean) => void) => {
-      navigator.clipboard.writeText(text).then(() => {
-        setter(true);
-        setTimeout(() => setter(false), 2000);
-      });
-    },
-    [],
-  );
+  const copyText = useCallback((text: string, setter: (v: boolean) => void) => {
+    navigator.clipboard.writeText(text).then(() => {
+      setter(true);
+      setTimeout(() => setter(false), 2000);
+    });
+  }, []);
 
   const endpoint = ENDPOINTS.find((e) => e.id === selectedId)!;
 
@@ -1458,10 +1455,7 @@ export default function SandboxExplorer() {
           <button
             type="button"
             onClick={() =>
-              copyText(
-                `${DOCS_API_URL}${endpoint.path}`,
-                setCopiedPath,
-              )
+              copyText(`${DOCS_API_URL}${endpoint.path}`, setCopiedPath)
             }
             title="Copy full URL"
             style={{
@@ -1472,9 +1466,7 @@ export default function SandboxExplorer() {
               padding: "0.25rem 0.5rem",
               fontSize: "0.6875rem",
               fontWeight: 600,
-              color: copiedPath
-                ? "#16A34A"
-                : "var(--color-text-muted)",
+              color: copiedPath ? "#16A34A" : "var(--color-text-muted)",
               display: "flex",
               alignItems: "center",
               gap: "0.3rem",
@@ -1484,12 +1476,31 @@ export default function SandboxExplorer() {
           >
             {copiedPath ? (
               <>
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}><polyline points="20 6 9 17 4 12" /></svg>
+                <svg
+                  width="13"
+                  height="13"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2.5}
+                >
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
                 Copied
               </>
             ) : (
               <>
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>
+                <svg
+                  width="13"
+                  height="13"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <rect x="9" y="9" width="13" height="13" rx="2" />
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                </svg>
                 Copy URL
               </>
             )}
@@ -1730,33 +1741,36 @@ export default function SandboxExplorer() {
                 }}
               >
                 <div style={{ display: "flex", flex: 1 }}>
-                  {(["curl", "javascript", "python"] as CodeTab[]).map((tab) => (
-                    <button
-                      key={tab}
-                      onClick={() => setCodeTab(tab)}
-                      className="code-tab-btn"
-                      style={{
-                        padding: "0.5rem 1rem",
-                        background: "none",
-                        border: "none",
-                        borderBottom:
-                          codeTab === tab
-                            ? "2px solid var(--color-accent)"
-                            : "2px solid transparent",
-                        color: codeTab === tab ? "#fff" : "rgba(255,255,255,0.4)",
-                        fontSize: "0.78125rem",
-                        fontWeight: codeTab === tab ? 700 : 400,
-                        cursor: "pointer",
-                        letterSpacing: "0.04em",
-                      }}
-                    >
-                      {tab === "curl"
-                        ? "cURL"
-                        : tab === "javascript"
-                          ? "JavaScript"
-                          : "Python"}
-                    </button>
-                  ))}
+                  {(["curl", "javascript", "python"] as CodeTab[]).map(
+                    (tab) => (
+                      <button
+                        key={tab}
+                        onClick={() => setCodeTab(tab)}
+                        className="code-tab-btn"
+                        style={{
+                          padding: "0.5rem 1rem",
+                          background: "none",
+                          border: "none",
+                          borderBottom:
+                            codeTab === tab
+                              ? "2px solid var(--color-accent)"
+                              : "2px solid transparent",
+                          color:
+                            codeTab === tab ? "#fff" : "rgba(255,255,255,0.4)",
+                          fontSize: "0.78125rem",
+                          fontWeight: codeTab === tab ? 700 : 400,
+                          cursor: "pointer",
+                          letterSpacing: "0.04em",
+                        }}
+                      >
+                        {tab === "curl"
+                          ? "cURL"
+                          : tab === "javascript"
+                            ? "JavaScript"
+                            : "Python"}
+                      </button>
+                    ),
+                  )}
                 </div>
                 <button
                   type="button"
@@ -1779,12 +1793,31 @@ export default function SandboxExplorer() {
                 >
                   {copiedCode ? (
                     <>
-                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}><polyline points="20 6 9 17 4 12" /></svg>
+                      <svg
+                        width="13"
+                        height="13"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth={2.5}
+                      >
+                        <polyline points="20 6 9 17 4 12" />
+                      </svg>
                       Copied!
                     </>
                   ) : (
                     <>
-                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>
+                      <svg
+                        width="13"
+                        height="13"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth={2}
+                      >
+                        <rect x="9" y="9" width="13" height="13" rx="2" />
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                      </svg>
                       Copy
                     </>
                   )}
@@ -1894,12 +1927,31 @@ export default function SandboxExplorer() {
                   >
                     {copiedResponse ? (
                       <>
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}><polyline points="20 6 9 17 4 12" /></svg>
+                        <svg
+                          width="13"
+                          height="13"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth={2.5}
+                        >
+                          <polyline points="20 6 9 17 4 12" />
+                        </svg>
                         Copied!
                       </>
                     ) : (
                       <>
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>
+                        <svg
+                          width="13"
+                          height="13"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth={2}
+                        >
+                          <rect x="9" y="9" width="13" height="13" rx="2" />
+                          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                        </svg>
                         Copy
                       </>
                     )}
@@ -1991,12 +2043,31 @@ export default function SandboxExplorer() {
                   >
                     {copiedSample ? (
                       <>
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}><polyline points="20 6 9 17 4 12" /></svg>
+                        <svg
+                          width="13"
+                          height="13"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth={2.5}
+                        >
+                          <polyline points="20 6 9 17 4 12" />
+                        </svg>
                         Copied!
                       </>
                     ) : (
                       <>
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>
+                        <svg
+                          width="13"
+                          height="13"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth={2}
+                        >
+                          <rect x="9" y="9" width="13" height="13" rx="2" />
+                          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                        </svg>
                         Copy
                       </>
                     )}
