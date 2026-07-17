@@ -819,6 +819,378 @@ export default async function LandingPage() {
           </div>
         </section>
 
+        {/* ── MARKETPLACE PAYMENTS / FOR PLATFORMS ──────────────────────── */}
+        <section
+          aria-label="Escrow infrastructure for platforms and marketplaces"
+          style={{
+            background:
+              "linear-gradient(135deg, #0F1F3D 0%, #14243d 55%, #0F1F3D 100%)",
+            padding: "5rem 0",
+          }}
+        >
+          <div className="page-wrapper">
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(290px, 1fr))",
+                gap: "3.5rem",
+                alignItems: "center",
+              }}
+            >
+              {/* Left: copy */}
+              <div>
+                <p
+                  style={{
+                    display: "inline-block",
+                    fontSize: "0.8125rem",
+                    fontWeight: 700,
+                    letterSpacing: "0.1em",
+                    textTransform: "uppercase",
+                    color: "var(--color-accent)",
+                    marginBottom: "1rem",
+                  }}
+                >
+                  For Marketplaces and Platforms
+                </p>
+                <h2
+                  style={{
+                    fontSize: "clamp(1.625rem, 4vw, 2.375rem)",
+                    fontWeight: 800,
+                    color: "#ffffff",
+                    lineHeight: 1.2,
+                    marginBottom: "1.25rem",
+                    letterSpacing: "-0.01em",
+                  }}
+                >
+                  The escrow layer powering{" "}
+                  <span style={{ color: "var(--color-accent)" }}>
+                    Cameroon&apos;s platforms
+                  </span>
+                </h2>
+                <p
+                  style={{
+                    fontSize: "1rem",
+                    color: "rgba(255,255,255,0.7)",
+                    lineHeight: 1.8,
+                    marginBottom: "1rem",
+                    maxWidth: "480px",
+                  }}
+                >
+                  Fonlok provides a complete payment and escrow API that any
+                  marketplace or e-commerce platform can integrate in hours.
+                  Seller payouts go directly to their Mobile Money number — no
+                  Fonlok account required on either side.
+                </p>
+                <p
+                  style={{
+                    fontSize: "1rem",
+                    color: "rgba(255,255,255,0.7)",
+                    lineHeight: 1.8,
+                    marginBottom: "2rem",
+                    maxWidth: "480px",
+                  }}
+                >
+                  A flat 2% platform fee is deducted at payout. Buyers pay
+                  nothing extra. Full integration takes less than a day with our
+                  documented REST API.
+                </p>
+                <div
+                  style={{ display: "flex", gap: "0.875rem", flexWrap: "wrap" }}
+                >
+                  <Link
+                    href="/developers"
+                    className="btn-accent"
+                    style={{ fontSize: "0.9375rem" }}
+                  >
+                    Build with Fonlok
+                  </Link>
+                  <Link
+                    href="/contact"
+                    style={{
+                      display: "inline-block",
+                      padding: "0.65rem 1.4rem",
+                      borderRadius: "8px",
+                      border: "1.5px solid rgba(255,255,255,0.25)",
+                      color: "rgba(255,255,255,0.85)",
+                      fontWeight: 600,
+                      fontSize: "0.9375rem",
+                      textDecoration: "none",
+                    }}
+                  >
+                    Talk to us
+                  </Link>
+                </div>
+              </div>
+
+              {/* Right: feature list */}
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "1rem",
+                }}
+              >
+                {[
+                  {
+                    title: "Funds held until delivery is confirmed",
+                    body: "Buyers pay upfront. Fonlok holds the funds in escrow and releases them only after the buyer confirms receipt — or a dispute is resolved.",
+                  },
+                  {
+                    title: "Direct MoMo payout to any seller",
+                    body: "Pass the seller's phone number with each order. When funds are released, Fonlok disburses instantly via MTN or Orange Mobile Money. No seller account needed.",
+                  },
+                  {
+                    title: "Automatic email receipts at every step",
+                    body: "Fonlok sends branded confirmations to the buyer and payout receipts to the seller automatically. You manage the order; Fonlok handles the financial paper trail.",
+                  },
+                  {
+                    title: "Signed webhooks for real-time order state",
+                    body: "Receive HMAC-signed notifications when a payment is confirmed, released, or disputed — so your platform always reflects the true state of every transaction.",
+                  },
+                ].map((item) => (
+                  <div
+                    key={item.title}
+                    style={{
+                      background: "rgba(255,255,255,0.05)",
+                      border: "1px solid rgba(255,255,255,0.1)",
+                      borderRadius: "12px",
+                      padding: "1.25rem 1.5rem",
+                    }}
+                  >
+                    <p
+                      style={{
+                        margin: "0 0 0.375rem",
+                        fontWeight: 700,
+                        color: "#ffffff",
+                        fontSize: "0.9375rem",
+                      }}
+                    >
+                      {item.title}
+                    </p>
+                    <p
+                      style={{
+                        margin: 0,
+                        fontSize: "0.875rem",
+                        color: "rgba(255,255,255,0.6)",
+                        lineHeight: 1.7,
+                      }}
+                    >
+                      {item.body}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ── PARTNER PLATFORMS ─────────────────────────────────────────────── */}
+        <section
+          aria-label="Platforms powered by Fonlok"
+          style={{
+            backgroundColor: "var(--color-white)",
+            padding: "5rem 0",
+          }}
+        >
+          <div className="page-wrapper">
+            <div style={{ textAlign: "center", marginBottom: "3rem" }}>
+              <p
+                style={{
+                  display: "inline-block",
+                  fontSize: "0.8125rem",
+                  fontWeight: 700,
+                  letterSpacing: "0.1em",
+                  textTransform: "uppercase",
+                  color: "var(--color-accent)",
+                  marginBottom: "1rem",
+                }}
+              >
+                Powered by Fonlok
+              </p>
+              <h2
+                style={{
+                  fontSize: "clamp(1.5rem, 3vw, 2rem)",
+                  fontWeight: 800,
+                  color: "var(--color-primary)",
+                  marginBottom: "0.875rem",
+                }}
+              >
+                Platforms that trust Fonlok
+              </h2>
+              <p
+                style={{
+                  fontSize: "1rem",
+                  color: "var(--color-text-muted)",
+                  maxWidth: "520px",
+                  margin: "0 auto",
+                  lineHeight: 1.75,
+                }}
+              >
+                When you shop on a Fonlok-powered marketplace, your payment is
+                held securely in escrow and released to the seller only after
+                you confirm delivery.
+              </p>
+            </div>
+
+            <div style={{ maxWidth: "700px", margin: "0 auto" }}>
+              {/* Njimbong partner card */}
+              <div
+                className="card"
+                style={{
+                  padding: "2rem 2.5rem",
+                  borderLeft: "4px solid var(--color-accent)",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "1rem",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    flexWrap: "wrap",
+                    gap: "0.75rem",
+                  }}
+                >
+                  <div
+                    style={{
+                      background: "var(--color-primary)",
+                      color: "#ffffff",
+                      fontWeight: 800,
+                      fontSize: "1.125rem",
+                      letterSpacing: "-0.01em",
+                      padding: "0.375rem 0.875rem",
+                      borderRadius: "8px",
+                    }}
+                  >
+                    Njimbong
+                  </div>
+                  <span
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "0.375rem",
+                      backgroundColor: "#f0fdf4",
+                      border: "1px solid #bbf7d0",
+                      borderRadius: "999px",
+                      padding: "0.3rem 0.875rem",
+                      fontSize: "0.75rem",
+                      fontWeight: 700,
+                      color: "#15803d",
+                      letterSpacing: "0.02em",
+                    }}
+                  >
+                    <span
+                      style={{
+                        width: "6px",
+                        height: "6px",
+                        borderRadius: "50%",
+                        backgroundColor: "#16a34a",
+                        display: "inline-block",
+                      }}
+                    />
+                    Escrow active
+                  </span>
+                </div>
+                <p
+                  style={{
+                    margin: 0,
+                    fontSize: "0.9375rem",
+                    color: "var(--color-text-body)",
+                    lineHeight: 1.75,
+                  }}
+                >
+                  Cameroon&apos;s peer-to-peer marketplace for new and
+                  second-hand goods. Every purchase on Njimbong is protected by
+                  Fonlok escrow — funds are held securely and released directly
+                  to the seller&apos;s Mobile Money number only after the buyer
+                  confirms receipt.
+                </p>
+                <p
+                  style={{
+                    margin: 0,
+                    fontSize: "0.875rem",
+                    color: "var(--color-text-muted)",
+                    lineHeight: 1.7,
+                  }}
+                >
+                  Neither buyers nor sellers need a Fonlok account to
+                  transact on Njimbong. The escrow service runs entirely in
+                  the background, providing protection for every order.
+                </p>
+                <div>
+                  <a
+                    href="https://njimbong.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn-accent"
+                    style={{
+                      fontSize: "0.875rem",
+                      textDecoration: "none",
+                      display: "inline-block",
+                    }}
+                  >
+                    Shop on Njimbong — secured by Fonlok
+                  </a>
+                </div>
+              </div>
+
+              {/* "Is your platform next?" invite */}
+              <div
+                style={{
+                  marginTop: "1.5rem",
+                  padding: "1.75rem 2rem",
+                  background: "var(--color-cloud)",
+                  borderRadius: "12px",
+                  border: "1px solid var(--color-border)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  flexWrap: "wrap",
+                  gap: "1.25rem",
+                }}
+              >
+                <div>
+                  <p
+                    style={{
+                      margin: "0 0 0.375rem",
+                      fontSize: "1rem",
+                      fontWeight: 700,
+                      color: "var(--color-primary)",
+                    }}
+                  >
+                    Running a marketplace or e-commerce platform?
+                  </p>
+                  <p
+                    style={{
+                      margin: 0,
+                      fontSize: "0.875rem",
+                      color: "var(--color-text-muted)",
+                      lineHeight: 1.65,
+                    }}
+                  >
+                    Integrate Fonlok escrow and give your users the payment
+                    protection they need — with a single REST API call per order.
+                  </p>
+                </div>
+                <Link
+                  href="/developers"
+                  className="btn-primary"
+                  style={{
+                    fontSize: "0.875rem",
+                    textDecoration: "none",
+                    whiteSpace: "nowrap",
+                    flexShrink: 0,
+                  }}
+                >
+                  View integration docs
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* ── FINAL CTA ─────────────────────────────────────────────────────── */}
         <section
           aria-label="Call to action"

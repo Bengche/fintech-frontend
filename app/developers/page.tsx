@@ -14,20 +14,23 @@ import SandboxKeyManager from "./_components/SandboxKeyManager";
 import SandboxExplorer from "./_components/SandboxExplorer";
 
 export const metadata: Metadata = {
-  title: "Developer Sandbox",
+  title: "Developer API — Sandbox & Live Integration",
   description:
-    "Test your Fonlok integration end-to-end in an isolated sandbox environment. No real payments, full API fidelity.",
+    "Build escrow payments into your platform using the Fonlok API. Test everything in the sandbox, then go live with a production key. No Fonlok account required for your users.",
   keywords: [
     "Fonlok API",
+    "escrow API Cameroon",
+    "payment gateway API Cameroon",
     "developer sandbox",
-    "payment API Cameroon",
-    "test escrow API",
-    "MTN MoMo API sandbox",
+    "marketplace payment integration",
+    "MTN MoMo API",
+    "Orange Money API",
+    "Cameroon payment gateway",
   ],
   openGraph: {
-    title: "Developer Sandbox — Fonlok",
+    title: "Developer API — Fonlok Escrow as a Service",
     description:
-      "Integrate Fonlok escrow payments with confidence. Test every flow in our sandbox before going live.",
+      "Integrate Fonlok escrow into your marketplace or platform. Seller payouts go direct to MoMo. Full sandbox for testing, live API for production.",
     url: "https://fonlok.com/developers",
     siteName: "Fonlok",
     type: "website",
@@ -222,15 +225,12 @@ export default function DevelopersPage() {
                   display: "inline-flex",
                   alignItems: "center",
                   gap: "0.375rem",
-                  // background: "rgba(245,158,11,0.15)",
-                  // border: "1px solid rgba(245,158,11,0.4)",
                   color: "#FCD34D",
                   fontSize: "0.75rem",
                   fontWeight: 700,
                   letterSpacing: "0.08em",
                   textTransform: "uppercase",
                   padding: "0.3rem 0.75rem",
-                  // borderRadius: "999px",
                 }}
               >
                 <svg
@@ -242,7 +242,7 @@ export default function DevelopersPage() {
                   <circle cx="12" cy="12" r="10" opacity="0.25" />
                   <circle cx="12" cy="12" r="5" />
                 </svg>
-                Sandbox environment
+                Sandbox + Production API
               </span>
             </div>
             <h1
@@ -255,10 +255,10 @@ export default function DevelopersPage() {
                 letterSpacing: "-0.02em",
               }}
             >
-              Build on Fonlok.
+              Escrow as a service.
               <br />
               <span style={{ color: "var(--color-accent)" }}>
-                Test without limits.
+                Built for Cameroon&apos;s platforms.
               </span>
             </h1>
             <p
@@ -266,14 +266,26 @@ export default function DevelopersPage() {
                 fontSize: "1.0625rem",
                 color: "rgba(255,255,255,0.72)",
                 lineHeight: 1.75,
+                maxWidth: "580px",
+                marginBottom: "1.25rem",
+              }}
+            >
+              Integrate Fonlok into any marketplace or platform with a single
+              REST API. Seller payouts go directly to their Mobile Money number.
+              No Fonlok account required on either side.
+            </p>
+            <p
+              style={{
+                fontSize: "1rem",
+                color: "rgba(255,255,255,0.55)",
+                lineHeight: 1.75,
                 maxWidth: "560px",
                 marginBottom: "2rem",
               }}
             >
-              The Fonlok sandbox gives you a complete, isolated environment to
-              test every payment and escrow flow before going live. No real
-              money moves. Nothing on Fonlok&apos;s live platform is ever
-              affected.
+              Use the sandbox below to test every flow end-to-end before going
+              live. No real money moves. When you&apos;re ready, a production
+              key unlocks the full live API.
             </p>
             <div style={{ display: "flex", gap: "0.875rem", flexWrap: "wrap" }}>
               <a
@@ -338,6 +350,155 @@ export default function DevelopersPage() {
             initiated.
           </span>
         </div>
+
+        {/* ── Production API callout ──────────────────────────────────────── */}
+        <section
+          className="dev-section"
+          style={{
+            background: "var(--color-white)",
+            padding: "3.5rem 1.5rem",
+            borderBottom: "1px solid var(--color-border)",
+          }}
+        >
+          <div className="page-wrapper">
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+                gap: "2rem",
+              }}
+            >
+              {[
+                {
+                  label: "Create invoice",
+                  method: "POST",
+                  path: "/v1/invoices",
+                  desc: "Pass seller name, email, phone and item details. Fonlok creates the escrow invoice and returns a payment URL.",
+                },
+                {
+                  label: "Initiate payment",
+                  method: "POST",
+                  path: "/v1/payments/initiate",
+                  desc: "Send a MoMo USSD push to the buyer's phone. Returns a reference for polling or webhook confirmation.",
+                },
+                {
+                  label: "Release funds",
+                  method: "POST",
+                  path: "/v1/payments/release",
+                  desc: "When the buyer confirms receipt, call this. Fonlok disburses the net amount to the seller's MoMo number instantly.",
+                },
+              ].map((item) => (
+                <div
+                  key={item.path}
+                  style={{
+                    background: "var(--color-cloud)",
+                    border: "1px solid var(--color-border)",
+                    borderRadius: "12px",
+                    padding: "1.375rem 1.5rem",
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "0.625rem",
+                      marginBottom: "0.75rem",
+                    }}
+                  >
+                    <span
+                      style={{
+                        background: "var(--color-primary)",
+                        color: "var(--color-accent)",
+                        fontSize: "0.7rem",
+                        fontWeight: 800,
+                        letterSpacing: "0.05em",
+                        padding: "0.2rem 0.5rem",
+                        borderRadius: "4px",
+                        fontFamily: "monospace",
+                      }}
+                    >
+                      {item.method}
+                    </span>
+                    <code
+                      style={{
+                        fontSize: "0.8125rem",
+                        fontWeight: 700,
+                        color: "var(--color-primary)",
+                      }}
+                    >
+                      {item.path}
+                    </code>
+                  </div>
+                  <p
+                    style={{
+                      margin: 0,
+                      fontSize: "0.875rem",
+                      color: "var(--color-text-muted)",
+                      lineHeight: 1.7,
+                    }}
+                  >
+                    {item.desc}
+                  </p>
+                </div>
+              ))}
+            </div>
+            <div
+              style={{
+                marginTop: "2rem",
+                padding: "1.375rem 1.75rem",
+                background: "rgba(245,158,11,0.07)",
+                border: "1px solid rgba(245,158,11,0.3)",
+                borderRadius: "12px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                flexWrap: "wrap",
+                gap: "1rem",
+              }}
+            >
+              <div>
+                <p
+                  style={{
+                    margin: "0 0 0.25rem",
+                    fontWeight: 700,
+                    fontSize: "0.9375rem",
+                    color: "var(--color-primary)",
+                  }}
+                >
+                  Ready to integrate the live API?
+                </p>
+                <p
+                  style={{
+                    margin: 0,
+                    fontSize: "0.875rem",
+                    color: "var(--color-text-muted)",
+                    lineHeight: 1.65,
+                  }}
+                >
+                  Create a Fonlok account, generate a production key from your
+                  dashboard, and follow the integration guide below.
+                </p>
+              </div>
+              <a
+                href="mailto:support@fonlok.com?subject=Production API Access"
+                style={{
+                  display: "inline-block",
+                  padding: "0.625rem 1.375rem",
+                  borderRadius: "8px",
+                  background: "var(--color-primary)",
+                  color: "#ffffff",
+                  fontWeight: 700,
+                  fontSize: "0.875rem",
+                  textDecoration: "none",
+                  whiteSpace: "nowrap",
+                  flexShrink: 0,
+                }}
+              >
+                Request live access
+              </a>
+            </div>
+          </div>
+        </section>
 
         {/* ── Overview ─────────────────────────────────────────────────────── */}
         <section
