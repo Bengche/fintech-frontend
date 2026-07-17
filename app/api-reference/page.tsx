@@ -263,6 +263,7 @@ function ParamTable({
     <div
       style={{
         overflowX: "auto",
+        WebkitOverflowScrolling: "touch",
         border: `1px solid ${C.border}`,
         borderRadius: "8px",
         marginBottom: "1.5rem",
@@ -500,6 +501,7 @@ export default function ApiReferencePage() {
       <SiteHeader />
 
       <style>{`
+        *, *::before, *::after { box-sizing: border-box; }
         .api-ref-layout {
           display: flex;
           min-height: calc(100vh - 64px);
@@ -521,6 +523,10 @@ export default function ApiReferencePage() {
           min-width: 0;
           padding: 2rem 2.5rem 6rem;
           max-width: 860px;
+          overflow-x: hidden;
+        }
+        .api-ref-main pre {
+          -webkit-overflow-scrolling: touch;
         }
         .api-ref-nav-link {
           display: block;
@@ -549,27 +555,64 @@ export default function ApiReferencePage() {
           transition: color 0.15s;
         }
         .api-ref-nav-child:hover { color: ${C.navy}; }
+        @media (max-width: 900px) {
+          .api-ref-sidebar { width: 200px; }
+          .api-ref-main { padding: 2rem 1.75rem 6rem; }
+        }
         @media (max-width: 768px) {
           .api-ref-layout { flex-direction: column; }
           .api-ref-sidebar {
             width: 100%;
             height: auto;
-            position: static;
+            position: sticky;
+            top: 0;
+            z-index: 20;
             border-right: none;
             border-bottom: 1px solid ${C.border};
-            padding: 1rem 0;
+            padding: 0;
             display: flex;
-            flex-wrap: wrap;
-            gap: 0;
+            flex-wrap: nowrap;
             overflow-x: auto;
+            overflow-y: hidden;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
           }
+          .api-ref-sidebar::-webkit-scrollbar { display: none; }
+          /* Make section-group divs transparent to flex layout */
+          .api-ref-nav-group { display: contents; }
+          /* Hide section headings and child sub-links in mobile strip */
           .api-ref-nav-section { display: none; }
-          .api-ref-nav-link, .api-ref-nav-child {
-            padding: 0.4rem 0.875rem;
+          .api-ref-nav-child { display: none; }
+          /* Hide the sidebar brand title */
+          .api-ref-sidebar-title { display: none; }
+          .api-ref-nav-link {
+            display: inline-block;
+            padding: 0.625rem 0.875rem;
             white-space: nowrap;
+            font-size: 0.8rem;
+            flex-shrink: 0;
           }
           .api-ref-main {
-            padding: 1.5rem 1rem 4rem;
+            padding: 1.25rem 1rem 4rem;
+            width: 100%;
+          }
+        }
+        @media (max-width: 480px) {
+          .api-ref-main {
+            padding: 1rem 0.75rem 3rem;
+          }
+          /* Shrink code blocks on very small screens */
+          .api-ref-main pre {
+            font-size: 0.72rem !important;
+            padding: 0.875rem 0.875rem !important;
+            border-radius: 8px !important;
+          }
+          /* Shrink table text */
+          .api-ref-main table {
+            font-size: 0.78rem !important;
+          }
+          .api-ref-main th, .api-ref-main td {
+            padding: 0.5rem 0.625rem !important;
           }
         }
       `}</style>
@@ -578,17 +621,19 @@ export default function ApiReferencePage() {
         {/* ── Left navigation ────────────────────────────────────────────── */}
         <aside className="api-ref-sidebar">
           <div
+            className="api-ref-sidebar-title"
             style={{
               padding: "0 1.5rem 1rem",
               fontWeight: 800,
               fontSize: "0.875rem",
               color: C.navy,
+              flexShrink: 0,
             }}
           >
             API Reference
           </div>
           {NAV_SECTIONS.map((s) => (
-            <div key={s.id}>
+            <div key={s.id} className="api-ref-nav-group">
               {"children" in s ? (
                 <>
                   <div className="api-ref-nav-section">{s.label}</div>
@@ -665,9 +710,9 @@ export default function ApiReferencePage() {
               border: `1px solid ${C.border}`,
               borderRadius: "8px",
               padding: "1rem 1.25rem",
-              display: "flex",
-              gap: "2rem",
-              flexWrap: "wrap",
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))",
+              gap: "1rem",
               marginBottom: "2rem",
               fontSize: "0.84rem",
             }}
@@ -932,6 +977,7 @@ curl https://api.fonlok.com/v1/ping \\
           <div
             style={{
               overflowX: "auto",
+              WebkitOverflowScrolling: "touch",
               border: `1px solid ${C.border}`,
               borderRadius: "8px",
               marginBottom: "1.5rem",
@@ -1865,6 +1911,7 @@ def fonlok_webhook():
           <div
             style={{
               overflowX: "auto",
+              WebkitOverflowScrolling: "touch",
               border: `1px solid ${C.border}`,
               borderRadius: "8px",
               marginBottom: "1.5rem",
