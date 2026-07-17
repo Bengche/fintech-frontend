@@ -5749,7 +5749,12 @@ function LiveKeysAdminTab({
   };
 
   const doRevoke = async (id: number) => {
-    if (!window.confirm("Revoke this key? The holder will lose API access immediately.")) return;
+    if (
+      !window.confirm(
+        "Revoke this key? The holder will lose API access immediately.",
+      )
+    )
+      return;
     setActionMsg("");
     setActionErr("");
     setActionLoadingId(id);
@@ -5770,7 +5775,10 @@ function LiveKeysAdminTab({
     }
   };
 
-  const FILTERS: { key: "pending" | "approved" | "revoked" | "all"; label: string }[] = [
+  const FILTERS: {
+    key: "pending" | "approved" | "revoked" | "all";
+    label: string;
+  }[] = [
     { key: "pending", label: "Pending" },
     { key: "approved", label: "Approved" },
     { key: "revoked", label: "Revoked" },
@@ -5779,15 +5787,35 @@ function LiveKeysAdminTab({
 
   const statusPill = (row: Record<string, RowValue>) => {
     if (row.revoked_at && row.rejected_at) {
-      return { bg: "rgba(220,38,38,0.08)", bd: "rgba(220,38,38,0.24)", cl: "#991b1b", label: "Rejected" };
+      return {
+        bg: "rgba(220,38,38,0.08)",
+        bd: "rgba(220,38,38,0.24)",
+        cl: "#991b1b",
+        label: "Rejected",
+      };
     }
     if (row.revoked_at) {
-      return { bg: "rgba(100,116,139,0.08)", bd: "rgba(100,116,139,0.2)", cl: "#475569", label: "Revoked" };
+      return {
+        bg: "rgba(100,116,139,0.08)",
+        bd: "rgba(100,116,139,0.2)",
+        cl: "#475569",
+        label: "Revoked",
+      };
     }
     if (row.approved_at) {
-      return { bg: "rgba(22,163,74,0.1)", bd: "rgba(22,163,74,0.3)", cl: "#166534", label: "Approved" };
+      return {
+        bg: "rgba(22,163,74,0.1)",
+        bd: "rgba(22,163,74,0.3)",
+        cl: "#166534",
+        label: "Approved",
+      };
     }
-    return { bg: "rgba(245,158,11,0.12)", bd: "rgba(245,158,11,0.32)", cl: "#92400e", label: "Pending" };
+    return {
+      bg: "rgba(245,158,11,0.12)",
+      bd: "rgba(245,158,11,0.32)",
+      cl: "#92400e",
+      label: "Pending",
+    };
   };
 
   return (
@@ -5815,9 +5843,15 @@ function LiveKeysAdminTab({
           <h3 style={{ margin: 0, fontSize: "1.05rem", fontWeight: 800 }}>
             Live API Key Applications
           </h3>
-          <p style={{ margin: "4px 0 0", fontSize: "0.84rem", color: "var(--color-text-muted)" }}>
-            Review and approve or reject live API key requests from platform partners.
-            Approved keys carry a 2% fee on every released payment.
+          <p
+            style={{
+              margin: "4px 0 0",
+              fontSize: "0.84rem",
+              color: "var(--color-text-muted)",
+            }}
+          >
+            Review and approve or reject live API key requests from platform
+            partners. Approved keys carry a 2% fee on every released payment.
           </p>
         </div>
         <button
@@ -5861,12 +5895,26 @@ function LiveKeysAdminTab({
       </div>
 
       {actionMsg && (
-        <p style={{ margin: 0, color: "#16a34a", fontWeight: 600, fontSize: "0.88rem" }}>
+        <p
+          style={{
+            margin: 0,
+            color: "#16a34a",
+            fontWeight: 600,
+            fontSize: "0.88rem",
+          }}
+        >
           {actionMsg}
         </p>
       )}
       {actionErr && (
-        <p style={{ margin: 0, color: "#dc2626", fontWeight: 600, fontSize: "0.88rem" }}>
+        <p
+          style={{
+            margin: 0,
+            color: "#dc2626",
+            fontWeight: 600,
+            fontSize: "0.88rem",
+          }}
+        >
           {actionErr}
         </p>
       )}
@@ -5902,7 +5950,15 @@ function LiveKeysAdminTab({
             }}
           >
             {/* Header row */}
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "0.5rem" }}>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "flex-start",
+                flexWrap: "wrap",
+                gap: "0.5rem",
+              }}
+            >
               <div>
                 <span style={{ fontWeight: 800, fontSize: "0.95rem" }}>
                   {String(row.company_name || "—")}
@@ -5912,7 +5968,11 @@ function LiveKeysAdminTab({
                     href={String(row.website_url)}
                     target="_blank"
                     rel="noopener noreferrer"
-                    style={{ marginLeft: "0.5rem", color: "#2563eb", fontSize: "0.82rem" }}
+                    style={{
+                      marginLeft: "0.5rem",
+                      color: "#2563eb",
+                      fontSize: "0.82rem",
+                    }}
                   >
                     {String(row.website_url)}
                   </a>
@@ -5934,36 +5994,65 @@ function LiveKeysAdminTab({
             </div>
 
             {/* Details grid */}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: "0.4rem 1.5rem", fontSize: "0.83rem", color: "var(--color-text-muted)" }}>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))",
+                gap: "0.4rem 1.5rem",
+                fontSize: "0.83rem",
+                color: "var(--color-text-muted)",
+              }}
+            >
               <div>
-                <span style={{ fontWeight: 700, color: "var(--color-text)" }}>Applicant: </span>
+                <span style={{ fontWeight: 700, color: "var(--color-text)" }}>
+                  Applicant:{" "}
+                </span>
                 {String(row.user_name || "—")} ({String(row.user_email || "—")})
               </div>
               <div>
-                <span style={{ fontWeight: 700, color: "var(--color-text)" }}>Key prefix: </span>
-                <code style={{ background: "#f1f5f9", padding: "1px 5px", borderRadius: "4px" }}>
+                <span style={{ fontWeight: 700, color: "var(--color-text)" }}>
+                  Key prefix:{" "}
+                </span>
+                <code
+                  style={{
+                    background: "#f1f5f9",
+                    padding: "1px 5px",
+                    borderRadius: "4px",
+                  }}
+                >
                   {String(row.key_prefix || "—")}…
                 </code>
               </div>
               <div>
-                <span style={{ fontWeight: 700, color: "var(--color-text)" }}>Label: </span>
+                <span style={{ fontWeight: 700, color: "var(--color-text)" }}>
+                  Label:{" "}
+                </span>
                 {String(row.label || "—")}
               </div>
               <div>
-                <span style={{ fontWeight: 700, color: "var(--color-text)" }}>Applied: </span>
+                <span style={{ fontWeight: 700, color: "var(--color-text)" }}>
+                  Applied:{" "}
+                </span>
                 {row.created_at
-                  ? new Date(String(row.created_at)).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })
+                  ? new Date(String(row.created_at)).toLocaleDateString(
+                      "en-GB",
+                      { day: "2-digit", month: "short", year: "numeric" },
+                    )
                   : "—"}
               </div>
               {isApproved && (
                 <div>
-                  <span style={{ fontWeight: 700, color: "var(--color-text)" }}>Requests: </span>
+                  <span style={{ fontWeight: 700, color: "var(--color-text)" }}>
+                    Requests:{" "}
+                  </span>
                   {String(row.request_count ?? 0)}
                 </div>
               )}
               {row.rejection_reason && (
                 <div style={{ gridColumn: "1 / -1" }}>
-                  <span style={{ fontWeight: 700, color: "var(--color-text)" }}>Rejection reason: </span>
+                  <span style={{ fontWeight: 700, color: "var(--color-text)" }}>
+                    Rejection reason:{" "}
+                  </span>
                   {String(row.rejection_reason)}
                 </div>
               )}
@@ -5988,8 +6077,16 @@ function LiveKeysAdminTab({
 
             {/* Actions */}
             {isPending && (
-              <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-                <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "0.5rem",
+                }}
+              >
+                <div
+                  style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}
+                >
                   <button
                     disabled={isBusy}
                     onClick={() => doApprove(id)}
@@ -6027,7 +6124,13 @@ function LiveKeysAdminTab({
                   </button>
                 </div>
                 {rejectFormId === id && (
-                  <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: "0.4rem",
+                    }}
+                  >
                     <textarea
                       placeholder="Reason for rejection (optional but recommended)"
                       value={rejectReason}

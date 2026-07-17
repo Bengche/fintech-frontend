@@ -52,41 +52,44 @@ const C = {
 };
 
 const METHOD: Record<string, { bg: string; color: string }> = {
-  GET:    { bg: "rgba(22,163,74,0.12)",  color: "#166534" },
-  POST:   { bg: "rgba(37,99,235,0.1)",   color: "#1d4ed8" },
-  DELETE: { bg: "rgba(220,38,38,0.08)",  color: "#991b1b" },
+  GET: { bg: "rgba(22,163,74,0.12)", color: "#166534" },
+  POST: { bg: "rgba(37,99,235,0.1)", color: "#1d4ed8" },
+  DELETE: { bg: "rgba(220,38,38,0.08)", color: "#991b1b" },
 };
 
 // ── Static content ────────────────────────────────────────────────────────────
 
 const NAV_SECTIONS = [
-  { id: "introduction",  label: "Introduction" },
+  { id: "introduction", label: "Introduction" },
   { id: "authentication", label: "Authentication" },
-  { id: "rate-limits",   label: "Rate limits" },
-  { id: "errors",        label: "Errors" },
+  { id: "rate-limits", label: "Rate limits" },
+  { id: "errors", label: "Errors" },
   {
-    id: "invoices", label: "Invoices",
+    id: "invoices",
+    label: "Invoices",
     children: [
       { id: "create-invoice", label: "Create invoice" },
-      { id: "get-invoice",    label: "Retrieve invoice" },
+      { id: "get-invoice", label: "Retrieve invoice" },
     ],
   },
   {
-    id: "payments", label: "Payments",
+    id: "payments",
+    label: "Payments",
     children: [
       { id: "initiate-payment", label: "Initiate payment" },
-      { id: "payment-status",   label: "Payment status" },
-      { id: "release-funds",    label: "Release funds" },
-      { id: "open-dispute",     label: "Open dispute" },
+      { id: "payment-status", label: "Payment status" },
+      { id: "release-funds", label: "Release funds" },
+      { id: "open-dispute", label: "Open dispute" },
     ],
   },
   {
-    id: "webhooks", label: "Webhooks",
+    id: "webhooks",
+    label: "Webhooks",
     children: [
-      { id: "register-webhook",  label: "Register webhook" },
-      { id: "list-webhooks",     label: "List webhooks" },
-      { id: "delete-webhook",    label: "Delete webhook" },
-      { id: "webhook-events",    label: "Events reference" },
+      { id: "register-webhook", label: "Register webhook" },
+      { id: "list-webhooks", label: "List webhooks" },
+      { id: "delete-webhook", label: "Delete webhook" },
+      { id: "webhook-events", label: "Events reference" },
       { id: "verify-signatures", label: "Verify signatures" },
     ],
   },
@@ -94,21 +97,84 @@ const NAV_SECTIONS = [
 ];
 
 const ERROR_CODES = [
-  { code: "missing_api_key",        status: 401, description: "No Authorization header was provided." },
-  { code: "invalid_api_key_format", status: 401, description: "The key is not in the expected sk_live_<32hex> format." },
-  { code: "invalid_api_key",        status: 401, description: "The key does not match any record on file." },
-  { code: "revoked_api_key",        status: 401, description: "The key has been revoked and can no longer be used." },
-  { code: "pending_approval",       status: 403, description: "The key exists but has not yet been approved by Fonlok." },
-  { code: "validation_error",       status: 422, description: "One or more request fields failed validation. Inspect the errors array." },
-  { code: "not_found",              status: 404, description: "The requested resource does not exist on your account." },
-  { code: "duplicate_reference",    status: 409, description: "An invoice with the provided external reference already exists." },
-  { code: "invalid_invoice_status", status: 409, description: "The operation is not allowed in the invoice's current status." },
-  { code: "invoice_not_found",      status: 404, description: "No API-created invoice matched the given id." },
-  { code: "payment_gateway_error",  status: 502, description: "Campay is temporarily unreachable. Safe to retry." },
-  { code: "webhook_limit_reached",  status: 429, description: "You have reached the 5-webhook limit. Remove one first." },
-  { code: "key_limit_reached",      status: 429, description: "You have 5 active live keys. Revoke one to create another." },
-  { code: "unsafe_url",             status: 400, description: "The webhook URL resolves to a private or loopback IP." },
-  { code: "server_error",           status: 500, description: "An unexpected server error. Contact support if it persists." },
+  {
+    code: "missing_api_key",
+    status: 401,
+    description: "No Authorization header was provided.",
+  },
+  {
+    code: "invalid_api_key_format",
+    status: 401,
+    description: "The key is not in the expected sk_live_<32hex> format.",
+  },
+  {
+    code: "invalid_api_key",
+    status: 401,
+    description: "The key does not match any record on file.",
+  },
+  {
+    code: "revoked_api_key",
+    status: 401,
+    description: "The key has been revoked and can no longer be used.",
+  },
+  {
+    code: "pending_approval",
+    status: 403,
+    description: "The key exists but has not yet been approved by Fonlok.",
+  },
+  {
+    code: "validation_error",
+    status: 422,
+    description:
+      "One or more request fields failed validation. Inspect the errors array.",
+  },
+  {
+    code: "not_found",
+    status: 404,
+    description: "The requested resource does not exist on your account.",
+  },
+  {
+    code: "duplicate_reference",
+    status: 409,
+    description:
+      "An invoice with the provided external reference already exists.",
+  },
+  {
+    code: "invalid_invoice_status",
+    status: 409,
+    description:
+      "The operation is not allowed in the invoice's current status.",
+  },
+  {
+    code: "invoice_not_found",
+    status: 404,
+    description: "No API-created invoice matched the given id.",
+  },
+  {
+    code: "payment_gateway_error",
+    status: 502,
+    description: "Campay is temporarily unreachable. Safe to retry.",
+  },
+  {
+    code: "webhook_limit_reached",
+    status: 429,
+    description: "You have reached the 5-webhook limit. Remove one first.",
+  },
+  {
+    code: "key_limit_reached",
+    status: 429,
+    description: "You have 5 active live keys. Revoke one to create another.",
+  },
+  {
+    code: "unsafe_url",
+    status: 400,
+    description: "The webhook URL resolves to a private or loopback IP.",
+  },
+  {
+    code: "server_error",
+    status: 500,
+    description: "An unexpected server error. Contact support if it persists.",
+  },
 ];
 
 // ── Sub-components ────────────────────────────────────────────────────────────
@@ -322,13 +388,7 @@ function SectionTitle({
   );
 }
 
-function SubTitle({
-  id,
-  children,
-}: {
-  id: string;
-  children: React.ReactNode;
-}) {
+function SubTitle({ id, children }: { id: string; children: React.ReactNode }) {
   return (
     <h3
       id={id}
@@ -536,7 +596,11 @@ export default function ApiReferencePage() {
                     Overview
                   </a>
                   {s.children!.map((c) => (
-                    <a key={c.id} href={`#${c.id}`} className="api-ref-nav-child">
+                    <a
+                      key={c.id}
+                      href={`#${c.id}`}
+                      className="api-ref-nav-child"
+                    >
                       {c.label}
                     </a>
                   ))}
@@ -552,7 +616,6 @@ export default function ApiReferencePage() {
 
         {/* ── Main content ───────────────────────────────────────────────── */}
         <main className="api-ref-main">
-
           {/* ─── Introduction ──────────────────────────────────────────── */}
           <div style={{ marginBottom: "0.5rem" }}>
             <span
@@ -592,8 +655,8 @@ export default function ApiReferencePage() {
           >
             The Fonlok API lets you embed escrow-protected payments into any
             marketplace or platform. Collect Mobile Money from buyers in
-            Cameroon, hold funds securely, then disburse directly to sellers.
-            No Fonlok account required on either side.
+            Cameroon, hold funds securely, then disburse directly to sellers. No
+            Fonlok account required on either side.
           </p>
 
           <div
@@ -610,50 +673,120 @@ export default function ApiReferencePage() {
             }}
           >
             <div>
-              <div style={{ color: C.muted, fontWeight: 700, fontSize: "0.72rem", letterSpacing: "0.05em", textTransform: "uppercase", marginBottom: "4px" }}>
+              <div
+                style={{
+                  color: C.muted,
+                  fontWeight: 700,
+                  fontSize: "0.72rem",
+                  letterSpacing: "0.05em",
+                  textTransform: "uppercase",
+                  marginBottom: "4px",
+                }}
+              >
                 Base URL
               </div>
-              <code style={{ fontFamily: "monospace", color: C.navy, fontWeight: 700 }}>
+              <code
+                style={{
+                  fontFamily: "monospace",
+                  color: C.navy,
+                  fontWeight: 700,
+                }}
+              >
                 https://api.fonlok.com
               </code>
             </div>
             <div>
-              <div style={{ color: C.muted, fontWeight: 700, fontSize: "0.72rem", letterSpacing: "0.05em", textTransform: "uppercase", marginBottom: "4px" }}>
+              <div
+                style={{
+                  color: C.muted,
+                  fontWeight: 700,
+                  fontSize: "0.72rem",
+                  letterSpacing: "0.05em",
+                  textTransform: "uppercase",
+                  marginBottom: "4px",
+                }}
+              >
                 Version
               </div>
               <code style={{ fontFamily: "monospace", color: C.navy }}>v1</code>
             </div>
             <div>
-              <div style={{ color: C.muted, fontWeight: 700, fontSize: "0.72rem", letterSpacing: "0.05em", textTransform: "uppercase", marginBottom: "4px" }}>
+              <div
+                style={{
+                  color: C.muted,
+                  fontWeight: 700,
+                  fontSize: "0.72rem",
+                  letterSpacing: "0.05em",
+                  textTransform: "uppercase",
+                  marginBottom: "4px",
+                }}
+              >
                 Protocol
               </div>
-              <code style={{ fontFamily: "monospace", color: C.navy }}>HTTPS only</code>
+              <code style={{ fontFamily: "monospace", color: C.navy }}>
+                HTTPS only
+              </code>
             </div>
             <div>
-              <div style={{ color: C.muted, fontWeight: 700, fontSize: "0.72rem", letterSpacing: "0.05em", textTransform: "uppercase", marginBottom: "4px" }}>
+              <div
+                style={{
+                  color: C.muted,
+                  fontWeight: 700,
+                  fontSize: "0.72rem",
+                  letterSpacing: "0.05em",
+                  textTransform: "uppercase",
+                  marginBottom: "4px",
+                }}
+              >
                 Currency
               </div>
-              <code style={{ fontFamily: "monospace", color: C.navy }}>XAF</code>
+              <code style={{ fontFamily: "monospace", color: C.navy }}>
+                XAF
+              </code>
             </div>
           </div>
 
           <SectionTitle id="introduction">Introduction</SectionTitle>
           <Lead>
-            All API requests use JSON over HTTPS. Every response is a JSON object
-            with an <InlineCode>object</InlineCode> field describing the resource
-            type. Errors always include an <InlineCode>error</InlineCode> code
-            string and a human-readable <InlineCode>message</InlineCode>.
+            All API requests use JSON over HTTPS. Every response is a JSON
+            object with an <InlineCode>object</InlineCode> field describing the
+            resource type. Errors always include an{" "}
+            <InlineCode>error</InlineCode> code string and a human-readable{" "}
+            <InlineCode>message</InlineCode>.
           </Lead>
 
-          <p style={{ color: C.muted, fontSize: "0.9rem", lineHeight: 1.75, marginBottom: "1rem" }}>
+          <p
+            style={{
+              color: C.muted,
+              fontSize: "0.9rem",
+              lineHeight: 1.75,
+              marginBottom: "1rem",
+            }}
+          >
             A typical integration follows this sequence:
           </p>
 
           {[
-            ["1", "Create invoice", "POST /v1/invoices — register a transaction with seller and buyer details."],
-            ["2", "Initiate payment", "POST /v1/payments/initiate — send a MoMo prompt to the buyer's phone."],
-            ["3", "Wait for confirmation", "Listen for the payment.confirmed webhook event, or poll GET /v1/payments/:ref/status."],
-            ["4", "Release funds", "POST /v1/payments/release — Fonlok disburses net amount directly to the seller's MoMo."],
+            [
+              "1",
+              "Create invoice",
+              "POST /v1/invoices — register a transaction with seller and buyer details.",
+            ],
+            [
+              "2",
+              "Initiate payment",
+              "POST /v1/payments/initiate — send a MoMo prompt to the buyer's phone.",
+            ],
+            [
+              "3",
+              "Wait for confirmation",
+              "Listen for the payment.confirmed webhook event, or poll GET /v1/payments/:ref/status.",
+            ],
+            [
+              "4",
+              "Release funds",
+              "POST /v1/payments/release — Fonlok disburses net amount directly to the seller's MoMo.",
+            ],
           ].map(([n, title, desc]) => (
             <div
               key={n}
@@ -683,8 +816,12 @@ export default function ApiReferencePage() {
                 {n}
               </span>
               <div>
-                <strong style={{ color: C.text, fontSize: "0.875rem" }}>{title}</strong>{" "}
-                <span style={{ color: C.muted, fontSize: "0.85rem" }}>{desc}</span>
+                <strong style={{ color: C.text, fontSize: "0.875rem" }}>
+                  {title}
+                </strong>{" "}
+                <span style={{ color: C.muted, fontSize: "0.85rem" }}>
+                  {desc}
+                </span>
               </div>
             </div>
           ))}
@@ -700,10 +837,17 @@ export default function ApiReferencePage() {
 
           <Code>{`Authorization: Bearer sk_live_a1b2c3d4e5f6...`}</Code>
 
-          <p style={{ color: C.muted, fontSize: "0.9rem", lineHeight: 1.75, marginBottom: "1rem" }}>
-            Live keys follow the format{" "}
-            <InlineCode>sk_live_</InlineCode> + 32 lowercase hex characters (40
-            characters total). Keys are managed in your{" "}
+          <p
+            style={{
+              color: C.muted,
+              fontSize: "0.9rem",
+              lineHeight: 1.75,
+              marginBottom: "1rem",
+            }}
+          >
+            Live keys follow the format <InlineCode>sk_live_</InlineCode> + 32
+            lowercase hex characters (40 characters total). Keys are managed in
+            your{" "}
             <a href="/developers" style={{ color: C.blue }}>
               Developer dashboard
             </a>
@@ -717,7 +861,14 @@ export default function ApiReferencePage() {
             by email once a Fonlok team member activates your key.
           </Note>
 
-          <p style={{ color: C.muted, fontSize: "0.9rem", lineHeight: 1.75, marginBottom: "1rem" }}>
+          <p
+            style={{
+              color: C.muted,
+              fontSize: "0.9rem",
+              lineHeight: 1.75,
+              marginBottom: "1rem",
+            }}
+          >
             To test your integration without real money, use the{" "}
             <a href="/developers" style={{ color: C.blue }}>
               sandbox environment
@@ -745,10 +896,10 @@ curl https://api.fonlok.com/v1/ping \\
           {/* ─── Rate limits ──────────────────────────────────────────── */}
           <SectionTitle id="rate-limits">Rate limits</SectionTitle>
           <Lead>
-            The production API allows{" "}
-            <strong>30 requests per minute</strong> per API key. Exceeding this
-            limit returns HTTP <InlineCode>429 Too Many Requests</InlineCode>.
-            The sandbox has a separate limit.
+            The production API allows <strong>30 requests per minute</strong>{" "}
+            per API key. Exceeding this limit returns HTTP{" "}
+            <InlineCode>429 Too Many Requests</InlineCode>. The sandbox has a
+            separate limit.
           </Lead>
 
           <Code>{`# 429 response
@@ -786,7 +937,13 @@ curl https://api.fonlok.com/v1/ping \\
               marginBottom: "1.5rem",
             }}
           >
-            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.83rem" }}>
+            <table
+              style={{
+                width: "100%",
+                borderCollapse: "collapse",
+                fontSize: "0.83rem",
+              }}
+            >
               <thead>
                 <tr style={{ background: C.bg }}>
                   {["Error code", "HTTP status", "Meaning"].map((h) => (
@@ -815,16 +972,45 @@ curl https://api.fonlok.com/v1/ping \\
                     key={e.code}
                     style={{
                       borderBottom:
-                        i < ERROR_CODES.length - 1 ? `1px solid ${C.border}` : "none",
+                        i < ERROR_CODES.length - 1
+                          ? `1px solid ${C.border}`
+                          : "none",
                     }}
                   >
-                    <td style={{ padding: "0.65rem 1rem", fontFamily: "monospace", fontWeight: 600, color: C.navy, whiteSpace: "nowrap" }}>
+                    <td
+                      style={{
+                        padding: "0.65rem 1rem",
+                        fontFamily: "monospace",
+                        fontWeight: 600,
+                        color: C.navy,
+                        whiteSpace: "nowrap",
+                      }}
+                    >
                       {e.code}
                     </td>
-                    <td style={{ padding: "0.65rem 1rem", fontFamily: "monospace", color: e.status >= 500 ? C.red : e.status >= 400 ? "#b45309" : C.green, fontWeight: 700, whiteSpace: "nowrap" }}>
+                    <td
+                      style={{
+                        padding: "0.65rem 1rem",
+                        fontFamily: "monospace",
+                        color:
+                          e.status >= 500
+                            ? C.red
+                            : e.status >= 400
+                              ? "#b45309"
+                              : C.green,
+                        fontWeight: 700,
+                        whiteSpace: "nowrap",
+                      }}
+                    >
                       {e.status}
                     </td>
-                    <td style={{ padding: "0.65rem 1rem", color: C.muted, lineHeight: 1.55 }}>
+                    <td
+                      style={{
+                        padding: "0.65rem 1rem",
+                        color: C.muted,
+                        lineHeight: 1.55,
+                      }}
+                    >
                       {e.description}
                     </td>
                   </tr>
@@ -840,8 +1026,7 @@ curl https://api.fonlok.com/v1/ping \\
           <Lead>
             An invoice represents a transaction between a seller and a buyer on
             your platform. Funds move through four status transitions:{" "}
-            <InlineCode>pending</InlineCode> →{" "}
-            <InlineCode>paid</InlineCode> →{" "}
+            <InlineCode>pending</InlineCode> → <InlineCode>paid</InlineCode> →{" "}
             <InlineCode>completed</InlineCode> (or{" "}
             <InlineCode>disputed</InlineCode> if a problem arises).
           </Lead>
@@ -857,11 +1042,23 @@ curl https://api.fonlok.com/v1/ping \\
             }}
           >
             {[
-              { label: "pending",   color: "#92400e", bg: "rgba(245,158,11,0.1)" },
-              { label: "paid",      color: "#1d4ed8", bg: "rgba(37,99,235,0.1)" },
-              { label: "completed", color: "#166534", bg: "rgba(22,163,74,0.1)" },
-              { label: "disputed",  color: "#991b1b", bg: "rgba(220,38,38,0.08)" },
-              { label: "cancelled", color: C.muted,   bg: C.bg },
+              {
+                label: "pending",
+                color: "#92400e",
+                bg: "rgba(245,158,11,0.1)",
+              },
+              { label: "paid", color: "#1d4ed8", bg: "rgba(37,99,235,0.1)" },
+              {
+                label: "completed",
+                color: "#166534",
+                bg: "rgba(22,163,74,0.1)",
+              },
+              {
+                label: "disputed",
+                color: "#991b1b",
+                bg: "rgba(220,38,38,0.08)",
+              },
+              { label: "cancelled", color: C.muted, bg: C.bg },
             ].map(({ label, color, bg }) => (
               <span
                 key={label}
@@ -893,17 +1090,80 @@ curl https://api.fonlok.com/v1/ping \\
 
           <ParamTable
             params={[
-              { name: "title",        type: "string",  required: true,  description: "Name of the item or service being sold. Max 200 characters." },
-              { name: "amount",       type: "number",  required: true,  description: "Amount in XAF. Minimum 500." },
-              { name: "currency",     type: "string",  required: false, description: 'Currency code. Only "XAF" is supported. Defaults to "XAF".' },
-              { name: "seller_name",  type: "string",  required: true,  description: "Full name of the seller. Max 200 characters." },
-              { name: "seller_email", type: "string",  required: true,  description: "Seller's email address. Receives payment confirmation." },
-              { name: "seller_phone", type: "string",  required: true,  description: "Seller's MoMo number in format 237XXXXXXXXX. Payout is sent here." },
-              { name: "buyer_email",  type: "string",  required: false, description: "Buyer's email address. Receives payment receipt." },
-              { name: "buyer_phone",  type: "string",  required: false, description: "Buyer's MoMo number (237XXXXXXXXX). Used for payment if not passed in initiate." },
-              { name: "description",  type: "string",  required: false, description: "Extended description of the item or service. Max 2000 characters." },
-              { name: "reference",    type: "string",  required: false, description: "Your own order or transaction ID. Must be unique per account. Max 200 characters." },
-              { name: "expires_at",   type: "ISO 8601 date", required: false, description: "Date after which the invoice can no longer be paid." },
+              {
+                name: "title",
+                type: "string",
+                required: true,
+                description:
+                  "Name of the item or service being sold. Max 200 characters.",
+              },
+              {
+                name: "amount",
+                type: "number",
+                required: true,
+                description: "Amount in XAF. Minimum 500.",
+              },
+              {
+                name: "currency",
+                type: "string",
+                required: false,
+                description:
+                  'Currency code. Only "XAF" is supported. Defaults to "XAF".',
+              },
+              {
+                name: "seller_name",
+                type: "string",
+                required: true,
+                description: "Full name of the seller. Max 200 characters.",
+              },
+              {
+                name: "seller_email",
+                type: "string",
+                required: true,
+                description:
+                  "Seller's email address. Receives payment confirmation.",
+              },
+              {
+                name: "seller_phone",
+                type: "string",
+                required: true,
+                description:
+                  "Seller's MoMo number in format 237XXXXXXXXX. Payout is sent here.",
+              },
+              {
+                name: "buyer_email",
+                type: "string",
+                required: false,
+                description: "Buyer's email address. Receives payment receipt.",
+              },
+              {
+                name: "buyer_phone",
+                type: "string",
+                required: false,
+                description:
+                  "Buyer's MoMo number (237XXXXXXXXX). Used for payment if not passed in initiate.",
+              },
+              {
+                name: "description",
+                type: "string",
+                required: false,
+                description:
+                  "Extended description of the item or service. Max 2000 characters.",
+              },
+              {
+                name: "reference",
+                type: "string",
+                required: false,
+                description:
+                  "Your own order or transaction ID. Must be unique per account. Max 200 characters.",
+              },
+              {
+                name: "expires_at",
+                type: "ISO 8601 date",
+                required: false,
+                description:
+                  "Date after which the invoice can no longer be paid.",
+              },
             ]}
           />
 
@@ -1001,9 +1261,26 @@ curl https://api.fonlok.com/v1/ping \\
 
           <ParamTable
             params={[
-              { name: "invoice_id",   type: "string", required: true,  description: "The id returned by POST /v1/invoices." },
-              { name: "phone_number", type: "string", required: true,  description: "Buyer's MoMo number (237XXXXXXXXX). Accepts MTN and Orange Money numbers." },
-              { name: "buyer_email",  type: "string", required: false, description: "Buyer's email for receipt confirmation. Overrides the invoice's buyer_email." },
+              {
+                name: "invoice_id",
+                type: "string",
+                required: true,
+                description: "The id returned by POST /v1/invoices.",
+              },
+              {
+                name: "phone_number",
+                type: "string",
+                required: true,
+                description:
+                  "Buyer's MoMo number (237XXXXXXXXX). Accepts MTN and Orange Money numbers.",
+              },
+              {
+                name: "buyer_email",
+                type: "string",
+                required: false,
+                description:
+                  "Buyer's email for receipt confirmation. Overrides the invoice's buyer_email.",
+              },
             ]}
           />
 
@@ -1041,7 +1318,8 @@ curl https://api.fonlok.com/v1/ping \\
             Poll the status of a payment by its reference. The status field
             reflects the payment&apos;s state: <InlineCode>pending</InlineCode>{" "}
             (awaiting buyer approval), <InlineCode>paid</InlineCode> (buyer
-            approved), or <InlineCode>failed</InlineCode> (declined or timed out).
+            approved), or <InlineCode>failed</InlineCode> (declined or timed
+            out).
           </Lead>
           <Badge method="GET" path="/v1/payments/:reference/status" />
 
@@ -1080,7 +1358,13 @@ curl https://api.fonlok.com/v1/ping \\
 
           <ParamTable
             params={[
-              { name: "invoice_id", type: "string", required: true, description: "The id of the invoice to release. Must be in paid status." },
+              {
+                name: "invoice_id",
+                type: "string",
+                required: true,
+                description:
+                  "The id of the invoice to release. Must be in paid status.",
+              },
             ]}
           />
 
@@ -1124,11 +1408,26 @@ curl https://api.fonlok.com/v1/ping \\
               }}
             >
               <span>Gross amount:</span> <span>35,000 XAF</span>
-              <span>Platform fee (2%):</span> <span style={{ color: C.red }}>− 700 XAF</span>
-              <span style={{ color: C.text, fontWeight: 700, borderTop: `1px solid ${C.border}`, paddingTop: "4px" }}>
+              <span>Platform fee (2%):</span>{" "}
+              <span style={{ color: C.red }}>− 700 XAF</span>
+              <span
+                style={{
+                  color: C.text,
+                  fontWeight: 700,
+                  borderTop: `1px solid ${C.border}`,
+                  paddingTop: "4px",
+                }}
+              >
                 Seller receives:
               </span>
-              <span style={{ color: C.green, fontWeight: 700, borderTop: `1px solid ${C.border}`, paddingTop: "4px" }}>
+              <span
+                style={{
+                  color: C.green,
+                  fontWeight: 700,
+                  borderTop: `1px solid ${C.border}`,
+                  paddingTop: "4px",
+                }}
+              >
                 34,300 XAF
               </span>
             </div>
@@ -1150,8 +1449,20 @@ curl https://api.fonlok.com/v1/ping \\
 
           <ParamTable
             params={[
-              { name: "invoice_id", type: "string", required: true, description: "The id of the invoice to dispute. Must be in paid status." },
-              { name: "reason",     type: "string", required: true, description: "Description of the issue raised by the buyer. Max 1000 characters." },
+              {
+                name: "invoice_id",
+                type: "string",
+                required: true,
+                description:
+                  "The id of the invoice to dispute. Must be in paid status.",
+              },
+              {
+                name: "reason",
+                type: "string",
+                required: true,
+                description:
+                  "Description of the issue raised by the buyer. Max 1000 characters.",
+              },
             ]}
           />
 
@@ -1195,8 +1506,20 @@ curl https://api.fonlok.com/v1/ping \\
 
           <ParamTable
             params={[
-              { name: "url",   type: "string", required: true,  description: "Your HTTPS endpoint URL. Private and loopback IPs are rejected." },
-              { name: "label", type: "string", required: false, description: "A human-readable label to identify this webhook. Max 80 characters." },
+              {
+                name: "url",
+                type: "string",
+                required: true,
+                description:
+                  "Your HTTPS endpoint URL. Private and loopback IPs are rejected.",
+              },
+              {
+                name: "label",
+                type: "string",
+                required: false,
+                description:
+                  "A human-readable label to identify this webhook. Max 80 characters.",
+              },
             ]}
           />
 
@@ -1220,15 +1543,17 @@ curl https://api.fonlok.com/v1/ping \\
 }`}</Code>
 
           <Note>
-            Save <InlineCode>secret</InlineCode> in your environment variables as{" "}
-            <InlineCode>FONLOK_WEBHOOK_SECRET</InlineCode>. You must use it to
-            verify the <InlineCode>X-Fonlok-Signature</InlineCode> header on
+            Save <InlineCode>secret</InlineCode> in your environment variables
+            as <InlineCode>FONLOK_WEBHOOK_SECRET</InlineCode>. You must use it
+            to verify the <InlineCode>X-Fonlok-Signature</InlineCode> header on
             every incoming event.
           </Note>
 
           {/* GET /v1/webhooks */}
           <SubTitle id="list-webhooks">List webhooks</SubTitle>
-          <Lead>Returns all active webhook endpoints registered on your account.</Lead>
+          <Lead>
+            Returns all active webhook endpoints registered on your account.
+          </Lead>
           <Badge method="GET" path="/v1/webhooks" />
 
           <Code>{`curl https://api.fonlok.com/v1/webhooks \\
@@ -1402,17 +1727,41 @@ curl https://api.fonlok.com/v1/ping \\
             originated from Fonlok and was not tampered with in transit.
           </Lead>
 
-          <p style={{ color: C.muted, fontSize: "0.88rem", marginBottom: "0.75rem", fontWeight: 700 }}>
+          <p
+            style={{
+              color: C.muted,
+              fontSize: "0.88rem",
+              marginBottom: "0.75rem",
+              fontWeight: 700,
+            }}
+          >
             Algorithm
           </p>
-          <p style={{ color: C.muted, fontSize: "0.9rem", lineHeight: 1.75, marginBottom: "1rem" }}>
-            The signature is <InlineCode>sha256=&lt;HMAC-SHA256(rawBody, webhookSecret)&gt;</InlineCode>.
-            Compute it from the <strong>raw request body bytes</strong> — not the
-            parsed JSON object — and compare it to the header value using a
+          <p
+            style={{
+              color: C.muted,
+              fontSize: "0.9rem",
+              lineHeight: 1.75,
+              marginBottom: "1rem",
+            }}
+          >
+            The signature is{" "}
+            <InlineCode>
+              sha256=&lt;HMAC-SHA256(rawBody, webhookSecret)&gt;
+            </InlineCode>
+            . Compute it from the <strong>raw request body bytes</strong> — not
+            the parsed JSON object — and compare it to the header value using a
             constant-time comparison to prevent timing attacks.
           </p>
 
-          <p style={{ color: C.muted, fontSize: "0.88rem", marginBottom: "0.5rem", fontWeight: 700 }}>
+          <p
+            style={{
+              color: C.muted,
+              fontSize: "0.88rem",
+              marginBottom: "0.5rem",
+              fontWeight: 700,
+            }}
+          >
             Node.js
           </p>
           <Code>{`import crypto from "crypto";
@@ -1466,7 +1815,14 @@ app.post(
   },
 );`}</Code>
 
-          <p style={{ color: C.muted, fontSize: "0.88rem", marginBottom: "0.5rem", fontWeight: 700 }}>
+          <p
+            style={{
+              color: C.muted,
+              fontSize: "0.88rem",
+              marginBottom: "0.5rem",
+              fontWeight: 700,
+            }}
+          >
             Python
           </p>
           <Code>{`import hmac, hashlib, os
@@ -1514,7 +1870,13 @@ def fonlok_webhook():
               marginBottom: "1.5rem",
             }}
           >
-            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.84rem" }}>
+            <table
+              style={{
+                width: "100%",
+                borderCollapse: "collapse",
+                fontSize: "0.84rem",
+              }}
+            >
               <thead>
                 <tr style={{ background: C.bg }}>
                   {["Provider", "Prefix after 237", "Example"].map((h) => (
@@ -1538,16 +1900,46 @@ def fonlok_webhook():
               </thead>
               <tbody>
                 {[
-                  ["MTN MoMo",     "67x, 68x, 65x (0–4), 69x (9x)",  "237670123456"],
-                  ["Orange Money", "69x (non-9x), 65x (5–9), 69x", "237690123456"],
+                  ["MTN MoMo", "67x, 68x, 65x (0–4), 69x (9x)", "237670123456"],
+                  [
+                    "Orange Money",
+                    "69x (non-9x), 65x (5–9), 69x",
+                    "237690123456",
+                  ],
                 ].map(([provider, prefix, example], i) => (
                   <tr
                     key={provider}
-                    style={{ borderBottom: i === 0 ? `1px solid ${C.border}` : "none" }}
+                    style={{
+                      borderBottom: i === 0 ? `1px solid ${C.border}` : "none",
+                    }}
                   >
-                    <td style={{ padding: "0.75rem 1rem", fontWeight: 600, color: C.text }}>{provider}</td>
-                    <td style={{ padding: "0.75rem 1rem", color: C.muted, fontFamily: "monospace" }}>{prefix}</td>
-                    <td style={{ padding: "0.75rem 1rem", fontFamily: "monospace", color: C.navy }}>{example}</td>
+                    <td
+                      style={{
+                        padding: "0.75rem 1rem",
+                        fontWeight: 600,
+                        color: C.text,
+                      }}
+                    >
+                      {provider}
+                    </td>
+                    <td
+                      style={{
+                        padding: "0.75rem 1rem",
+                        color: C.muted,
+                        fontFamily: "monospace",
+                      }}
+                    >
+                      {prefix}
+                    </td>
+                    <td
+                      style={{
+                        padding: "0.75rem 1rem",
+                        fontFamily: "monospace",
+                        color: C.navy,
+                      }}
+                    >
+                      {example}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -1577,7 +1969,14 @@ def fonlok_webhook():
               marginTop: "2rem",
             }}
           >
-            <p style={{ margin: "0 0 0.5rem", fontWeight: 800, color: "#fff", fontSize: "1rem" }}>
+            <p
+              style={{
+                margin: "0 0 0.5rem",
+                fontWeight: 800,
+                color: "#fff",
+                fontSize: "1rem",
+              }}
+            >
               Need help with your integration?
             </p>
             <p style={{ margin: 0 }}>
@@ -1593,7 +1992,6 @@ def fonlok_webhook():
               to manage your API keys and test in the sandbox.
             </p>
           </div>
-
         </main>
       </div>
     </>

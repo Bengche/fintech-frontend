@@ -1115,9 +1115,9 @@ export default async function LandingPage() {
                     lineHeight: 1.7,
                   }}
                 >
-                  Neither buyers nor sellers need a Fonlok account to
-                  transact on Njimbong. The escrow service runs entirely in
-                  the background, providing protection for every order.
+                  Neither buyers nor sellers need a Fonlok account to transact
+                  on Njimbong. The escrow service runs entirely in the
+                  background, providing protection for every order.
                 </p>
                 <div>
                   <a
@@ -1171,7 +1171,8 @@ export default async function LandingPage() {
                     }}
                   >
                     Integrate Fonlok escrow and give your users the payment
-                    protection they need — with a single REST API call per order.
+                    protection they need — with a single REST API call per
+                    order.
                   </p>
                 </div>
                 <Link
