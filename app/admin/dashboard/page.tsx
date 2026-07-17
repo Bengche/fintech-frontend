@@ -116,7 +116,8 @@ type TabKey =
   | "controls"
   | "suspensions"
   | "audit"
-  | "inbox";
+  | "inbox"
+  | "live-keys";
 
 // ─── Main Component ────────────────────────────────────────────────────────────
 export default function AdminDashboard() {
@@ -139,6 +140,7 @@ export default function AdminDashboard() {
     { key: "suspensions", label: "Suspensions" },
     { key: "audit", label: "Audit Log" },
     { key: "inbox", label: "Inbox" },
+    { key: "live-keys", label: "Live API Keys" },
   ];
 
   // Auth state: null = checking, true = ok, false = not authed
@@ -188,6 +190,20 @@ export default function AdminDashboard() {
     "all" | "new" | "read" | "archived"
   >("new");
   const [inboxUpdatingId, setInboxUpdatingId] = useState<number | null>(null);
+
+  // Live API Keys tab state
+  const [liveKeys, setLiveKeys] = useState<Record<string, RowValue>[]>([]);
+  const [liveKeysLoading, setLiveKeysLoading] = useState(false);
+  const [liveKeysLoaded, setLiveKeysLoaded] = useState(false);
+  const [liveKeysError, setLiveKeysError] = useState("");
+  const [liveKeysFilter, setLiveKeysFilter] = useState<
+    "pending" | "approved" | "revoked" | "all"
+  >("pending");
+  const [liveKeyActionLoadingId, setLiveKeyActionLoadingId] = useState<
+    number | null
+  >(null);
+  const [liveKeyActionMsg, setLiveKeyActionMsg] = useState("");
+  const [liveKeyActionErr, setLiveKeyActionErr] = useState("");
 
   // User profile drilldown state
   const [profileUserId, setProfileUserId] = useState<number | null>(null);
@@ -389,7 +405,8 @@ export default function AdminDashboard() {
       activeTab === "verify" ||
       activeTab === "controls" ||
       activeTab === "suspensions" ||
-      activeTab === "inbox"
+      activeTab === "inbox" ||
+      activeTab === "live-keys"
     )
       return;
     const tabState = {
@@ -421,6 +438,35 @@ export default function AdminDashboard() {
     if (!authed || activeTab !== "suspensions") return;
     loadTab("suspensions", false, 0);
   }, [activeTab, authed, suspensionFilter, loadTab]);
+
+  const loadLiveKeys = useCallback(
+    async (filter: "pending" | "approved" | "revoked" | "all") => {
+      setLiveKeysLoading(true);
+      setLiveKeysError("");
+      try {
+        const res = await axios.get(
+          `${API_URL}/admin/live-keys?status=${filter}`,
+          { withCredentials: true },
+        );
+        setLiveKeys(res.data.keys || []);
+        setLiveKeysLoaded(true);
+      } catch (err: unknown) {
+        setLiveKeysError(
+          axios.isAxiosError(err) && err.response?.data?.message
+            ? err.response.data.message
+            : "Failed to load live keys.",
+        );
+      } finally {
+        setLiveKeysLoading(false);
+      }
+    },
+    [],
+  );
+
+  useEffect(() => {
+    if (!authed || activeTab !== "live-keys") return;
+    loadLiveKeys(liveKeysFilter);
+  }, [activeTab, authed, liveKeysFilter, loadLiveKeys]);
 
   // ── 5. Debounced user search for the direct-message picker ────────────────────
   useEffect(() => {
@@ -3571,6 +3617,25 @@ export default function AdminDashboard() {
           />
         )}
 
+        {/* ─────────────────────── LIVE API KEYS TAB ──────────────────────── */}
+        {activeTab === "live-keys" && (
+          <LiveKeysAdminTab
+            data={liveKeys}
+            loading={liveKeysLoading}
+            loaded={liveKeysLoaded}
+            error={liveKeysError}
+            filter={liveKeysFilter}
+            setFilter={setLiveKeysFilter}
+            actionLoadingId={liveKeyActionLoadingId}
+            setActionLoadingId={setLiveKeyActionLoadingId}
+            actionMsg={liveKeyActionMsg}
+            setActionMsg={setLiveKeyActionMsg}
+            actionErr={liveKeyActionErr}
+            setActionErr={setLiveKeyActionErr}
+            onReload={() => loadLiveKeys(liveKeysFilter)}
+          />
+        )}
+
         {/* ─────────────────────── INBOX TAB ─────────────────────────────────── */}
         {activeTab === "inbox" && (
           <SupportInboxTab
@@ -5596,6 +5661,448 @@ function SupportInboxTab({
           );
         })}
       </div>
+    </section>
+  );
+}
+
+// ─── Live API Keys Admin Tab ──────────────────────────────────────────────────
+function LiveKeysAdminTab({
+  data,
+  loading,
+  loaded,
+  error,
+  filter,
+  setFilter,
+  actionLoadingId,
+  setActionLoadingId,
+  actionMsg,
+  setActionMsg,
+  actionErr,
+  setActionErr,
+  onReload,
+}: {
+  data: Record<string, RowValue>[];
+  loading: boolean;
+  loaded: boolean;
+  error: string;
+  filter: "pending" | "approved" | "revoked" | "all";
+  setFilter: React.Dispatch<
+    React.SetStateAction<"pending" | "approved" | "revoked" | "all">
+  >;
+  actionLoadingId: number | null;
+  setActionLoadingId: React.Dispatch<React.SetStateAction<number | null>>;
+  actionMsg: string;
+  setActionMsg: React.Dispatch<React.SetStateAction<string>>;
+  actionErr: string;
+  setActionErr: React.Dispatch<React.SetStateAction<string>>;
+  onReload: () => void;
+}) {
+  const [rejectFormId, setRejectFormId] = useState<number | null>(null);
+  const [rejectReason, setRejectReason] = useState("");
+
+  const doApprove = async (id: number) => {
+    setActionMsg("");
+    setActionErr("");
+    setActionLoadingId(id);
+    try {
+      await axios.patch(
+        `${API_URL}/admin/live-keys/${id}/approve`,
+        {},
+        { withCredentials: true },
+      );
+      setActionMsg("Key approved. The applicant has been notified by email.");
+      onReload();
+    } catch (err: unknown) {
+      setActionErr(
+        axios.isAxiosError(err) && err.response?.data?.message
+          ? err.response.data.message
+          : "Approval failed.",
+      );
+    } finally {
+      setActionLoadingId(null);
+    }
+  };
+
+  const doReject = async (id: number) => {
+    setActionMsg("");
+    setActionErr("");
+    setActionLoadingId(id);
+    try {
+      await axios.patch(
+        `${API_URL}/admin/live-keys/${id}/reject`,
+        { reason: rejectReason.trim() || undefined },
+        { withCredentials: true },
+      );
+      setActionMsg("Key rejected. The applicant has been notified by email.");
+      setRejectFormId(null);
+      setRejectReason("");
+      onReload();
+    } catch (err: unknown) {
+      setActionErr(
+        axios.isAxiosError(err) && err.response?.data?.message
+          ? err.response.data.message
+          : "Rejection failed.",
+      );
+    } finally {
+      setActionLoadingId(null);
+    }
+  };
+
+  const doRevoke = async (id: number) => {
+    if (!window.confirm("Revoke this key? The holder will lose API access immediately.")) return;
+    setActionMsg("");
+    setActionErr("");
+    setActionLoadingId(id);
+    try {
+      await axios.delete(`${API_URL}/admin/live-keys/${id}`, {
+        withCredentials: true,
+      });
+      setActionMsg("Key revoked.");
+      onReload();
+    } catch (err: unknown) {
+      setActionErr(
+        axios.isAxiosError(err) && err.response?.data?.message
+          ? err.response.data.message
+          : "Revocation failed.",
+      );
+    } finally {
+      setActionLoadingId(null);
+    }
+  };
+
+  const FILTERS: { key: "pending" | "approved" | "revoked" | "all"; label: string }[] = [
+    { key: "pending", label: "Pending" },
+    { key: "approved", label: "Approved" },
+    { key: "revoked", label: "Revoked" },
+    { key: "all", label: "All" },
+  ];
+
+  const statusPill = (row: Record<string, RowValue>) => {
+    if (row.revoked_at && row.rejected_at) {
+      return { bg: "rgba(220,38,38,0.08)", bd: "rgba(220,38,38,0.24)", cl: "#991b1b", label: "Rejected" };
+    }
+    if (row.revoked_at) {
+      return { bg: "rgba(100,116,139,0.08)", bd: "rgba(100,116,139,0.2)", cl: "#475569", label: "Revoked" };
+    }
+    if (row.approved_at) {
+      return { bg: "rgba(22,163,74,0.1)", bd: "rgba(22,163,74,0.3)", cl: "#166534", label: "Approved" };
+    }
+    return { bg: "rgba(245,158,11,0.12)", bd: "rgba(245,158,11,0.32)", cl: "#92400e", label: "Pending" };
+  };
+
+  return (
+    <section
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: "1rem",
+        background: "var(--color-surface,#fff)",
+        borderRadius: "12px",
+        padding: "1rem",
+        boxShadow: "0 1px 4px rgba(0,0,0,0.07)",
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          gap: "0.75rem",
+          flexWrap: "wrap",
+        }}
+      >
+        <div>
+          <h3 style={{ margin: 0, fontSize: "1.05rem", fontWeight: 800 }}>
+            Live API Key Applications
+          </h3>
+          <p style={{ margin: "4px 0 0", fontSize: "0.84rem", color: "var(--color-text-muted)" }}>
+            Review and approve or reject live API key requests from platform partners.
+            Approved keys carry a 2% fee on every released payment.
+          </p>
+        </div>
+        <button
+          onClick={onReload}
+          disabled={loading}
+          style={{
+            padding: "0.45rem 1rem",
+            borderRadius: "8px",
+            border: "1px solid var(--color-border,#e2e8f0)",
+            background: "transparent",
+            cursor: loading ? "not-allowed" : "pointer",
+            fontSize: "0.82rem",
+            fontWeight: 600,
+          }}
+        >
+          {loading ? "Loading…" : "Refresh"}
+        </button>
+      </div>
+
+      {/* Filter pills */}
+      <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+        {FILTERS.map((f) => (
+          <button
+            key={f.key}
+            onClick={() => setFilter(f.key)}
+            style={{
+              padding: "0.35rem 0.9rem",
+              borderRadius: "999px",
+              fontSize: "0.8rem",
+              fontWeight: 700,
+              cursor: "pointer",
+              border: `1.5px solid ${filter === f.key ? "#0f1f3d" : "var(--color-border,#e2e8f0)"}`,
+              background: filter === f.key ? "#0f1f3d" : "transparent",
+              color: filter === f.key ? "#fff" : "var(--color-text-muted)",
+              transition: "all 0.15s",
+            }}
+          >
+            {f.label}
+          </button>
+        ))}
+      </div>
+
+      {actionMsg && (
+        <p style={{ margin: 0, color: "#16a34a", fontWeight: 600, fontSize: "0.88rem" }}>
+          {actionMsg}
+        </p>
+      )}
+      {actionErr && (
+        <p style={{ margin: 0, color: "#dc2626", fontWeight: 600, fontSize: "0.88rem" }}>
+          {actionErr}
+        </p>
+      )}
+
+      {loading && !loaded && (
+        <p style={{ color: "var(--color-text-muted)" }}>Loading…</p>
+      )}
+      {error && <p style={{ color: "#dc2626" }}>{error}</p>}
+
+      {loaded && data.length === 0 && (
+        <p style={{ color: "var(--color-text-muted)", fontSize: "0.9rem" }}>
+          No {filter === "all" ? "" : filter} keys found.
+        </p>
+      )}
+
+      {data.map((row) => {
+        const id = Number(row.id);
+        const pill = statusPill(row);
+        const isPending = !row.approved_at && !row.revoked_at;
+        const isApproved = !!row.approved_at && !row.revoked_at;
+        const isBusy = actionLoadingId === id;
+
+        return (
+          <div
+            key={id}
+            style={{
+              border: "1px solid var(--color-border,#e2e8f0)",
+              borderRadius: "10px",
+              padding: "1rem 1.25rem",
+              display: "flex",
+              flexDirection: "column",
+              gap: "0.6rem",
+            }}
+          >
+            {/* Header row */}
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "0.5rem" }}>
+              <div>
+                <span style={{ fontWeight: 800, fontSize: "0.95rem" }}>
+                  {String(row.company_name || "—")}
+                </span>
+                {row.website_url && (
+                  <a
+                    href={String(row.website_url)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ marginLeft: "0.5rem", color: "#2563eb", fontSize: "0.82rem" }}
+                  >
+                    {String(row.website_url)}
+                  </a>
+                )}
+              </div>
+              <span
+                style={{
+                  background: pill.bg,
+                  border: `1px solid ${pill.bd}`,
+                  color: pill.cl,
+                  borderRadius: "999px",
+                  padding: "0.2rem 0.65rem",
+                  fontSize: "0.75rem",
+                  fontWeight: 800,
+                }}
+              >
+                {pill.label}
+              </span>
+            </div>
+
+            {/* Details grid */}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: "0.4rem 1.5rem", fontSize: "0.83rem", color: "var(--color-text-muted)" }}>
+              <div>
+                <span style={{ fontWeight: 700, color: "var(--color-text)" }}>Applicant: </span>
+                {String(row.user_name || "—")} ({String(row.user_email || "—")})
+              </div>
+              <div>
+                <span style={{ fontWeight: 700, color: "var(--color-text)" }}>Key prefix: </span>
+                <code style={{ background: "#f1f5f9", padding: "1px 5px", borderRadius: "4px" }}>
+                  {String(row.key_prefix || "—")}…
+                </code>
+              </div>
+              <div>
+                <span style={{ fontWeight: 700, color: "var(--color-text)" }}>Label: </span>
+                {String(row.label || "—")}
+              </div>
+              <div>
+                <span style={{ fontWeight: 700, color: "var(--color-text)" }}>Applied: </span>
+                {row.created_at
+                  ? new Date(String(row.created_at)).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })
+                  : "—"}
+              </div>
+              {isApproved && (
+                <div>
+                  <span style={{ fontWeight: 700, color: "var(--color-text)" }}>Requests: </span>
+                  {String(row.request_count ?? 0)}
+                </div>
+              )}
+              {row.rejection_reason && (
+                <div style={{ gridColumn: "1 / -1" }}>
+                  <span style={{ fontWeight: 700, color: "var(--color-text)" }}>Rejection reason: </span>
+                  {String(row.rejection_reason)}
+                </div>
+              )}
+            </div>
+
+            {/* Use case */}
+            {row.use_case && (
+              <div
+                style={{
+                  background: "#f8fafc",
+                  borderRadius: "6px",
+                  padding: "0.5rem 0.75rem",
+                  fontSize: "0.83rem",
+                  color: "#334155",
+                  borderLeft: "3px solid #cbd5e1",
+                }}
+              >
+                <span style={{ fontWeight: 700 }}>Use case: </span>
+                {String(row.use_case)}
+              </div>
+            )}
+
+            {/* Actions */}
+            {isPending && (
+              <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+                <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+                  <button
+                    disabled={isBusy}
+                    onClick={() => doApprove(id)}
+                    style={{
+                      padding: "0.4rem 1.1rem",
+                      borderRadius: "8px",
+                      border: "none",
+                      background: isBusy ? "#86efac" : "#16a34a",
+                      color: "#fff",
+                      fontWeight: 700,
+                      fontSize: "0.82rem",
+                      cursor: isBusy ? "not-allowed" : "pointer",
+                    }}
+                  >
+                    {isBusy ? "Processing…" : "Approve"}
+                  </button>
+                  <button
+                    disabled={isBusy}
+                    onClick={() => {
+                      setRejectFormId(rejectFormId === id ? null : id);
+                      setRejectReason("");
+                    }}
+                    style={{
+                      padding: "0.4rem 1.1rem",
+                      borderRadius: "8px",
+                      border: "1px solid #fca5a5",
+                      background: "transparent",
+                      color: "#dc2626",
+                      fontWeight: 700,
+                      fontSize: "0.82rem",
+                      cursor: isBusy ? "not-allowed" : "pointer",
+                    }}
+                  >
+                    Reject
+                  </button>
+                </div>
+                {rejectFormId === id && (
+                  <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
+                    <textarea
+                      placeholder="Reason for rejection (optional but recommended)"
+                      value={rejectReason}
+                      onChange={(e) => setRejectReason(e.target.value)}
+                      rows={2}
+                      style={{
+                        width: "100%",
+                        maxWidth: "480px",
+                        padding: "0.5rem 0.75rem",
+                        borderRadius: "6px",
+                        border: "1px solid var(--color-border,#e2e8f0)",
+                        fontSize: "0.83rem",
+                        resize: "vertical",
+                        boxSizing: "border-box",
+                      }}
+                    />
+                    <div style={{ display: "flex", gap: "0.4rem" }}>
+                      <button
+                        disabled={isBusy}
+                        onClick={() => doReject(id)}
+                        style={{
+                          padding: "0.35rem 0.9rem",
+                          borderRadius: "6px",
+                          border: "none",
+                          background: "#dc2626",
+                          color: "#fff",
+                          fontWeight: 700,
+                          fontSize: "0.8rem",
+                          cursor: isBusy ? "not-allowed" : "pointer",
+                        }}
+                      >
+                        {isBusy ? "Rejecting…" : "Confirm Reject"}
+                      </button>
+                      <button
+                        onClick={() => setRejectFormId(null)}
+                        style={{
+                          padding: "0.35rem 0.9rem",
+                          borderRadius: "6px",
+                          border: "1px solid var(--color-border,#e2e8f0)",
+                          background: "transparent",
+                          fontWeight: 600,
+                          fontSize: "0.8rem",
+                          cursor: "pointer",
+                        }}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+            {isApproved && (
+              <div>
+                <button
+                  disabled={isBusy}
+                  onClick={() => doRevoke(id)}
+                  style={{
+                    padding: "0.35rem 0.9rem",
+                    borderRadius: "6px",
+                    border: "1px solid #fca5a5",
+                    background: "transparent",
+                    color: "#dc2626",
+                    fontWeight: 700,
+                    fontSize: "0.8rem",
+                    cursor: isBusy ? "not-allowed" : "pointer",
+                  }}
+                >
+                  {isBusy ? "Revoking…" : "Revoke Key"}
+                </button>
+              </div>
+            )}
+          </div>
+        );
+      })}
     </section>
   );
 }
