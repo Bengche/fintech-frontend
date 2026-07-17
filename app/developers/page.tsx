@@ -496,6 +496,23 @@ export default function DevelopersPage() {
               >
                 Request live access
               </a>
+              <a
+                href="/api-reference"
+                style={{
+                  display: "inline-block",
+                  padding: "0.625rem 1.375rem",
+                  borderRadius: "8px",
+                  border: "1px solid var(--color-primary)",
+                  color: "var(--color-primary)",
+                  fontWeight: 700,
+                  fontSize: "0.875rem",
+                  textDecoration: "none",
+                  whiteSpace: "nowrap",
+                  flexShrink: 0,
+                }}
+              >
+                View full API reference
+              </a>
             </div>
           </div>
         </section>
