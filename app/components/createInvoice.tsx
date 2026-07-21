@@ -24,7 +24,6 @@ export default function CreateInvoice({
   const [invoiceError, setInvoiceError] = useState("");
   const [saveTemplateSuccess, setSaveTemplateSuccess] = useState("");
   const [formData, setFormData] = useState({
-    email: "",
     currency: "XAF",
     amount: "",
     invoicename: "",
@@ -45,20 +44,6 @@ export default function CreateInvoice({
     };
   }, [sellerLogoPreview]);
 
-  // --- Email ownership check ---
-  const [myEmail, setMyEmail] = useState<string | null>(null);
-  const emailMismatch =
-    myEmail !== null &&
-    formData.email.trim() !== "" &&
-    formData.email.trim().toLowerCase() !== myEmail.toLowerCase();
-
-  // Fetch authenticated user's email when the modal opens
-  useEffect(() => {
-    if (!openModal) return;
-    Axios.get(`${API}/user/me`, { withCredentials: true })
-      .then((res) => setMyEmail(res.data.email ?? null))
-      .catch(() => setMyEmail(null));
-  }, [openModal]);
 
   // --- Installment payment state ---
   const [paymentType, setPaymentType] = useState<"full" | "installment">(
@@ -90,7 +75,6 @@ export default function CreateInvoice({
 
   const resetForm = () => {
     setFormData({
-      email: "",
       currency: "XAF",
       amount: "",
       invoicename: "",
@@ -114,7 +98,6 @@ export default function CreateInvoice({
     setOpenModal(false);
     setInvoiceError("");
     setSaveTemplateSuccess("");
-    setMyEmail(null);
     setShowSaveTemplate(false);
     setTemplateName("");
     setSellerLogo(null);
@@ -161,7 +144,6 @@ export default function CreateInvoice({
     try {
       const payload = new FormData();
       payload.append("invoicename", formData.invoicename);
-      payload.append("email", formData.email);
       payload.append("currency", formData.currency || "XAF");
       payload.append("amount", formData.amount);
       payload.append("description", formData.description);
@@ -389,105 +371,21 @@ export default function CreateInvoice({
 
                 <div style={{ height: "1rem" }} />
 
-                {/* Identity notice */}
-                <div
-                  style={{
-                    marginBottom: "1.25rem",
-                    padding: "0.625rem 0.875rem",
-                    backgroundColor: "#fef3c7",
-                    border: "1px solid #f59e0b",
-                    borderRadius: "var(--radius-sm)",
-                    color: "#92400e",
-                    fontSize: "0.8125rem",
-                    lineHeight: 1.5,
-                  }}
-                >
-                  ⚠️ {t("create.identityNotice")}
-                </div>
-
-                {/* Invoice name + email (two columns on wider screens) */}
-                <div
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns:
-                      "repeat(auto-fill, minmax(230px, 1fr))",
-                    gap: "1rem",
-                    marginBottom: "1rem",
-                  }}
-                >
-                  <div>
-                    <label className="label" htmlFor="invoicename">
-                      {t("create.invoiceName")}
-                    </label>
-                    <input
-                      className="input"
-                      placeholder={t("create.invoiceNamePlaceholder")}
-                      id="invoicename"
-                      name="invoicename"
-                      type="text"
-                      required
-                      onChange={handleChange}
-                      value={formData.invoicename}
-                    />
-                  </div>
-                  <div>
-                    <label className="label" htmlFor="email">
-                      {t("create.accountEmail")}
-                    </label>
-                    <input
-                      className="input"
-                      id="email"
-                      name="email"
-                      type="email"
-                      placeholder="you@example.com"
-                      required
-                      onChange={handleChange}
-                      value={formData.email}
-                      style={
-                        emailMismatch ? { borderColor: "#dc2626" } : undefined
-                      }
-                    />
-                    {emailMismatch && (
-                      <div
-                        style={{
-                          marginTop: "0.5rem",
-                          padding: "0.75rem 1rem",
-                          backgroundColor: "#fef2f2",
-                          border: "1px solid #fca5a5",
-                          borderRadius: "var(--radius-sm, 6px)",
-                          color: "#991b1b",
-                          fontSize: "0.8125rem",
-                          lineHeight: 1.55,
-                        }}
-                      >
-                        <div
-                          style={{
-                            fontWeight: 700,
-                            marginBottom: "0.3rem",
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "0.375rem",
-                          }}
-                        >
-                          🚫 {t("create.wrongEmailTitle")}
-                        </div>
-                        <p style={{ margin: 0 }}>
-                          {t("create.wrongEmailBody")}
-                        </p>
-                        {myEmail && (
-                          <p
-                            style={{
-                              margin: "0.4rem 0 0",
-                              fontStyle: "italic",
-                              color: "#b91c1c",
-                            }}
-                          >
-                            {t("create.wrongEmailHint")}
-                          </p>
-                        )}
-                      </div>
-                    )}
-                  </div>
+                {/* Invoice name */}
+                <div style={{ marginBottom: "1rem" }}>
+                  <label className="label" htmlFor="invoicename">
+                    {t("create.invoiceName")}
+                  </label>
+                  <input
+                    className="input"
+                    placeholder={t("create.invoiceNamePlaceholder")}
+                    id="invoicename"
+                    name="invoicename"
+                    type="text"
+                    required
+                    onChange={handleChange}
+                    value={formData.invoicename}
+                  />
                 </div>
 
                 {/* Currency + amount */}
@@ -1032,14 +930,11 @@ export default function CreateInvoice({
                   <button
                     type="submit"
                     className="btn-primary"
-                    disabled={isSubmitting || emailMismatch}
+                    disabled={isSubmitting}
                     style={{
                       fontSize: "0.9375rem",
-                      cursor:
-                        isSubmitting || emailMismatch
-                          ? "not-allowed"
-                          : "pointer",
-                      opacity: isSubmitting || emailMismatch ? 0.65 : 1,
+                      cursor: isSubmitting ? "not-allowed" : "pointer",
+                      opacity: isSubmitting ? 0.65 : 1,
                     }}
                   >
                     {isSubmitting ? t("create.submitting") : t("create.submit")}
