@@ -29,9 +29,11 @@ export default function BuyerChatPage() {
   const { invoice_number } = useParams<{ invoice_number: string }>();
   const t = useTranslations("BuyerChat");
 
-  // Read the token from the URL e.g. /chat/INV-123?token=abc123
+  // Read the token and role from the URL e.g. /chat/INV-123?token=abc123&role=buyer
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
+  // role=seller is set in links sent to the seller party (API-based disputes)
+  const role = searchParams.get("role") === "seller" ? "seller" : "buyer";
   // dispute=true is added to the URL when the buyer clicks "Open a Dispute" from their email
   const openDisputeDirectly = searchParams.get("dispute") === "true";
 
@@ -150,7 +152,7 @@ export default function BuyerChatPage() {
     try {
       await Axios.post(`${API}/chat/send/${invoice_number}`, {
         message: newMessage,
-        sender_type: "buyer",
+        sender_type: role,
         token: token,
       });
       setNewMessage("");
@@ -166,7 +168,7 @@ export default function BuyerChatPage() {
 
     const formData = new FormData();
     formData.append("file", selectedFile);
-    formData.append("sender_type", "buyer");
+    formData.append("sender_type", role);
     formData.append("token", token || "");
 
     setIsUploading(true);
