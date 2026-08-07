@@ -25,8 +25,27 @@ import MobileBottomNav from "./MobileBottomNav";
 // Paths (prefix-matched) that should NOT receive any global chrome.
 const EXCLUDED_PREFIXES = ["/admin", "/maintenance", "/offline"];
 
-// Paths that manage their own top nav.
-// LayoutShell still adds SiteFooter on these routes.
+// Paths whose page component renders its own <SiteHeader>.
+// The global dark Navbar must NOT be added on top of these.
+// LayoutShell still injects DashboardSidebar (logged-in desktop) and
+// MobileBottomNav (logged-in mobile), and still adds SiteFooter.
+const SITE_HEADER_PREFIXES = [
+  "/faq",
+  "/pricing",
+  "/contact",
+  "/how-it-works",
+  "/privacy",
+  "/terms",
+  "/developers",
+  "/settings",
+  "/blog",
+  "/api-reference",
+  "/referral-programme",
+  "/kyc",
+];
+
+// Paths that manage their own top nav AND suppress the sidebar/mobile nav
+// (e.g. the homepage has a fully custom layout).
 const CUSTOM_NAV_PATHS = ["/"];
 
 export default function LayoutShell({
@@ -43,7 +62,10 @@ export default function LayoutShell({
 
   if (excluded) return <>{children}</>;
 
-  const showNavbar = !CUSTOM_NAV_PATHS.includes(pathname);
+  const hasSiteHeader = SITE_HEADER_PREFIXES.some((p) =>
+    pathname.startsWith(p),
+  );
+  const showNavbar = !CUSTOM_NAV_PATHS.includes(pathname) && !hasSiteHeader;
   const isLoggedIn = !authLoading && !!user_id;
 
   if (isLoggedIn) {
@@ -61,9 +83,9 @@ export default function LayoutShell({
             flexDirection: "column",
           }}
         >
-          {/* Top navbar — visible only on mobile/tablet (lg: hidden).
-              Suppressed on pages that render their own top nav (e.g. homepage). */}
-          {!CUSTOM_NAV_PATHS.includes(pathname) && (
+          {/* Mobile top navbar — only when the page does NOT render its own
+              SiteHeader and is not a custom-nav page. Suppressed on lg+. */}
+          {!CUSTOM_NAV_PATHS.includes(pathname) && !hasSiteHeader && (
             <div className="lg:hidden">
               <Navbar />
             </div>

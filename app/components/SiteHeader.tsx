@@ -89,27 +89,30 @@ export default function SiteHeader() {
           <FonlokLogo variant="dark" iconSize={32} />
         </Link>
 
-        {/* Desktop nav links — hidden on mobile */}
-        <nav
-          aria-label="Site navigation"
-          className="hidden md:flex"
-          style={{ gap: "2rem", alignItems: "center" }}
-        >
-          {NAV_LINKS.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              style={{
-                fontSize: "0.9rem",
-                fontWeight: 500,
-                color: "var(--color-text-body)",
-                textDecoration: "none",
-              }}
-            >
-              {link.label}
-            </Link>
-          ))}
-        </nav>
+        {/* Desktop nav links — marketing pages only; hidden when logged in
+            (the sidebar already covers navigation for authenticated users) */}
+        {!user_id && (
+          <nav
+            aria-label="Site navigation"
+            className="hidden md:flex"
+            style={{ gap: "2rem", alignItems: "center" }}
+          >
+            {NAV_LINKS.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                style={{
+                  fontSize: "0.9rem",
+                  fontWeight: 500,
+                  color: "var(--color-text-body)",
+                  textDecoration: "none",
+                }}
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
+        )}
 
         {/* Desktop auth buttons + language switcher — hidden on mobile */}
         <div
@@ -368,32 +371,35 @@ export default function SiteHeader() {
             padding: "1rem 1.5rem 1.5rem",
           }}
         >
-          <nav
-            aria-label="Mobile navigation"
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              marginBottom: "1.25rem",
-            }}
-          >
-            {NAV_LINKS.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={() => setMobileOpen(false)}
-                style={{
-                  fontSize: "1rem",
-                  fontWeight: 500,
-                  color: "var(--color-text-body)",
-                  padding: "0.75rem 0",
-                  textDecoration: "none",
-                  borderBottom: "1px solid var(--color-border)",
-                }}
-              >
-                {link.label}
-              </Link>
-            ))}
-          </nav>
+          {/* Marketing nav links — only shown to logged-out visitors */}
+          {!user_id && (
+            <nav
+              aria-label="Mobile navigation"
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                marginBottom: "1.25rem",
+              }}
+            >
+              {NAV_LINKS.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => setMobileOpen(false)}
+                  style={{
+                    fontSize: "1rem",
+                    fontWeight: 500,
+                    color: "var(--color-text-body)",
+                    padding: "0.75rem 0",
+                    textDecoration: "none",
+                    borderBottom: "1px solid var(--color-border)",
+                  }}
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </nav>
+          )}
 
           <div
             style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}

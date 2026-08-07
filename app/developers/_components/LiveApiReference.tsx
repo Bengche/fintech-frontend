@@ -22,6 +22,7 @@
  */
 
 import type { ReactNode } from "react";
+import CodeTabs from "./CodeTabs";
 
 const BASE =
   process.env.NEXT_PUBLIC_API_BASE_URL || "https://your-backend.railway.app";
@@ -224,6 +225,8 @@ interface EndpointProps {
   description: string;
   params?: ParamRow[];
   curlExample?: string;
+  jsExample?: string;
+  pythonExample?: string;
   responseExample: string;
   notes?: ReactNode;
 }
@@ -234,6 +237,8 @@ function Endpoint({
   description,
   params,
   curlExample,
+  jsExample,
+  pythonExample,
   responseExample,
   notes,
 }: EndpointProps) {
@@ -321,7 +326,9 @@ function Endpoint({
           </>
         )}
 
-        {curlExample && <CodeBlock label="cURL">{curlExample}</CodeBlock>}
+        {(curlExample || jsExample || pythonExample) && (
+          <CodeTabs curl={curlExample} js={jsExample} python={pythonExample} />
+        )}
 
         <p
           style={{
@@ -581,6 +588,15 @@ export default function LiveApiReference() {
           description="Health check. Verifies that your live key is valid and the API is reachable. Returns a JSON object confirming the environment. Does not initiate any transaction."
           curlExample={`curl ${BASE}/v1/ping \\
   -H "Authorization: Bearer sk_live_..."`}
+          jsExample={`const res = await fetch('${BASE}/v1/ping', {
+  headers: { Authorization: 'Bearer sk_live_...' }
+});
+const data = await res.json();`}
+          pythonExample={`import requests
+
+res = requests.get('${BASE}/v1/ping',
+    headers={'Authorization': 'Bearer sk_live_...'})
+data = res.json()`}
           responseExample={`{
   "object": "api_status",
   "status": "ok",
@@ -692,6 +708,41 @@ export default function LiveApiReference() {
     "reference": "order_789",
     "expires_at": "2026-12-31"
   }'`}
+          jsExample={`const res = await fetch('${BASE}/v1/invoices', {
+  method: 'POST',
+  headers: {
+    Authorization: 'Bearer sk_live_...',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    title: 'iPhone 15 Pro',
+    amount: 850000,
+    seller_name: 'Jean Fotso',
+    seller_email: 'jean@example.com',
+    seller_phone: '237670000001',
+    buyer_email: 'buyer@example.com',
+    description: 'Brand new, sealed box',
+    reference: 'order_789',
+    expires_at: '2026-12-31'
+  })
+});
+const invoice = await res.json();`}
+          pythonExample={`import requests
+
+res = requests.post('${BASE}/v1/invoices',
+    headers={'Authorization': 'Bearer sk_live_...'},
+    json={
+        'title': 'iPhone 15 Pro',
+        'amount': 850000,
+        'seller_name': 'Jean Fotso',
+        'seller_email': 'jean@example.com',
+        'seller_phone': '237670000001',
+        'buyer_email': 'buyer@example.com',
+        'description': 'Brand new, sealed box',
+        'reference': 'order_789',
+        'expires_at': '2026-12-31'
+    })
+invoice = res.json()`}
           responseExample={`HTTP 201 Created
 
 {
@@ -731,6 +782,15 @@ export default function LiveApiReference() {
           description="Retrieve a single invoice by its ID (the invoicenumber returned on creation). Returns the complete invoice object including current status, payment URL, timestamps, and — when disputed — secure chat links for both parties."
           curlExample={`curl ${BASE}/v1/invoices/42-a1b2c3d4e5f6 \\
   -H "Authorization: Bearer sk_live_..."`}
+          jsExample={`const res = await fetch('${BASE}/v1/invoices/42-a1b2c3d4e5f6', {
+  headers: { Authorization: 'Bearer sk_live_...' }
+});
+const invoice = await res.json();`}
+          pythonExample={`import requests
+
+res = requests.get('${BASE}/v1/invoices/42-a1b2c3d4e5f6',
+    headers={'Authorization': 'Bearer sk_live_...'})
+invoice = res.json()`}
           responseExample={`{
   "object": "invoice",
   "id": "42-a1b2c3d4e5f6",
@@ -812,6 +872,29 @@ export default function LiveApiReference() {
     "phone_number": "237670000000",
     "buyer_email": "buyer@example.com"
   }'`}
+          jsExample={`const res = await fetch('${BASE}/v1/payments/initiate', {
+  method: 'POST',
+  headers: {
+    Authorization: 'Bearer sk_live_...',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    invoice_id: '42-a1b2c3d4e5f6',
+    phone_number: '237670000000',
+    buyer_email: 'buyer@example.com'
+  })
+});
+const payment = await res.json();`}
+          pythonExample={`import requests
+
+res = requests.post('${BASE}/v1/payments/initiate',
+    headers={'Authorization': 'Bearer sk_live_...'},
+    json={
+        'invoice_id': '42-a1b2c3d4e5f6',
+        'phone_number': '237670000000',
+        'buyer_email': 'buyer@example.com'
+    })
+payment = res.json()`}
           responseExample={`HTTP 201 Created
 
 {
@@ -844,6 +927,16 @@ export default function LiveApiReference() {
           description="Poll the status of a payment using the reference UUID returned by POST /v1/payments/initiate. Returns the payment status and the associated invoice status."
           curlExample={`curl ${BASE}/v1/payments/a1b2c3d4-e5f6-7890-abcd-ef1234567890/status \\
   -H "Authorization: Bearer sk_live_..."`}
+          jsExample={`const res = await fetch('${BASE}/v1/payments/a1b2c3d4-e5f6-7890-abcd-ef1234567890/status', {
+  headers: { Authorization: 'Bearer sk_live_...' }
+});
+const status = await res.json();`}
+          pythonExample={`import requests
+
+ref = 'a1b2c3d4-e5f6-7890-abcd-ef1234567890'
+res = requests.get(f'${BASE}/v1/payments/{ref}/status',
+    headers={'Authorization': 'Bearer sk_live_...'})
+status = res.json()`}
           responseExample={`{
   "object": "payment_status",
   "reference": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
@@ -885,6 +978,21 @@ export default function LiveApiReference() {
   -H "Authorization: Bearer sk_live_..." \\
   -H "Content-Type: application/json" \\
   -d '{"invoice_id": "42-a1b2c3d4e5f6"}'`}
+          jsExample={`const res = await fetch('${BASE}/v1/payments/release', {
+  method: 'POST',
+  headers: {
+    Authorization: 'Bearer sk_live_...',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({ invoice_id: '42-a1b2c3d4e5f6' })
+});
+const release = await res.json();`}
+          pythonExample={`import requests
+
+res = requests.post('${BASE}/v1/payments/release',
+    headers={'Authorization': 'Bearer sk_live_...'},
+    json={'invoice_id': '42-a1b2c3d4e5f6'})
+release = res.json()`}
           responseExample={`{
   "object": "release",
   "invoice_id": "42-a1b2c3d4e5f6",
@@ -943,6 +1051,29 @@ export default function LiveApiReference() {
     "reason": "Item was not as described. Phone has a cracked screen.",
     "context": "Buyer reported this on 2025-01-15 at 14:30. Photos: ..."
   }'`}
+          jsExample={`const res = await fetch('${BASE}/v1/payments/dispute', {
+  method: 'POST',
+  headers: {
+    Authorization: 'Bearer sk_live_...',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    invoice_id: '42-a1b2c3d4e5f6',
+    reason: 'Item was not as described. Phone has a cracked screen.',
+    context: 'Buyer reported this on 2025-01-15 at 14:30. Photos: ...'
+  })
+});
+const dispute = await res.json();`}
+          pythonExample={`import requests
+
+res = requests.post('${BASE}/v1/payments/dispute',
+    headers={'Authorization': 'Bearer sk_live_...'},
+    json={
+        'invoice_id': '42-a1b2c3d4e5f6',
+        'reason': 'Item was not as described. Phone has a cracked screen.',
+        'context': 'Buyer reported this on 2025-01-15 at 14:30. Photos: ...'
+    })
+dispute = res.json()`}
           responseExample={`{
   "object": "dispute",
   "invoice_id": "42-a1b2c3d4e5f6",
@@ -1001,6 +1132,27 @@ export default function LiveApiReference() {
     "invoice_id": "42-a1b2c3d4e5f6",
     "user_ref": "user_1234"
   }'`}
+          jsExample={`const res = await fetch('${BASE}/v1/wallet/pay', {
+  method: 'POST',
+  headers: {
+    Authorization: 'Bearer sk_live_...',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    invoice_id: '42-a1b2c3d4e5f6',
+    user_ref: 'user_1234'
+  })
+});
+const result = await res.json();`}
+          pythonExample={`import requests
+
+res = requests.post('${BASE}/v1/wallet/pay',
+    headers={'Authorization': 'Bearer sk_live_...'},
+    json={
+        'invoice_id': '42-a1b2c3d4e5f6',
+        'user_ref': 'user_1234'
+    })
+result = res.json()`}
           responseExample={`{
   "invoice_id": "42-a1b2c3d4e5f6",
   "invoice_name": "iPhone 15 Pro",
@@ -1071,6 +1223,29 @@ export default function LiveApiReference() {
     "phone": "237670000000",
     "user_ref": "user_1234"
   }'`}
+          jsExample={`const res = await fetch('${BASE}/v1/wallet/deposit/initiate', {
+  method: 'POST',
+  headers: {
+    Authorization: 'Bearer sk_live_...',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    amount: 10000,
+    phone: '237670000000',
+    user_ref: 'user_1234'
+  })
+});
+const deposit = await res.json();`}
+          pythonExample={`import requests
+
+res = requests.post('${BASE}/v1/wallet/deposit/initiate',
+    headers={'Authorization': 'Bearer sk_live_...'},
+    json={
+        'amount': 10000,
+        'phone': '237670000000',
+        'user_ref': 'user_1234'
+    })
+deposit = res.json()`}
           responseExample={`HTTP 202 Accepted
 
 {
@@ -1100,6 +1275,15 @@ export default function LiveApiReference() {
           description="Poll Campay for the status of a pending deposit. On the first SUCCESSFUL response the wallet is credited atomically. Safe to call multiple times — idempotent."
           curlExample={`curl ${BASE}/v1/wallet/deposit/campay-ref-abc123/status \\
   -H "Authorization: Bearer sk_live_..."`}
+          jsExample={`const res = await fetch('${BASE}/v1/wallet/deposit/campay-ref-abc123/status', {
+  headers: { Authorization: 'Bearer sk_live_...' }
+});
+const status = await res.json();`}
+          pythonExample={`import requests
+
+res = requests.get('${BASE}/v1/wallet/deposit/campay-ref-abc123/status',
+    headers={'Authorization': 'Bearer sk_live_...'})
+status = res.json()`}
           responseExample={`// Completed — wallet credited
 {
   "reference": "campay-ref-abc123",
@@ -1132,6 +1316,16 @@ export default function LiveApiReference() {
           description="Return the current wallet balance for a user_ref. Returns 0 if no wallet exists yet."
           curlExample={`curl "${BASE}/v1/wallet/balance?user_ref=user_1234" \\
   -H "Authorization: Bearer sk_live_..."`}
+          jsExample={`const res = await fetch('${BASE}/v1/wallet/balance?user_ref=user_1234', {
+  headers: { Authorization: 'Bearer sk_live_...' }
+});
+const { balance } = await res.json();`}
+          pythonExample={`import requests
+
+res = requests.get('${BASE}/v1/wallet/balance',
+    headers={'Authorization': 'Bearer sk_live_...'},
+    params={'user_ref': 'user_1234'})
+balance = res.json()['balance']`}
           responseExample={`{
   "user_ref": "user_1234",
   "balance": 10000,
@@ -1188,6 +1382,29 @@ export default function LiveApiReference() {
     "phone": "237670000000",
     "user_ref": "user_1234"
   }'`}
+          jsExample={`const res = await fetch('${BASE}/v1/wallet/withdraw', {
+  method: 'POST',
+  headers: {
+    Authorization: 'Bearer sk_live_...',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    amount: 5000,
+    phone: '237670000000',
+    user_ref: 'user_1234'
+  })
+});
+const withdrawal = await res.json();`}
+          pythonExample={`import requests
+
+res = requests.post('${BASE}/v1/wallet/withdraw',
+    headers={'Authorization': 'Bearer sk_live_...'},
+    json={
+        'amount': 5000,
+        'phone': '237670000000',
+        'user_ref': 'user_1234'
+    })
+withdrawal = res.json()`}
           responseExample={`{
   "transaction_id": 91,
   "reference": "campay-wdr-ref-xyz789",
@@ -1244,6 +1461,29 @@ export default function LiveApiReference() {
     "url": "https://yourapp.com/webhooks/fonlok",
     "label": "Production webhook"
   }'`}
+          jsExample={`const res = await fetch('${BASE}/v1/webhooks/register', {
+  method: 'POST',
+  headers: {
+    Authorization: 'Bearer sk_live_...',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    url: 'https://yourapp.com/webhooks/fonlok',
+    label: 'Production webhook'
+  })
+});
+const webhook = await res.json();
+// Store webhook.secret immediately — shown only once`}
+          pythonExample={`import requests
+
+res = requests.post('${BASE}/v1/webhooks/register',
+    headers={'Authorization': 'Bearer sk_live_...'},
+    json={
+        'url': 'https://yourapp.com/webhooks/fonlok',
+        'label': 'Production webhook'
+    })
+webhook = res.json()
+# Store webhook['secret'] immediately — shown only once`}
           responseExample={`HTTP 201 Created
 
 {
@@ -1271,6 +1511,15 @@ export default function LiveApiReference() {
           description="List all registered webhook endpoints for your API key, including active status and the last time an event was delivered. Secrets are never returned after initial registration."
           curlExample={`curl ${BASE}/v1/webhooks \\
   -H "Authorization: Bearer sk_live_..."`}
+          jsExample={`const res = await fetch('${BASE}/v1/webhooks', {
+  headers: { Authorization: 'Bearer sk_live_...' }
+});
+const { data: webhooks } = await res.json();`}
+          pythonExample={`import requests
+
+res = requests.get('${BASE}/v1/webhooks',
+    headers={'Authorization': 'Bearer sk_live_...'})
+webhooks = res.json()['data']`}
           responseExample={`{
   "object": "list",
   "data": [
@@ -1293,6 +1542,16 @@ export default function LiveApiReference() {
           curlExample={`curl ${BASE}/v1/webhooks/12 \\
   -X DELETE \\
   -H "Authorization: Bearer sk_live_..."`}
+          jsExample={`const res = await fetch('${BASE}/v1/webhooks/12', {
+  method: 'DELETE',
+  headers: { Authorization: 'Bearer sk_live_...' }
+});
+const result = await res.json();`}
+          pythonExample={`import requests
+
+res = requests.delete('${BASE}/v1/webhooks/12',
+    headers={'Authorization': 'Bearer sk_live_...'})
+result = res.json()`}
           responseExample={`{
   "object": "webhook",
   "id": 12,
