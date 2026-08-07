@@ -482,7 +482,7 @@ export default function DevelopersPage() {
                 </p>
               </div>
               <a
-                href="mailto:support@fonlok.com?subject=Production API Access"
+                href="#live-keys"
                 style={{
                   display: "inline-block",
                   padding: "0.625rem 1.375rem",
