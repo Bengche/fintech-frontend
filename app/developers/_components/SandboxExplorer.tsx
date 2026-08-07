@@ -19,14 +19,12 @@ import { useState, useCallback } from "react";
 const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
 
 // DOCS_API_URL is used only in generated code snippets (cURL, JS, Python).
-// It defaults to the canonical public API base so that docs show a clean URL
-// rather than a raw infrastructure URL (e.g. a Railway subdomain).
-// Set NEXT_PUBLIC_API_DOCS_BASE_URL in your frontend env if your public API
-// domain differs from NEXT_PUBLIC_API_BASE_URL.
+// Set NEXT_PUBLIC_API_DOCS_BASE_URL in your frontend env to override the URL
+// shown in code examples. Falls back to the configured API base URL.
 const DOCS_API_URL =
   process.env.NEXT_PUBLIC_API_DOCS_BASE_URL ||
   process.env.NEXT_PUBLIC_API_BASE_URL ||
-  "https://api.fonlok.com";
+  "http://localhost:5000";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 

@@ -11,7 +11,9 @@
 import type { Metadata } from "next";
 import SiteHeader from "../components/SiteHeader";
 import SandboxKeyManager from "./_components/SandboxKeyManager";
+import LiveKeyManager from "./_components/LiveKeyManager";
 import SandboxExplorer from "./_components/SandboxExplorer";
+import LiveApiReference from "./_components/LiveApiReference";
 
 export const metadata: Metadata = {
   title: "Developer API — Sandbox & Live Integration",
@@ -296,7 +298,7 @@ export default function DevelopersPage() {
                 Open API explorer
               </a>
               <a
-                href="#keys"
+                href="#live-keys"
                 style={{
                   display: "inline-block",
                   padding: "0.65rem 1.4rem",
@@ -497,7 +499,7 @@ export default function DevelopersPage() {
                 Request live access
               </a>
               <a
-                href="/api-reference"
+                href="#live-api"
                 style={{
                   display: "inline-block",
                   padding: "0.625rem 1.375rem",
@@ -516,6 +518,9 @@ export default function DevelopersPage() {
             </div>
           </div>
         </section>
+
+        {/* ── Live API reference ────────────────────────────────────────── */}
+        <LiveApiReference />
 
         {/* ── Overview ─────────────────────────────────────────────────────── */}
         <section
@@ -981,6 +986,83 @@ export default function DevelopersPage() {
           </div>
         </section>
 
+        {/* ── Live API key management ───────────────────────────────────────── */}
+        <section
+          id="live-keys"
+          className="dev-section"
+          style={{
+            background: "#F8FAFC",
+            padding: "5rem 1.5rem",
+            borderTop: "1px solid var(--color-border)",
+            scrollMarginTop: "72px",
+          }}
+        >
+          <div className="page-wrapper" style={{ maxWidth: "900px" }}>
+            <div style={{ marginBottom: "2.5rem" }}>
+              <span
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "0.375rem",
+                  background: "#f0fdf4",
+                  border: "1px solid #bbf7d0",
+                  color: "#16a34a",
+                  fontSize: "0.75rem",
+                  fontWeight: 700,
+                  letterSpacing: "0.07em",
+                  textTransform: "uppercase",
+                  padding: "0.3rem 0.875rem",
+                  borderRadius: "999px",
+                  marginBottom: "1rem",
+                }}
+              >
+                <svg width="8" height="8" viewBox="0 0 8 8" fill="currentColor">
+                  <circle cx="4" cy="4" r="4" opacity="0.25" />
+                  <circle cx="4" cy="4" r="2" />
+                </svg>
+                Live API
+              </span>
+              <h2
+                style={{
+                  fontSize: "clamp(1.5rem, 3vw, 2rem)",
+                  fontWeight: 800,
+                  color: "var(--color-text-heading)",
+                  marginBottom: "0.5rem",
+                  letterSpacing: "-0.015em",
+                }}
+              >
+                Live API keys
+              </h2>
+              <p
+                style={{
+                  fontSize: "1rem",
+                  color: "var(--color-text-muted)",
+                  maxWidth: "560px",
+                  lineHeight: 1.7,
+                }}
+              >
+                Live keys are prefixed with{" "}
+                <code
+                  style={{
+                    fontFamily: "monospace",
+                    background: "var(--color-mist)",
+                    padding: "0.1rem 0.4rem",
+                    borderRadius: "4px",
+                    fontSize: "0.875em",
+                  }}
+                >
+                  sk_live_
+                </code>{" "}
+                and process real payments. Submit an application below — your
+                key is generated immediately but requires admin approval before
+                it becomes active. You will be emailed once it is activated.
+              </p>
+            </div>
+
+            <LiveKeyManager />
+          </div>
+        </section>
+
         {/* ── FAQ ──────────────────────────────────────────────────────────── */}
         <section
           className="dev-section"
@@ -1032,6 +1114,26 @@ export default function DevelopersPage() {
                 {
                   q: "How do I report a bug in the sandbox API?",
                   a: 'Reach us at support@fonlok.com with the subject line "Sandbox API issue". Include the endpoint, your request body, and the response you received.',
+                },
+                {
+                  q: "How do I get a live (production) API key?",
+                  a: 'Scroll up to the "Live API keys" section, sign in, and click "Apply for a live key". Fill in your company name, website URL, and a brief description of your use case. Your key is generated immediately but starts as pending — a Fonlok admin reviews all applications and you will be emailed once it is activated.',
+                },
+                {
+                  q: "What happens when a buyer opens a dispute?",
+                  a: 'Call POST /v1/payments/dispute with the invoice_id, a reason (max 1,000 chars), and an optional context field (max 10,000 chars — paste conversation history or evidence here). Fonlok freezes the funds, creates a shared chat thread, emails both parties their role-scoped chat links, and returns those links in the API response. Fonlok\'s dispute lifecycle is binary: open → resolved. You receive a payment.disputed webhook immediately and a payment.dispute_resolved webhook (with a decision field of "seller" or "buyer") when the admin closes the case. The typical resolution SLA is 24–48 hours.',
+                },
+                {
+                  q: "How do I verify that a webhook payload came from Fonlok?",
+                  a: "Every delivery includes an X-Fonlok-Signature header containing an HMAC-SHA256 hex digest of the raw request body, signed with your webhook secret. Compute the same digest on your server and compare using a constant-time comparison function (e.g. crypto.timingSafeEqual in Node.js). Reject any request where the signatures do not match.",
+                },
+                {
+                  q: "What is the platform fee and who pays it?",
+                  a: "Fonlok deducts a 2% platform fee from the gross amount at the time of release. The seller receives 98% of the invoice amount (minus Campay's ~1% MoMo transfer fee, applied transparently). There are no charges to create invoices or initiate payments — the fee is only deducted when funds are released.",
+                },
+                {
+                  q: "Can a buyer pay from a wallet instead of MoMo?",
+                  a: "Yes. If your platform pre-funds buyer wallets, use POST /v1/wallet/pay with the buyer's user_ref. Funds are debited atomically from the wallet and the invoice moves to 'paid' immediately — no MoMo prompt is needed.",
                 },
               ].map(({ q, a }) => (
                 <details
