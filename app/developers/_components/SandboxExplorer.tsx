@@ -394,6 +394,49 @@ const ENDPOINTS: Endpoint[] = [
       message: "Sandbox: Payment failed.",
     },
   },
+  {
+    id: "dispute",
+    group: "Payments",
+    method: "POST",
+    path: "/sandbox/payments/dispute",
+    summary: "Dispute a test payment",
+    description:
+      "Marks a 'paid' sandbox invoice as disputed. Mirrors POST /v1/payments/dispute — same request shape, same response shape. No real emails are sent and no real funds are held. The invoice moves from 'paid' to 'disputed' status.",
+    params: [
+      {
+        name: "invoice_id",
+        in: "body",
+        type: "string",
+        required: true,
+        description: "The ID of a paid sandbox invoice to dispute.",
+        placeholder: "inv_test_a1b2c3d4e5f6g7h8",
+      },
+      {
+        name: "reason",
+        in: "body",
+        type: "string",
+        required: true,
+        description: "The buyer's reason for opening the dispute.",
+        placeholder: "Item was not as described.",
+      },
+    ],
+    sampleResponse: {
+      object: "sandbox_dispute",
+      invoice_id: "inv_test_a1b2c3d4e5f6g7h8",
+      status: "disputed",
+      reason: "Item was not as described.",
+      disputed_at: "2026-07-01T12:05:00.000Z",
+      chat_links: {
+        buyer:
+          "https://fonlok.com/chat/inv_test_a1b2c3d4e5f6g7h8?token=sandbox_chat_token_buyer_abc123&role=buyer",
+        seller:
+          "https://fonlok.com/chat/inv_test_a1b2c3d4e5f6g7h8?token=sandbox_chat_token_seller_def456&role=seller",
+      },
+      _sandbox: true,
+      message:
+        "Sandbox: Invoice flagged as disputed. No real funds are held and no emails were sent.",
+    },
+  },
   // ── Standalone MoMo ────────────────────────────────────────────────────────
   {
     id: "momo-charge",
@@ -875,6 +918,93 @@ const ENDPOINTS: Endpoint[] = [
       status: "success",
       reference: "ref_test_c3d4e5f6g7h8i9j0",
       created_at: "2026-06-30T12:00:00.000Z",
+      _sandbox: true,
+    },
+  },
+  // ── Webhooks ───────────────────────────────────────────────────────────────
+  {
+    id: "register-webhook",
+    group: "Webhooks",
+    method: "POST",
+    path: "/sandbox/webhooks/register",
+    summary: "Register a sandbox webhook",
+    description:
+      "Registers a URL to receive sandbox webhook events. Mirrors POST /v1/webhooks/register exactly — same SSRF guard, same 5-endpoint cap, same secret format (prefixed whsec_test_). The secret is shown only once; store it immediately and use it to verify X-Fonlok-Signature on incoming events.",
+    params: [
+      {
+        name: "url",
+        in: "body",
+        type: "string",
+        required: true,
+        description: "Your publicly reachable webhook endpoint URL.",
+        placeholder: "https://your-app.com/webhooks/fonlok",
+      },
+      {
+        name: "label",
+        in: "body",
+        type: "string",
+        required: false,
+        description: "Optional label to identify this webhook.",
+        placeholder: "Local dev — ngrok",
+      },
+    ],
+    sampleResponse: {
+      object: "sandbox_webhook",
+      id: 1,
+      url: "https://your-app.com/webhooks/fonlok",
+      label: "Local dev — ngrok",
+      secret: "whsec_test_a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6",
+      created_at: "2026-07-01T12:00:00.000Z",
+      _sandbox: true,
+      _note: "Store the secret securely. It will not be shown again.",
+    },
+  },
+  {
+    id: "list-webhooks",
+    group: "Webhooks",
+    method: "GET",
+    path: "/sandbox/webhooks",
+    summary: "List sandbox webhooks",
+    description:
+      "Returns all webhook endpoints registered for this sandbox key. Mirrors GET /v1/webhooks.",
+    params: [],
+    sampleResponse: {
+      object: "list",
+      data: [
+        {
+          id: 1,
+          url: "https://your-app.com/webhooks/fonlok",
+          label: "Local dev — ngrok",
+          active: true,
+          created_at: "2026-07-01T12:00:00.000Z",
+        },
+      ],
+      _sandbox: true,
+    },
+  },
+  {
+    id: "delete-webhook",
+    group: "Webhooks",
+    method: "DELETE",
+    path: "/sandbox/webhooks/:id",
+    summary: "Remove a sandbox webhook",
+    description:
+      "Deactivates a registered sandbox webhook endpoint by its ID. Mirrors DELETE /v1/webhooks/:id.",
+    params: [
+      {
+        name: "id",
+        in: "path",
+        type: "string",
+        required: true,
+        description: "The webhook ID to remove.",
+        placeholder: "1",
+      },
+    ],
+    sampleResponse: {
+      object: "sandbox_webhook",
+      id: 1,
+      active: false,
+      deleted: true,
       _sandbox: true,
     },
   },

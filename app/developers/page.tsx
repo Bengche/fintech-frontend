@@ -1129,7 +1129,7 @@ export default function DevelopersPage() {
                 },
                 {
                   q: "What is the platform fee and who pays it?",
-                  a: "Fonlok deducts a 2% platform fee from the gross amount at the time of release. The seller receives 98% of the invoice amount (minus Campay's ~1% MoMo transfer fee, applied transparently). There are no charges to create invoices or initiate payments — the fee is only deducted when funds are released.",
+                  a: "Fonlok deducts a 3% platform fee from the gross amount at the time of release. The seller receives the remainder directly to their Mobile Money number. There are no charges to create invoices or initiate payments — the fee is only deducted when funds are released.",
                 },
                 {
                   q: "Can a buyer pay from a wallet instead of MoMo?",

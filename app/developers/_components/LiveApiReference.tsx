@@ -569,13 +569,12 @@ export default function LiveApiReference() {
               lineHeight: 1.75,
             }}
           >
-            <strong>Fees:</strong> Fonlok charges a 2% platform fee deducted at
-            release. Campay charges an additional ~1% on the Mobile Money
-            disbursement separately, making the effective total ~3%. The{" "}
+            <strong>Fees:</strong> Fonlok charges a 3% platform fee deducted at
+            release. The{" "}
             <code style={{ fontFamily: "monospace", fontSize: "0.875em" }}>
               POST /v1/payments/release
             </code>{" "}
-            response reports only the Fonlok platform fee.{" "}
+            response includes the exact fee and net amount.{" "}
             <strong>Currency:</strong> Only XAF (Central African Franc) is
             supported.
           </div>
@@ -963,7 +962,7 @@ status = res.json()`}
         <Endpoint
           method="POST"
           path="/v1/payments/release"
-          description="Release escrowed funds to the seller after the buyer confirms receipt. Fonlok deducts a 2% platform fee, then disburses the net amount to the seller's MoMo phone via Campay. Sends PDF receipt emails to both seller and buyer. Only 'paid' invoices created via the API can be released through this endpoint."
+          description="Release escrowed funds to the seller after the buyer confirms receipt. Fonlok deducts a 3% platform fee and disburses the net amount directly to the seller's MoMo phone. Sends PDF receipt emails to both seller and buyer. Only 'paid' invoices created via the API can be released through this endpoint."
           params={[
             {
               name: "invoice_id",
