@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Axios from "axios";
@@ -18,6 +18,7 @@ import {
   ChevronDown,
   ChevronUp,
   Tag,
+  CheckCheck,
 } from "lucide-react";
 import { useAuth } from "@/context/UserContext";
 
@@ -233,24 +234,16 @@ export default function SellerProfilePage() {
       year: "numeric",
     });
 
-  const renderStars = (rating: number) => (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "row",
-        alignItems: "center",
-        gap: "2px",
-      }}
-    >
+  const renderStars = (rating: number, size = 13) => (
+    <div className="flex items-center gap-0.5">
       {Array.from({ length: 5 }, (_, i) => (
         <Star
           key={i}
-          size={14}
-          fill={i < Math.round(rating) ? "var(--color-accent)" : "transparent"}
-          stroke={
+          size={size}
+          className={
             i < Math.round(rating)
-              ? "var(--color-accent)"
-              : "var(--color-border-strong)"
+              ? "fill-amber-400 text-amber-400"
+              : "fill-transparent text-slate-300"
           }
         />
       ))}
@@ -271,32 +264,22 @@ export default function SellerProfilePage() {
 
   if (loading)
     return (
-      <div
-        className="seller-profile-page"
-        style={{ minHeight: "100vh", backgroundColor: "var(--color-cloud)" }}
-      >
-        <div
-          style={{
-            textAlign: "center",
-            padding: "5rem 1.25rem",
-            color: "var(--color-text-muted)",
-          }}
-        >
-          {t("loading")}
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-8 h-8 rounded-full border-2 border-[#0f1f3d] border-t-transparent animate-spin" />
+          <p className="text-sm text-slate-400">{t("loading")}</p>
         </div>
       </div>
     );
 
   if (error)
     return (
-      <div
-        className="seller-profile-page"
-        style={{ minHeight: "100vh", backgroundColor: "var(--color-cloud)" }}
-      >
-        <div
-          style={{ maxWidth: "480px", margin: "4rem auto", padding: "1.25rem" }}
-        >
-          <div className="alert alert-danger">{error}</div>
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-5">
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-8 max-w-sm w-full text-center">
+          <div className="w-12 h-12 rounded-full bg-red-50 flex items-center justify-center mx-auto mb-4">
+            <ShieldAlert size={22} className="text-red-500" />
+          </div>
+          <p className="text-slate-700 font-medium">{error}</p>
         </div>
       </div>
     );
@@ -307,6 +290,7 @@ export default function SellerProfilePage() {
     authUsername && authUsername === seller.username,
   );
   const needsKycAction = isOwnProfile && seller.kyc_status !== "approved";
+
   const kycPanelTitle =
     seller.kyc_status === "pending"
       ? t("kycPromptPendingTitle")
@@ -325,538 +309,268 @@ export default function SellerProfilePage() {
       : seller.kyc_status === "rejected"
         ? t("kycResubmit")
         : t("kycGetVerified");
-  const kycPanelBackground =
-    seller.kyc_status === "pending"
-      ? "linear-gradient(135deg, rgba(245,158,11,0.07), rgba(15,31,61,0.04))"
-      : seller.kyc_status === "rejected"
-        ? "linear-gradient(135deg, rgba(239,68,68,0.08), rgba(15,31,61,0.04))"
-        : "linear-gradient(135deg, rgba(15,31,61,0.04), rgba(245,158,11,0.08))";
-  const kycPanelBorder =
-    seller.kyc_status === "pending"
-      ? "1px solid rgba(245,158,11,0.22)"
-      : seller.kyc_status === "rejected"
-        ? "1px solid rgba(239,68,68,0.2)"
-        : "1px solid rgba(15,31,61,0.08)";
+  const kycAccent = seller.kyc_status === "rejected" ? "red" : "amber";
+
+  const avatarSrc = seller.profilepicture
+    ? seller.profilepicture.startsWith("http")
+      ? seller.profilepicture
+      : `${API}/uploads/${seller.profilepicture}`
+    : null;
 
   return (
-    <div
-      className="seller-profile-page"
-      style={{ minHeight: "100vh", backgroundColor: "var(--color-cloud)" }}
-    >
-      <div
-        className="seller-profile-shell"
-        style={{
-          maxWidth: "720px",
-          margin: "0 auto",
-          padding: "2rem 1.25rem 4rem",
-        }}
-      >
-        {/* Escrow education strip â€” guests only */}
+    <div className="min-h-screen bg-slate-50">
+      <div className="max-w-2xl mx-auto px-4 py-6 pb-16 space-y-4">
+        {/* -- Guest escrow strip ----------------------------------------- */}
         {!authUsername && (
-          <div
-            style={{
-              marginBottom: "1.25rem",
-              padding: "1rem 1.125rem",
-              borderRadius: "var(--radius-md)",
-              background:
-                "linear-gradient(135deg, rgba(15,31,61,0.04), rgba(245,158,11,0.06))",
-              border: "1px solid rgba(245,158,11,0.2)",
-            }}
-          >
-            <p
-              style={{
-                margin: "0 0 0.35rem",
-                fontWeight: 700,
-                fontSize: "0.9rem",
-                color: "var(--color-text-heading)",
-              }}
-            >
+          <div className="rounded-2xl bg-gradient-to-r from-[#0f1f3d]/5 to-amber-50 border border-amber-200/60 px-4 py-3">
+            <p className="text-xs font-bold text-[#0f1f3d] uppercase tracking-wider mb-0.5">
               {t("escrowStripTitle")}
             </p>
-            <p
-              style={{
-                margin: 0,
-                fontSize: "0.84rem",
-                lineHeight: 1.65,
-                color: "var(--color-text-muted)",
-              }}
-            >
+            <p className="text-xs text-slate-500 leading-relaxed">
               {t("escrowStripBody")}
             </p>
           </div>
         )}
 
-        {/* Seller hero card */}
-        <div
-          className="card seller-hero-card"
-          style={{ marginBottom: "1.5rem" }}
-        >
-          <div
-            className="seller-hero-top"
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              marginBottom: "1rem",
-              gap: "0.75rem",
-              flexWrap: "wrap",
-            }}
-          >
-            <p
-              style={{
-                margin: 0,
-                fontSize: "0.75rem",
-                letterSpacing: "0.08em",
-                textTransform: "uppercase",
-                color: "var(--color-text-muted)",
-                fontWeight: 700,
-              }}
+        {/* -- Hero card ---------------------------------------------------- */}
+        <div className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
+          {/* Navy gradient banner */}
+          <div className="h-24 bg-gradient-to-br from-[#0f1f3d] via-[#162d5a] to-[#1e3a7a] relative">
+            <button
+              onClick={handleShare}
+              className="absolute top-3 right-3 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white text-xs font-medium transition-colors backdrop-blur-sm border border-white/10"
             >
-              {t("publicProfile")}
-            </p>
-            <button className="btn-ghost" onClick={handleShare}>
-              <Share2 size={16} />
-              {copied ? t("linkCopied") : t("shareProfile")}
+              {copied ? <CheckCheck size={13} /> : <Share2 size={13} />}
+              <span>{copied ? t("linkCopied") : t("shareProfile")}</span>
             </button>
+            <span className="absolute top-3 left-4 text-[10px] font-bold uppercase tracking-widest text-white/40">
+              {t("publicProfile")}
+            </span>
           </div>
 
-          <div
-            className="seller-identity-row"
-            style={{
-              display: "flex",
-              alignItems: "flex-start",
-              gap: "1.25rem",
-              flexWrap: "wrap",
-            }}
-          >
-            {seller.profilepicture ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={
-                  seller.profilepicture.startsWith("http")
-                    ? seller.profilepicture
-                    : `${API}/uploads/${seller.profilepicture}`
-                }
-                alt={seller.name}
-                style={{
-                  width: "72px",
-                  height: "72px",
-                  borderRadius: "9999px",
-                  objectFit: "cover",
-                  flexShrink: 0,
-                  border: "3px solid var(--color-border)",
-                }}
-              />
-            ) : (
-              <div
-                style={{
-                  width: "72px",
-                  height: "72px",
-                  borderRadius: "9999px",
-                  backgroundColor: "var(--color-primary-light)",
-                  color: "var(--color-primary)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: "1.75rem",
-                  fontWeight: 800,
-                  flexShrink: 0,
-                }}
-              >
-                {seller.name.charAt(0).toUpperCase()}
-              </div>
-            )}
-            <div className="seller-identity-main" style={{ flex: 1 }}>
-              <h1
-                style={{
-                  fontSize: "1.375rem",
-                  fontWeight: 700,
-                  color: "var(--color-text-heading)",
-                  margin: "0 0 0.2rem",
-                }}
-              >
-                {seller.name}
-              </h1>
-              <p
-                style={{
-                  margin: "0 0 0.125rem",
-                  color: "var(--color-text-muted)",
-                  fontSize: "0.9rem",
-                }}
-              >
-                @{seller.username}
-              </p>
-              {seller.bio && (
-                <p
-                  style={{
-                    margin: "0.375rem 0 0.375rem",
-                    color: "var(--color-text-body)",
-                    fontSize: "0.875rem",
-                    lineHeight: 1.6,
-                    maxWidth: "38rem",
-                  }}
-                >
-                  {seller.bio}
-                </p>
-              )}
-              {seller.tags && seller.tags.length > 0 && (
-                <div
-                  style={{
-                    display: "flex",
-                    flexWrap: "wrap",
-                    gap: "0.375rem",
-                    margin: "0.375rem 0 0.5rem",
-                  }}
-                >
-                  {seller.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      style={{
-                        display: "inline-flex",
-                        alignItems: "center",
-                        gap: "0.25rem",
-                        padding: "0.2rem 0.6rem",
-                        borderRadius: "999px",
-                        background: "rgba(245,158,11,0.1)",
-                        border: "1px solid rgba(245,158,11,0.25)",
-                        color: "var(--color-accent)",
-                        fontSize: "0.77rem",
-                        fontWeight: 600,
-                      }}
-                    >
-                      <Tag size={11} />
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              )}
-              {seller.country && (
-                <p
-                  style={{
-                    margin: "0 0 0.125rem",
-                    color: "var(--color-text-muted)",
-                    fontSize: "0.875rem",
-                  }}
-                >
-                  {seller.country}
-                </p>
-              )}
-              <p
-                style={{
-                  margin: "0 0 0.5rem",
-                  fontSize: "0.8rem",
-                  color: "var(--color-text-muted)",
-                }}
-              >
-                {t("memberSince")} {formatDate(seller.createdat)}
-              </p>
-
-              {/* Badges row */}
-              <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem" }}>
-                {/* Main KYC / identity-verification badge */}
-                {seller.kyc_status === "approved" ? (
-                  <div
-                    style={{
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: "0.35rem",
-                      padding: "0.3rem 0.85rem",
-                      borderRadius: "999px",
-                      background: "rgba(22,163,74,0.1)",
-                      border: "1.5px solid rgba(22,163,74,0.35)",
-                      color: "#166534",
-                      fontSize: "0.8rem",
-                      fontWeight: 800,
-                      letterSpacing: "0.01em",
-                    }}
-                  >
-                    <BadgeCheck size={15} />
-                    {t("verifiedBadge")}
-                  </div>
-                ) : seller.kyc_status === "pending" ? (
-                  <div
-                    style={{
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: "0.35rem",
-                      padding: "0.3rem 0.85rem",
-                      borderRadius: "999px",
-                      background: "rgba(245,158,11,0.1)",
-                      border: "1.5px solid rgba(245,158,11,0.35)",
-                      color: "#92400e",
-                      fontSize: "0.8rem",
-                      fontWeight: 700,
-                    }}
-                  >
-                    <ShieldAlert size={14} />
-                    {t("verificationPending")}
-                  </div>
+          <div className="px-5 pb-5">
+            {/* Avatar � overlaps banner */}
+            <div className="-mt-10 mb-3">
+              <div className="relative inline-block">
+                {avatarSrc ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={avatarSrc}
+                    alt={seller.name}
+                    className="w-20 h-20 rounded-2xl object-cover ring-4 ring-white shadow-md"
+                  />
                 ) : (
-                  <div
-                    style={{
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: "0.35rem",
-                      padding: "0.3rem 0.85rem",
-                      borderRadius: "999px",
-                      background: "rgba(100,116,139,0.08)",
-                      border: "1.5px solid rgba(100,116,139,0.25)",
-                      color: "#64748b",
-                      fontSize: "0.8rem",
-                      fontWeight: 700,
-                    }}
-                  >
-                    <ShieldAlert size={14} />
-                    {t("notVerifiedBadge")}
+                  <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#0f1f3d] to-[#1e3a7a] ring-4 ring-white shadow-md flex items-center justify-center text-white text-3xl font-extrabold">
+                    {seller.name.charAt(0).toUpperCase()}
                   </div>
                 )}
-                {/* Sub-badges for individual verifications */}
-                {verifiedBadges.id && (
-                  <div
-                    style={{
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: "0.25rem",
-                      padding: "0.25rem 0.65rem",
-                      borderRadius: "999px",
-                      background: "rgba(22,163,74,0.06)",
-                      border: "1px solid rgba(22,163,74,0.22)",
-                      color: "#15803d",
-                      fontSize: "0.75rem",
-                      fontWeight: 600,
-                    }}
-                  >
-                    <BadgeCheck size={12} style={{ flexShrink: 0 }} />
-                    {t("idVerified")}
-                  </div>
-                )}
-                {verifiedBadges.phone && (
-                  <div
-                    style={{
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: "0.25rem",
-                      padding: "0.25rem 0.65rem",
-                      borderRadius: "999px",
-                      background: "rgba(22,163,74,0.06)",
-                      border: "1px solid rgba(22,163,74,0.22)",
-                      color: "#15803d",
-                      fontSize: "0.75rem",
-                      fontWeight: 600,
-                    }}
-                  >
-                    <BadgeCheck size={12} style={{ flexShrink: 0 }} />
-                    {t("phoneVerified")}
-                  </div>
-                )}
-                {verifiedBadges.email && (
-                  <div
-                    style={{
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: "0.25rem",
-                      padding: "0.25rem 0.65rem",
-                      borderRadius: "999px",
-                      background: "rgba(22,163,74,0.06)",
-                      border: "1px solid rgba(22,163,74,0.22)",
-                      color: "#15803d",
-                      fontSize: "0.75rem",
-                      fontWeight: 600,
-                    }}
-                  >
-                    <BadgeCheck size={12} style={{ flexShrink: 0 }} />
-                    {t("emailVerified")}
+                {seller.kyc_status === "approved" && (
+                  <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-emerald-500 ring-2 ring-white flex items-center justify-center">
+                    <BadgeCheck size={11} className="text-white" />
                   </div>
                 )}
               </div>
             </div>
+
+            {/* Name + username */}
+            <div className="mb-2">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h1 className="text-xl font-extrabold text-slate-900 tracking-tight leading-tight">
+                  {seller.name}
+                </h1>
+                {seller.kyc_status === "approved" && (
+                  <BadgeCheck size={18} className="text-emerald-500 shrink-0" />
+                )}
+              </div>
+              <p className="text-sm text-slate-400 font-medium">
+                @{seller.username}
+              </p>
+            </div>
+
+            {seller.bio && (
+              <p className="text-sm text-slate-600 leading-relaxed mb-3 max-w-lg">
+                {seller.bio}
+              </p>
+            )}
+
+            {seller.tags && seller.tags.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 mb-3">
+                {seller.tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-50 border border-amber-200/80 text-amber-700 text-xs font-semibold"
+                  >
+                    <Tag size={10} />
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            )}
+
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 mb-3 text-xs text-slate-400">
+              {seller.country && <span>{seller.country}</span>}
+              {seller.country && <span>�</span>}
+              <span>
+                {t("memberSince")} {formatDate(seller.createdat)}
+              </span>
+            </div>
+
+            {/* Verification badges */}
+            <div className="flex flex-wrap gap-1.5">
+              {seller.kyc_status === "approved" ? (
+                <ProfileBadge color="green" icon={<BadgeCheck size={11} />}>
+                  {t("verifiedBadge")}
+                </ProfileBadge>
+              ) : seller.kyc_status === "pending" ? (
+                <ProfileBadge color="amber" icon={<ShieldAlert size={11} />}>
+                  {t("verificationPending")}
+                </ProfileBadge>
+              ) : (
+                <ProfileBadge color="slate" icon={<ShieldAlert size={11} />}>
+                  {t("notVerifiedBadge")}
+                </ProfileBadge>
+              )}
+              {verifiedBadges.id && (
+                <ProfileBadge color="green" icon={<BadgeCheck size={10} />}>
+                  {t("idVerified")}
+                </ProfileBadge>
+              )}
+              {verifiedBadges.phone && (
+                <ProfileBadge color="green" icon={<BadgeCheck size={10} />}>
+                  {t("phoneVerified")}
+                </ProfileBadge>
+              )}
+              {verifiedBadges.email && (
+                <ProfileBadge color="green" icon={<BadgeCheck size={10} />}>
+                  {t("emailVerified")}
+                </ProfileBadge>
+              )}
+            </div>
           </div>
 
+          {/* KYC prompt */}
           {needsKycAction && (
             <div
-              className="seller-kyc-panel"
-              style={{
-                marginTop: "1rem",
-                padding: "1rem 1.05rem",
-                borderRadius: "1rem",
-                background: kycPanelBackground,
-                border: kycPanelBorder,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                gap: "1rem",
-                flexWrap: "wrap",
-              }}
+              className={`mx-4 mb-4 rounded-2xl px-4 py-3.5 border flex items-center justify-between gap-3 flex-wrap ${
+                kycAccent === "red"
+                  ? "bg-red-50 border-red-200/60"
+                  : "bg-amber-50 border-amber-200/60"
+              }`}
             >
-              <div
-                className="seller-kyc-copy"
-                style={{ flex: 1, minWidth: "220px" }}
-              >
+              <div className="flex-1 min-w-0">
                 <p
-                  style={{
-                    margin: "0 0 0.25rem",
-                    fontSize: "0.95rem",
-                    fontWeight: 800,
-                    color: "var(--color-text-heading)",
-                  }}
+                  className={`text-sm font-bold mb-0.5 ${kycAccent === "red" ? "text-red-800" : "text-amber-800"}`}
                 >
                   {kycPanelTitle}
                 </p>
                 <p
-                  style={{
-                    margin: 0,
-                    fontSize: "0.86rem",
-                    lineHeight: 1.65,
-                    color: "var(--color-text-muted)",
-                    maxWidth: "42rem",
-                  }}
+                  className={`text-xs leading-relaxed ${kycAccent === "red" ? "text-red-600" : "text-amber-700"}`}
                 >
                   {kycPanelBody}
                 </p>
               </div>
               <Link
                 href="/kyc"
-                className="btn-primary seller-kyc-btn"
-                style={{
-                  textDecoration: "none",
-                  flexShrink: 0,
-                  display: "inline-flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: "0.45rem",
-                  width: "min(100%, 220px)",
-                }}
+                className={`shrink-0 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition-colors ${
+                  kycAccent === "red"
+                    ? "bg-red-600 hover:bg-red-700 text-white"
+                    : "bg-amber-500 hover:bg-amber-600 text-white"
+                }`}
               >
-                <ShieldAlert size={16} />
+                <ShieldAlert size={13} />
                 {kycButtonLabel}
               </Link>
             </div>
           )}
-
-          {/* Stats row */}
-          <div
-            className="seller-stats-row"
-            style={{
-              display: "flex",
-              gap: "1.5rem",
-              marginTop: "1.5rem",
-              paddingTop: "1.25rem",
-              borderTop: "1px solid var(--color-border)",
-              flexWrap: "wrap",
-            }}
-          >
-            <StatBox
-              value={completedCount}
-              label={t("dealsClosed")}
-              color="var(--color-success)"
-            />
-            <StatBox
-              value={Math.round(totalSecured)}
-              label={t("securedXaf")}
-              suffix=" XAF"
-              color="var(--color-accent)"
-            />
-            {successRate !== null && (
-              <StatBox
-                value={successRate}
-                label={t("successRate")}
-                suffix="%"
-                color="var(--color-success)"
-              />
-            )}
-            {disputeRate !== null && (
-              <StatBox
-                value={disputeRate}
-                label={t("disputeRate")}
-                suffix="%"
-                color="var(--color-primary)"
-              />
-            )}
-          </div>
         </div>
 
-        {/* Contact CTA */}
-        <div
-          className="card seller-contact-card"
-          style={{ marginBottom: "1.5rem" }}
-        >
-          <h2
-            style={{
-              fontSize: "1.0625rem",
-              fontWeight: 700,
-              color: "var(--color-text-heading)",
-              margin: "0 0 0.375rem",
-            }}
-          >
+        {/* -- Stats strip --------------------------------------------------- */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <StatCard
+            value={completedCount.toLocaleString()}
+            label={t("dealsClosed")}
+            accent="#10b981"
+          />
+          <StatCard
+            value={Math.round(totalSecured).toLocaleString()}
+            label={t("securedXaf")}
+            suffix=" XAF"
+            accent="#f59e0b"
+          />
+          {successRate !== null && (
+            <StatCard
+              value={`${successRate}%`}
+              label={t("successRate")}
+              accent="#10b981"
+            />
+          )}
+          {disputeRate !== null && (
+            <StatCard
+              value={`${disputeRate}%`}
+              label={t("disputeRate")}
+              accent="#0f1f3d"
+            />
+          )}
+        </div>
+
+        {/* -- Contact card -------------------------------------------------- */}
+        <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-5">
+          <h2 className="text-base font-extrabold text-slate-900 tracking-tight mb-0.5">
             {t("ctaTitle")}
           </h2>
-          <p
-            style={{
-              color: "var(--color-text-muted)",
-              margin: "0 0 1rem",
-              fontSize: "0.875rem",
-            }}
-          >
-            {t("ctaBody")}
-          </p>
-          <form
-            onSubmit={submitDealRequest}
-            className="seller-contact-form"
-            style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}
-          >
-            <input
-              className="input"
-              placeholder={t("yourName")}
-              value={requestName}
-              onChange={(e) => setRequestName(e.target.value)}
-              required
-              maxLength={100}
-            />
-            <input
-              className="input"
-              placeholder={t("yourEmail")}
-              value={requestEmail}
-              onChange={(e) => setRequestEmail(e.target.value)}
-              required
-              type="email"
-            />
+          <p className="text-sm text-slate-400 mb-4">{t("ctaBody")}</p>
+
+          <form onSubmit={submitDealRequest} className="space-y-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <input
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-800 placeholder-slate-400 outline-none focus:border-[#0f1f3d] focus:ring-2 focus:ring-[#0f1f3d]/10 transition-all"
+                placeholder={t("yourName")}
+                value={requestName}
+                onChange={(e) => setRequestName(e.target.value)}
+                required
+                maxLength={100}
+              />
+              <input
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-800 placeholder-slate-400 outline-none focus:border-[#0f1f3d] focus:ring-2 focus:ring-[#0f1f3d]/10 transition-all"
+                placeholder={t("yourEmail")}
+                value={requestEmail}
+                onChange={(e) => setRequestEmail(e.target.value)}
+                required
+                type="email"
+              />
+            </div>
             <textarea
-              className="input"
+              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-800 placeholder-slate-400 outline-none focus:border-[#0f1f3d] focus:ring-2 focus:ring-[#0f1f3d]/10 transition-all resize-none"
               placeholder={t("dealMessage")}
               value={requestMessage}
               onChange={(e) => setRequestMessage(e.target.value)}
               required
               minLength={10}
               maxLength={1000}
-              style={{ minHeight: "96px", resize: "vertical" }}
+              rows={3}
             />
             {requestError && (
-              <div className="alert alert-danger">{requestError}</div>
+              <p className="text-xs text-red-500 bg-red-50 border border-red-100 rounded-xl px-3 py-2">
+                {requestError}
+              </p>
             )}
             {requestSuccess && (
-              <div className="alert alert-success">{requestSuccess}</div>
+              <p className="text-xs text-emerald-600 bg-emerald-50 border border-emerald-100 rounded-xl px-3 py-2 flex items-center gap-1.5">
+                <CheckCheck size={13} />
+                {requestSuccess}
+              </p>
             )}
             <button
-              className="btn-primary"
               type="submit"
               disabled={requestLoading}
+              className="w-full flex items-center justify-center gap-2 bg-[#0f1f3d] hover:bg-[#1a3460] disabled:opacity-60 text-white text-sm font-bold py-2.5 rounded-xl transition-colors"
             >
-              <Send size={16} />
+              <Send size={14} />
               {requestLoading ? t("sending") : t("sendDealRequest")}
             </button>
           </form>
 
-          {/* Safe to pay indicators */}
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              gap: "0.875rem",
-              marginTop: "1rem",
-              paddingTop: "0.875rem",
-              borderTop: "1px solid var(--color-border)",
-            }}
-          >
+          <div className="flex flex-wrap gap-x-4 gap-y-1.5 mt-4 pt-4 border-t border-slate-100">
             {[
               { Icon: Lock, text: t("safeEscrow") },
               { Icon: ShieldCheck, text: t("safeGuarantee") },
@@ -864,341 +578,145 @@ export default function SellerProfilePage() {
             ].map(({ Icon, text }) => (
               <div
                 key={text}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "0.4rem",
-                  color: "var(--color-text-muted)",
-                  fontSize: "0.78rem",
-                }}
+                className="flex items-center gap-1.5 text-slate-400 text-xs"
               >
-                <Icon size={13} strokeWidth={2.2} />
+                <Icon size={12} strokeWidth={2.2} />
                 <span>{text}</span>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Reviews header */}
-        <div
-          className="seller-reviews-head"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            marginBottom: "1rem",
-            flexWrap: "wrap",
-            gap: "0.75rem",
-          }}
-        >
-          <h2
-            style={{
-              fontSize: "1.0625rem",
-              fontWeight: 700,
-              color: "var(--color-text-heading)",
-              margin: 0,
-            }}
-          >
-            {t("reviewsTitle")}
-          </h2>
-          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-            {renderStars(averageRating)}
-            <span
-              style={{
-                fontSize: "0.875rem",
-                fontWeight: 700,
-                color: "var(--color-text-heading)",
-              }}
-            >
-              {averageRating || 0}
-            </span>
+        {/* -- Reviews ------------------------------------------------------- */}
+        <div>
+          <div className="flex items-center justify-between mb-3 px-0.5">
+            <h2 className="text-base font-extrabold text-slate-900 tracking-tight">
+              {t("reviewsTitle")}
+            </h2>
+            {averageRating > 0 && (
+              <div className="flex items-center gap-2 bg-white rounded-xl border border-slate-100 px-3 py-1.5 shadow-sm">
+                {renderStars(averageRating)}
+                <span className="text-sm font-bold text-slate-800">
+                  {averageRating}
+                </span>
+              </div>
+            )}
           </div>
-        </div>
 
-        {/* Reviews list */}
-        {reviews.length === 0 ? (
-          <p style={{ color: "var(--color-text-muted)" }}>
-            {t("noReviewsFull")}
-          </p>
-        ) : (
-          <>
-            <div
-              className="seller-reviews-list"
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: "0.875rem",
-              }}
-            >
+          {reviews.length === 0 ? (
+            <div className="bg-white rounded-3xl border border-slate-100 p-8 text-center">
+              <div className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center mx-auto mb-3">
+                <Star size={18} className="text-slate-300" />
+              </div>
+              <p className="text-sm text-slate-400">{t("noReviewsFull")}</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
               {visibleReviews.map((review) => (
                 <div
                   key={review.id}
-                  className="card seller-review-card"
-                  style={{ padding: "1rem 1.125rem", position: "relative" }}
+                  className={`bg-white rounded-2xl border shadow-sm p-4 transition-shadow hover:shadow-md ${
+                    review.pinned ? "border-amber-200/80" : "border-slate-100"
+                  }`}
                 >
-                  {/* Card header: avatar + name/stars block + date */}
-                  <div
-                    style={{
-                      display: "flex",
-                      flexDirection: "row",
-                      alignItems: "flex-start",
-                      gap: "0.75rem",
-                      marginBottom: "0.625rem",
-                    }}
-                  >
-                    {/* Avatar circle */}
-                    <div
-                      style={{
-                        flexShrink: 0,
-                        width: "36px",
-                        height: "36px",
-                        borderRadius: "50%",
-                        background: "var(--color-mist)",
-                        border: "1px solid var(--color-border)",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        fontSize: "0.875rem",
-                        fontWeight: 700,
-                        color: "var(--color-text-muted)",
-                        textTransform: "uppercase",
-                      }}
-                    >
+                  <div className="flex items-start gap-3 mb-2.5">
+                    <div className="shrink-0 w-9 h-9 rounded-xl bg-gradient-to-br from-slate-100 to-slate-200 border border-slate-200 flex items-center justify-center text-sm font-bold text-slate-500 uppercase">
                       {(review.reviewer_name || "A").charAt(0)}
                     </div>
-
-                    {/* Name + stars (flex-1 so it fills remaining space) */}
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div
-                        style={{
-                          display: "flex",
-                          flexDirection: "row",
-                          alignItems: "center",
-                          flexWrap: "wrap",
-                          gap: "0.4rem",
-                          marginBottom: "0.2rem",
-                        }}
-                      >
-                        <span
-                          style={{
-                            fontWeight: 700,
-                            fontSize: "0.9rem",
-                            color: "var(--color-text-heading)",
-                            whiteSpace: "nowrap",
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                            maxWidth: "180px",
-                          }}
-                        >
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center flex-wrap gap-1.5 mb-1">
+                        <span className="text-sm font-bold text-slate-800 truncate max-w-[160px]">
                           {review.reviewer_name}
                         </span>
                         {review.pinned && (
-                          <span
-                            style={{
-                              display: "inline-flex",
-                              alignItems: "center",
-                              gap: "0.2rem",
-                              fontSize: "0.68rem",
-                              fontWeight: 700,
-                              color: "var(--color-accent)",
-                              background:
-                                "rgba(var(--color-accent-rgb, 59,130,246),0.08)",
-                              border:
-                                "1px solid rgba(var(--color-accent-rgb, 59,130,246),0.2)",
-                              borderRadius: "999px",
-                              padding: "0.1rem 0.45rem",
-                            }}
-                          >
-                            <Pin size={10} />
+                          <span className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-600 bg-amber-50 border border-amber-200/80 rounded-full px-2 py-0.5">
+                            <Pin size={9} />
                             {t("pinned")}
                           </span>
                         )}
-                      </div>
-                      {/* Stars row — always horizontal */}
-                      <div
-                        style={{
-                          display: "flex",
-                          flexDirection: "row",
-                          alignItems: "center",
-                          gap: "0.4rem",
-                        }}
-                      >
-                        {renderStars(review.rating)}
                         <span
-                          style={{
-                            fontSize: "0.72rem",
-                            fontWeight: 700,
-                            color: review.rating >= 4 ? "#16a34a" : "#dc2626",
-                            background:
-                              review.rating >= 4
-                                ? "rgba(22,163,74,0.08)"
-                                : "rgba(220,38,38,0.08)",
-                            border: `1px solid ${review.rating >= 4 ? "rgba(22,163,74,0.2)" : "rgba(220,38,38,0.2)"}`,
-                            borderRadius: "999px",
-                            padding: "0.1rem 0.45rem",
-                          }}
+                          className={`inline-flex items-center text-[10px] font-bold rounded-full px-2 py-0.5 ${
+                            review.rating >= 4
+                              ? "bg-emerald-50 text-emerald-700 border border-emerald-200/80"
+                              : "bg-red-50 text-red-600 border border-red-200/80"
+                          }`}
                         >
                           {review.rating >= 4
                             ? t("positiveLabel")
                             : t("negativeLabel")}
                         </span>
                       </div>
+                      {renderStars(review.rating)}
                     </div>
-
-                    {/* Date — right-aligned, never wraps away from header */}
-                    <span
-                      style={{
-                        flexShrink: 0,
-                        fontSize: "0.75rem",
-                        color: "var(--color-text-muted)",
-                        whiteSpace: "nowrap",
-                        paddingTop: "0.1rem",
-                      }}
-                    >
+                    <span className="shrink-0 text-[11px] text-slate-400 pt-0.5">
                       {formatDate(review.created_at)}
                     </span>
                   </div>
 
-                  {/* Invoice name tag */}
                   {review.show_invoice_name && review.invoice_name && (
-                    <div
-                      style={{
-                        display: "inline-flex",
-                        alignItems: "center",
-                        gap: "0.3rem",
-                        marginBottom: "0.5rem",
-                        padding: "0.2rem 0.55rem",
-                        borderRadius: "999px",
-                        background: "rgba(100,116,139,0.08)",
-                        border: "1px solid rgba(100,116,139,0.15)",
-                        color: "var(--color-text-muted)",
-                        fontSize: "0.73rem",
-                        fontWeight: 600,
-                      }}
-                    >
-                      <Tag size={11} />
+                    <div className="inline-flex items-center gap-1 mb-2 px-2 py-0.5 rounded-full bg-slate-50 border border-slate-200 text-[11px] text-slate-400 font-medium">
+                      <Tag size={9} />
                       {t("invoiceTag")}: {review.invoice_name}
                     </div>
                   )}
 
-                  {/* Comment */}
                   {review.comment && (
-                    <p
-                      style={{
-                        margin: 0,
-                        color: "var(--color-text-body)",
-                        lineHeight: 1.6,
-                        fontSize: "0.875rem",
-                      }}
-                    >
+                    <p className="text-sm text-slate-600 leading-relaxed">
                       {review.comment}
                     </p>
                   )}
 
-                  {/* Seller reply */}
                   {review.seller_reply && (
-                    <div
-                      style={{
-                        marginTop: "0.75rem",
-                        padding: "0.75rem 0.875rem",
-                        borderRadius: "var(--radius-md)",
-                        background: "rgba(15,31,61,0.04)",
-                        border: "1px solid rgba(15,31,61,0.07)",
-                      }}
-                    >
-                      <p
-                        style={{
-                          margin: "0 0 0.25rem",
-                          fontSize: "0.78rem",
-                          fontWeight: 700,
-                          color: "var(--color-text-muted)",
-                        }}
-                      >
-                        <MessageSquare
-                          size={12}
-                          style={{
-                            marginRight: "0.3rem",
-                            verticalAlign: "middle",
-                          }}
-                        />
+                    <div className="mt-3 rounded-xl bg-slate-50 border border-slate-100 px-3.5 py-2.5">
+                      <p className="text-[11px] font-bold text-slate-400 flex items-center gap-1 mb-1">
+                        <MessageSquare size={11} />
                         {t("sellerReply")}
                       </p>
-                      <p
-                        style={{
-                          margin: 0,
-                          fontSize: "0.875rem",
-                          color: "var(--color-text-body)",
-                          lineHeight: 1.6,
-                        }}
-                      >
+                      <p className="text-sm text-slate-600 leading-relaxed">
                         {review.seller_reply}
                       </p>
                     </div>
                   )}
 
-                  {/* Feedback (reply posted notice) */}
                   {replyFeedback[review.id] && (
-                    <p
-                      style={{
-                        margin: "0.5rem 0 0",
-                        fontSize: "0.8rem",
-                        color: "var(--color-success)",
-                      }}
-                    >
+                    <p className="mt-2 text-xs text-emerald-600">
                       {replyFeedback[review.id]}
                     </p>
                   )}
 
-                  {/* Owner actions */}
                   {isOwnProfile && (
-                    <div
-                      style={{
-                        display: "flex",
-                        gap: "0.5rem",
-                        marginTop: "0.75rem",
-                        flexWrap: "wrap",
-                      }}
-                    >
+                    <div className="flex gap-2 mt-3 flex-wrap">
                       <button
-                        className="btn-ghost"
-                        style={{
-                          fontSize: "0.78rem",
-                          padding: "0.25rem 0.6rem",
-                        }}
                         disabled={pinLoading[review.id]}
                         onClick={() => togglePin(review.id, !!review.pinned)}
+                        className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-500 hover:text-slate-700 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-lg px-2.5 py-1 transition-colors disabled:opacity-50"
                       >
-                        <Pin size={13} />
+                        <Pin size={11} />
                         {review.pinned ? t("unpinReview") : t("pinReview")}
                       </button>
                       {!review.seller_reply && (
                         <button
-                          className="btn-ghost"
-                          style={{
-                            fontSize: "0.78rem",
-                            padding: "0.25rem 0.6rem",
-                          }}
                           onClick={() =>
                             setReplyOpen((prev) => ({
                               ...prev,
                               [review.id]: !prev[review.id],
                             }))
                           }
+                          className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-500 hover:text-slate-700 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-lg px-2.5 py-1 transition-colors"
                         >
-                          <MessageSquare size={13} />
+                          <MessageSquare size={11} />
                           {t("replyToReview")}
                         </button>
                       )}
                     </div>
                   )}
 
-                  {/* Reply form */}
                   {isOwnProfile &&
                     replyOpen[review.id] &&
                     !review.seller_reply && (
-                      <div style={{ marginTop: "0.75rem" }}>
+                      <div className="mt-3 space-y-2">
                         <textarea
-                          className="input"
+                          className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-800 placeholder-slate-400 outline-none focus:border-[#0f1f3d] focus:ring-2 focus:ring-[#0f1f3d]/10 transition-all resize-none"
                           placeholder={t("replyPlaceholder")}
                           value={replyDraft[review.id] || ""}
                           onChange={(e) =>
@@ -1208,47 +726,29 @@ export default function SellerProfilePage() {
                             }))
                           }
                           maxLength={800}
-                          style={{
-                            minHeight: "80px",
-                            resize: "vertical",
-                            fontSize: "0.875rem",
-                          }}
+                          rows={2}
                         />
-                        <div
-                          style={{
-                            display: "flex",
-                            gap: "0.5rem",
-                            marginTop: "0.5rem",
-                          }}
-                        >
+                        <div className="flex gap-2">
                           <button
-                            className="btn-primary"
-                            style={{
-                              fontSize: "0.8rem",
-                              padding: "0.35rem 0.875rem",
-                            }}
                             disabled={
                               replySubmitting[review.id] ||
                               !(replyDraft[review.id] || "").trim()
                             }
                             onClick={() => submitReply(review.id)}
+                            className="inline-flex items-center gap-1 text-xs font-bold bg-[#0f1f3d] hover:bg-[#1a3460] disabled:opacity-50 text-white px-3 py-1.5 rounded-lg transition-colors"
                           >
                             {replySubmitting[review.id]
                               ? "..."
                               : t("submitReply")}
                           </button>
                           <button
-                            className="btn-ghost"
-                            style={{
-                              fontSize: "0.8rem",
-                              padding: "0.35rem 0.875rem",
-                            }}
                             onClick={() =>
                               setReplyOpen((prev) => ({
                                 ...prev,
                                 [review.id]: false,
                               }))
                             }
+                            className="inline-flex items-center gap-1 text-xs font-semibold text-slate-500 hover:text-slate-700 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-lg transition-colors"
                           >
                             {t("cancelReply")}
                           </button>
@@ -1257,71 +757,80 @@ export default function SellerProfilePage() {
                     )}
                 </div>
               ))}
-            </div>
 
-            {reviews.length > REVIEWS_INITIAL && (
-              <button
-                className="btn-ghost"
-                style={{
-                  marginTop: "0.875rem",
-                  width: "100%",
-                  justifyContent: "center",
-                }}
-                onClick={() => setShowAllReviews((v) => !v)}
-              >
-                {showAllReviews ? (
-                  <>
-                    <ChevronUp size={15} />
-                    {t("showLessReviews")}
-                  </>
-                ) : (
-                  <>
-                    <ChevronDown size={15} />
-                    {t("showMoreReviews", { count: String(reviews.length) })}
-                  </>
-                )}
-              </button>
-            )}
-          </>
-        )}
+              {reviews.length > REVIEWS_INITIAL && (
+                <button
+                  onClick={() => setShowAllReviews((v) => !v)}
+                  className="w-full flex items-center justify-center gap-2 py-3 text-sm font-semibold text-slate-500 hover:text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 rounded-2xl transition-colors"
+                >
+                  {showAllReviews ? (
+                    <>
+                      <ChevronUp size={15} />
+                      {t("showLessReviews")}
+                    </>
+                  ) : (
+                    <>
+                      <ChevronDown size={15} />
+                      {t("showMoreReviews", { count: String(reviews.length) })}
+                    </>
+                  )}
+                </button>
+              )}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
 }
 
-function StatBox({
+// -- Sub-components -------------------------------------------------------------
+
+function ProfileBadge({
+  children,
+  color,
+  icon,
+}: {
+  children: React.ReactNode;
+  color: "green" | "amber" | "slate";
+  icon?: React.ReactNode;
+}) {
+  const styles = {
+    green: "bg-emerald-50 border-emerald-200/80 text-emerald-700",
+    amber: "bg-amber-50 border-amber-200/80 text-amber-700",
+    slate: "bg-slate-100 border-slate-200 text-slate-500",
+  };
+  return (
+    <span
+      className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full border text-xs font-semibold ${styles[color]}`}
+    >
+      {icon}
+      {children}
+    </span>
+  );
+}
+
+function StatCard({
   value,
   label,
-  color,
   suffix = "",
+  accent,
 }: {
-  value: number;
+  value: string | number;
   label: string;
-  color: string;
   suffix?: string;
+  accent: string;
 }) {
   return (
-    <div className="seller-stat-box" style={{ textAlign: "center" }}>
+    <div className="bg-white rounded-2xl border border-slate-100 shadow-sm px-4 py-3.5">
       <p
-        className="seller-stat-value"
-        style={{
-          fontSize: "1.75rem",
-          fontWeight: 800,
-          color,
-          margin: "0 0 0.2rem",
-        }}
+        className="text-xl font-extrabold tracking-tight leading-none mb-1"
+        style={{ color: accent }}
       >
-        {value.toLocaleString()}
+        {value}
         {suffix}
       </p>
-      <p
-        className="seller-stat-label"
-        style={{
-          fontSize: "0.8125rem",
-          color: "var(--color-text-muted)",
-          margin: 0,
-        }}
-      >
+      <p className="text-xs text-slate-400 font-medium leading-tight">
         {label}
       </p>
     </div>
