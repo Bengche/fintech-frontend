@@ -788,94 +788,32 @@ export default function Dashboard() {
           {activeTab === "invoices" && (
             <div>
               {/* Panel header */}
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  flexWrap: "wrap",
-                  gap: "0.75rem",
-                  marginBottom: showFilter ? "0.875rem" : "1.25rem",
-                }}
-              >
+              <div className="flex items-center justify-between flex-wrap gap-3 mb-5">
                 <div>
-                  <h2
-                    style={{
-                      margin: 0,
-                      fontSize: "1.125rem",
-                      fontWeight: 700,
-                      color: "var(--color-text-heading)",
-                    }}
-                  >
+                  <h2 className="text-lg font-bold text-slate-900 m-0 leading-tight">
                     {t("invoicesTab.title")}
                   </h2>
-                  <p
-                    style={{
-                      margin: "0.2rem 0 0",
-                      fontSize: "0.8125rem",
-                      color: "var(--color-text-muted)",
-                    }}
-                  >
+                  <p className="text-xs text-slate-500 mt-0.5">
                     {t("invoicesTab.subtitle")}
                   </p>
                 </div>
 
-                {/* Right-side action row — search icon + refresh */}
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "0.5rem",
-                  }}
-                >
-                  {/* Search / filter toggle */}
+                {/* Action row */}
+                <div className="flex items-center gap-2">
+                  {/* Amount filter toggle */}
                   <button
                     onClick={() => {
                       haptic("soft");
                       setShowFilter((v) => !v);
                     }}
-                    aria-label={showFilter ? "Close search" : "Search invoices"}
+                    aria-label={showFilter ? "Close filter" : "Filter by amount"}
                     aria-expanded={showFilter}
-                    title="Search & filter invoices"
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      width: "2.25rem",
-                      height: "2.25rem",
-                      borderRadius: "0.625rem",
-                      border: showFilter
-                        ? "1.5px solid var(--color-primary)"
-                        : "1.5px solid var(--color-border)",
-                      background: showFilter
-                        ? "var(--color-primary-light)"
-                        : "var(--color-white)",
-                      color: showFilter
-                        ? "var(--color-primary)"
-                        : "var(--color-text-muted)",
-                      cursor: "pointer",
-                      transition:
-                        "border-color 0.15s, background 0.15s, color 0.15s",
-                      flexShrink: 0,
-                    }}
-                    onMouseEnter={(e) => {
-                      if (!showFilter) {
-                        (
-                          e.currentTarget as HTMLButtonElement
-                        ).style.borderColor = "var(--color-primary)";
-                        (e.currentTarget as HTMLButtonElement).style.color =
-                          "var(--color-primary)";
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (!showFilter) {
-                        (
-                          e.currentTarget as HTMLButtonElement
-                        ).style.borderColor = "var(--color-border)";
-                        (e.currentTarget as HTMLButtonElement).style.color =
-                          "var(--color-text-muted)";
-                      }
-                    }}
+                    className={[
+                      "flex items-center justify-center w-9 h-9 rounded-xl border transition-all duration-150",
+                      showFilter
+                        ? "bg-[#0f1f3d] border-[#0f1f3d] text-white"
+                        : "bg-white border-slate-200 text-slate-500 hover:border-slate-300 hover:text-slate-700",
+                    ].join(" ")}
                   >
                     <Search size={15} strokeWidth={2.1} />
                   </button>
@@ -902,42 +840,16 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              {/* Inline filter panel — slides in below header */}
+              {/* Inline filter panel */}
               {showFilter && (
-                <div
-                  style={{
-                    borderRadius: "0.75rem",
-                    border: "1px solid var(--color-border)",
-                    background: "var(--color-white)",
-                    marginBottom: "1.25rem",
-                    overflow: "hidden",
-                  }}
-                >
-                  <div
-                    style={{
-                      padding: "0.625rem 1rem",
-                      borderBottom: "1px solid var(--color-border)",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "0.5rem",
-                    }}
-                  >
-                    <Search
-                      size={14}
-                      strokeWidth={2}
-                      color="var(--color-text-muted)"
-                    />
-                    <span
-                      style={{
-                        fontSize: "0.8125rem",
-                        fontWeight: 600,
-                        color: "var(--color-text-heading)",
-                      }}
-                    >
-                      Search & Filter
+                <div className="bg-white rounded-2xl border border-slate-200 shadow-sm mb-4 overflow-hidden">
+                  <div className="flex items-center gap-2 px-4 py-3 border-b border-slate-100">
+                    <Search size={13} strokeWidth={2} className="text-slate-400" />
+                    <span className="text-xs font-bold text-slate-700 uppercase tracking-wide">
+                      Filter by Amount
                     </span>
                   </div>
-                  <div style={{ padding: "0 1rem" }}>
+                  <div className="px-4">
                     <FilterInvoice />
                   </div>
                 </div>

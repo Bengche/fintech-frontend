@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import Axios from "axios";
 import { useAuth } from "@/context/UserContext";
 import { QRCodeSVG } from "qrcode.react";
@@ -18,7 +18,9 @@ import {
   Check,
   QrCode,
   ChevronDown,
-  ChevronUp,
+  FileText,
+  Search,
+  ExternalLink,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { haptic } from "@/hooks/useHaptic";
@@ -42,32 +44,62 @@ interface Invoice {
 
 type GetAllProps = {
   link: string;
-  /** When true the internal "Your Invoices" heading and Refresh button are hidden.
-   *  The parent tab provides the heading and can trigger refresh via its own button. */
   hideHeader?: boolean;
-  /** Forwarded setter so a parent can inject a trigger-refresh function. */
   onRegisterRefresh?: (fn: () => void) => void;
 };
 
 const STATUS_TABS = ["all", "pending", "paid", "delivered", "expired"] as const;
 
-function statusBadge(status: string) {
-  const map: Record<string, string> = {
-    pending: "badge badge-warning",
-    paid: "badge badge-info",
-    delivered: "badge badge-success",
-    expired: "badge badge-neutral",
+function getStatusConfig(status: string): {
+  pill: string;
+  dotBg: string;
+  iconBg: string;
+  label: string;
+} {
+  const map: Record<string, { pill: string; dotBg: string; iconBg: string; label: string }> = {
+    pending: {
+      pill: "bg-amber-50 text-amber-700 border border-amber-200",
+      dotBg: "bg-amber-400",
+      iconBg: "bg-amber-50",
+      label: "Pending",
+    },
+    paid: {
+      pill: "bg-blue-50 text-blue-700 border border-blue-200",
+      dotBg: "bg-blue-500",
+      iconBg: "bg-blue-50",
+      label: "Paid",
+    },
+    delivered: {
+      pill: "bg-emerald-50 text-emerald-700 border border-emerald-200",
+      dotBg: "bg-emerald-500",
+      iconBg: "bg-emerald-50",
+      label: "Delivered",
+    },
+    completed: {
+      pill: "bg-emerald-50 text-emerald-700 border border-emerald-200",
+      dotBg: "bg-emerald-500",
+      iconBg: "bg-emerald-50",
+      label: "Completed",
+    },
+    expired: {
+      pill: "bg-slate-100 text-slate-500 border border-slate-200",
+      dotBg: "bg-slate-400",
+      iconBg: "bg-slate-100",
+      label: "Expired",
+    },
+    disputed: {
+      pill: "bg-rose-50 text-rose-700 border border-rose-200",
+      dotBg: "bg-rose-500",
+      iconBg: "bg-rose-50",
+      label: "Disputed",
+    },
   };
-  return map[status] ?? "badge badge-neutral";
+  return map[status] ?? map.expired;
 }
 
-/** Returns true only for invoices that have not yet entered a payment lifecycle. */
 function canDeleteInvoice(invoice: Invoice): boolean {
   return invoice.status === "pending" || invoice.status === "expired";
 }
-
-/** Returns a human-readable (i18n) reason why deletion is blocked, or undefined when deletion is allowed. */
-// Implemented inside component to access the `t` translator from useTranslations.
 
 export default function GetAllInvoices({
   hideHeader = false,
@@ -96,6 +128,8 @@ export default function GetAllInvoices({
   const [showQRId, setShowQRId] = useState<number | null>(null);
   const [expandedIds, setExpandedIds] = useState<Set<number>>(new Set());
   const [visible, setVisible] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const { user_id } = useAuth();
 
   function toggleExpand(id: number) {
     setExpandedIds((prev) => {
@@ -105,8 +139,6 @@ export default function GetAllInvoices({
       return next;
     });
   }
-  const [searchQuery, setSearchQuery] = useState("");
-  const { user_id } = useAuth();
 
   const getAllInvoices = useCallback(async () => {
     setLoading(true);
@@ -122,7 +154,6 @@ export default function GetAllInvoices({
     }
   }, [user_id]);
 
-  // Register the refresh function with the parent after mount — never during render
   useEffect(() => {
     if (onRegisterRefresh) onRegisterRefresh(getAllInvoices);
   }, [onRegisterRefresh, getAllInvoices]);
@@ -133,7 +164,6 @@ export default function GetAllInvoices({
       if (navigator.clipboard && window.isSecureContext) {
         await navigator.clipboard.writeText(copyLink);
       } else {
-        // Fallback for older browsers / non-HTTPS contexts
         const ta = document.createElement("textarea");
         ta.value = copyLink;
         ta.style.cssText = "position:fixed;opacity:0;pointer-events:none;";
@@ -165,29 +195,12 @@ export default function GetAllInvoices({
 
   return (
     <div>
-      {/* Header row — shown when not embedded in a parent tab */}
       {!hideHeader && (
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            flexWrap: "wrap",
-            gap: "0.75rem",
-            marginBottom: "1rem",
-          }}
-        >
-          <h2
-            style={{
-              fontSize: "1.125rem",
-              fontWeight: 700,
-              color: "var(--color-text-heading)",
-              margin: 0,
-            }}
-          >
+        <div className="flex items-center justify-between flex-wrap gap-3 mb-5">
+          <h2 className="text-lg font-bold text-slate-900 m-0">
             {t("list.title")}
           </h2>
-          <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+          <div className="flex gap-2 flex-wrap">
             <button
               className="btn-primary"
               onClick={() => {
@@ -200,9 +213,8 @@ export default function GetAllInvoices({
             </button>
             {invoices && (
               <button
-                className="btn-ghost"
+                className="btn-ghost text-sm"
                 onClick={() => setVisible((v) => !v)}
-                style={{ fontSize: "0.875rem" }}
               >
                 {visible ? "Hide" : "Show"}
               </button>
@@ -211,605 +223,327 @@ export default function GetAllInvoices({
         </div>
       )}
 
-      {/* Search input — shown above the filter tabs whenever invoices are loaded */}
       {invoices && invoices.length > 0 && visible && (
-        <div style={{ marginBottom: "0.75rem" }}>
-          <input
-            type="text"
-            placeholder="Search by name or invoice number…"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            style={{
-              width: "100%",
-              padding: "0.5rem 0.75rem",
-              fontSize: "0.875rem",
-              borderRadius: "var(--radius-sm)",
-              border: "1px solid var(--color-border)",
-              backgroundColor: "var(--color-mist)",
-              color: "var(--color-text-heading)",
-              outline: "none",
-              boxSizing: "border-box",
-            }}
-          />
+        <div className="mb-4 space-y-3">
+          <div className="relative">
+            <Search
+              size={15}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+            />
+            <input
+              type="text"
+              placeholder="Search by name or invoice number..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-9 pr-4 py-2.5 text-sm rounded-xl border border-slate-200 bg-white text-slate-800 placeholder:text-slate-400 outline-none focus:border-[#0f1f3d] focus:ring-2 focus:ring-[#0f1f3d]/10 transition-all"
+            />
+          </div>
+          <div className="flex gap-1.5 flex-wrap">
+            {STATUS_TABS.map((tab) => {
+              const isActive = statusFilter === tab;
+              return (
+                <button
+                  key={tab}
+                  onClick={() => {
+                    haptic("soft");
+                    setStatusFilter(tab);
+                  }}
+                  className={[
+                    "px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all duration-150 border",
+                    isActive
+                      ? "bg-[#0f1f3d] text-white border-[#0f1f3d] shadow-sm"
+                      : "bg-white text-slate-500 border-slate-200 hover:border-slate-300 hover:text-slate-700",
+                  ].join(" ")}
+                >
+                  {tab === "all"
+                    ? t("list.statusAll")
+                    : t(
+                        `list.status${tab.charAt(0).toUpperCase()}${tab.slice(1)}` as Parameters<
+                          typeof t
+                        >[0],
+                      )}
+                </button>
+              );
+            })}
+          </div>
         </div>
       )}
 
-      {/* Status filter tabs */}
-      {invoices && invoices.length > 0 && visible && (
-        <div
-          style={{
-            display: "flex",
-            gap: "0.375rem",
-            flexWrap: "wrap",
-            marginBottom: "1rem",
-          }}
-        >
-          {STATUS_TABS.map((tab) => (
-            <button
-              key={tab}
-              onClick={() => {
-                haptic("soft");
-                setStatusFilter(tab);
-              }}
-              style={{
-                padding: "0.3125rem 0.875rem",
-                borderRadius: "999px",
-                fontSize: "0.8125rem",
-                fontWeight: 600,
-                border: "none",
-                cursor: "pointer",
-                backgroundColor:
-                  statusFilter === tab
-                    ? "var(--color-primary)"
-                    : "var(--color-mist)",
-                color:
-                  statusFilter === tab
-                    ? "var(--color-white)"
-                    : "var(--color-text-muted)",
-                transition: "background 0.15s",
-              }}
-            >
-              {tab === "all"
-                ? t("list.statusAll")
-                : t(
-                    `list.status${tab.charAt(0).toUpperCase()}${tab.slice(1)}` as Parameters<
-                      typeof t
-                    >[0],
-                  )}
-            </button>
-          ))}
-        </div>
-      )}
-
-      {/* Empty state */}
       {invoices === null && !loading && visible && (
-        <div
-          style={{
-            textAlign: "center",
-            padding: "2.5rem 1rem",
-            color: "var(--color-text-muted)",
-          }}
-        >
-          <p style={{ fontSize: "0.9375rem" }}>{t("list.empty")}</p>
+        <div className="flex flex-col items-center justify-center py-16 px-4">
+          <div className="w-14 h-14 rounded-2xl bg-slate-100 flex items-center justify-center mb-4">
+            <FileText size={24} className="text-slate-400" />
+          </div>
+          <p className="text-sm font-semibold text-slate-700 mb-1">{t("list.empty")}</p>
+          <p className="text-xs text-slate-400 text-center max-w-xs">
+            Create your first invoice to start receiving secure payments.
+          </p>
         </div>
       )}
 
       {filtered.length === 0 && invoices !== null && !loading && visible && (
-        <div
-          style={{
-            textAlign: "center",
-            padding: "1.5rem",
-            color: "var(--color-text-muted)",
-            fontSize: "0.875rem",
-          }}
-        >
-          {t("list.noMatch")}
+        <div className="flex flex-col items-center py-10 text-slate-400">
+          <Search size={20} className="mb-2 text-slate-300" />
+          <p className="text-sm">{t("list.noMatch")}</p>
         </div>
       )}
 
-      {/* Invoice cards */}
-      {visible &&
-        filtered.map((invoice) => {
-          const isExpanded = expandedIds.has(invoice.id);
-          const invoiceUrl = `${FRONTEND_URL}/pay/${invoice.invoicenumber}`;
-          const createdStr = new Date(invoice.createdat).toLocaleDateString(
-            "en-GB",
-            { day: "2-digit", month: "short", year: "numeric" },
-          );
-          const expiresStr = invoice.expires_at
-            ? new Date(invoice.expires_at).toLocaleDateString("en-GB", {
-                day: "2-digit",
-                month: "short",
-                year: "numeric",
-              })
-            : null;
-          const isMilestone = invoice.payment_type === "installment";
-          const hasActions =
-            invoice.status === "paid" ||
-            invoice.status === "delivered" ||
-            invoice.status === "completed";
+      {visible && (
+        <div className="space-y-2.5">
+          {filtered.map((invoice) => {
+            const isExpanded = expandedIds.has(invoice.id);
+            const invoiceUrl = `${FRONTEND_URL}/pay/${invoice.invoicenumber}`;
+            const sc = getStatusConfig(invoice.status);
+            const createdStr = new Date(invoice.createdat).toLocaleDateString(
+              "en-GB",
+              { day: "2-digit", month: "short", year: "numeric" },
+            );
+            const expiresStr = invoice.expires_at
+              ? new Date(invoice.expires_at).toLocaleDateString("en-GB", {
+                  day: "2-digit",
+                  month: "short",
+                  year: "numeric",
+                })
+              : null;
+            const isMilestone = invoice.payment_type === "installment";
+            const hasActions =
+              invoice.status === "paid" ||
+              invoice.status === "delivered" ||
+              invoice.status === "completed";
 
-          return (
-            <div
-              key={invoice.id}
-              className="card"
-              style={{
-                marginBottom: "0.625rem",
-                padding: 0,
-                overflow: "hidden",
-                border: "1px solid var(--color-border)",
-                boxShadow: "var(--shadow-card)",
-              }}
-            >
-              {/* ── Collapsed summary row (always visible, clickable) ── */}
-              <button
-                onClick={() => {
-                  haptic("soft");
-                  toggleExpand(invoice.id);
-                }}
-                className="tx-row"
-                style={{
-                  borderBottom: isExpanded
-                    ? "1px solid var(--color-border)"
-                    : "none",
-                }}
-                aria-expanded={isExpanded}
-              >
-                {/* Status icon dot */}
-                <div
-                  className="tx-row-icon"
-                  style={{
-                    background:
-                      invoice.status === "paid"
-                        ? "rgba(59,130,246,0.12)"
-                        : invoice.status === "delivered" ||
-                            invoice.status === "completed"
-                          ? "rgba(16,185,129,0.12)"
-                          : invoice.status === "pending"
-                            ? "rgba(245,158,11,0.12)"
-                            : "var(--color-mist)",
-                    color:
-                      invoice.status === "paid"
-                        ? "#3b82f6"
-                        : invoice.status === "delivered" ||
-                            invoice.status === "completed"
-                          ? "#059669"
-                          : invoice.status === "pending"
-                            ? "#d97706"
-                            : "var(--color-text-muted)",
-                  }}
-                >
-                  <span
-                    style={{
-                      width: 8,
-                      height: 8,
-                      borderRadius: "50%",
-                      background: "currentColor",
-                      display: "block",
-                    }}
-                  />
-                </div>
-
-                {/* Name + ref */}
-                <div className="tx-row-body">
-                  <p className="tx-row-name">{invoice.invoicename}</p>
-                  <p className="tx-row-sub">
-                    <span
-                      style={{
-                        fontFamily: 'ui-monospace,"Cascadia Code",monospace',
-                        fontSize: "0.7rem",
-                      }}
-                    >
-                      #{invoice.invoicenumber}
-                    </span>
-                    <span
-                      style={{
-                        color: "var(--color-border-strong)",
-                        margin: "0 0.3rem",
-                      }}
-                    >
-                      ·
-                    </span>
-                    <span>{createdStr}</span>
-                  </p>
-                </div>
-
-                {/* Amount + badge + chevron */}
-                <div
-                  className="tx-row-right"
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    gap: "0.625rem",
-                  }}
-                >
-                  <div style={{ textAlign: "right" }}>
-                    <p className="tx-row-amount">
-                      {Number(invoice.amount).toLocaleString()}{" "}
-                      {invoice.currency}
-                    </p>
-                    <span
-                      className={statusBadge(invoice.status)}
-                      style={{ fontSize: "0.7rem" }}
-                    >
-                      {invoice.status.charAt(0).toUpperCase() +
-                        invoice.status.slice(1)}
-                    </span>
-                  </div>
-                  {isExpanded ? (
-                    <ChevronUp
-                      size={16}
-                      style={{
-                        color: "var(--color-text-muted)",
-                        flexShrink: 0,
-                      }}
-                    />
-                  ) : (
-                    <ChevronDown
-                      size={16}
-                      style={{
-                        color: "var(--color-text-muted)",
-                        flexShrink: 0,
-                      }}
-                    />
-                  )}
-                </div>
-              </button>
-
-              {/* ── Meta bar ── */}
+            return (
               <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "0.5rem",
-                  flexWrap: "wrap",
-                  padding: "0 1rem 0.75rem",
-                  borderBottom: isExpanded
-                    ? "1px solid var(--color-border)"
-                    : "none",
-                }}
+                key={invoice.id}
+                className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden transition-shadow duration-200 hover:shadow-md"
               >
-                <span
-                  style={{
-                    fontSize: "0.75rem",
-                    color: "var(--color-text-muted)",
+                {/* Collapsed summary row */}
+                <button
+                  onClick={() => {
+                    haptic("soft");
+                    toggleExpand(invoice.id);
                   }}
+                  aria-expanded={isExpanded}
+                  className="w-full flex items-center gap-3 sm:gap-4 px-4 py-3.5 text-left transition-colors duration-150 hover:bg-slate-50/60"
                 >
-                  {t("list.fieldCreated")}: {createdStr}
-                </span>
-                {expiresStr && (
-                  <>
-                    <span
-                      style={{
-                        color: "var(--color-border)",
-                        fontSize: "0.75rem",
-                      }}
-                    >
-                      ·
-                    </span>
-                    <span
-                      style={{
-                        fontSize: "0.75rem",
-                        color: "var(--color-text-muted)",
-                      }}
-                    >
-                      {t("list.fieldExpires")}: {expiresStr}
-                    </span>
-                  </>
-                )}
-                {isMilestone && (
-                  <>
-                    <span
-                      style={{
-                        color: "var(--color-border)",
-                        fontSize: "0.75rem",
-                      }}
-                    >
-                      ·
-                    </span>
-                    <span
-                      style={{
-                        fontSize: "0.6875rem",
-                        fontWeight: 600,
-                        padding: "0.125rem 0.5rem",
-                        backgroundColor: "#fffbeb",
-                        color: "#92400e",
-                        border: "1px solid #fcd34d",
-                        borderRadius: "999px",
-                      }}
-                    >
-                      Milestone
-                    </span>
-                  </>
-                )}
-                {/* Quick-action: view invoice page (always accessible) */}
-                <Link
-                  href={`/pay/${invoice.invoicenumber}`}
-                  onClick={(e) => e.stopPropagation()}
-                  style={{
-                    marginLeft: "auto",
-                    fontSize: "0.75rem",
-                    color: "var(--color-primary)",
-                    fontWeight: 600,
-                    textDecoration: "none",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  View Invoice →
-                </Link>
-              </div>
-
-              {/* ── Expanded details panel ── */}
-              {isExpanded && (
-                <div style={{ padding: "1rem" }}>
-                  {/* Invoice link row */}
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "0.5rem",
-                      backgroundColor: "var(--color-mist)",
-                      border: "1px solid var(--color-border)",
-                      borderRadius: "var(--radius-sm)",
-                      padding: "0.5rem 0.75rem",
-                      marginBottom: "0.875rem",
-                      flexWrap: "wrap",
-                    }}
+                  {/* Status icon */}
+                  <span
+                    className={[
+                      "shrink-0 w-9 h-9 rounded-xl flex items-center justify-center",
+                      sc.iconBg,
+                    ].join(" ")}
                   >
-                    <span
-                      style={{
-                        flex: 1,
-                        fontSize: "0.8rem",
-                        color: "var(--color-text-muted)",
-                        wordBreak: "break-all",
-                      }}
-                    >
-                      {invoiceUrl}
-                    </span>
-                    <button
-                      onClick={() => handleCopy(invoice.id, invoiceUrl)}
-                      className="btn-ghost"
-                      style={{
-                        fontSize: "0.75rem",
-                        padding: "0.25rem 0.625rem",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "0.25rem",
-                      }}
-                    >
-                      {copiedId === invoice.id ? (
+                    <span className={["w-2.5 h-2.5 rounded-full", sc.dotBg].join(" ")} />
+                  </span>
+
+                  {/* Name + ref */}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-slate-900 truncate leading-tight">
+                      {invoice.invoicename}
+                    </p>
+                    <p className="text-[11px] text-slate-400 mt-0.5 flex items-center gap-1.5 flex-wrap">
+                      <span className="font-mono">#{invoice.invoicenumber}</span>
+                      <span className="text-slate-200">·</span>
+                      <span>{createdStr}</span>
+                      {isMilestone && (
                         <>
-                          <Check size={13} /> {t("list.copied")}
-                        </>
-                      ) : (
-                        <>
-                          <Copy size={13} /> {t("list.copyLink")}
+                          <span className="text-slate-200">·</span>
+                          <span className="text-[0.63rem] font-semibold px-1.5 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
+                            Milestone
+                          </span>
                         </>
                       )}
-                    </button>
+                    </p>
                   </div>
 
-                  {/* Share row */}
-                  <div
-                    style={{
-                      display: "flex",
-                      gap: "0.5rem",
-                      flexWrap: "wrap",
-                      alignItems: "center",
-                      marginBottom: "0.75rem",
-                    }}
-                  >
-                    <a
-                      href={`https://wa.me/?text=${encodeURIComponent(`Pay me for "${invoice.invoicename}" on Fonlok 👉 ${invoiceUrl}`)}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={{
-                        display: "inline-flex",
-                        alignItems: "center",
-                        gap: "0.35rem",
-                        padding: "0.35rem 0.875rem",
-                        backgroundColor: "#25D366",
-                        color: "#fff",
-                        borderRadius: "var(--radius-sm)",
-                        fontWeight: 600,
-                        fontSize: "0.8125rem",
-                        textDecoration: "none",
-                      }}
-                    >
-                      <svg
-                        viewBox="0 0 24 24"
-                        width="14"
-                        height="14"
-                        fill="currentColor"
-                        aria-hidden="true"
-                      >
-                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
-                      </svg>
-                      {t("list.whatsapp")}
-                    </a>
-                    <button
-                      className="btn-ghost"
-                      onClick={() =>
-                        setShowQRId(showQRId === invoice.id ? null : invoice.id)
-                      }
-                      style={{
-                        fontSize: "0.8125rem",
-                        padding: "0.35rem 0.875rem",
-                        display: "inline-flex",
-                        alignItems: "center",
-                        gap: "0.35rem",
-                      }}
-                    >
-                      <QrCode size={14} />
-                      {showQRId === invoice.id
-                        ? t("list.hideQR")
-                        : t("list.showQR")}
-                    </button>
-                  </div>
-
-                  {/* QR Code */}
-                  {showQRId === invoice.id && (
-                    <div
-                      style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "center",
-                        gap: "0.5rem",
-                        padding: "0.875rem",
-                        backgroundColor: "var(--color-mist)",
-                        border: "1px solid var(--color-border)",
-                        borderRadius: "var(--radius-sm)",
-                        marginBottom: "0.75rem",
-                      }}
-                    >
-                      <div
-                        style={{
-                          padding: "0.75rem",
-                          backgroundColor: "#fff",
-                          borderRadius: "var(--radius-sm)",
-                          border: "1px solid var(--color-border)",
-                          display: "inline-block",
-                        }}
-                      >
-                        <QRCodeSVG value={invoiceUrl} size={130} />
-                      </div>
-                      <p
-                        style={{
-                          fontSize: "0.75rem",
-                          color: "var(--color-text-muted)",
-                          margin: 0,
-                          textAlign: "center",
-                        }}
-                      >
-                        {t("list.qrHint")}
+                  {/* Amount + badge + chevron */}
+                  <div className="shrink-0 flex items-center gap-2 sm:gap-3">
+                    <div className="text-right">
+                      <p className="text-sm font-bold text-slate-900 leading-tight tabular-nums">
+                        {Number(invoice.amount).toLocaleString()}{" "}
+                        <span className="text-[11px] font-medium text-slate-500">
+                          {invoice.currency}
+                        </span>
                       </p>
+                      <span
+                        className={[
+                          "inline-block mt-1 text-[0.63rem] font-semibold px-2 py-0.5 rounded-full",
+                          sc.pill,
+                        ].join(" ")}
+                      >
+                        {sc.label}
+                      </span>
                     </div>
+                    <span
+                      className={[
+                        "text-slate-400 transition-transform duration-200",
+                        isExpanded ? "rotate-180" : "",
+                      ].join(" ")}
+                    >
+                      <ChevronDown size={16} strokeWidth={2} />
+                    </span>
+                  </div>
+                </button>
+
+                {/* Meta / quick-links bar */}
+                <div
+                  className={[
+                    "flex items-center gap-3 flex-wrap px-4 py-2 border-t border-slate-50 bg-slate-50/40",
+                    isExpanded ? "border-b border-slate-100" : "",
+                  ].join(" ")}
+                >
+                  {expiresStr && (
+                    <span className="text-[11px] text-slate-400">
+                      Expires {expiresStr}
+                    </span>
                   )}
-
-                  {/* Divider */}
-                  <div
-                    style={{
-                      borderTop: "1px solid var(--color-border)",
-                      marginBottom: "0.875rem",
-                    }}
-                  />
-
-                  {/* Action buttons */}
-                  <div
-                    style={{
-                      display: "flex",
-                      gap: "0.5rem",
-                      flexWrap: "wrap",
-                      alignItems: "center",
-                    }}
+                  <Link
+                    href={`/pay/${invoice.invoicenumber}`}
+                    onClick={(e) => e.stopPropagation()}
+                    className="ml-auto flex items-center gap-1 text-[11px] font-semibold text-[#0f1f3d] hover:text-[#f59e0b] transition-colors no-underline"
                   >
-                    <EditInvoice
-                      invoice_number={invoice.invoicenumber}
-                      onEdit={getAllInvoices}
-                      canEdit={canDeleteInvoice(invoice)}
-                      editBlockReason={getEditBlockReason(invoice)}
-                    />
-                    <DeleteInvoice
-                      invoice_id={invoice.id}
-                      onDelete={getAllInvoices}
-                      canDelete={canDeleteInvoice(invoice)}
-                      deleteBlockReason={getDeleteBlockReason(invoice)}
-                    />
-                    {invoice.status === "paid" && !isMilestone && (
-                      <MarkDelivered
-                        invoice_id={invoice.id}
-                        onDelivered={getAllInvoices}
+                    View Invoice
+                    <ExternalLink size={10} strokeWidth={2.5} />
+                  </Link>
+                </div>
+
+                {/* Expanded details panel */}
+                {isExpanded && (
+                  <div className="px-4 pt-4 pb-5 space-y-4">
+                    {/* Payment link */}
+                    <div>
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">
+                        Payment Link
+                      </p>
+                      <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 flex-wrap">
+                        <span className="flex-1 text-[11px] text-slate-500 font-mono break-all min-w-0">
+                          {invoiceUrl}
+                        </span>
+                        <button
+                          onClick={() => handleCopy(invoice.id, invoiceUrl)}
+                          className={[
+                            "shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all border",
+                            copiedId === invoice.id
+                              ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                              : "bg-white text-slate-700 border-slate-200 hover:border-slate-300",
+                          ].join(" ")}
+                        >
+                          {copiedId === invoice.id ? (
+                            <>
+                              <Check size={12} /> {t("list.copied")}
+                            </>
+                          ) : (
+                            <>
+                              <Copy size={12} /> {t("list.copyLink")}
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Share */}
+                    <div className="flex gap-2 flex-wrap items-center">
+                      <a
+                        href={`https://wa.me/?text=${encodeURIComponent(`Pay me for "${invoice.invoicename}" on Fonlok 👉 ${invoiceUrl}`)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold text-white no-underline hover:opacity-90 transition-opacity"
+                        style={{ backgroundColor: "#25D366" }}
+                      >
+                        <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" aria-hidden="true">
+                          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+                        </svg>
+                        {t("list.whatsapp")}
+                      </a>
+                      <button
+                        onClick={() =>
+                          setShowQRId(showQRId === invoice.id ? null : invoice.id)
+                        }
+                        className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-white text-slate-700 border border-slate-200 hover:border-slate-300 transition-colors"
+                      >
+                        <QrCode size={13} />
+                        {showQRId === invoice.id ? t("list.hideQR") : t("list.showQR")}
+                      </button>
+                    </div>
+
+                    {/* QR Code */}
+                    {showQRId === invoice.id && (
+                      <div className="flex flex-col items-center gap-3 p-5 bg-slate-50 border border-slate-200 rounded-2xl">
+                        <div className="p-3 bg-white rounded-xl border border-slate-200 shadow-sm">
+                          <QRCodeSVG value={invoiceUrl} size={130} />
+                        </div>
+                        <p className="text-xs text-slate-400 text-center max-w-[200px]">
+                          {t("list.qrHint")}
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Divider */}
+                    <div className="border-t border-slate-100" />
+
+                    {/* Action buttons */}
+                    <div className="flex gap-2 flex-wrap items-center">
+                      <EditInvoice
+                        invoice_number={invoice.invoicenumber}
+                        onEdit={getAllInvoices}
+                        canEdit={canDeleteInvoice(invoice)}
+                        editBlockReason={getEditBlockReason(invoice)}
                       />
+                      <DeleteInvoice
+                        invoice_id={invoice.id}
+                        onDelete={getAllInvoices}
+                        canDelete={canDeleteInvoice(invoice)}
+                        deleteBlockReason={getDeleteBlockReason(invoice)}
+                      />
+                      {invoice.status === "paid" && !isMilestone && (
+                        <MarkDelivered
+                          invoice_id={invoice.id}
+                          onDelivered={getAllInvoices}
+                        />
+                      )}
+                    </div>
+
+                    {/* Milestone strip */}
+                    {invoice.status === "paid" && isMilestone && (
+                      <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200">
+                        <p className="text-sm font-bold text-amber-800 mb-1">
+                          {t("list.milestoneActionTitle")}
+                        </p>
+                        <p className="text-xs text-amber-700 leading-relaxed mb-3">
+                          {t("list.milestoneActionBody")}
+                        </p>
+                        <Link
+                          href={`/invoice/${invoice.invoicenumber}#milestones`}
+                          className="inline-block px-4 py-2 rounded-xl bg-amber-500 text-white text-xs font-bold no-underline hover:bg-amber-600 transition-colors"
+                        >
+                          {t("list.manageMilestones")}
+                        </Link>
+                      </div>
+                    )}
+
+                    {/* Chat & Dispute */}
+                    {hasActions && (
+                      <div className="flex gap-2 flex-wrap pt-1 border-t border-slate-100">
+                        <Link
+                          href={`/dashboard/chat/${invoice.invoicenumber}`}
+                          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#0f1f3d] text-white text-xs font-semibold no-underline hover:bg-[#162d5a] transition-colors"
+                        >
+                          <MessageSquare size={13} />
+                          Chat with Buyer
+                        </Link>
+                        <DisputeButton
+                          invoice_number={invoice.invoicenumber}
+                          sender_type="seller"
+                          paymentType={invoice.payment_type}
+                        />
+                      </div>
                     )}
                   </div>
-
-                  {/* Milestone action strip */}
-                  {invoice.status === "paid" && isMilestone && (
-                    <div
-                      style={{
-                        marginTop: "0.75rem",
-                        padding: "0.875rem 1rem",
-                        backgroundColor: "#fffbeb",
-                        border: "1.5px solid #f59e0b",
-                        borderRadius: "var(--radius-sm)",
-                      }}
-                    >
-                      <p
-                        style={{
-                          margin: "0 0 0.5rem",
-                          fontSize: "0.8125rem",
-                          fontWeight: 700,
-                          color: "#92400e",
-                        }}
-                      >
-                        {t("list.milestoneActionTitle")}
-                      </p>
-                      <p
-                        style={{
-                          margin: "0 0 0.75rem",
-                          fontSize: "0.8rem",
-                          color: "#78350f",
-                          lineHeight: 1.5,
-                        }}
-                      >
-                        {t("list.milestoneActionBody")}
-                      </p>
-                      <Link
-                        href={`/invoice/${invoice.invoicenumber}#milestones`}
-                        style={{
-                          display: "inline-block",
-                          padding: "0.35rem 0.875rem",
-                          backgroundColor: "#f59e0b",
-                          color: "#fff",
-                          borderRadius: "var(--radius-sm)",
-                          fontWeight: 700,
-                          fontSize: "0.8125rem",
-                          textDecoration: "none",
-                        }}
-                      >
-                        {t("list.manageMilestones")}
-                      </Link>
-                    </div>
-                  )}
-
-                  {/* Chat & Dispute */}
-                  {hasActions && (
-                    <div
-                      style={{
-                        marginTop: "0.875rem",
-                        paddingTop: "0.875rem",
-                        borderTop: "1px solid var(--color-border)",
-                        display: "flex",
-                        gap: "0.5rem",
-                        flexWrap: "wrap",
-                      }}
-                    >
-                      <Link
-                        href={`/dashboard/chat/${invoice.invoicenumber}`}
-                        className="btn-primary"
-                        style={{
-                          fontSize: "0.8125rem",
-                          display: "inline-flex",
-                          alignItems: "center",
-                          gap: "0.375rem",
-                          textDecoration: "none",
-                        }}
-                      >
-                        <MessageSquare size={14} />
-                        Chat with Buyer
-                      </Link>
-                      <DisputeButton
-                        invoice_number={invoice.invoicenumber}
-                        sender_type="seller"
-                        paymentType={invoice.payment_type}
-                      />
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          );
-        })}
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
