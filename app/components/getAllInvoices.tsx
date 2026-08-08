@@ -513,7 +513,8 @@ export default function GetAllInvoices({
                         </p>
                         <Link
                           href={`/invoice/${invoice.invoicenumber}#milestones`}
-                          className="inline-block px-4 py-2 rounded-xl bg-amber-500 text-white text-xs font-bold no-underline hover:bg-amber-600 transition-colors"
+                          className="inline-block px-4 py-2 rounded-xl bg-amber-500 text-xs font-bold no-underline hover:bg-amber-600 transition-colors"
+                          style={{ color: "#ffffff" }}
                         >
                           {t("list.manageMilestones")}
                         </Link>
@@ -525,7 +526,8 @@ export default function GetAllInvoices({
                       <div className="flex gap-2 flex-wrap pt-1 border-t border-slate-100">
                         <Link
                           href={`/dashboard/chat/${invoice.invoicenumber}`}
-                          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#0f1f3d] text-white text-xs font-semibold no-underline hover:bg-[#162d5a] transition-colors"
+                          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#0f1f3d] text-xs font-semibold no-underline hover:bg-[#162d5a] transition-colors"
+                          style={{ color: "#ffffff" }}
                         >
                           <MessageSquare size={13} />
                           Chat with Buyer

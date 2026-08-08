@@ -806,7 +806,9 @@ export default function Dashboard() {
                       haptic("soft");
                       setShowFilter((v) => !v);
                     }}
-                    aria-label={showFilter ? "Close filter" : "Filter by amount"}
+                    aria-label={
+                      showFilter ? "Close filter" : "Filter by amount"
+                    }
                     aria-expanded={showFilter}
                     className={[
                       "flex items-center justify-center w-9 h-9 rounded-xl border transition-all duration-150",
@@ -844,7 +846,11 @@ export default function Dashboard() {
               {showFilter && (
                 <div className="bg-white rounded-2xl border border-slate-200 shadow-sm mb-4 overflow-hidden">
                   <div className="flex items-center gap-2 px-4 py-3 border-b border-slate-100">
-                    <Search size={13} strokeWidth={2} className="text-slate-400" />
+                    <Search
+                      size={13}
+                      strokeWidth={2}
+                      className="text-slate-400"
+                    />
                     <span className="text-xs font-bold text-slate-700 uppercase tracking-wide">
                       Filter by Amount
                     </span>
