@@ -197,7 +197,7 @@ export default function AdminDashboard() {
   const [liveKeysLoaded, setLiveKeysLoaded] = useState(false);
   const [liveKeysError, setLiveKeysError] = useState("");
   const [liveKeysFilter, setLiveKeysFilter] = useState<
-    "pending" | "approved" | "revoked" | "all"
+    "pending" | "approved" | "suspended" | "revoked" | "all"
   >("pending");
   const [liveKeyActionLoadingId, setLiveKeyActionLoadingId] = useState<
     number | null
@@ -440,7 +440,9 @@ export default function AdminDashboard() {
   }, [activeTab, authed, suspensionFilter, loadTab]);
 
   const loadLiveKeys = useCallback(
-    async (filter: "pending" | "approved" | "revoked" | "all") => {
+    async (
+      filter: "pending" | "approved" | "suspended" | "revoked" | "all",
+    ) => {
       setLiveKeysLoading(true);
       setLiveKeysError("");
       try {
@@ -5685,9 +5687,11 @@ function LiveKeysAdminTab({
   loading: boolean;
   loaded: boolean;
   error: string;
-  filter: "pending" | "approved" | "revoked" | "all";
+  filter: "pending" | "approved" | "suspended" | "revoked" | "all";
   setFilter: React.Dispatch<
-    React.SetStateAction<"pending" | "approved" | "revoked" | "all">
+    React.SetStateAction<
+      "pending" | "approved" | "suspended" | "revoked" | "all"
+    >
   >;
   actionLoadingId: number | null;
   setActionLoadingId: React.Dispatch<React.SetStateAction<number | null>>;
@@ -5775,12 +5779,40 @@ function LiveKeysAdminTab({
     }
   };
 
+  const doStatusChange = async (id: number, action: "suspend" | "activate") => {
+    setActionMsg("");
+    setActionErr("");
+    setActionLoadingId(id);
+    try {
+      await axios.patch(
+        `${API_URL}/admin/live-keys/${id}/${action}`,
+        {},
+        { withCredentials: true },
+      );
+      setActionMsg(
+        action === "suspend"
+          ? "Key suspended. The holder has been notified by email."
+          : "Key reactivated. The holder has been notified by email.",
+      );
+      onReload();
+    } catch (err: unknown) {
+      setActionErr(
+        axios.isAxiosError(err) && err.response?.data?.message
+          ? err.response.data.message
+          : `Failed to ${action} key.`,
+      );
+    } finally {
+      setActionLoadingId(null);
+    }
+  };
+
   const FILTERS: {
-    key: "pending" | "approved" | "revoked" | "all";
+    key: "pending" | "approved" | "suspended" | "revoked" | "all";
     label: string;
   }[] = [
     { key: "pending", label: "Pending" },
     { key: "approved", label: "Approved" },
+    { key: "suspended", label: "Suspended" },
     { key: "revoked", label: "Revoked" },
     { key: "all", label: "All" },
   ];
@@ -5800,6 +5832,14 @@ function LiveKeysAdminTab({
         bd: "rgba(100,116,139,0.2)",
         cl: "#475569",
         label: "Revoked",
+      };
+    }
+    if (row.suspended_at) {
+      return {
+        bg: "rgba(245,158,11,0.12)",
+        bd: "rgba(245,158,11,0.32)",
+        cl: "#92400e",
+        label: "Suspended",
       };
     }
     if (row.approved_at) {
@@ -5841,7 +5881,7 @@ function LiveKeysAdminTab({
       >
         <div>
           <h3 style={{ margin: 0, fontSize: "1.05rem", fontWeight: 800 }}>
-            Live API Key Applications
+            Live API Keys
           </h3>
           <p
             style={{
@@ -5850,8 +5890,8 @@ function LiveKeysAdminTab({
               color: "var(--color-text-muted)",
             }}
           >
-            Review and approve or reject live API key requests from platform
-            partners. Approved keys carry a 2% fee on every released payment.
+            Review access, successful payment volume, and API-key status for
+            platform partners.
           </p>
         </div>
         <button
@@ -5935,6 +5975,7 @@ function LiveKeysAdminTab({
         const pill = statusPill(row);
         const isPending = !row.approved_at && !row.revoked_at;
         const isApproved = !!row.approved_at && !row.revoked_at;
+        const isSuspended = !!row.suspended_at;
         const isBusy = actionLoadingId === id;
 
         return (
@@ -6029,6 +6070,24 @@ function LiveKeysAdminTab({
                 </span>
                 {String(row.label || "—")}
               </div>
+              {isApproved && (
+                <div>
+                  <span style={{ fontWeight: 700, color: "var(--color-text)" }}>
+                    Successfully processed:{" "}
+                  </span>
+                  <strong style={{ color: "var(--color-text)" }}>
+                    {new Intl.NumberFormat("en-GB", {
+                      style: "currency",
+                      currency: "XAF",
+                      maximumFractionDigits: 0,
+                    }).format(Number(row.successful_amount || 0))}
+                  </strong>
+                  <span>
+                    {" "}
+                    ({String(row.successful_payment_count || 0)} paid)
+                  </span>
+                </div>
+              )}
               <div>
                 <span style={{ fontWeight: 700, color: "var(--color-text)" }}>
                   Applied:{" "}
@@ -6184,12 +6243,34 @@ function LiveKeysAdminTab({
               </div>
             )}
             {isApproved && (
-              <div>
+              <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+                <button
+                  disabled={isBusy}
+                  onClick={() =>
+                    doStatusChange(id, isSuspended ? "activate" : "suspend")
+                  }
+                  style={{
+                    padding: "0.4rem 0.9rem",
+                    borderRadius: "6px",
+                    border: `1px solid ${isSuspended ? "#86efac" : "#fcd34d"}`,
+                    background: "transparent",
+                    color: isSuspended ? "#15803d" : "#92400e",
+                    fontWeight: 700,
+                    fontSize: "0.8rem",
+                    cursor: isBusy ? "not-allowed" : "pointer",
+                  }}
+                >
+                  {isBusy
+                    ? "Updating…"
+                    : isSuspended
+                      ? "Reactivate Key"
+                      : "Suspend Key"}
+                </button>
                 <button
                   disabled={isBusy}
                   onClick={() => doRevoke(id)}
                   style={{
-                    padding: "0.35rem 0.9rem",
+                    padding: "0.4rem 0.9rem",
                     borderRadius: "6px",
                     border: "1px solid #fca5a5",
                     background: "transparent",
@@ -6199,7 +6280,7 @@ function LiveKeysAdminTab({
                     cursor: isBusy ? "not-allowed" : "pointer",
                   }}
                 >
-                  {isBusy ? "Revoking…" : "Revoke Key"}
+                  {isBusy ? "Updating…" : "Revoke Key"}
                 </button>
               </div>
             )}
