@@ -4,6 +4,33 @@ import { useTranslations } from "next-intl";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { QRCodeSVG } from "qrcode.react";
+import {
+  Ban,
+  Banknote,
+  Gift,
+  Hourglass,
+  Inbox,
+  KeyRound,
+  LayoutDashboard,
+  LogOut,
+  Megaphone,
+  ReceiptText,
+  Scale,
+  ScrollText,
+  ShieldCheck,
+  SlidersHorizontal,
+  Users,
+  FileText,
+  CreditCard,
+  Wallet,
+  TrendingUp,
+  Lock,
+  Handshake,
+  AlertTriangle,
+  CheckCircle2,
+  Link2,
+  type LucideIcon,
+} from "lucide-react";
 
 const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
 const ITEMS_PER_PAGE = 10;
@@ -96,9 +123,14 @@ const statusBadge = (status: RowValue) => {
     completed: "badge badge-success",
     refunded: "badge badge-info",
     refund_pending: "badge badge-warning",
+    partially_paid: "badge badge-info",
   };
   return map[key] ?? "badge badge-neutral";
 };
+
+// "partially_paid" -> "partially paid" (CSS capitalises it)
+const statusText = (status: RowValue) =>
+  String(status ?? "").replace(/_/g, " ");
 
 // ─── Tab Names ─────────────────────────────────────────────────────────────────
 type TabKey =
@@ -118,6 +150,37 @@ type TabKey =
   | "audit"
   | "inbox"
   | "live-keys";
+
+// Sidebar / tab-strip structure: grouped so 16 sections stay easy to scan.
+const NAV_GROUPS: { title: string; keys: TabKey[] }[] = [
+  { title: "Insights", keys: ["overview"] },
+  {
+    title: "Operations",
+    keys: ["users", "invoices", "payments", "payouts", "stuck", "disputes"],
+  },
+  { title: "Growth", keys: ["referrals", "messages", "inbox"] },
+  { title: "Compliance", keys: ["kyc", "suspensions", "verify", "audit"] },
+  { title: "Platform", keys: ["controls", "live-keys"] },
+];
+
+const TAB_ICONS: Record<TabKey, LucideIcon> = {
+  overview: LayoutDashboard,
+  users: Users,
+  invoices: FileText,
+  payments: CreditCard,
+  payouts: Banknote,
+  stuck: Hourglass,
+  disputes: Scale,
+  referrals: Gift,
+  messages: Megaphone,
+  inbox: Inbox,
+  kyc: ShieldCheck,
+  suspensions: Ban,
+  verify: ReceiptText,
+  audit: ScrollText,
+  controls: SlidersHorizontal,
+  "live-keys": KeyRound,
+};
 
 // ─── Main Component ────────────────────────────────────────────────────────────
 export default function AdminDashboard() {
@@ -914,56 +977,22 @@ export default function AdminDashboard() {
   // ── Showing a loading screen while checking auth ─────────────────────────────
   if (authed === null) {
     return (
-      <div
-        style={{
-          minHeight: "100vh",
-          backgroundColor: "var(--color-primary)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <p style={{ color: "#94a3b8", fontSize: "0.9375rem" }}>
-          {t("dashboard.verifyingSession")}
-        </p>
+      <div className="adm-boot">
+        <div style={{ textAlign: "center" }}>
+          <div className="adm-spinner" />
+          <p style={{ margin: 0 }}>{t("dashboard.verifyingSession")}</p>
+        </div>
       </div>
     );
   }
 
   // ─── Render ──────────────────────────────────────────────────────────────────
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        backgroundColor: "var(--color-cloud)",
-        display: "flex",
-        flexDirection: "column",
-      }}
-    >
+    <div className="adm">
       {/* ── Top Navigation Bar ───────────────────────────────────────────────── */}
-      <header
-        style={{
-          backgroundColor: "var(--color-primary)",
-          borderBottom: "1px solid rgba(255,255,255,0.08)",
-          padding: "0.75rem 1.5rem",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-        }}
-      >
-        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-          <div
-            style={{
-              width: "2rem",
-              height: "2rem",
-              borderRadius: "0.5rem",
-              backgroundColor: "var(--color-accent)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              flexShrink: 0,
-            }}
-          >
+      <header className="adm-header">
+        <div className="adm-brand">
+          <div className="adm-brand-mark">
             <svg
               width="18"
               height="18"
@@ -979,952 +1008,643 @@ export default function AdminDashboard() {
               />
             </svg>
           </div>
-          <div>
-            <h1
-              style={{
-                color: "#ffffff",
-                fontWeight: 700,
-                fontSize: "0.9375rem",
-                margin: 0,
-                lineHeight: 1.2,
-              }}
-            >
-              {t("dashboard.headerTitle")}
-            </h1>
-            <p style={{ color: "#64748b", fontSize: "0.75rem", margin: 0 }}>
-              {t("dashboard.headerSubtitle")}
-            </p>
+          <div style={{ minWidth: 0 }}>
+            <h1 className="adm-brand-title">{t("dashboard.headerTitle")}</h1>
+            <p className="adm-brand-sub">{t("dashboard.headerSubtitle")}</p>
           </div>
         </div>
-        <button
-          onClick={handleLogout}
-          style={{
-            color: "#94a3b8",
-            fontSize: "0.875rem",
-            padding: "0.375rem 0.875rem",
-            borderRadius: "0.5rem",
-            border: "1px solid rgba(255,255,255,0.1)",
-            backgroundColor: "transparent",
-            cursor: "pointer",
-          }}
-        >
-          {t("dashboard.signOut")}
-        </button>
+        <div className="adm-header-actions">
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="adm-signout"
+            aria-label={t("dashboard.signOut")}
+          >
+            <LogOut size={15} />
+            <span>{t("dashboard.signOut")}</span>
+          </button>
+        </div>
       </header>
 
       {/* ── Tab Navigation ───────────────────────────────────────────────────── */}
-      <nav
-        style={{
-          backgroundColor: "var(--color-white)",
-          borderBottom: "1px solid var(--color-border)",
-          padding: "0 1.5rem",
-          overflowX: "auto",
-        }}
-      >
-        <ul
-          style={{
-            display: "flex",
-            gap: "0.25rem",
-            minWidth: "max-content",
-            listStyle: "none",
-            margin: 0,
-            padding: 0,
-          }}
-        >
-          {TABS.map((tab) => (
-            <li key={tab.key}>
-              <button
-                onClick={() => setActiveTab(tab.key)}
-                style={{
-                  padding: "0.875rem 1rem",
-                  fontSize: "0.875rem",
-                  fontWeight: 600,
-                  borderTop: "none",
-                  borderLeft: "none",
-                  borderRight: "none",
-                  borderBottom:
-                    activeTab === tab.key
-                      ? "2px solid var(--color-primary)"
-                      : "2px solid transparent",
-                  color:
-                    activeTab === tab.key
-                      ? "var(--color-primary)"
-                      : "var(--color-text-muted)",
-                  background: "none",
-                  cursor: "pointer",
-                  whiteSpace: "nowrap",
-                  transition: "color 0.15s",
-                }}
-              >
-                {tab.label}
-              </button>
-            </li>
-          ))}
-        </ul>
-      </nav>
-
-      {/* ── Page Content ─────────────────────────────────────────────────────── */}
-      <main
-        style={{
-          flex: 1,
-          padding: "1.5rem",
-          maxWidth: "80rem",
-          margin: "0 auto",
-          width: "100%",
-        }}
-      >
-        {/* ────────────────────── OVERVIEW TAB ──────────────────────────────── */}
-        {activeTab === "overview" && (
-          <>
-            <section
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: "1.5rem",
-              }}
-            >
-              <h2
-                style={{
-                  fontSize: "1.25rem",
-                  fontWeight: 800,
-                  color: "var(--color-text-heading)",
-                  margin: 0,
-                }}
-              >
-                {t("dashboard.overviewTitle")}
-              </h2>
-
-              {statsLoading ? (
-                <p style={{ color: "var(--color-text-muted)" }}>
-                  {t("dashboard.loadingStats")}
-                </p>
-              ) : stats ? (
-                <>
-                  {/* First row: activity stats */}
-                  <div
-                    style={{
-                      display: "grid",
-                      gridTemplateColumns:
-                        "repeat(auto-fill, minmax(180px, 1fr))",
-                      gap: "1rem",
-                    }}
-                  >
-                    <StatCard
-                      label={t("dashboard.statTotalUsers")}
-                      value={stats.totalUsers.toLocaleString()}
-                      color="blue"
-                      icon="👤"
-                    />
-                    <StatCard
-                      label={t("dashboard.statTotalInvoices")}
-                      value={stats.totalInvoices.toLocaleString()}
-                      color="indigo"
-                      icon="🧾"
-                    />
-                    <StatCard
-                      label={t("dashboard.statPayments")}
-                      value={stats.totalPaymentsCount.toLocaleString()}
-                      color="teal"
-                      icon="💳"
-                    />
-                    <StatCard
-                      label={t("dashboard.statPayouts")}
-                      value={stats.totalPayoutsCount.toLocaleString()}
-                      color="cyan"
-                      icon="📤"
-                    />
-                  </div>
-
-                  {/* Second row: money stats */}
-                  <div
-                    style={{
-                      display: "grid",
-                      gridTemplateColumns:
-                        "repeat(auto-fill, minmax(220px, 1fr))",
-                      gap: "1rem",
-                    }}
-                  >
-                    <StatCard
-                      label={t("dashboard.statVolume")}
-                      value={fmtXAF(stats.totalAmountProcessed)}
-                      color="green"
-                      icon="💰"
-                      large
-                    />
-                    <StatCard
-                      label={t("dashboard.statRevenue")}
-                      value={fmtXAF(stats.platformRevenue)}
-                      color="emerald"
-                      icon="📈"
-                      large
-                    />
-                    <StatCard
-                      label={t("dashboard.statEscrowBalance")}
-                      value={fmtXAF(stats.escrowBalance)}
-                      color="orange"
-                      icon="🔒"
-                      large
-                    />
-                    <StatCard
-                      label={t("dashboard.statPendingReferrals")}
-                      value={fmtXAF(stats.pendingReferralBalance)}
-                      color="violet"
-                      icon="⏳"
-                      large
-                    />
-                    <StatCard
-                      label={t("dashboard.statReferralsPaid")}
-                      value={fmtXAF(stats.totalReferralCommissionsPaid)}
-                      color="purple"
-                      icon="🤝"
-                      large
-                    />
-                  </div>
-
-                  {/* Third row: disputes & referrers */}
-                  <div
-                    style={{
-                      display: "grid",
-                      gridTemplateColumns:
-                        "repeat(auto-fill, minmax(180px, 1fr))",
-                      gap: "1rem",
-                    }}
-                  >
-                    <StatCard
-                      label={t("dashboard.statOpenDisputes")}
-                      value={stats.openDisputes.toLocaleString()}
-                      color={stats.openDisputes > 0 ? "red" : "gray"}
-                      icon="⚠️"
-                    />
-                    <StatCard
-                      label={t("dashboard.statResolvedDisputes")}
-                      value={stats.resolvedDisputes.toLocaleString()}
-                      color="blue"
-                      icon="✅"
-                    />
-                    <StatCard
-                      label={t("dashboard.statReferrers")}
-                      value={stats.activeReferrers.toLocaleString()}
-                      color="violet"
-                      icon="🔗"
-                    />
-                  </div>
-                </>
-              ) : (
-                <p style={{ color: "var(--color-text-muted)" }}>
-                  {t("dashboard.noStats")}
-                </p>
-              )}
-            </section>
-
-            {/* ── Revenue / users / payments sparklines ── */}
-            {analyticsLoading && (
-              <p
-                style={{
-                  color: "var(--color-text-muted)",
-                  padding: "0 1.5rem",
-                }}
-              >
-                Loading charts…
-              </p>
-            )}
-            {analytics && !analyticsLoading && (
-              <section
-                style={{
-                  padding: "0 1.5rem 1.5rem",
-                  display: "flex",
-                  flexWrap: "wrap",
-                  gap: "1rem",
-                }}
-              >
-                {[
-                  {
-                    label: "Revenue (30d)",
-                    data: analytics.revenue,
-                    key: "total" as const,
-                    color: "#16a34a",
-                    fmt: (v: number) => `${v.toLocaleString()} XAF`,
-                  },
-                  {
-                    label: "New Users (30d)",
-                    data: analytics.users,
-                    key: "count" as const,
-                    color: "#2563eb",
-                    fmt: (v: number) => String(v),
-                  },
-                  {
-                    label: "Payments (30d)",
-                    data: analytics.payments,
-                    key: "count" as const,
-                    color: "#7c3aed",
-                    fmt: (v: number) => String(v),
-                  },
-                ].map(({ label, data, key, color, fmt }) => {
-                  const vals = data.map(
-                    (d) => Number((d as Record<string, unknown>)[key]) || 0,
-                  );
-                  const max = Math.max(...vals, 1);
-                  const total = vals.reduce((a, b) => a + b, 0);
-                  const W = 240,
-                    H = 60,
-                    P = 4;
-                  const pts =
-                    vals.length > 1
-                      ? vals
-                          .map(
-                            (v, i) =>
-                              `${P + (i / (vals.length - 1)) * (W - P * 2)},${H - P - (v / max) * (H - P * 2)}`,
-                          )
-                          .join(" ")
-                      : "";
+      <div className="adm-shell">
+        <nav className="adm-nav" aria-label="Admin sections">
+          <ul className="adm-nav-list">
+            {NAV_GROUPS.map((group) => (
+              <Fragment key={group.title}>
+                <li className="adm-nav-group" aria-hidden="true">
+                  {group.title}
+                </li>
+                {group.keys.map((key) => {
+                  const tab = TABS.find((tb) => tb.key === key);
+                  if (!tab) return null;
+                  const Icon = TAB_ICONS[key];
                   return (
-                    <div
-                      key={label}
-                      style={{
-                        background: "var(--color-surface,#fff)",
-                        borderRadius: "12px",
-                        padding: "1rem 1.25rem",
-                        minWidth: "240px",
-                        flex: "1 1 240px",
-                        boxShadow: "0 1px 4px rgba(0,0,0,0.07)",
-                      }}
-                    >
-                      <p
-                        style={{
-                          margin: "0 0 0.25rem",
-                          fontSize: "0.75rem",
-                          fontWeight: 700,
-                          color: "var(--color-text-muted)",
-                          textTransform: "uppercase",
-                          letterSpacing: "0.06em",
+                    <li key={key}>
+                      <button
+                        type="button"
+                        className="adm-nav-item"
+                        aria-current={activeTab === key ? "page" : undefined}
+                        onClick={(e) => {
+                          setActiveTab(key);
+                          e.currentTarget.scrollIntoView({
+                            inline: "center",
+                            block: "nearest",
+                            behavior: "smooth",
+                          });
                         }}
                       >
-                        {label}
-                      </p>
-                      <p
-                        style={{
-                          margin: "0 0 0.75rem",
-                          fontSize: "1.25rem",
-                          fontWeight: 800,
-                          color,
-                        }}
-                      >
-                        {fmt(total)}
-                      </p>
-                      {pts && (
-                        <svg
-                          width={W}
-                          height={H}
-                          style={{ display: "block", overflow: "visible" }}
-                        >
-                          <polyline
-                            points={pts}
-                            fill="none"
-                            stroke={color}
-                            strokeWidth={2}
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          />
-                          <polyline
-                            points={`${P},${H} ${pts} ${P + ((vals.length - 1) / (vals.length - 1)) * (W - P * 2)},${H}`}
-                            fill={color}
-                            fillOpacity={0.08}
-                            stroke="none"
-                          />
-                        </svg>
-                      )}
-                    </div>
+                        <Icon size={16} />
+                        {tab.label}
+                        {key === "disputes" &&
+                          stats !== null &&
+                          stats.openDisputes > 0 && (
+                            <span className="adm-nav-badge">
+                              {stats.openDisputes}
+                            </span>
+                          )}
+                      </button>
+                    </li>
                   );
                 })}
-              </section>
-            )}
-          </>
-        )}
+              </Fragment>
+            ))}
+          </ul>
+        </nav>
 
-        {/* ────────────────────── USERS TAB ─────────────────────────────────── */}
-        {activeTab === "users" && (
-          <TabSection
-            title={t("dashboard.usersTitle")}
-            state={users}
-            onLoadMore={() => loadTab("users", true, users.page)}
-            emptyMessage={t("dashboard.usersEmpty")}
-          >
-            {userActionMsg && (
-              <div
-                className="alert alert-success"
-                style={{ marginBottom: "0.75rem" }}
-              >
-                {userActionMsg}
-              </div>
+        {/* ── Page Content ─────────────────────────────────────────────────────── */}
+        <main className="adm-main">
+          <div key={activeTab} className="adm-rise" data-tab={activeTab}>
+            {/* ────────────────────── OVERVIEW TAB ──────────────────────────────── */}
+            {activeTab === "overview" && (
+              <>
+                <section className="adm-stack">
+                  <div className="adm-page-head">
+                    <div>
+                      <h2 className="adm-page-title">
+                        {t("dashboard.overviewTitle")}
+                      </h2>
+                      <p className="adm-page-sub">
+                        Live snapshot of activity, money flow and open risk.
+                      </p>
+                    </div>
+                  </div>
+
+                  {statsLoading ? (
+                    <div className="adm-grid-stats adm-cols-4" aria-busy="true">
+                      {Array.from({ length: 8 }).map((_, i) => (
+                        <div key={i} className="adm-skel adm-skel-stat" />
+                      ))}
+                    </div>
+                  ) : stats ? (
+                    <>
+                      <p className="adm-section-label">Activity</p>
+                      <div className="adm-grid-stats adm-cols-4">
+                        <StatCard
+                          label={t("dashboard.statTotalUsers")}
+                          value={stats.totalUsers.toLocaleString()}
+                          color="blue"
+                          icon="👤"
+                        />
+                        <StatCard
+                          label={t("dashboard.statTotalInvoices")}
+                          value={stats.totalInvoices.toLocaleString()}
+                          color="indigo"
+                          icon="🧾"
+                        />
+                        <StatCard
+                          label={t("dashboard.statPayments")}
+                          value={stats.totalPaymentsCount.toLocaleString()}
+                          color="teal"
+                          icon="💳"
+                        />
+                        <StatCard
+                          label={t("dashboard.statPayouts")}
+                          value={stats.totalPayoutsCount.toLocaleString()}
+                          color="cyan"
+                          icon="📤"
+                        />
+                      </div>
+
+                      <p className="adm-section-label">Money</p>
+                      <div className="adm-grid-stats adm-cols-5">
+                        <StatCard
+                          label={t("dashboard.statVolume")}
+                          value={fmtXAF(stats.totalAmountProcessed)}
+                          color="green"
+                          icon="💰"
+                          large
+                        />
+                        <StatCard
+                          label={t("dashboard.statRevenue")}
+                          value={fmtXAF(stats.platformRevenue)}
+                          color="emerald"
+                          icon="📈"
+                          large
+                        />
+                        <StatCard
+                          label={t("dashboard.statEscrowBalance")}
+                          value={fmtXAF(stats.escrowBalance)}
+                          color="orange"
+                          icon="🔒"
+                          large
+                        />
+                        <StatCard
+                          label={t("dashboard.statPendingReferrals")}
+                          value={fmtXAF(stats.pendingReferralBalance)}
+                          color="violet"
+                          icon="⏳"
+                          large
+                        />
+                        <StatCard
+                          label={t("dashboard.statReferralsPaid")}
+                          value={fmtXAF(stats.totalReferralCommissionsPaid)}
+                          color="purple"
+                          icon="🤝"
+                          large
+                        />
+                      </div>
+
+                      <p className="adm-section-label">Risk &amp; community</p>
+                      <div className="adm-grid-stats">
+                        <StatCard
+                          label={t("dashboard.statOpenDisputes")}
+                          value={stats.openDisputes.toLocaleString()}
+                          color={stats.openDisputes > 0 ? "red" : "gray"}
+                          icon="⚠️"
+                        />
+                        <StatCard
+                          label={t("dashboard.statResolvedDisputes")}
+                          value={stats.resolvedDisputes.toLocaleString()}
+                          color="blue"
+                          icon="✅"
+                        />
+                        <StatCard
+                          label={t("dashboard.statReferrers")}
+                          value={stats.activeReferrers.toLocaleString()}
+                          color="violet"
+                          icon="🔗"
+                        />
+                      </div>
+                    </>
+                  ) : (
+                    <p style={{ color: "var(--color-text-muted)" }}>
+                      {t("dashboard.noStats")}
+                    </p>
+                  )}
+                </section>
+
+                {/* ── Revenue / users / payments sparklines ── */}
+                {analyticsLoading && (
+                  <div className="adm-grid-charts" aria-busy="true">
+                    {Array.from({ length: 3 }).map((_, i) => (
+                      <div key={i} className="adm-skel adm-skel-stat" />
+                    ))}
+                  </div>
+                )}
+                {analytics && !analyticsLoading && (
+                  <section
+                    className="adm-grid-charts"
+                    style={{ marginTop: "1.1rem" }}
+                  >
+                    {[
+                      {
+                        label: "Revenue (30d)",
+                        data: analytics.revenue,
+                        key: "total" as const,
+                        color: "#16a34a",
+                        fmt: (v: number) => `${v.toLocaleString()} XAF`,
+                      },
+                      {
+                        label: "New Users (30d)",
+                        data: analytics.users,
+                        key: "count" as const,
+                        color: "#2563eb",
+                        fmt: (v: number) => String(v),
+                      },
+                      {
+                        label: "Payments (30d)",
+                        data: analytics.payments,
+                        key: "count" as const,
+                        color: "#7c3aed",
+                        fmt: (v: number) => String(v),
+                      },
+                    ].map(({ label, data, key, color, fmt }) => {
+                      const vals = data.map(
+                        (d) => Number((d as Record<string, unknown>)[key]) || 0,
+                      );
+                      const max = Math.max(...vals, 1);
+                      const total = vals.reduce((a, b) => a + b, 0);
+                      const W = 240,
+                        H = 60,
+                        P = 4;
+                      const pts =
+                        vals.length > 1
+                          ? vals
+                              .map(
+                                (v, i) =>
+                                  `${P + (i / (vals.length - 1)) * (W - P * 2)},${H - P - (v / max) * (H - P * 2)}`,
+                              )
+                              .join(" ")
+                          : "";
+                      return (
+                        <div key={label} className="adm-card adm-chart">
+                          <p className="adm-stat-label">{label}</p>
+                          <p className="adm-chart-value" style={{ color }}>
+                            {fmt(total)}
+                          </p>
+                          {pts && (
+                            <svg
+                              viewBox={`0 0 ${W} ${H}`}
+                              width={W}
+                              height={H}
+                              role="img"
+                              aria-label={label}
+                            >
+                              <polyline
+                                points={pts}
+                                fill="none"
+                                stroke={color}
+                                strokeWidth={2}
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                              <polyline
+                                points={`${P},${H} ${pts} ${P + ((vals.length - 1) / (vals.length - 1)) * (W - P * 2)},${H}`}
+                                fill={color}
+                                fillOpacity={0.08}
+                                stroke="none"
+                              />
+                            </svg>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </section>
+                )}
+              </>
             )}
-            {userActionErr && (
-              <div
-                className="alert alert-danger"
-                style={{ marginBottom: "0.75rem" }}
+
+            {/* ────────────────────── USERS TAB ─────────────────────────────────── */}
+            {activeTab === "users" && (
+              <TabSection
+                title={t("dashboard.usersTitle")}
+                state={users}
+                onLoadMore={() => loadTab("users", true, users.page)}
+                emptyMessage={t("dashboard.usersEmpty")}
               >
-                {userActionErr}
-              </div>
-            )}
-            <table
-              style={{
-                width: "100%",
-                fontSize: "0.875rem",
-                borderCollapse: "collapse",
-              }}
-            >
-              <thead>
-                <tr style={{ backgroundColor: "var(--color-mist)" }}>
-                  <Th>{t("dashboard.colName")}</Th>
-                  <Th>{t("dashboard.colUsername")}</Th>
-                  <Th>{t("dashboard.colEmail")}</Th>
-                  <Th>{t("dashboard.colPhone")}</Th>
-                  <Th>{t("dashboard.colCountry")}</Th>
-                  <Th>{t("dashboard.colInvoiceCount")}</Th>
-                  <Th>{t("dashboard.colReferralCode")}</Th>
-                  <Th>{t("dashboard.colJoined")}</Th>
-                  <Th>Actions</Th>
-                </tr>
-              </thead>
-              <tbody>
-                {users.data.map((u) => {
-                  const uid = Number(u.id);
-                  const isDeleting = userDeleteLoadingId === uid;
-                  const showSuspendForm = suspendFormUserId === uid;
-                  return (
-                    <Fragment key={String(u.id)}>
-                      <tr
-                        style={{
-                          borderBottom: showSuspendForm
-                            ? "none"
-                            : "1px solid var(--color-border)",
-                        }}
-                      >
-                        <Td bold>{u.name}</Td>
-                        <Td muted>@{u.username}</Td>
-                        <Td>{u.email}</Td>
-                        <Td mono>{u.phone}</Td>
-                        <Td>{u.country}</Td>
-                        <Td>{u.invoice_count}</Td>
-                        <Td mono>{u.referral_code ?? "—"}</Td>
-                        <Td muted>{fmtDate(u.createdat)}</Td>
-                        <Td>
-                          <div
+                {userActionMsg && (
+                  <div
+                    className="alert alert-success"
+                    style={{ marginBottom: "0.75rem" }}
+                  >
+                    {userActionMsg}
+                  </div>
+                )}
+                {userActionErr && (
+                  <div
+                    className="alert alert-danger"
+                    style={{ marginBottom: "0.75rem" }}
+                  >
+                    {userActionErr}
+                  </div>
+                )}
+                <table
+                  style={{
+                    width: "100%",
+                    fontSize: "0.875rem",
+                    borderCollapse: "collapse",
+                  }}
+                >
+                  <thead>
+                    <tr style={{ backgroundColor: "var(--color-mist)" }}>
+                      <Th>{t("dashboard.colName")}</Th>
+                      <Th>{t("dashboard.colUsername")}</Th>
+                      <Th>{t("dashboard.colEmail")}</Th>
+                      <Th>{t("dashboard.colPhone")}</Th>
+                      <Th>{t("dashboard.colCountry")}</Th>
+                      <Th>{t("dashboard.colInvoiceCount")}</Th>
+                      <Th>{t("dashboard.colReferralCode")}</Th>
+                      <Th>{t("dashboard.colJoined")}</Th>
+                      <Th>Actions</Th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {users.data.map((u) => {
+                      const uid = Number(u.id);
+                      const isDeleting = userDeleteLoadingId === uid;
+                      const showSuspendForm = suspendFormUserId === uid;
+                      return (
+                        <Fragment key={String(u.id)}>
+                          <tr
                             style={{
-                              display: "flex",
-                              gap: "0.3rem",
-                              flexWrap: "wrap",
+                              borderBottom: showSuspendForm
+                                ? "none"
+                                : "1px solid var(--color-border)",
                             }}
                           >
-                            <button
-                              disabled={isDeleting}
-                              onClick={async () => {
-                                const confirmed = window.confirm(
-                                  `Permanently delete account for @${u.username || u.email}?\n\nThis cannot be undone. Their email and phone will be blocked from creating new accounts.`,
-                                );
-                                if (!confirmed) return;
-                                setUserActionMsg("");
-                                setUserActionErr("");
-                                setUserDeleteLoadingId(uid);
-                                try {
-                                  const r = await axios.delete(
-                                    `${API_URL}/admin/users/${uid}`,
-                                    { withCredentials: true },
-                                  );
-                                  setUserActionMsg(
-                                    r.data.message ?? "Account deleted.",
-                                  );
-                                  loadTab("users", false, 0);
-                                } catch (err: unknown) {
-                                  setUserActionErr(
-                                    axios.isAxiosError(err) &&
-                                      err.response?.data?.message
-                                      ? err.response.data.message
-                                      : "Failed to delete account.",
-                                  );
-                                } finally {
-                                  setUserDeleteLoadingId(null);
-                                }
-                              }}
-                              style={{
-                                background: "#991b1b",
-                                color: "#fff",
-                                border: "none",
-                                borderRadius: "6px",
-                                padding: "0.3rem 0.7rem",
-                                fontWeight: 700,
-                                fontSize: "0.76rem",
-                                cursor: isDeleting ? "not-allowed" : "pointer",
-                                opacity: isDeleting ? 0.6 : 1,
-                                whiteSpace: "nowrap",
-                              }}
-                            >
-                              {isDeleting ? "..." : "Delete"}
-                            </button>
-                            <button
-                              onClick={() => {
-                                setSuspendFormUserId(
-                                  showSuspendForm ? null : uid,
-                                );
-                                setSuspendReason("");
-                                setSuspendType("temporary");
-                                setSuspendDays("7");
-                                setUserActionMsg("");
-                                setUserActionErr("");
-                              }}
-                              style={{
-                                background: showSuspendForm
-                                  ? "#64748b"
-                                  : "#d97706",
-                                color: "#fff",
-                                border: "none",
-                                borderRadius: "6px",
-                                padding: "0.3rem 0.7rem",
-                                fontWeight: 700,
-                                fontSize: "0.76rem",
-                                cursor: "pointer",
-                                whiteSpace: "nowrap",
-                              }}
-                            >
-                              {showSuspendForm ? "Cancel" : "Suspend"}
-                            </button>
-                            <button
-                              onClick={() => setProfileUserId(uid)}
-                              style={{
-                                background: "#0F1F3D",
-                                color: "#fff",
-                                border: "none",
-                                borderRadius: "6px",
-                                padding: "0.3rem 0.7rem",
-                                fontWeight: 700,
-                                fontSize: "0.76rem",
-                                cursor: "pointer",
-                                whiteSpace: "nowrap",
-                              }}
-                            >
-                              Profile
-                            </button>
-                          </div>
-                        </Td>
-                      </tr>
-                      {showSuspendForm && (
-                        <tr
-                          style={{
-                            borderBottom: "1px solid var(--color-border)",
-                          }}
-                        >
-                          <td
-                            colSpan={9}
-                            style={{
-                              padding: "0.75rem 1rem",
-                              background: "#fffbeb",
-                            }}
-                          >
-                            <div
-                              style={{
-                                display: "flex",
-                                flexWrap: "wrap",
-                                gap: "0.75rem",
-                                alignItems: "flex-end",
-                              }}
-                            >
-                              <div style={{ flex: "1 1 220px" }}>
-                                <label
-                                  style={{
-                                    display: "block",
-                                    fontSize: "0.78rem",
-                                    fontWeight: 700,
-                                    color: "#92400e",
-                                    marginBottom: "3px",
-                                  }}
-                                >
-                                  Reason{" "}
-                                  <span style={{ color: "#ef4444" }}>*</span>
-                                </label>
-                                <input
-                                  type="text"
-                                  value={suspendReason}
-                                  onChange={(e) =>
-                                    setSuspendReason(e.target.value)
-                                  }
-                                  placeholder="e.g. Violation of terms of service"
-                                  style={{
-                                    width: "100%",
-                                    padding: "0.4rem 0.6rem",
-                                    borderRadius: "6px",
-                                    border: "1px solid #d97706",
-                                    fontSize: "0.83rem",
-                                    boxSizing: "border-box",
-                                  }}
-                                />
-                              </div>
-                              <div style={{ flex: "0 0 130px" }}>
-                                <label
-                                  style={{
-                                    display: "block",
-                                    fontSize: "0.78rem",
-                                    fontWeight: 700,
-                                    color: "#92400e",
-                                    marginBottom: "3px",
-                                  }}
-                                >
-                                  Type
-                                </label>
-                                <select
-                                  value={suspendType}
-                                  onChange={(e) =>
-                                    setSuspendType(
-                                      e.target.value as
-                                        | "permanent"
-                                        | "temporary",
-                                    )
-                                  }
-                                  style={{
-                                    width: "100%",
-                                    padding: "0.4rem 0.6rem",
-                                    borderRadius: "6px",
-                                    border: "1px solid #d97706",
-                                    fontSize: "0.83rem",
-                                    background: "#fff",
-                                  }}
-                                >
-                                  <option value="temporary">Temporary</option>
-                                  <option value="permanent">Permanent</option>
-                                </select>
-                              </div>
-                              {suspendType === "temporary" && (
-                                <div style={{ flex: "0 0 110px" }}>
-                                  <label
-                                    style={{
-                                      display: "block",
-                                      fontSize: "0.78rem",
-                                      fontWeight: 700,
-                                      color: "#92400e",
-                                      marginBottom: "3px",
-                                    }}
-                                  >
-                                    Days
-                                  </label>
-                                  <input
-                                    type="number"
-                                    min="1"
-                                    value={suspendDays}
-                                    onChange={(e) =>
-                                      setSuspendDays(e.target.value)
-                                    }
-                                    style={{
-                                      width: "100%",
-                                      padding: "0.4rem 0.6rem",
-                                      borderRadius: "6px",
-                                      border: "1px solid #d97706",
-                                      fontSize: "0.83rem",
-                                      boxSizing: "border-box",
-                                    }}
-                                  />
-                                </div>
-                              )}
-                              <button
-                                disabled={suspendSubmitting}
-                                onClick={() => submitSuspend(uid)}
+                            <Td bold>{u.name}</Td>
+                            <Td muted>@{u.username}</Td>
+                            <Td>{u.email}</Td>
+                            <Td mono>{u.phone}</Td>
+                            <Td>{u.country}</Td>
+                            <Td>{u.invoice_count}</Td>
+                            <Td mono>{u.referral_code ?? "—"}</Td>
+                            <Td muted>{fmtDate(u.createdat)}</Td>
+                            <Td>
+                              <div
                                 style={{
-                                  background: "#d97706",
-                                  color: "#fff",
-                                  border: "none",
-                                  borderRadius: "6px",
-                                  padding: "0.45rem 1rem",
-                                  fontWeight: 700,
-                                  fontSize: "0.83rem",
-                                  cursor: suspendSubmitting
-                                    ? "not-allowed"
-                                    : "pointer",
-                                  opacity: suspendSubmitting ? 0.6 : 1,
-                                  whiteSpace: "nowrap",
+                                  display: "flex",
+                                  gap: "0.3rem",
+                                  flexWrap: "wrap",
                                 }}
                               >
-                                {suspendSubmitting
-                                  ? "Suspending…"
-                                  : "Confirm Suspend"}
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      )}
-                    </Fragment>
-                  );
-                })}
-              </tbody>
-            </table>
-          </TabSection>
-        )}
+                                <button
+                                  disabled={isDeleting}
+                                  onClick={async () => {
+                                    const confirmed = window.confirm(
+                                      `Permanently delete account for @${u.username || u.email}?\n\nThis cannot be undone. Their email and phone will be blocked from creating new accounts.`,
+                                    );
+                                    if (!confirmed) return;
+                                    setUserActionMsg("");
+                                    setUserActionErr("");
+                                    setUserDeleteLoadingId(uid);
+                                    try {
+                                      const r = await axios.delete(
+                                        `${API_URL}/admin/users/${uid}`,
+                                        { withCredentials: true },
+                                      );
+                                      setUserActionMsg(
+                                        r.data.message ?? "Account deleted.",
+                                      );
+                                      loadTab("users", false, 0);
+                                    } catch (err: unknown) {
+                                      setUserActionErr(
+                                        axios.isAxiosError(err) &&
+                                          err.response?.data?.message
+                                          ? err.response.data.message
+                                          : "Failed to delete account.",
+                                      );
+                                    } finally {
+                                      setUserDeleteLoadingId(null);
+                                    }
+                                  }}
+                                  style={{
+                                    background: "#991b1b",
+                                    color: "#fff",
+                                    border: "none",
+                                    borderRadius: "6px",
+                                    padding: "0.3rem 0.7rem",
+                                    fontWeight: 700,
+                                    fontSize: "0.76rem",
+                                    cursor: isDeleting
+                                      ? "not-allowed"
+                                      : "pointer",
+                                    opacity: isDeleting ? 0.6 : 1,
+                                    whiteSpace: "nowrap",
+                                  }}
+                                >
+                                  {isDeleting ? "..." : "Delete"}
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    setSuspendFormUserId(
+                                      showSuspendForm ? null : uid,
+                                    );
+                                    setSuspendReason("");
+                                    setSuspendType("temporary");
+                                    setSuspendDays("7");
+                                    setUserActionMsg("");
+                                    setUserActionErr("");
+                                  }}
+                                  style={{
+                                    background: showSuspendForm
+                                      ? "#64748b"
+                                      : "#d97706",
+                                    color: "#fff",
+                                    border: "none",
+                                    borderRadius: "6px",
+                                    padding: "0.3rem 0.7rem",
+                                    fontWeight: 700,
+                                    fontSize: "0.76rem",
+                                    cursor: "pointer",
+                                    whiteSpace: "nowrap",
+                                  }}
+                                >
+                                  {showSuspendForm ? "Cancel" : "Suspend"}
+                                </button>
+                                <button
+                                  onClick={() => setProfileUserId(uid)}
+                                  style={{
+                                    background: "#0F1F3D",
+                                    color: "#fff",
+                                    border: "none",
+                                    borderRadius: "6px",
+                                    padding: "0.3rem 0.7rem",
+                                    fontWeight: 700,
+                                    fontSize: "0.76rem",
+                                    cursor: "pointer",
+                                    whiteSpace: "nowrap",
+                                  }}
+                                >
+                                  Profile
+                                </button>
+                              </div>
+                            </Td>
+                          </tr>
+                          {showSuspendForm && (
+                            <tr
+                              style={{
+                                borderBottom: "1px solid var(--color-border)",
+                              }}
+                            >
+                              <td
+                                colSpan={9}
+                                style={{
+                                  padding: "0.75rem 1rem",
+                                  background: "#fffbeb",
+                                }}
+                              >
+                                <div
+                                  style={{
+                                    display: "flex",
+                                    flexWrap: "wrap",
+                                    gap: "0.75rem",
+                                    alignItems: "flex-end",
+                                  }}
+                                >
+                                  <div style={{ flex: "1 1 220px" }}>
+                                    <label
+                                      style={{
+                                        display: "block",
+                                        fontSize: "0.78rem",
+                                        fontWeight: 700,
+                                        color: "#92400e",
+                                        marginBottom: "3px",
+                                      }}
+                                    >
+                                      Reason{" "}
+                                      <span style={{ color: "#ef4444" }}>
+                                        *
+                                      </span>
+                                    </label>
+                                    <input
+                                      type="text"
+                                      value={suspendReason}
+                                      onChange={(e) =>
+                                        setSuspendReason(e.target.value)
+                                      }
+                                      placeholder="e.g. Violation of terms of service"
+                                      style={{
+                                        width: "100%",
+                                        padding: "0.4rem 0.6rem",
+                                        borderRadius: "6px",
+                                        border: "1px solid #d97706",
+                                        fontSize: "0.83rem",
+                                        boxSizing: "border-box",
+                                      }}
+                                    />
+                                  </div>
+                                  <div style={{ flex: "0 0 130px" }}>
+                                    <label
+                                      style={{
+                                        display: "block",
+                                        fontSize: "0.78rem",
+                                        fontWeight: 700,
+                                        color: "#92400e",
+                                        marginBottom: "3px",
+                                      }}
+                                    >
+                                      Type
+                                    </label>
+                                    <select
+                                      value={suspendType}
+                                      onChange={(e) =>
+                                        setSuspendType(
+                                          e.target.value as
+                                            | "permanent"
+                                            | "temporary",
+                                        )
+                                      }
+                                      style={{
+                                        width: "100%",
+                                        padding: "0.4rem 0.6rem",
+                                        borderRadius: "6px",
+                                        border: "1px solid #d97706",
+                                        fontSize: "0.83rem",
+                                        background: "#fff",
+                                      }}
+                                    >
+                                      <option value="temporary">
+                                        Temporary
+                                      </option>
+                                      <option value="permanent">
+                                        Permanent
+                                      </option>
+                                    </select>
+                                  </div>
+                                  {suspendType === "temporary" && (
+                                    <div style={{ flex: "0 0 110px" }}>
+                                      <label
+                                        style={{
+                                          display: "block",
+                                          fontSize: "0.78rem",
+                                          fontWeight: 700,
+                                          color: "#92400e",
+                                          marginBottom: "3px",
+                                        }}
+                                      >
+                                        Days
+                                      </label>
+                                      <input
+                                        type="number"
+                                        min="1"
+                                        value={suspendDays}
+                                        onChange={(e) =>
+                                          setSuspendDays(e.target.value)
+                                        }
+                                        style={{
+                                          width: "100%",
+                                          padding: "0.4rem 0.6rem",
+                                          borderRadius: "6px",
+                                          border: "1px solid #d97706",
+                                          fontSize: "0.83rem",
+                                          boxSizing: "border-box",
+                                        }}
+                                      />
+                                    </div>
+                                  )}
+                                  <button
+                                    disabled={suspendSubmitting}
+                                    onClick={() => submitSuspend(uid)}
+                                    style={{
+                                      background: "#d97706",
+                                      color: "#fff",
+                                      border: "none",
+                                      borderRadius: "6px",
+                                      padding: "0.45rem 1rem",
+                                      fontWeight: 700,
+                                      fontSize: "0.83rem",
+                                      cursor: suspendSubmitting
+                                        ? "not-allowed"
+                                        : "pointer",
+                                      opacity: suspendSubmitting ? 0.6 : 1,
+                                      whiteSpace: "nowrap",
+                                    }}
+                                  >
+                                    {suspendSubmitting
+                                      ? "Suspending…"
+                                      : "Confirm Suspend"}
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          )}
+                        </Fragment>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </TabSection>
+            )}
 
-        {/* ────────────────────── INVOICES TAB ──────────────────────────────── */}
-        {activeTab === "invoices" && (
-          <TabSection
-            title={t("dashboard.invoicesTitle")}
-            state={invoices}
-            onLoadMore={() => loadTab("invoices", true, invoices.page)}
-            emptyMessage={t("dashboard.invoicesEmpty")}
-          >
-            <table
-              style={{
-                width: "100%",
-                fontSize: "0.875rem",
-                borderCollapse: "collapse",
-              }}
-            >
-              <thead>
-                <tr style={{ backgroundColor: "var(--color-mist)" }}>
-                  <Th>{t("dashboard.colInvoiceNum")}</Th>
-                  <Th>{t("dashboard.colInvoiceName")}</Th>
-                  <Th>{t("dashboard.colSeller")}</Th>
-                  <Th>{t("dashboard.colBuyerEmail")}</Th>
-                  <Th>{t("dashboard.colAmount")}</Th>
-                  <Th>{t("dashboard.colStatus")}</Th>
-                  <Th>{t("dashboard.colCreated")}</Th>
-                  <Th>{t("dashboard.colExpires")}</Th>
-                </tr>
-              </thead>
-              <tbody>
-                {invoices.data.map((inv) => (
-                  <tr
-                    key={String(inv.invoicenumber)}
-                    style={{ borderBottom: "1px solid var(--color-border)" }}
-                  >
-                    <Td mono>{inv.invoicenumber}</Td>
-                    <Td bold>{inv.invoicename}</Td>
-                    <Td>
-                      <span
-                        style={{
-                          fontWeight: 600,
-                          color: "var(--color-text-heading)",
-                        }}
-                      >
-                        {inv.seller_name}
-                      </span>
-                      <span
-                        style={{
-                          display: "block",
-                          color: "var(--color-text-muted)",
-                          fontSize: "0.75rem",
-                        }}
-                      >
-                        {inv.seller_email}
-                      </span>
-                    </Td>
-                    <Td>{inv.clientemail}</Td>
-                    <Td bold>
-                      {Number(inv.amount).toLocaleString()} {inv.currency}
-                    </Td>
-                    <Td>
-                      <span className={statusBadge(inv.status)}>
-                        {inv.status}
-                      </span>
-                    </Td>
-                    <Td muted>{fmtDate(inv.createdat)}</Td>
-                    <Td muted>
-                      {inv.expires_at ? fmtDate(inv.expires_at) : "—"}
-                    </Td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </TabSection>
-        )}
-
-        {/* ────────────────────── PAYMENTS TAB ──────────────────────────────── */}
-        {activeTab === "payments" && (
-          <TabSection
-            title={t("dashboard.paymentsTitle")}
-            state={payments}
-            onLoadMore={() => loadTab("payments", true, payments.page)}
-            emptyMessage={t("dashboard.paymentsEmpty")}
-          >
-            <table
-              style={{
-                width: "100%",
-                fontSize: "0.875rem",
-                borderCollapse: "collapse",
-              }}
-            >
-              <thead>
-                <tr style={{ backgroundColor: "var(--color-mist)" }}>
-                  <Th>{t("dashboard.colInvoiceRef")}</Th>
-                  <Th>{t("dashboard.colInvoiceNameRef")}</Th>
-                  <Th>{t("dashboard.colSeller")}</Th>
-                  <Th>{t("dashboard.colAmount")}</Th>
-                  <Th>{t("dashboard.colMethod")}</Th>
-                  <Th>{t("dashboard.colStatus")}</Th>
-                  <Th>{t("dashboard.colDate")}</Th>
-                </tr>
-              </thead>
-              <tbody>
-                {payments.data.map((p) => (
-                  <tr
-                    key={String(p.id)}
-                    style={{ borderBottom: "1px solid var(--color-border)" }}
-                  >
-                    <Td mono>{p.invoicenumber}</Td>
-                    <Td>{p.invoicename}</Td>
-                    <Td>{p.seller_name}</Td>
-                    <Td bold>
-                      {Number(p.amount).toLocaleString()} {p.currency}
-                    </Td>
-                    <Td>{p.provider ?? "Mobile Money"}</Td>
-                    <Td>
-                      <span className={statusBadge(p.status)}>{p.status}</span>
-                    </Td>
-                    <Td muted>{fmtDate(p.createdat)}</Td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </TabSection>
-        )}
-
-        {/* ────────────────────── PAYOUTS TAB ───────────────────────────────── */}
-        {activeTab === "payouts" && (
-          <TabSection
-            title={t("dashboard.payoutsTitle")}
-            state={payouts}
-            onLoadMore={() => loadTab("payouts", true, payouts.page)}
-            emptyMessage={t("dashboard.payoutsEmpty")}
-          >
-            <table
-              style={{
-                width: "100%",
-                fontSize: "0.875rem",
-                borderCollapse: "collapse",
-              }}
-            >
-              <thead>
-                <tr style={{ backgroundColor: "var(--color-mist)" }}>
-                  <Th>{t("dashboard.colNum")}</Th>
-                  <Th>{t("dashboard.colInvoiceRef")}</Th>
-                  <Th>{t("dashboard.colSeller")}</Th>
-                  <Th>{t("dashboard.colPhone")}</Th>
-                  <Th>{t("dashboard.colAmount")}</Th>
-                  <Th>{t("dashboard.colMethod")}</Th>
-                  <Th>{t("dashboard.colStatus")}</Th>
-                  <Th>{t("dashboard.colDate")}</Th>
-                </tr>
-              </thead>
-              <tbody>
-                {payouts.data.map((p) => (
-                  <tr
-                    key={String(p.id)}
-                    style={{ borderBottom: "1px solid var(--color-border)" }}
-                  >
-                    <Td muted>{p.id}</Td>
-                    <Td mono>{p.invoice_number ?? "—"}</Td>
-                    <Td>
-                      <span
-                        style={{
-                          fontWeight: 600,
-                          color: "var(--color-text-heading)",
-                        }}
-                      >
-                        {p.seller_name}
-                      </span>
-                      <span
-                        style={{
-                          display: "block",
-                          color: "var(--color-text-muted)",
-                          fontSize: "0.75rem",
-                        }}
-                      >
-                        {p.seller_email}
-                      </span>
-                    </Td>
-                    <Td mono>{p.seller_phone}</Td>
-                    <Td bold>{fmtXAF(p.amount)}</Td>
-                    <Td>{p.method}</Td>
-                    <Td>
-                      <span className={statusBadge(p.status)}>{p.status}</span>
-                    </Td>
-                    <Td muted>{fmtDate(p.createdat)}</Td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </TabSection>
-        )}
-
-        {/* ─────────────── PENDING RELEASES (STUCK INVOICES) TAB ────────────── */}
-        {activeTab === "stuck" && (
-          <TabSection
-            title={t("dashboard.stuckTitle")}
-            state={stuck}
-            onLoadMore={() => loadTab("stuck", true, stuck.page)}
-            emptyMessage={t("dashboard.stuckEmpty")}
-          >
-            <table
-              style={{
-                width: "100%",
-                fontSize: "0.875rem",
-                borderCollapse: "collapse",
-              }}
-            >
-              <thead>
-                <tr style={{ backgroundColor: "var(--color-mist)" }}>
-                  <Th>{t("dashboard.colInvoiceNum")}</Th>
-                  <Th>{t("dashboard.colInvoiceName")}</Th>
-                  <Th>{t("dashboard.colSeller")}</Th>
-                  <Th>{t("dashboard.colBuyerEmail")}</Th>
-                  <Th>{t("dashboard.colAmount")}</Th>
-                  <Th>{t("dashboard.colStatus")}</Th>
-                  <Th>{t("dashboard.colPaidAt")}</Th>
-                  <Th>{t("dashboard.colDeliveredAt")}</Th>
-                  <Th>Admin Action</Th>
-                </tr>
-              </thead>
-              <tbody>
-                {stuckActionMsg && (
-                  <tr>
-                    <td
-                      colSpan={9}
-                      style={{
-                        padding: "0.65rem 1rem",
-                        background: "#f0fdf4",
-                        color: "#166534",
-                        fontSize: "0.85rem",
-                        fontWeight: 600,
-                        borderBottom: "1px solid var(--color-border)",
-                      }}
-                    >
-                      {stuckActionMsg}
-                    </td>
-                  </tr>
-                )}
-                {stuckActionErr && (
-                  <tr>
-                    <td
-                      colSpan={9}
-                      style={{
-                        padding: "0.65rem 1rem",
-                        background: "#fef2f2",
-                        color: "#991b1b",
-                        fontSize: "0.85rem",
-                        fontWeight: 600,
-                        borderBottom: "1px solid var(--color-border)",
-                      }}
-                    >
-                      {stuckActionErr}
-                    </td>
-                  </tr>
-                )}
-                {stuck.data.map((inv) => {
-                  const isActiveRow =
-                    stuckActionInvNum === String(inv.invoicenumber);
-                  return (
-                    <Fragment key={String(inv.id)}>
+            {/* ────────────────────── INVOICES TAB ──────────────────────────────── */}
+            {activeTab === "invoices" && (
+              <TabSection
+                title={t("dashboard.invoicesTitle")}
+                state={invoices}
+                onLoadMore={() => loadTab("invoices", true, invoices.page)}
+                emptyMessage={t("dashboard.invoicesEmpty")}
+              >
+                <table
+                  style={{
+                    width: "100%",
+                    fontSize: "0.875rem",
+                    borderCollapse: "collapse",
+                  }}
+                >
+                  <thead>
+                    <tr style={{ backgroundColor: "var(--color-mist)" }}>
+                      <Th>{t("dashboard.colInvoiceNum")}</Th>
+                      <Th>{t("dashboard.colInvoiceName")}</Th>
+                      <Th>{t("dashboard.colSeller")}</Th>
+                      <Th>{t("dashboard.colBuyerEmail")}</Th>
+                      <Th>{t("dashboard.colAmount")}</Th>
+                      <Th>{t("dashboard.colStatus")}</Th>
+                      <Th>{t("dashboard.colCreated")}</Th>
+                      <Th>{t("dashboard.colExpires")}</Th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {invoices.data.map((inv) => (
                       <tr
+                        key={String(inv.invoicenumber)}
                         style={{
-                          borderBottom: isActiveRow
-                            ? "none"
-                            : "1px solid var(--color-border)",
+                          borderBottom: "1px solid var(--color-border)",
                         }}
                       >
                         <Td mono>{inv.invoicenumber}</Td>
-                        <Td>{inv.invoicename}</Td>
+                        <Td bold>{inv.invoicename}</Td>
                         <Td>
                           <span
                             style={{
@@ -1944,586 +1664,1047 @@ export default function AdminDashboard() {
                             {inv.seller_email}
                           </span>
                         </Td>
-                        <Td muted>{inv.clientemail}</Td>
-                        <Td bold>{fmtXAF(inv.amount)}</Td>
+                        <Td>{inv.clientemail}</Td>
+                        <Td bold>
+                          {Number(inv.amount).toLocaleString()} {inv.currency}
+                        </Td>
                         <Td>
                           <span className={statusBadge(inv.status)}>
-                            {String(inv.status)}
+                            {statusText(inv.status)}
                           </span>
                         </Td>
-                        <Td muted>{fmtDate(inv.paid_at)}</Td>
+                        <Td muted>{fmtDate(inv.createdat)}</Td>
                         <Td muted>
-                          {inv.delivered_at ? fmtDate(inv.delivered_at) : "—"}
-                        </Td>
-                        <Td>
-                          <div
-                            style={{
-                              display: "flex",
-                              gap: "0.3rem",
-                              flexWrap: "wrap",
-                            }}
-                          >
-                            <button
-                              onClick={() => {
-                                const invNum = String(inv.invoicenumber);
-                                if (
-                                  isActiveRow &&
-                                  stuckActionType === "release"
-                                ) {
-                                  setStuckActionInvNum(null);
-                                  setStuckActionType(null);
-                                } else {
-                                  setStuckActionInvNum(invNum);
-                                  setStuckActionType("release");
-                                  setStuckAdminNote("");
-                                  setStuckActionMsg("");
-                                  setStuckActionErr("");
-                                }
-                              }}
-                              style={{
-                                background:
-                                  isActiveRow && stuckActionType === "release"
-                                    ? "#64748b"
-                                    : "#16a34a",
-                                color: "#fff",
-                                border: "none",
-                                borderRadius: "6px",
-                                padding: "0.3rem 0.65rem",
-                                fontWeight: 700,
-                                fontSize: "0.75rem",
-                                cursor: "pointer",
-                                whiteSpace: "nowrap",
-                              }}
-                            >
-                              {isActiveRow && stuckActionType === "release"
-                                ? "Cancel"
-                                : "Release Funds"}
-                            </button>
-                            <button
-                              onClick={() => {
-                                const invNum = String(inv.invoicenumber);
-                                if (
-                                  isActiveRow &&
-                                  stuckActionType === "refund"
-                                ) {
-                                  setStuckActionInvNum(null);
-                                  setStuckActionType(null);
-                                } else {
-                                  setStuckActionInvNum(invNum);
-                                  setStuckActionType("refund");
-                                  setStuckAdminNote("");
-                                  setStuckActionMsg("");
-                                  setStuckActionErr("");
-                                }
-                              }}
-                              style={{
-                                background:
-                                  isActiveRow && stuckActionType === "refund"
-                                    ? "#64748b"
-                                    : "#b45309",
-                                color: "#fff",
-                                border: "none",
-                                borderRadius: "6px",
-                                padding: "0.3rem 0.65rem",
-                                fontWeight: 700,
-                                fontSize: "0.75rem",
-                                cursor: "pointer",
-                                whiteSpace: "nowrap",
-                              }}
-                            >
-                              {isActiveRow && stuckActionType === "refund"
-                                ? "Cancel"
-                                : "Refund Buyer"}
-                            </button>
-                          </div>
+                          {inv.expires_at ? fmtDate(inv.expires_at) : "—"}
                         </Td>
                       </tr>
-                      {isActiveRow && stuckActionType && (
-                        <tr
+                    ))}
+                  </tbody>
+                </table>
+              </TabSection>
+            )}
+
+            {/* ────────────────────── PAYMENTS TAB ──────────────────────────────── */}
+            {activeTab === "payments" && (
+              <TabSection
+                title={t("dashboard.paymentsTitle")}
+                state={payments}
+                onLoadMore={() => loadTab("payments", true, payments.page)}
+                emptyMessage={t("dashboard.paymentsEmpty")}
+              >
+                <table
+                  style={{
+                    width: "100%",
+                    fontSize: "0.875rem",
+                    borderCollapse: "collapse",
+                  }}
+                >
+                  <thead>
+                    <tr style={{ backgroundColor: "var(--color-mist)" }}>
+                      <Th>{t("dashboard.colInvoiceRef")}</Th>
+                      <Th>{t("dashboard.colInvoiceNameRef")}</Th>
+                      <Th>{t("dashboard.colSeller")}</Th>
+                      <Th>{t("dashboard.colAmount")}</Th>
+                      <Th>{t("dashboard.colMethod")}</Th>
+                      <Th>{t("dashboard.colStatus")}</Th>
+                      <Th>{t("dashboard.colDate")}</Th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {payments.data.map((p) => (
+                      <tr
+                        key={String(p.id)}
+                        style={{
+                          borderBottom: "1px solid var(--color-border)",
+                        }}
+                      >
+                        <Td mono>{p.invoicenumber}</Td>
+                        <Td>{p.invoicename}</Td>
+                        <Td>{p.seller_name}</Td>
+                        <Td bold>
+                          {Number(p.amount).toLocaleString()} {p.currency}
+                        </Td>
+                        <Td>{p.provider ?? "Mobile Money"}</Td>
+                        <Td>
+                          <span className={statusBadge(p.status)}>
+                            {statusText(p.status)}
+                          </span>
+                        </Td>
+                        <Td muted>{fmtDate(p.createdat)}</Td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </TabSection>
+            )}
+
+            {/* ────────────────────── PAYOUTS TAB ───────────────────────────────── */}
+            {activeTab === "payouts" && (
+              <TabSection
+                title={t("dashboard.payoutsTitle")}
+                state={payouts}
+                onLoadMore={() => loadTab("payouts", true, payouts.page)}
+                emptyMessage={t("dashboard.payoutsEmpty")}
+              >
+                <table
+                  style={{
+                    width: "100%",
+                    fontSize: "0.875rem",
+                    borderCollapse: "collapse",
+                  }}
+                >
+                  <thead>
+                    <tr style={{ backgroundColor: "var(--color-mist)" }}>
+                      <Th>{t("dashboard.colNum")}</Th>
+                      <Th>{t("dashboard.colInvoiceRef")}</Th>
+                      <Th>{t("dashboard.colSeller")}</Th>
+                      <Th>{t("dashboard.colPhone")}</Th>
+                      <Th>{t("dashboard.colAmount")}</Th>
+                      <Th>{t("dashboard.colMethod")}</Th>
+                      <Th>{t("dashboard.colStatus")}</Th>
+                      <Th>{t("dashboard.colDate")}</Th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {payouts.data.map((p) => (
+                      <tr
+                        key={String(p.id)}
+                        style={{
+                          borderBottom: "1px solid var(--color-border)",
+                        }}
+                      >
+                        <Td muted>{p.id}</Td>
+                        <Td mono>{p.invoice_number ?? "—"}</Td>
+                        <Td>
+                          <span
+                            style={{
+                              fontWeight: 600,
+                              color: "var(--color-text-heading)",
+                            }}
+                          >
+                            {p.seller_name}
+                          </span>
+                          <span
+                            style={{
+                              display: "block",
+                              color: "var(--color-text-muted)",
+                              fontSize: "0.75rem",
+                            }}
+                          >
+                            {p.seller_email}
+                          </span>
+                        </Td>
+                        <Td mono>{p.seller_phone}</Td>
+                        <Td bold>{fmtXAF(p.amount)}</Td>
+                        <Td>{p.method}</Td>
+                        <Td>
+                          <span className={statusBadge(p.status)}>
+                            {statusText(p.status)}
+                          </span>
+                        </Td>
+                        <Td muted>{fmtDate(p.createdat)}</Td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </TabSection>
+            )}
+
+            {/* ─────────────── PENDING RELEASES (STUCK INVOICES) TAB ────────────── */}
+            {activeTab === "stuck" && (
+              <TabSection
+                title={t("dashboard.stuckTitle")}
+                state={stuck}
+                onLoadMore={() => loadTab("stuck", true, stuck.page)}
+                emptyMessage={t("dashboard.stuckEmpty")}
+              >
+                <table
+                  style={{
+                    width: "100%",
+                    fontSize: "0.875rem",
+                    borderCollapse: "collapse",
+                  }}
+                >
+                  <thead>
+                    <tr style={{ backgroundColor: "var(--color-mist)" }}>
+                      <Th>{t("dashboard.colInvoiceNum")}</Th>
+                      <Th>{t("dashboard.colInvoiceName")}</Th>
+                      <Th>{t("dashboard.colSeller")}</Th>
+                      <Th>{t("dashboard.colBuyerEmail")}</Th>
+                      <Th>{t("dashboard.colAmount")}</Th>
+                      <Th>{t("dashboard.colStatus")}</Th>
+                      <Th>{t("dashboard.colPaidAt")}</Th>
+                      <Th>{t("dashboard.colDeliveredAt")}</Th>
+                      <Th>Admin Action</Th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {stuckActionMsg && (
+                      <tr>
+                        <td
+                          colSpan={9}
                           style={{
+                            padding: "0.65rem 1rem",
+                            background: "#f0fdf4",
+                            color: "#166534",
+                            fontSize: "0.85rem",
+                            fontWeight: 600,
                             borderBottom: "1px solid var(--color-border)",
                           }}
                         >
-                          <td
-                            colSpan={9}
+                          {stuckActionMsg}
+                        </td>
+                      </tr>
+                    )}
+                    {stuckActionErr && (
+                      <tr>
+                        <td
+                          colSpan={9}
+                          style={{
+                            padding: "0.65rem 1rem",
+                            background: "#fef2f2",
+                            color: "#991b1b",
+                            fontSize: "0.85rem",
+                            fontWeight: 600,
+                            borderBottom: "1px solid var(--color-border)",
+                          }}
+                        >
+                          {stuckActionErr}
+                        </td>
+                      </tr>
+                    )}
+                    {stuck.data.map((inv) => {
+                      const isActiveRow =
+                        stuckActionInvNum === String(inv.invoicenumber);
+                      return (
+                        <Fragment key={String(inv.id)}>
+                          <tr
                             style={{
-                              padding: "1rem 1.25rem",
-                              background:
-                                stuckActionType === "release"
-                                  ? "#f0fdf4"
-                                  : "#fffbeb",
+                              borderBottom: isActiveRow
+                                ? "none"
+                                : "1px solid var(--color-border)",
                             }}
                           >
-                            <p
-                              style={{
-                                margin: "0 0 0.5rem",
-                                fontWeight: 700,
-                                fontSize: "0.9rem",
-                                color:
-                                  stuckActionType === "release"
-                                    ? "#14532d"
-                                    : "#78350f",
-                              }}
-                            >
-                              {stuckActionType === "release"
-                                ? `Release funds to seller — Invoice ${String(inv.invoicenumber)}`
-                                : `Refund buyer — Invoice ${String(inv.invoicenumber)}`}
-                            </p>
-                            <p
-                              style={{
-                                margin: "0 0 0.75rem",
-                                fontSize: "0.82rem",
-                                color: "#475569",
-                                lineHeight: 1.5,
-                              }}
-                            >
-                              {stuckActionType === "release"
-                                ? `This will disburse the escrowed amount (minus the 2% platform fee) to the seller's registered Mobile Money number. This action is irreversible.`
-                                : `This will send a refund (minus the 2% platform fee) to the buyer's registered Mobile Money number. This action is irreversible.`}
-                            </p>
-                            <div
-                              style={{
-                                display: "flex",
-                                flexWrap: "wrap",
-                                gap: "0.75rem",
-                                alignItems: "flex-end",
-                              }}
-                            >
-                              <div style={{ flex: "1 1 280px" }}>
-                                <label
-                                  style={{
-                                    display: "block",
-                                    fontSize: "0.78rem",
-                                    fontWeight: 700,
-                                    color:
-                                      stuckActionType === "release"
-                                        ? "#166534"
-                                        : "#92400e",
-                                    marginBottom: "4px",
-                                  }}
-                                >
-                                  Reason / Admin Note{" "}
-                                  <span style={{ color: "#ef4444" }}>*</span>
-                                </label>
-                                <textarea
-                                  rows={2}
-                                  value={stuckAdminNote}
-                                  onChange={(e) =>
-                                    setStuckAdminNote(e.target.value)
-                                  }
-                                  placeholder="e.g. Buyer unresponsive for 30+ days after multiple contact attempts."
-                                  style={{
-                                    width: "100%",
-                                    padding: "0.45rem 0.65rem",
-                                    borderRadius: "6px",
-                                    border: `1px solid ${stuckActionType === "release" ? "#16a34a" : "#d97706"}`,
-                                    fontSize: "0.83rem",
-                                    resize: "vertical",
-                                    boxSizing: "border-box",
-                                    fontFamily: "inherit",
-                                  }}
-                                />
-                              </div>
+                            <Td mono>{inv.invoicenumber}</Td>
+                            <Td>{inv.invoicename}</Td>
+                            <Td>
+                              <span
+                                style={{
+                                  fontWeight: 600,
+                                  color: "var(--color-text-heading)",
+                                }}
+                              >
+                                {inv.seller_name}
+                              </span>
+                              <span
+                                style={{
+                                  display: "block",
+                                  color: "var(--color-text-muted)",
+                                  fontSize: "0.75rem",
+                                }}
+                              >
+                                {inv.seller_email}
+                              </span>
+                            </Td>
+                            <Td muted>{inv.clientemail}</Td>
+                            <Td bold>{fmtXAF(inv.amount)}</Td>
+                            <Td>
+                              <span className={statusBadge(inv.status)}>
+                                {statusText(inv.status)}
+                              </span>
+                            </Td>
+                            <Td muted>{fmtDate(inv.paid_at)}</Td>
+                            <Td muted>
+                              {inv.delivered_at
+                                ? fmtDate(inv.delivered_at)
+                                : "—"}
+                            </Td>
+                            <Td>
                               <div
                                 style={{
                                   display: "flex",
-                                  gap: "0.5rem",
-                                  alignItems: "center",
-                                  flexShrink: 0,
+                                  gap: "0.3rem",
+                                  flexWrap: "wrap",
                                 }}
                               >
                                 <button
-                                  disabled={stuckSubmitting}
-                                  onClick={() =>
-                                    submitStuckAction(
-                                      String(inv.invoicenumber),
-                                      stuckActionType,
-                                    )
-                                  }
+                                  onClick={() => {
+                                    const invNum = String(inv.invoicenumber);
+                                    if (
+                                      isActiveRow &&
+                                      stuckActionType === "release"
+                                    ) {
+                                      setStuckActionInvNum(null);
+                                      setStuckActionType(null);
+                                    } else {
+                                      setStuckActionInvNum(invNum);
+                                      setStuckActionType("release");
+                                      setStuckAdminNote("");
+                                      setStuckActionMsg("");
+                                      setStuckActionErr("");
+                                    }
+                                  }}
                                   style={{
                                     background:
+                                      isActiveRow &&
                                       stuckActionType === "release"
-                                        ? "#16a34a"
+                                        ? "#64748b"
+                                        : "#16a34a",
+                                    color: "#fff",
+                                    border: "none",
+                                    borderRadius: "6px",
+                                    padding: "0.3rem 0.65rem",
+                                    fontWeight: 700,
+                                    fontSize: "0.75rem",
+                                    cursor: "pointer",
+                                    whiteSpace: "nowrap",
+                                  }}
+                                >
+                                  {isActiveRow && stuckActionType === "release"
+                                    ? "Cancel"
+                                    : "Release Funds"}
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    const invNum = String(inv.invoicenumber);
+                                    if (
+                                      isActiveRow &&
+                                      stuckActionType === "refund"
+                                    ) {
+                                      setStuckActionInvNum(null);
+                                      setStuckActionType(null);
+                                    } else {
+                                      setStuckActionInvNum(invNum);
+                                      setStuckActionType("refund");
+                                      setStuckAdminNote("");
+                                      setStuckActionMsg("");
+                                      setStuckActionErr("");
+                                    }
+                                  }}
+                                  style={{
+                                    background:
+                                      isActiveRow &&
+                                      stuckActionType === "refund"
+                                        ? "#64748b"
                                         : "#b45309",
                                     color: "#fff",
                                     border: "none",
                                     borderRadius: "6px",
-                                    padding: "0.5rem 1.1rem",
+                                    padding: "0.3rem 0.65rem",
                                     fontWeight: 700,
-                                    fontSize: "0.83rem",
-                                    cursor: stuckSubmitting
-                                      ? "not-allowed"
-                                      : "pointer",
-                                    opacity: stuckSubmitting ? 0.6 : 1,
-                                    whiteSpace: "nowrap",
-                                  }}
-                                >
-                                  {stuckSubmitting
-                                    ? "Processing…"
-                                    : stuckActionType === "release"
-                                      ? "Confirm Release"
-                                      : "Confirm Refund"}
-                                </button>
-                                <button
-                                  onClick={() => {
-                                    setStuckActionInvNum(null);
-                                    setStuckActionType(null);
-                                    setStuckAdminNote("");
-                                  }}
-                                  style={{
-                                    background: "none",
-                                    border: "1px solid var(--color-border)",
-                                    borderRadius: "6px",
-                                    padding: "0.5rem 0.9rem",
-                                    fontWeight: 600,
-                                    fontSize: "0.83rem",
+                                    fontSize: "0.75rem",
                                     cursor: "pointer",
                                     whiteSpace: "nowrap",
-                                    color: "var(--color-text-muted)",
                                   }}
                                 >
-                                  Cancel
+                                  {isActiveRow && stuckActionType === "refund"
+                                    ? "Cancel"
+                                    : "Refund Buyer"}
                                 </button>
                               </div>
-                            </div>
-                          </td>
-                        </tr>
-                      )}
-                    </Fragment>
-                  );
-                })}
-              </tbody>
-            </table>
-          </TabSection>
-        )}
+                            </Td>
+                          </tr>
+                          {isActiveRow && stuckActionType && (
+                            <tr
+                              style={{
+                                borderBottom: "1px solid var(--color-border)",
+                              }}
+                            >
+                              <td
+                                colSpan={9}
+                                style={{
+                                  padding: "1rem 1.25rem",
+                                  background:
+                                    stuckActionType === "release"
+                                      ? "#f0fdf4"
+                                      : "#fffbeb",
+                                }}
+                              >
+                                <p
+                                  style={{
+                                    margin: "0 0 0.5rem",
+                                    fontWeight: 700,
+                                    fontSize: "0.9rem",
+                                    color:
+                                      stuckActionType === "release"
+                                        ? "#14532d"
+                                        : "#78350f",
+                                  }}
+                                >
+                                  {stuckActionType === "release"
+                                    ? `Release funds to seller — Invoice ${String(inv.invoicenumber)}`
+                                    : `Refund buyer — Invoice ${String(inv.invoicenumber)}`}
+                                </p>
+                                <p
+                                  style={{
+                                    margin: "0 0 0.75rem",
+                                    fontSize: "0.82rem",
+                                    color: "#475569",
+                                    lineHeight: 1.5,
+                                  }}
+                                >
+                                  {stuckActionType === "release"
+                                    ? `This will disburse the escrowed amount (minus the 2% platform fee) to the seller's registered Mobile Money number. This action is irreversible.`
+                                    : `This will send a refund (minus the 2% platform fee) to the buyer's registered Mobile Money number. This action is irreversible.`}
+                                </p>
+                                <div
+                                  style={{
+                                    display: "flex",
+                                    flexWrap: "wrap",
+                                    gap: "0.75rem",
+                                    alignItems: "flex-end",
+                                  }}
+                                >
+                                  <div style={{ flex: "1 1 280px" }}>
+                                    <label
+                                      style={{
+                                        display: "block",
+                                        fontSize: "0.78rem",
+                                        fontWeight: 700,
+                                        color:
+                                          stuckActionType === "release"
+                                            ? "#166534"
+                                            : "#92400e",
+                                        marginBottom: "4px",
+                                      }}
+                                    >
+                                      Reason / Admin Note{" "}
+                                      <span style={{ color: "#ef4444" }}>
+                                        *
+                                      </span>
+                                    </label>
+                                    <textarea
+                                      rows={2}
+                                      value={stuckAdminNote}
+                                      onChange={(e) =>
+                                        setStuckAdminNote(e.target.value)
+                                      }
+                                      placeholder="e.g. Buyer unresponsive for 30+ days after multiple contact attempts."
+                                      style={{
+                                        width: "100%",
+                                        padding: "0.45rem 0.65rem",
+                                        borderRadius: "6px",
+                                        border: `1px solid ${stuckActionType === "release" ? "#16a34a" : "#d97706"}`,
+                                        fontSize: "0.83rem",
+                                        resize: "vertical",
+                                        boxSizing: "border-box",
+                                        fontFamily: "inherit",
+                                      }}
+                                    />
+                                  </div>
+                                  <div
+                                    style={{
+                                      display: "flex",
+                                      gap: "0.5rem",
+                                      alignItems: "center",
+                                      flexShrink: 0,
+                                    }}
+                                  >
+                                    <button
+                                      disabled={stuckSubmitting}
+                                      onClick={() =>
+                                        submitStuckAction(
+                                          String(inv.invoicenumber),
+                                          stuckActionType,
+                                        )
+                                      }
+                                      style={{
+                                        background:
+                                          stuckActionType === "release"
+                                            ? "#16a34a"
+                                            : "#b45309",
+                                        color: "#fff",
+                                        border: "none",
+                                        borderRadius: "6px",
+                                        padding: "0.5rem 1.1rem",
+                                        fontWeight: 700,
+                                        fontSize: "0.83rem",
+                                        cursor: stuckSubmitting
+                                          ? "not-allowed"
+                                          : "pointer",
+                                        opacity: stuckSubmitting ? 0.6 : 1,
+                                        whiteSpace: "nowrap",
+                                      }}
+                                    >
+                                      {stuckSubmitting
+                                        ? "Processing…"
+                                        : stuckActionType === "release"
+                                          ? "Confirm Release"
+                                          : "Confirm Refund"}
+                                    </button>
+                                    <button
+                                      onClick={() => {
+                                        setStuckActionInvNum(null);
+                                        setStuckActionType(null);
+                                        setStuckAdminNote("");
+                                      }}
+                                      style={{
+                                        background: "none",
+                                        border: "1px solid var(--color-border)",
+                                        borderRadius: "6px",
+                                        padding: "0.5rem 0.9rem",
+                                        fontWeight: 600,
+                                        fontSize: "0.83rem",
+                                        cursor: "pointer",
+                                        whiteSpace: "nowrap",
+                                        color: "var(--color-text-muted)",
+                                      }}
+                                    >
+                                      Cancel
+                                    </button>
+                                  </div>
+                                </div>
+                              </td>
+                            </tr>
+                          )}
+                        </Fragment>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </TabSection>
+            )}
 
-        {/* ────────────────────── DISPUTES TAB ──────────────────────────────── */}
-        {activeTab === "disputes" && (
-          <TabSection
-            title={t("dashboard.disputesTitle")}
-            state={disputes}
-            onLoadMore={() => loadTab("disputes", true, disputes.page)}
-            emptyMessage={t("dashboard.disputesEmpty")}
-          >
-            <table
-              style={{
-                width: "100%",
-                fontSize: "0.875rem",
-                borderCollapse: "collapse",
-              }}
-            >
-              <thead>
-                <tr style={{ backgroundColor: "var(--color-mist)" }}>
-                  <Th>{t("dashboard.colInvoiceNum")}</Th>
-                  <Th>{t("dashboard.colInvoiceName")}</Th>
-                  <Th>{t("dashboard.colSeller")}</Th>
-                  <Th>{t("dashboard.colAmount")}</Th>
-                  <Th>{t("dashboard.colOpenedBy")}</Th>
-                  <Th>{t("dashboard.colReason")}</Th>
-                  <Th>{t("dashboard.colStatus")}</Th>
-                  <Th>{t("dashboard.colDate")}</Th>
-                  <Th>{t("dashboard.colAction")}</Th>
-                </tr>
-              </thead>
-              <tbody>
-                {disputes.data.map((d) => (
-                  <tr
-                    key={String(d.id)}
-                    style={{ borderBottom: "1px solid var(--color-border)" }}
-                  >
-                    <Td mono>{d.invoicenumber}</Td>
-                    <Td>{d.invoicename}</Td>
-                    <Td>{d.seller_name}</Td>
-                    <Td bold>
-                      {d.amount != null
-                        ? Number(d.amount).toLocaleString()
-                        : "—"}{" "}
-                      {d.currency}
-                    </Td>
-                    <Td>
-                      <span
-                        className={
-                          d.opened_by === "buyer"
-                            ? "badge badge-info"
-                            : "badge badge-warning"
-                        }
-                      >
-                        {d.opened_by}
-                      </span>
-                    </Td>
-                    <Td>
-                      <span
-                        style={{
-                          display: "block",
-                          maxWidth: "18rem",
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                          whiteSpace: "nowrap",
-                          color: "var(--color-text-body)",
-                        }}
-                        title={d.reason != null ? String(d.reason) : undefined}
-                      >
-                        {d.reason}
-                      </span>
-                    </Td>
-                    <Td>
-                      <span className={statusBadge(d.status)}>
-                        {String(d.status ?? "").replace("_", " ")}
-                      </span>
-                    </Td>
-                    <Td muted>{fmtDate(d.created_at)}</Td>
-                    <Td>
-                      <a
-                        href={`/admin/dispute/${String(d.admin_token ?? "")}`}
-                        target="_blank"
-                        rel="noreferrer"
-                        style={{
-                          color: "var(--color-primary)",
-                          fontSize: "0.8125rem",
-                          fontWeight: 600,
-                          textDecoration: "underline",
-                        }}
-                      >
-                        {t("dashboard.moderate")}
-                      </a>
-                    </Td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </TabSection>
-        )}
-
-        {/* ────────────────────── MESSAGES TAB ──────────────────────────────── */}
-        {activeTab === "messages" && (
-          <section
-            style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}
-          >
-            <h2
-              style={{
-                fontSize: "1.25rem",
-                fontWeight: 800,
-                color: "var(--color-text-heading)",
-                margin: 0,
-              }}
-            >
-              {t("dashboard.msgSendTitle")}
-            </h2>
-
-            {/* ─── Compose card ──────────────────────────────────────────────── */}
-            <div
-              style={{
-                backgroundColor: "var(--color-white)",
-                border: "1px solid var(--color-border)",
-                borderRadius: "var(--radius-md)",
-                padding: "1.5rem",
-                boxShadow: "var(--shadow-card)",
-                display: "flex",
-                flexDirection: "column",
-                gap: "1.25rem",
-              }}
-            >
-              {/* Recipient type */}
-              <div>
-                <p
+            {/* ────────────────────── DISPUTES TAB ──────────────────────────────── */}
+            {activeTab === "disputes" && (
+              <TabSection
+                title={t("dashboard.disputesTitle")}
+                state={disputes}
+                onLoadMore={() => loadTab("disputes", true, disputes.page)}
+                emptyMessage={t("dashboard.disputesEmpty")}
+              >
+                <table
                   style={{
-                    fontSize: "0.8125rem",
-                    fontWeight: 600,
-                    color: "var(--color-text-muted)",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.05em",
-                    marginBottom: "0.625rem",
+                    width: "100%",
+                    fontSize: "0.875rem",
+                    borderCollapse: "collapse",
                   }}
                 >
-                  {t("dashboard.msgRecipientsLabel")}
-                </p>
-                <div style={{ display: "flex", gap: "1.25rem" }}>
-                  {(["all", "user"] as const).map((type) => (
-                    <label
-                      key={type}
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "0.5rem",
-                        cursor: "pointer",
-                        fontSize: "0.875rem",
-                        fontWeight: msgRecipientType === type ? 600 : 400,
-                        color:
-                          msgRecipientType === type
-                            ? "var(--color-primary)"
-                            : "var(--color-text-body)",
-                      }}
-                    >
-                      <input
-                        type="radio"
-                        name="msgRecipientType"
-                        value={type}
-                        checked={msgRecipientType === type}
-                        onChange={() => {
-                          setMsgRecipientType(type);
-                          setMsgSelectedUser(null);
-                          setMsgUserSearch("");
-                          setMsgUserResults([]);
-                        }}
-                        style={{ accentColor: "var(--color-primary)" }}
-                      />
-                      {type === "all"
-                        ? t("dashboard.msgBroadcastAll")
-                        : t("dashboard.msgSendSpecific")}
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              {/* User picker (only for direct message) */}
-              {msgRecipientType === "user" && (
-                <div style={{ position: "relative" }}>
-                  <label
-                    style={{
-                      display: "block",
-                      fontSize: "0.8125rem",
-                      fontWeight: 600,
-                      color: "var(--color-text-muted)",
-                      textTransform: "uppercase",
-                      letterSpacing: "0.05em",
-                      marginBottom: "0.375rem",
-                    }}
-                  >
-                    {t("dashboard.msgRecipientLabel")}
-                  </label>
-                  {msgSelectedUser ? (
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                        backgroundColor: "var(--color-mist)",
-                        border: "1px solid var(--color-border)",
-                        borderRadius: "var(--radius-sm)",
-                        padding: "0.625rem 0.875rem",
-                      }}
-                    >
-                      <div>
-                        <span
-                          style={{
-                            fontWeight: 600,
-                            color: "var(--color-text-heading)",
-                            fontSize: "0.875rem",
-                          }}
-                        >
-                          {msgSelectedUser.name}
-                        </span>
-                        <span
-                          style={{
-                            color: "var(--color-text-muted)",
-                            fontSize: "0.8125rem",
-                            marginLeft: "0.5rem",
-                          }}
-                        >
-                          @{msgSelectedUser.username} &middot;{" "}
-                          {msgSelectedUser.email}
-                        </span>
-                      </div>
-                      <button
-                        onClick={() => {
-                          setMsgSelectedUser(null);
-                          setMsgUserSearch("");
-                        }}
+                  <thead>
+                    <tr style={{ backgroundColor: "var(--color-mist)" }}>
+                      <Th>{t("dashboard.colInvoiceNum")}</Th>
+                      <Th>{t("dashboard.colInvoiceName")}</Th>
+                      <Th>{t("dashboard.colSeller")}</Th>
+                      <Th>{t("dashboard.colAmount")}</Th>
+                      <Th>{t("dashboard.colOpenedBy")}</Th>
+                      <Th>{t("dashboard.colReason")}</Th>
+                      <Th>{t("dashboard.colStatus")}</Th>
+                      <Th>{t("dashboard.colDate")}</Th>
+                      <Th>{t("dashboard.colAction")}</Th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {disputes.data.map((d) => (
+                      <tr
+                        key={String(d.id)}
                         style={{
-                          background: "none",
-                          border: "none",
-                          cursor: "pointer",
-                          color: "var(--color-text-muted)",
-                          fontSize: "1.25rem",
-                          lineHeight: 1,
-                          padding: "0 0.25rem",
+                          borderBottom: "1px solid var(--color-border)",
                         }}
-                        title={t("dashboard.msgRemove")}
                       >
-                        &times;
-                      </button>
+                        <Td mono>{d.invoicenumber}</Td>
+                        <Td>{d.invoicename}</Td>
+                        <Td>{d.seller_name}</Td>
+                        <Td bold>
+                          {d.amount != null
+                            ? Number(d.amount).toLocaleString()
+                            : "—"}{" "}
+                          {d.currency}
+                        </Td>
+                        <Td>
+                          <span
+                            className={
+                              d.opened_by === "buyer"
+                                ? "badge badge-info"
+                                : "badge badge-warning"
+                            }
+                          >
+                            {d.opened_by}
+                          </span>
+                        </Td>
+                        <Td>
+                          <span
+                            style={{
+                              display: "block",
+                              maxWidth: "18rem",
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                              whiteSpace: "nowrap",
+                              color: "var(--color-text-body)",
+                            }}
+                            title={
+                              d.reason != null ? String(d.reason) : undefined
+                            }
+                          >
+                            {d.reason}
+                          </span>
+                        </Td>
+                        <Td>
+                          <span className={statusBadge(d.status)}>
+                            {statusText(d.status)}
+                          </span>
+                        </Td>
+                        <Td muted>{fmtDate(d.created_at)}</Td>
+                        <Td>
+                          <a
+                            href={`/admin/dispute/${String(d.admin_token ?? "")}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            style={{
+                              color: "var(--color-primary)",
+                              fontSize: "0.8125rem",
+                              fontWeight: 600,
+                              textDecoration: "underline",
+                            }}
+                          >
+                            {t("dashboard.moderate")}
+                          </a>
+                        </Td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </TabSection>
+            )}
+
+            {/* ────────────────────── MESSAGES TAB ──────────────────────────────── */}
+            {activeTab === "messages" && (
+              <section
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "1.5rem",
+                }}
+              >
+                <h2
+                  style={{
+                    fontSize: "1.25rem",
+                    fontWeight: 800,
+                    color: "var(--color-text-heading)",
+                    margin: 0,
+                  }}
+                >
+                  {t("dashboard.msgSendTitle")}
+                </h2>
+
+                {/* ─── Compose card ──────────────────────────────────────────────── */}
+                <div
+                  style={{
+                    backgroundColor: "var(--color-white)",
+                    border: "1px solid var(--color-border)",
+                    borderRadius: "var(--radius-md)",
+                    padding: "1.5rem",
+                    boxShadow: "var(--shadow-card)",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "1.25rem",
+                  }}
+                >
+                  {/* Recipient type */}
+                  <div>
+                    <p
+                      style={{
+                        fontSize: "0.8125rem",
+                        fontWeight: 600,
+                        color: "var(--color-text-muted)",
+                        textTransform: "uppercase",
+                        letterSpacing: "0.05em",
+                        marginBottom: "0.625rem",
+                      }}
+                    >
+                      {t("dashboard.msgRecipientsLabel")}
+                    </p>
+                    <div style={{ display: "flex", gap: "1.25rem" }}>
+                      {(["all", "user"] as const).map((type) => (
+                        <label
+                          key={type}
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "0.5rem",
+                            cursor: "pointer",
+                            fontSize: "0.875rem",
+                            fontWeight: msgRecipientType === type ? 600 : 400,
+                            color:
+                              msgRecipientType === type
+                                ? "var(--color-primary)"
+                                : "var(--color-text-body)",
+                          }}
+                        >
+                          <input
+                            type="radio"
+                            name="msgRecipientType"
+                            value={type}
+                            checked={msgRecipientType === type}
+                            onChange={() => {
+                              setMsgRecipientType(type);
+                              setMsgSelectedUser(null);
+                              setMsgUserSearch("");
+                              setMsgUserResults([]);
+                            }}
+                            style={{ accentColor: "var(--color-primary)" }}
+                          />
+                          {type === "all"
+                            ? t("dashboard.msgBroadcastAll")
+                            : t("dashboard.msgSendSpecific")}
+                        </label>
+                      ))}
                     </div>
-                  ) : (
-                    <>
-                      <input
-                        type="text"
-                        placeholder={t("dashboard.msgSearchPlaceholder")}
-                        value={msgUserSearch}
-                        onChange={(e) => setMsgUserSearch(e.target.value)}
-                        className="form-input"
-                        style={{ width: "100%" }}
-                      />
-                      {(msgUserResults.length > 0 ||
-                        (msgUserSearching && msgUserSearch.trim())) && (
+                  </div>
+
+                  {/* User picker (only for direct message) */}
+                  {msgRecipientType === "user" && (
+                    <div style={{ position: "relative" }}>
+                      <label
+                        style={{
+                          display: "block",
+                          fontSize: "0.8125rem",
+                          fontWeight: 600,
+                          color: "var(--color-text-muted)",
+                          textTransform: "uppercase",
+                          letterSpacing: "0.05em",
+                          marginBottom: "0.375rem",
+                        }}
+                      >
+                        {t("dashboard.msgRecipientLabel")}
+                      </label>
+                      {msgSelectedUser ? (
                         <div
                           style={{
-                            position: "absolute",
-                            top: "100%",
-                            left: 0,
-                            right: 0,
-                            zIndex: 50,
-                            backgroundColor: "var(--color-white)",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                            backgroundColor: "var(--color-mist)",
                             border: "1px solid var(--color-border)",
                             borderRadius: "var(--radius-sm)",
-                            boxShadow: "var(--shadow-card)",
-                            marginTop: "0.25rem",
-                            overflow: "hidden",
+                            padding: "0.625rem 0.875rem",
                           }}
                         >
-                          {msgUserSearching && (
-                            <p
+                          <div>
+                            <span
                               style={{
-                                padding: "0.75rem 1rem",
-                                color: "var(--color-text-muted)",
+                                fontWeight: 600,
+                                color: "var(--color-text-heading)",
                                 fontSize: "0.875rem",
                               }}
                             >
-                              {t("dashboard.msgSearching")}
-                            </p>
+                              {msgSelectedUser.name}
+                            </span>
+                            <span
+                              style={{
+                                color: "var(--color-text-muted)",
+                                fontSize: "0.8125rem",
+                                marginLeft: "0.5rem",
+                              }}
+                            >
+                              @{msgSelectedUser.username} &middot;{" "}
+                              {msgSelectedUser.email}
+                            </span>
+                          </div>
+                          <button
+                            onClick={() => {
+                              setMsgSelectedUser(null);
+                              setMsgUserSearch("");
+                            }}
+                            style={{
+                              background: "none",
+                              border: "none",
+                              cursor: "pointer",
+                              color: "var(--color-text-muted)",
+                              fontSize: "1.25rem",
+                              lineHeight: 1,
+                              padding: "0 0.25rem",
+                            }}
+                            title={t("dashboard.msgRemove")}
+                          >
+                            &times;
+                          </button>
+                        </div>
+                      ) : (
+                        <>
+                          <input
+                            type="text"
+                            placeholder={t("dashboard.msgSearchPlaceholder")}
+                            value={msgUserSearch}
+                            onChange={(e) => setMsgUserSearch(e.target.value)}
+                            className="form-input"
+                            style={{ width: "100%" }}
+                          />
+                          {(msgUserResults.length > 0 ||
+                            (msgUserSearching && msgUserSearch.trim())) && (
+                            <div
+                              style={{
+                                position: "absolute",
+                                top: "100%",
+                                left: 0,
+                                right: 0,
+                                zIndex: 50,
+                                backgroundColor: "var(--color-white)",
+                                border: "1px solid var(--color-border)",
+                                borderRadius: "var(--radius-sm)",
+                                boxShadow: "var(--shadow-card)",
+                                marginTop: "0.25rem",
+                                overflow: "hidden",
+                              }}
+                            >
+                              {msgUserSearching && (
+                                <p
+                                  style={{
+                                    padding: "0.75rem 1rem",
+                                    color: "var(--color-text-muted)",
+                                    fontSize: "0.875rem",
+                                  }}
+                                >
+                                  {t("dashboard.msgSearching")}
+                                </p>
+                              )}
+                              {!msgUserSearching &&
+                                msgUserResults.map((u) => (
+                                  <button
+                                    key={u.id}
+                                    onClick={() => {
+                                      setMsgSelectedUser(u);
+                                      setMsgUserSearch("");
+                                      setMsgUserResults([]);
+                                    }}
+                                    style={{
+                                      display: "block",
+                                      width: "100%",
+                                      textAlign: "left",
+                                      padding: "0.625rem 1rem",
+                                      background: "none",
+                                      border: "none",
+                                      borderBottom:
+                                        "1px solid var(--color-border)",
+                                      cursor: "pointer",
+                                      fontSize: "0.875rem",
+                                    }}
+                                    onMouseEnter={(e) =>
+                                      (e.currentTarget.style.backgroundColor =
+                                        "var(--color-mist)")
+                                    }
+                                    onMouseLeave={(e) =>
+                                      (e.currentTarget.style.backgroundColor =
+                                        "")
+                                    }
+                                  >
+                                    <span
+                                      style={{
+                                        fontWeight: 600,
+                                        color: "var(--color-text-heading)",
+                                      }}
+                                    >
+                                      {u.name}
+                                    </span>
+                                    <span
+                                      style={{
+                                        color: "var(--color-text-muted)",
+                                        marginLeft: "0.5rem",
+                                      }}
+                                    >
+                                      @{u.username}
+                                    </span>
+                                    <span
+                                      style={{
+                                        display: "block",
+                                        color: "var(--color-text-muted)",
+                                        fontSize: "0.75rem",
+                                      }}
+                                    >
+                                      {u.email}
+                                    </span>
+                                  </button>
+                                ))}
+                              {!msgUserSearching &&
+                                msgUserResults.length === 0 &&
+                                msgUserSearch.trim() && (
+                                  <p
+                                    style={{
+                                      padding: "0.75rem 1rem",
+                                      color: "var(--color-text-muted)",
+                                      fontSize: "0.875rem",
+                                    }}
+                                  >
+                                    {t("dashboard.msgNoUsers")}
+                                  </p>
+                                )}
+                            </div>
                           )}
-                          {!msgUserSearching &&
-                            msgUserResults.map((u) => (
-                              <button
-                                key={u.id}
-                                onClick={() => {
-                                  setMsgSelectedUser(u);
-                                  setMsgUserSearch("");
-                                  setMsgUserResults([]);
-                                }}
+                        </>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Subject */}
+                  <div>
+                    <label
+                      style={{
+                        display: "block",
+                        fontSize: "0.8125rem",
+                        fontWeight: 600,
+                        color: "var(--color-text-muted)",
+                        textTransform: "uppercase",
+                        letterSpacing: "0.05em",
+                        marginBottom: "0.375rem",
+                      }}
+                    >
+                      {t("dashboard.msgSubjectLabel")}
+                    </label>
+                    <input
+                      type="text"
+                      placeholder={t("dashboard.msgSubjectPlaceholder")}
+                      value={msgSubject}
+                      onChange={(e) => setMsgSubject(e.target.value)}
+                      className="form-input"
+                      style={{ width: "100%" }}
+                    />
+                  </div>
+
+                  {/* Body */}
+                  <div>
+                    <label
+                      style={{
+                        display: "block",
+                        fontSize: "0.8125rem",
+                        fontWeight: 600,
+                        color: "var(--color-text-muted)",
+                        textTransform: "uppercase",
+                        letterSpacing: "0.05em",
+                        marginBottom: "0.375rem",
+                      }}
+                    >
+                      {t("dashboard.msgBodyLabel")}
+                    </label>
+                    <textarea
+                      rows={7}
+                      placeholder={t("dashboard.msgBodyPlaceholder")}
+                      value={msgBody}
+                      onChange={(e) => setMsgBody(e.target.value)}
+                      className="form-input"
+                      style={{
+                        width: "100%",
+                        resize: "vertical",
+                        fontFamily: "inherit",
+                        lineHeight: 1.6,
+                      }}
+                    />
+                  </div>
+
+                  {/* Feedback */}
+                  {msgSuccess && (
+                    <div
+                      className="alert alert-success"
+                      style={{ fontSize: "0.875rem" }}
+                    >
+                      {msgSuccess}
+                    </div>
+                  )}
+                  {msgError && (
+                    <div
+                      className="alert alert-danger"
+                      style={{ fontSize: "0.875rem" }}
+                    >
+                      {msgError}
+                    </div>
+                  )}
+
+                  {/* Send button */}
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "1rem",
+                      flexWrap: "wrap",
+                    }}
+                  >
+                    <button
+                      onClick={sendBroadcast}
+                      disabled={msgSending}
+                      className="btn-primary"
+                      style={{ minWidth: "11rem", fontSize: "0.9375rem" }}
+                    >
+                      {msgSending
+                        ? t("dashboard.msgSendingBtn")
+                        : msgRecipientType === "all"
+                          ? t("dashboard.msgBroadcastBtn")
+                          : t("dashboard.msgDirectBtn")}
+                    </button>
+                    {msgRecipientType === "all" && (
+                      <p
+                        style={{
+                          fontSize: "0.8125rem",
+                          color: "var(--color-text-muted)",
+                          margin: 0,
+                        }}
+                      >
+                        {t("dashboard.msgBroadcastNote")}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* ─── Sent message history ────────────────────────────────────── */}
+                <TabSection
+                  title={t("dashboard.msgHistoryTitle")}
+                  state={broadcasts}
+                  onLoadMore={() => loadTab("messages", true, broadcasts.page)}
+                  emptyMessage={t("dashboard.msgHistoryEmpty")}
+                >
+                  <table
+                    style={{
+                      width: "100%",
+                      fontSize: "0.875rem",
+                      borderCollapse: "collapse",
+                    }}
+                  >
+                    <thead>
+                      <tr style={{ backgroundColor: "var(--color-mist)" }}>
+                        <Th>{t("dashboard.colType")}</Th>
+                        <Th>{t("dashboard.colRecipient")}</Th>
+                        <Th>{t("dashboard.colSubject")}</Th>
+                        <Th>{t("dashboard.colDeliveredTo")}</Th>
+                        <Th>{t("dashboard.colSent")}</Th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {broadcasts.data.map((b) => (
+                        <tr
+                          key={String(b.id)}
+                          style={{
+                            borderBottom: "1px solid var(--color-border)",
+                          }}
+                        >
+                          <Td>
+                            <span
+                              className={
+                                b.recipient_type === "all"
+                                  ? "badge badge-info"
+                                  : "badge badge-neutral"
+                              }
+                            >
+                              {b.recipient_type === "all"
+                                ? t("dashboard.typeBroadcast")
+                                : t("dashboard.typeDirect")}
+                            </span>
+                          </Td>
+                          <Td>
+                            {b.recipient_type === "all" ? (
+                              <span
                                 style={{
-                                  display: "block",
-                                  width: "100%",
-                                  textAlign: "left",
-                                  padding: "0.625rem 1rem",
-                                  background: "none",
-                                  border: "none",
-                                  borderBottom: "1px solid var(--color-border)",
-                                  cursor: "pointer",
-                                  fontSize: "0.875rem",
+                                  color: "var(--color-text-muted)",
+                                  fontStyle: "italic",
                                 }}
-                                onMouseEnter={(e) =>
-                                  (e.currentTarget.style.backgroundColor =
-                                    "var(--color-mist)")
-                                }
-                                onMouseLeave={(e) =>
-                                  (e.currentTarget.style.backgroundColor = "")
-                                }
                               >
+                                {t("dashboard.recipientAllUsers")}
+                              </span>
+                            ) : (
+                              <>
                                 <span
                                   style={{
                                     fontWeight: 600,
                                     color: "var(--color-text-heading)",
                                   }}
                                 >
-                                  {u.name}
-                                </span>
-                                <span
-                                  style={{
-                                    color: "var(--color-text-muted)",
-                                    marginLeft: "0.5rem",
-                                  }}
-                                >
-                                  @{u.username}
+                                  {b.recipient_name ?? "—"}
                                 </span>
                                 <span
                                   style={{
@@ -2532,376 +2713,183 @@ export default function AdminDashboard() {
                                     fontSize: "0.75rem",
                                   }}
                                 >
-                                  {u.email}
+                                  {b.recipient_email}
                                 </span>
-                              </button>
-                            ))}
-                          {!msgUserSearching &&
-                            msgUserResults.length === 0 &&
-                            msgUserSearch.trim() && (
-                              <p
+                              </>
+                            )}
+                          </Td>
+                          <Td bold>{b.subject}</Td>
+                          <Td>
+                            {b.recipient_type === "all" ? (
+                              <span
                                 style={{
-                                  padding: "0.75rem 1rem",
-                                  color: "var(--color-text-muted)",
-                                  fontSize: "0.875rem",
+                                  fontWeight: 600,
+                                  color: "var(--color-primary)",
                                 }}
                               >
-                                {t("dashboard.msgNoUsers")}
-                              </p>
+                                {t("dashboard.usersCountLabel", {
+                                  count: Number(b.recipients_count ?? 0),
+                                })}
+                              </span>
+                            ) : (
+                              t("dashboard.oneUserLabel")
                             )}
-                        </div>
-                      )}
-                    </>
-                  )}
-                </div>
-              )}
+                          </Td>
+                          <Td muted>{fmtDate(b.sent_at)}</Td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </TabSection>
+              </section>
+            )}
 
-              {/* Subject */}
-              <div>
-                <label
-                  style={{
-                    display: "block",
-                    fontSize: "0.8125rem",
-                    fontWeight: 600,
-                    color: "var(--color-text-muted)",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.05em",
-                    marginBottom: "0.375rem",
-                  }}
-                >
-                  {t("dashboard.msgSubjectLabel")}
-                </label>
-                <input
-                  type="text"
-                  placeholder={t("dashboard.msgSubjectPlaceholder")}
-                  value={msgSubject}
-                  onChange={(e) => setMsgSubject(e.target.value)}
-                  className="form-input"
-                  style={{ width: "100%" }}
-                />
-              </div>
-
-              {/* Body */}
-              <div>
-                <label
-                  style={{
-                    display: "block",
-                    fontSize: "0.8125rem",
-                    fontWeight: 600,
-                    color: "var(--color-text-muted)",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.05em",
-                    marginBottom: "0.375rem",
-                  }}
-                >
-                  {t("dashboard.msgBodyLabel")}
-                </label>
-                <textarea
-                  rows={7}
-                  placeholder={t("dashboard.msgBodyPlaceholder")}
-                  value={msgBody}
-                  onChange={(e) => setMsgBody(e.target.value)}
-                  className="form-input"
+            {/* ────────────────────── REFERRALS TAB ─────────────────────────────── */}
+            {activeTab === "referrals" && (
+              <TabSection
+                title={t("dashboard.referralsTitle")}
+                state={referrals}
+                onLoadMore={() => loadTab("referrals", true, referrals.page)}
+                emptyMessage={t("dashboard.referralsEmpty")}
+              >
+                <table
                   style={{
                     width: "100%",
-                    resize: "vertical",
-                    fontFamily: "inherit",
-                    lineHeight: 1.6,
+                    fontSize: "0.875rem",
+                    borderCollapse: "collapse",
                   }}
-                />
-              </div>
-
-              {/* Feedback */}
-              {msgSuccess && (
-                <div
-                  className="alert alert-success"
-                  style={{ fontSize: "0.875rem" }}
                 >
-                  {msgSuccess}
-                </div>
-              )}
-              {msgError && (
-                <div
-                  className="alert alert-danger"
-                  style={{ fontSize: "0.875rem" }}
-                >
-                  {msgError}
-                </div>
-              )}
-
-              {/* Send button */}
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "1rem",
-                  flexWrap: "wrap",
-                }}
-              >
-                <button
-                  onClick={sendBroadcast}
-                  disabled={msgSending}
-                  className="btn-primary"
-                  style={{ minWidth: "11rem", fontSize: "0.9375rem" }}
-                >
-                  {msgSending
-                    ? t("dashboard.msgSendingBtn")
-                    : msgRecipientType === "all"
-                      ? t("dashboard.msgBroadcastBtn")
-                      : t("dashboard.msgDirectBtn")}
-                </button>
-                {msgRecipientType === "all" && (
-                  <p
-                    style={{
-                      fontSize: "0.8125rem",
-                      color: "var(--color-text-muted)",
-                      margin: 0,
-                    }}
-                  >
-                    {t("dashboard.msgBroadcastNote")}
-                  </p>
-                )}
-              </div>
-            </div>
-
-            {/* ─── Sent message history ────────────────────────────────────── */}
-            <TabSection
-              title={t("dashboard.msgHistoryTitle")}
-              state={broadcasts}
-              onLoadMore={() => loadTab("messages", true, broadcasts.page)}
-              emptyMessage={t("dashboard.msgHistoryEmpty")}
-            >
-              <table
-                style={{
-                  width: "100%",
-                  fontSize: "0.875rem",
-                  borderCollapse: "collapse",
-                }}
-              >
-                <thead>
-                  <tr style={{ backgroundColor: "var(--color-mist)" }}>
-                    <Th>{t("dashboard.colType")}</Th>
-                    <Th>{t("dashboard.colRecipient")}</Th>
-                    <Th>{t("dashboard.colSubject")}</Th>
-                    <Th>{t("dashboard.colDeliveredTo")}</Th>
-                    <Th>{t("dashboard.colSent")}</Th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {broadcasts.data.map((b) => (
-                    <tr
-                      key={String(b.id)}
-                      style={{ borderBottom: "1px solid var(--color-border)" }}
-                    >
-                      <Td>
-                        <span
-                          className={
-                            b.recipient_type === "all"
-                              ? "badge badge-info"
-                              : "badge badge-neutral"
-                          }
-                        >
-                          {b.recipient_type === "all"
-                            ? t("dashboard.typeBroadcast")
-                            : t("dashboard.typeDirect")}
-                        </span>
-                      </Td>
-                      <Td>
-                        {b.recipient_type === "all" ? (
+                  <thead>
+                    <tr style={{ backgroundColor: "var(--color-mist)" }}>
+                      <Th>{t("dashboard.colName")}</Th>
+                      <Th>{t("dashboard.colUsername")}</Th>
+                      <Th>{t("dashboard.colEmail")}</Th>
+                      <Th>{t("dashboard.colReferralCode")}</Th>
+                      <Th>{t("dashboard.colPeopleReferred")}</Th>
+                      <Th>{t("dashboard.colTotalEarned")}</Th>
+                      <Th>{t("dashboard.colCurrentBalance")}</Th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {referrals.data.map((r) => (
+                      <tr
+                        key={String(r.id)}
+                        style={{
+                          borderBottom: "1px solid var(--color-border)",
+                        }}
+                      >
+                        <Td bold>{r.name}</Td>
+                        <Td muted>@{r.username}</Td>
+                        <Td>{r.email}</Td>
+                        <Td>
                           <span
                             style={{
-                              color: "var(--color-text-muted)",
-                              fontStyle: "italic",
+                              fontFamily: "monospace",
+                              backgroundColor: "var(--color-mist)",
+                              color: "var(--color-text-heading)",
+                              padding: "0.125rem 0.5rem",
+                              borderRadius: "var(--radius-sm)",
+                              fontSize: "0.75rem",
+                              letterSpacing: "0.08em",
                             }}
                           >
-                            {t("dashboard.recipientAllUsers")}
+                            {r.referral_code}
                           </span>
-                        ) : (
-                          <>
-                            <span
-                              style={{
-                                fontWeight: 600,
-                                color: "var(--color-text-heading)",
-                              }}
-                            >
-                              {b.recipient_name ?? "—"}
-                            </span>
-                            <span
-                              style={{
-                                display: "block",
-                                color: "var(--color-text-muted)",
-                                fontSize: "0.75rem",
-                              }}
-                            >
-                              {b.recipient_email}
-                            </span>
-                          </>
-                        )}
-                      </Td>
-                      <Td bold>{b.subject}</Td>
-                      <Td>
-                        {b.recipient_type === "all" ? (
+                        </Td>
+                        <Td>
                           <span
                             style={{
                               fontWeight: 600,
                               color: "var(--color-primary)",
                             }}
                           >
-                            {t("dashboard.usersCountLabel", {
-                              count: Number(b.recipients_count ?? 0),
-                            })}
+                            {r.referred_count}
                           </span>
-                        ) : (
-                          t("dashboard.oneUserLabel")
-                        )}
-                      </Td>
-                      <Td muted>{fmtDate(b.sent_at)}</Td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </TabSection>
-          </section>
-        )}
+                          <span
+                            style={{
+                              color: "var(--color-text-muted)",
+                              fontSize: "0.75rem",
+                              marginLeft: "0.25rem",
+                            }}
+                          >
+                            {parseInt(String(r.referred_count)) === 1
+                              ? t("dashboard.personSingular")
+                              : t("dashboard.personPlural")}
+                          </span>
+                        </Td>
+                        <Td bold>{fmtXAF(r.total_earned)}</Td>
+                        <Td>
+                          <span
+                            style={{
+                              fontWeight: 600,
+                              color:
+                                Number(r.referral_balance) > 0
+                                  ? "var(--color-success)"
+                                  : "var(--color-text-muted)",
+                            }}
+                          >
+                            {fmtXAF(r.referral_balance)}
+                          </span>
+                        </Td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </TabSection>
+            )}
 
-        {/* ────────────────────── REFERRALS TAB ─────────────────────────────── */}
-        {activeTab === "referrals" && (
-          <TabSection
-            title={t("dashboard.referralsTitle")}
-            state={referrals}
-            onLoadMore={() => loadTab("referrals", true, referrals.page)}
-            emptyMessage={t("dashboard.referralsEmpty")}
-          >
-            <table
-              style={{
-                width: "100%",
-                fontSize: "0.875rem",
-                borderCollapse: "collapse",
-              }}
-            >
-              <thead>
-                <tr style={{ backgroundColor: "var(--color-mist)" }}>
-                  <Th>{t("dashboard.colName")}</Th>
-                  <Th>{t("dashboard.colUsername")}</Th>
-                  <Th>{t("dashboard.colEmail")}</Th>
-                  <Th>{t("dashboard.colReferralCode")}</Th>
-                  <Th>{t("dashboard.colPeopleReferred")}</Th>
-                  <Th>{t("dashboard.colTotalEarned")}</Th>
-                  <Th>{t("dashboard.colCurrentBalance")}</Th>
-                </tr>
-              </thead>
-              <tbody>
-                {referrals.data.map((r) => (
-                  <tr
-                    key={String(r.id)}
-                    style={{ borderBottom: "1px solid var(--color-border)" }}
-                  >
-                    <Td bold>{r.name}</Td>
-                    <Td muted>@{r.username}</Td>
-                    <Td>{r.email}</Td>
-                    <Td>
-                      <span
-                        style={{
-                          fontFamily: "monospace",
-                          backgroundColor: "var(--color-mist)",
-                          color: "var(--color-text-heading)",
-                          padding: "0.125rem 0.5rem",
-                          borderRadius: "var(--radius-sm)",
-                          fontSize: "0.75rem",
-                          letterSpacing: "0.08em",
-                        }}
-                      >
-                        {r.referral_code}
-                      </span>
-                    </Td>
-                    <Td>
-                      <span
-                        style={{
-                          fontWeight: 600,
-                          color: "var(--color-primary)",
-                        }}
-                      >
-                        {r.referred_count}
-                      </span>
-                      <span
-                        style={{
-                          color: "var(--color-text-muted)",
-                          fontSize: "0.75rem",
-                          marginLeft: "0.25rem",
-                        }}
-                      >
-                        {parseInt(String(r.referred_count)) === 1
-                          ? t("dashboard.personSingular")
-                          : t("dashboard.personPlural")}
-                      </span>
-                    </Td>
-                    <Td bold>{fmtXAF(r.total_earned)}</Td>
-                    <Td>
-                      <span
-                        style={{
-                          fontWeight: 600,
-                          color:
-                            Number(r.referral_balance) > 0
-                              ? "var(--color-success)"
-                              : "var(--color-text-muted)",
-                        }}
-                      >
-                        {fmtXAF(r.referral_balance)}
-                      </span>
-                    </Td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </TabSection>
-        )}
+            {/* ─────────────────────── SUSPENSIONS TAB ──────────────────────── */}
+            {activeTab === "suspensions" && (
+              <SuspensionsAdminTab
+                data={suspensions.data}
+                loading={suspensions.loading}
+                error={suspensions.error}
+                hasMore={suspensions.hasMore}
+                filter={suspensionFilter}
+                setFilter={setSuspensionFilter}
+                onLoadMore={() =>
+                  loadTab("suspensions", true, suspensions.page)
+                }
+                onReload={() => loadTab("suspensions", false, 0)}
+                actionLoadingId={suspActionLoadingId}
+                setActionLoadingId={setSuspActionLoadingId}
+                noteById={suspNoteById}
+                setNoteById={setSuspNoteById}
+              />
+            )}
 
-        {/* ─────────────────────── SUSPENSIONS TAB ──────────────────────── */}
-        {activeTab === "suspensions" && (
-          <SuspensionsAdminTab
-            data={suspensions.data}
-            loading={suspensions.loading}
-            error={suspensions.error}
-            hasMore={suspensions.hasMore}
-            filter={suspensionFilter}
-            setFilter={setSuspensionFilter}
-            onLoadMore={() => loadTab("suspensions", true, suspensions.page)}
-            onReload={() => loadTab("suspensions", false, 0)}
-            actionLoadingId={suspActionLoadingId}
-            setActionLoadingId={setSuspActionLoadingId}
-            noteById={suspNoteById}
-            setNoteById={setSuspNoteById}
-          />
-        )}
+            {/* ─────────────────────── KYC TAB ─────────────────────────────────── */}
+            {activeTab === "kyc" && (
+              <KycAdminTab
+                data={kyc.data}
+                loading={kyc.loading}
+                error={kyc.error}
+                hasMore={kyc.hasMore}
+                filter={kycFilter}
+                setFilter={setKycFilter}
+                onLoadMore={() => loadTab("kyc", true, kyc.page)}
+                onReload={() => loadTab("kyc", false, 0)}
+                actionLoadingId={kycActionLoadingId}
+                setActionLoadingId={setKycActionLoadingId}
+                noteById={kycNoteById}
+                setNoteById={setKycNoteById}
+              />
+            )}
 
-        {/* ─────────────────────── KYC TAB ─────────────────────────────────── */}
-        {activeTab === "kyc" && (
-          <KycAdminTab
-            data={kyc.data}
-            loading={kyc.loading}
-            error={kyc.error}
-            hasMore={kyc.hasMore}
-            filter={kycFilter}
-            setFilter={setKycFilter}
-            onLoadMore={() => loadTab("kyc", true, kyc.page)}
-            onReload={() => loadTab("kyc", false, 0)}
-            actionLoadingId={kycActionLoadingId}
-            setActionLoadingId={setKycActionLoadingId}
-            noteById={kycNoteById}
-            setNoteById={setKycNoteById}
-          />
-        )}
+            {/* ─────────────────────── VERIFY RECEIPT TAB ─────────────────────── */}
+            {activeTab === "verify" && <AdminVerifyTab />}
 
-        {/* ─────────────────────── VERIFY RECEIPT TAB ─────────────────────── */}
-        {activeTab === "verify" && <AdminVerifyTab />}
-
-        {/* ─────────────────────── CONTROLS TAB ─────────────────────────────── */}
-        {activeTab === "controls" && (
-          <section
-            style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}
-          >
-            {/* Responsive helper styles for Controls tab */}
-            <style>{`
+            {/* ─────────────────────── CONTROLS TAB ─────────────────────────────── */}
+            {activeTab === "controls" && (
+              <section
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "1.5rem",
+                }}
+              >
+                {/* Responsive helper styles for Controls tab */}
+                <style>{`
               .ctrl-card { background: var(--color-surface,#fff); border-radius: 12px; padding: 1.5rem; box-shadow: 0 1px 4px rgba(0,0,0,0.07); }
               @media (max-width: 600px) { .ctrl-card { padding: 1rem; } }
               .ctrl-toggle-row { display:flex; align-items:center; justify-content:space-between; gap:0.75rem; padding:1rem 1.25rem; border-radius:8px; flex-wrap:wrap; }
@@ -2913,822 +2901,817 @@ export default function AdminDashboard() {
               .ctrl-submit-btn { padding:0.65rem 1.5rem; border-radius:8px; font-weight:700; color:#fff; border:none; cursor:pointer; font-size:0.9rem; width:100%; }
               @media (min-width:480px) { .ctrl-submit-btn { width:auto; } }
             `}</style>
-            {/* ── Platform Toggles ─── */}
-            <div className="ctrl-card">
-              <h2
-                style={{
-                  margin: "0 0 1.25rem",
-                  fontSize: "1.1rem",
-                  fontWeight: 700,
-                }}
-              >
-                ⚙️ Platform Toggles
-              </h2>
-              {settingsLoading || !platformSettings ? (
-                <p style={{ color: "var(--color-text-muted)" }}>
-                  Loading settings…
-                </p>
-              ) : (
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "1rem",
-                  }}
-                >
-                  {(
-                    [
-                      {
-                        key: "maintenance_mode",
-                        label: "🔧 Maintenance Mode",
-                        desc: "Blocks all non-admin traffic with a maintenance page. Admin dashboard stays accessible.",
-                        value: platformSettings.maintenanceMode,
-                      },
-                      {
-                        key: "payments_blocked",
-                        label: "💳 Block Incoming Payments",
-                        desc: "Prevents buyers from initiating new MoMo payment prompts.",
-                        value: platformSettings.paymentsBlocked,
-                      },
-                      {
-                        key: "payouts_blocked",
-                        label: "📤 Block Outgoing Payouts",
-                        desc: "Prevents sellers from releasing escrow funds to their Mobile Money account.",
-                        value: platformSettings.payoutsBlocked,
-                      },
-                    ] as {
-                      key: string;
-                      label: string;
-                      desc: string;
-                      value: boolean;
-                    }[]
-                  ).map(({ key, label, desc, value }) => (
+                {/* ── Platform Toggles ─── */}
+                <div className="ctrl-card">
+                  <h2
+                    style={{
+                      margin: "0 0 1.25rem",
+                      fontSize: "1.1rem",
+                      fontWeight: 700,
+                    }}
+                  >
+                    Platform Toggles
+                  </h2>
+                  {settingsLoading || !platformSettings ? (
+                    <p style={{ color: "var(--color-text-muted)" }}>
+                      Loading settings…
+                    </p>
+                  ) : (
                     <div
-                      key={key}
                       style={{
                         display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between",
+                        flexDirection: "column",
                         gap: "1rem",
-                        padding: "1rem 1.25rem",
-                        borderRadius: "8px",
-                        background: value
-                          ? "rgba(239,68,68,0.06)"
-                          : "var(--color-bg, #f8fafc)",
-                        border: `1px solid ${value ? "rgba(239,68,68,0.25)" : "var(--color-border, #e2e8f0)"}`,
                       }}
                     >
-                      <div>
-                        <div style={{ fontWeight: 600, fontSize: "0.95rem" }}>
-                          {label}
-                        </div>
+                      {(
+                        [
+                          {
+                            key: "maintenance_mode",
+                            label: "Maintenance Mode",
+                            desc: "Blocks all non-admin traffic with a maintenance page. Admin dashboard stays accessible.",
+                            value: platformSettings.maintenanceMode,
+                          },
+                          {
+                            key: "payments_blocked",
+                            label: "Block Incoming Payments",
+                            desc: "Prevents buyers from initiating new MoMo payment prompts.",
+                            value: platformSettings.paymentsBlocked,
+                          },
+                          {
+                            key: "payouts_blocked",
+                            label: "Block Outgoing Payouts",
+                            desc: "Prevents sellers from releasing escrow funds to their Mobile Money account.",
+                            value: platformSettings.payoutsBlocked,
+                          },
+                        ] as {
+                          key: string;
+                          label: string;
+                          desc: string;
+                          value: boolean;
+                        }[]
+                      ).map(({ key, label, desc, value }) => (
                         <div
+                          key={key}
                           style={{
-                            fontSize: "0.8rem",
-                            color: "var(--color-text-muted)",
-                            marginTop: "2px",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                            gap: "1rem",
+                            padding: "1rem 1.25rem",
+                            borderRadius: "8px",
+                            background: value
+                              ? "rgba(239,68,68,0.06)"
+                              : "var(--color-bg, #f8fafc)",
+                            border: `1px solid ${value ? "rgba(239,68,68,0.25)" : "var(--color-border, #e2e8f0)"}`,
                           }}
                         >
-                          {desc}
+                          <div>
+                            <div
+                              style={{ fontWeight: 600, fontSize: "0.95rem" }}
+                            >
+                              {label}
+                            </div>
+                            <div
+                              style={{
+                                fontSize: "0.8rem",
+                                color: "var(--color-text-muted)",
+                                marginTop: "2px",
+                              }}
+                            >
+                              {desc}
+                            </div>
+                          </div>
+                          <button
+                            disabled={savingKey === key}
+                            onClick={() => toggleSetting(key, !value)}
+                            style={{
+                              flexShrink: 0,
+                              padding: "0.5rem 1.1rem",
+                              borderRadius: "20px",
+                              fontWeight: 600,
+                              fontSize: "0.85rem",
+                              cursor:
+                                savingKey === key ? "not-allowed" : "pointer",
+                              border: "none",
+                              background: value ? "#ef4444" : "#22c55e",
+                              color: "#fff",
+                              opacity: savingKey === key ? 0.6 : 1,
+                              transition: "background 0.2s",
+                            }}
+                          >
+                            {savingKey === key
+                              ? "Saving…"
+                              : value
+                                ? "ON — Click to Disable"
+                                : "OFF — Click to Enable"}
+                          </button>
                         </div>
-                      </div>
-                      <button
-                        disabled={savingKey === key}
-                        onClick={() => toggleSetting(key, !value)}
-                        style={{
-                          flexShrink: 0,
-                          padding: "0.5rem 1.1rem",
-                          borderRadius: "20px",
-                          fontWeight: 600,
-                          fontSize: "0.85rem",
-                          cursor: savingKey === key ? "not-allowed" : "pointer",
-                          border: "none",
-                          background: value ? "#ef4444" : "#22c55e",
-                          color: "#fff",
-                          opacity: savingKey === key ? 0.6 : 1,
-                          transition: "background 0.2s",
-                        }}
-                      >
-                        {savingKey === key
-                          ? "Saving…"
-                          : value
-                            ? "ON — Click to Disable"
-                            : "OFF — Click to Enable"}
-                      </button>
+                      ))}
                     </div>
-                  ))}
+                  )}
                 </div>
-              )}
-            </div>
 
-            {/* ── Manual Balance Adjustment ─── */}
-            <div className="ctrl-card">
-              <h2
-                style={{
-                  margin: "0 0 0.25rem",
-                  fontSize: "1.1rem",
-                  fontWeight: 700,
-                }}
-              >
-                🏦 Manual Balance Adjustment
-              </h2>
-              <p
-                style={{
-                  margin: "0 0 1.25rem",
-                  fontSize: "0.85rem",
-                  color: "var(--color-text-muted)",
-                }}
-              >
-                Credit or debit a user&apos;s wallet balance when a MoMo
-                transaction fails but the user was charged. A reason note is
-                mandatory and permanently logged.
-              </p>
-
-              {/* User picker */}
-              <div style={{ marginBottom: "0.75rem", position: "relative" }}>
-                <label
-                  style={{
-                    display: "block",
-                    fontSize: "0.85rem",
-                    fontWeight: 600,
-                    marginBottom: "4px",
-                  }}
-                >
-                  Search User
-                </label>
-                <input
-                  value={adjUserSearch}
-                  onChange={(e) => {
-                    setAdjUserSearch(e.target.value);
-                    setAdjSelectedUser(null);
-                  }}
-                  placeholder="Name, username or email…"
-                  style={{
-                    width: "100%",
-                    padding: "0.6rem 0.75rem",
-                    borderRadius: "8px",
-                    border: "1px solid var(--color-border, #e2e8f0)",
-                    fontSize: "0.9rem",
-                    boxSizing: "border-box",
-                  }}
-                />
-                {adjUserSearching && (
+                {/* ── Manual Balance Adjustment ─── */}
+                <div className="ctrl-card">
+                  <h2
+                    style={{
+                      margin: "0 0 0.25rem",
+                      fontSize: "1.1rem",
+                      fontWeight: 700,
+                    }}
+                  >
+                    Manual Balance Adjustment
+                  </h2>
                   <p
                     style={{
-                      fontSize: "0.8rem",
+                      margin: "0 0 1.25rem",
+                      fontSize: "0.85rem",
                       color: "var(--color-text-muted)",
-                      marginTop: "4px",
                     }}
                   >
-                    Searching…
+                    Credit or debit a user&apos;s wallet balance when a MoMo
+                    transaction fails but the user was charged. A reason note is
+                    mandatory and permanently logged.
                   </p>
-                )}
-                {adjUserResults.length > 0 && !adjSelectedUser && (
-                  <ul
+
+                  {/* User picker */}
+                  <div
+                    style={{ marginBottom: "0.75rem", position: "relative" }}
+                  >
+                    <label
+                      style={{
+                        display: "block",
+                        fontSize: "0.85rem",
+                        fontWeight: 600,
+                        marginBottom: "4px",
+                      }}
+                    >
+                      Search User
+                    </label>
+                    <input
+                      value={adjUserSearch}
+                      onChange={(e) => {
+                        setAdjUserSearch(e.target.value);
+                        setAdjSelectedUser(null);
+                      }}
+                      placeholder="Name, username or email…"
+                      style={{
+                        width: "100%",
+                        padding: "0.6rem 0.75rem",
+                        borderRadius: "8px",
+                        border: "1px solid var(--color-border, #e2e8f0)",
+                        fontSize: "0.9rem",
+                        boxSizing: "border-box",
+                      }}
+                    />
+                    {adjUserSearching && (
+                      <p
+                        style={{
+                          fontSize: "0.8rem",
+                          color: "var(--color-text-muted)",
+                          marginTop: "4px",
+                        }}
+                      >
+                        Searching…
+                      </p>
+                    )}
+                    {adjUserResults.length > 0 && !adjSelectedUser && (
+                      <ul
+                        style={{
+                          position: "absolute",
+                          top: "100%",
+                          left: 0,
+                          right: 0,
+                          zIndex: 50,
+                          background: "#fff",
+                          border: "1px solid #e2e8f0",
+                          borderRadius: "8px",
+                          listStyle: "none",
+                          margin: "4px 0 0",
+                          padding: "4px 0",
+                          boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                          maxHeight: "200px",
+                          overflowY: "auto",
+                        }}
+                      >
+                        {adjUserResults.map((u) => (
+                          <li
+                            key={u.id}
+                            onClick={() => {
+                              setAdjSelectedUser(u);
+                              setAdjUserSearch(u.name);
+                              setAdjUserResults([]);
+                            }}
+                            style={{
+                              padding: "0.5rem 0.75rem",
+                              cursor: "pointer",
+                              fontSize: "0.875rem",
+                            }}
+                          >
+                            {u.name}{" "}
+                            <span style={{ color: "#94a3b8" }}>
+                              @{u.username} · {u.email}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                    {adjSelectedUser && (
+                      <p
+                        style={{
+                          fontSize: "0.8rem",
+                          color: "#22c55e",
+                          marginTop: "4px",
+                        }}
+                      >
+                        ✓ Selected: {adjSelectedUser.name} (
+                        {adjSelectedUser.email})
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Amount + type */}
+                  <div className="ctrl-fields-row">
+                    <div className="ctrl-field">
+                      <label
+                        style={{
+                          display: "block",
+                          fontSize: "0.85rem",
+                          fontWeight: 600,
+                          marginBottom: "4px",
+                        }}
+                      >
+                        Amount (XAF)
+                      </label>
+                      <input
+                        type="number"
+                        min="1"
+                        value={adjAmount}
+                        onChange={(e) => setAdjAmount(e.target.value)}
+                        placeholder="e.g. 5000"
+                        style={{
+                          width: "100%",
+                          padding: "0.6rem 0.75rem",
+                          borderRadius: "8px",
+                          border: "1px solid var(--color-border, #e2e8f0)",
+                          fontSize: "0.9rem",
+                          boxSizing: "border-box",
+                        }}
+                      />
+                    </div>
+                    <div className="ctrl-field">
+                      <label
+                        style={{
+                          display: "block",
+                          fontSize: "0.85rem",
+                          fontWeight: 600,
+                          marginBottom: "4px",
+                        }}
+                      >
+                        Type
+                      </label>
+                      <select
+                        value={adjType}
+                        onChange={(e) =>
+                          setAdjType(e.target.value as "credit" | "debit")
+                        }
+                        style={{
+                          width: "100%",
+                          padding: "0.6rem 0.75rem",
+                          borderRadius: "8px",
+                          border: "1px solid var(--color-border, #e2e8f0)",
+                          fontSize: "0.9rem",
+                          background: "#fff",
+                          boxSizing: "border-box",
+                        }}
+                      >
+                        <option value="credit">✅ Credit (add funds)</option>
+                        <option value="debit">❌ Debit (remove funds)</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Reason */}
+                  <div style={{ marginBottom: "1rem" }}>
+                    <label
+                      style={{
+                        display: "block",
+                        fontSize: "0.85rem",
+                        fontWeight: 600,
+                        marginBottom: "4px",
+                      }}
+                    >
+                      Reason Note <span style={{ color: "#ef4444" }}>*</span>
+                    </label>
+                    <textarea
+                      value={adjReason}
+                      onChange={(e) => setAdjReason(e.target.value)}
+                      rows={3}
+                      placeholder="e.g. MoMo transaction ref #ABC123 failed but user was charged. Refunding via wallet credit."
+                      style={{
+                        width: "100%",
+                        padding: "0.6rem 0.75rem",
+                        borderRadius: "8px",
+                        border: "1px solid var(--color-border, #e2e8f0)",
+                        fontSize: "0.875rem",
+                        resize: "vertical",
+                        boxSizing: "border-box",
+                      }}
+                    />
+                  </div>
+
+                  {adjError && (
+                    <p
+                      style={{
+                        fontSize: "0.85rem",
+                        color: "#ef4444",
+                        marginBottom: "0.75rem",
+                      }}
+                    >
+                      {adjError}
+                    </p>
+                  )}
+                  {adjSuccess && (
+                    <p
+                      style={{
+                        fontSize: "0.85rem",
+                        color: "#22c55e",
+                        marginBottom: "0.75rem",
+                      }}
+                    >
+                      ✓ {adjSuccess}
+                    </p>
+                  )}
+
+                  <button
+                    disabled={adjSubmitting}
+                    onClick={submitAdjustment}
+                    className="ctrl-submit-btn"
                     style={{
-                      position: "absolute",
-                      top: "100%",
-                      left: 0,
-                      right: 0,
-                      zIndex: 50,
-                      background: "#fff",
-                      border: "1px solid #e2e8f0",
-                      borderRadius: "8px",
-                      listStyle: "none",
-                      margin: "4px 0 0",
-                      padding: "4px 0",
-                      boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-                      maxHeight: "200px",
-                      overflowY: "auto",
+                      background: adjType === "credit" ? "#22c55e" : "#ef4444",
+                      opacity: adjSubmitting ? 0.65 : 1,
+                      cursor: adjSubmitting ? "not-allowed" : "pointer",
                     }}
                   >
-                    {adjUserResults.map((u) => (
-                      <li
-                        key={u.id}
-                        onClick={() => {
-                          setAdjSelectedUser(u);
-                          setAdjUserSearch(u.name);
-                          setAdjUserResults([]);
-                        }}
+                    {adjSubmitting
+                      ? "Processing…"
+                      : adjType === "credit"
+                        ? "Apply Credit"
+                        : "Apply Debit"}
+                  </button>
+                </div>
+
+                {/* ── Adjustment Audit Log ─── */}
+                <div className="ctrl-card">
+                  <h2
+                    style={{
+                      margin: "0 0 1rem",
+                      fontSize: "1.1rem",
+                      fontWeight: 700,
+                    }}
+                  >
+                    Adjustment Audit Log
+                  </h2>
+                  {adjustments.loading && !adjustments.loaded ? (
+                    <p style={{ color: "var(--color-text-muted)" }}>Loading…</p>
+                  ) : adjustments.data.length === 0 ? (
+                    <p style={{ color: "var(--color-text-muted)" }}>
+                      No adjustments yet.
+                    </p>
+                  ) : (
+                    <div style={{ overflowX: "auto" }}>
+                      <table
                         style={{
-                          padding: "0.5rem 0.75rem",
-                          cursor: "pointer",
+                          width: "100%",
+                          borderCollapse: "collapse",
                           fontSize: "0.875rem",
                         }}
                       >
-                        {u.name}{" "}
-                        <span style={{ color: "#94a3b8" }}>
-                          @{u.username} · {u.email}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-                {adjSelectedUser && (
-                  <p
-                    style={{
-                      fontSize: "0.8rem",
-                      color: "#22c55e",
-                      marginTop: "4px",
-                    }}
-                  >
-                    ✓ Selected: {adjSelectedUser.name} ({adjSelectedUser.email})
-                  </p>
-                )}
-              </div>
-
-              {/* Amount + type */}
-              <div className="ctrl-fields-row">
-                <div className="ctrl-field">
-                  <label
-                    style={{
-                      display: "block",
-                      fontSize: "0.85rem",
-                      fontWeight: 600,
-                      marginBottom: "4px",
-                    }}
-                  >
-                    Amount (XAF)
-                  </label>
-                  <input
-                    type="number"
-                    min="1"
-                    value={adjAmount}
-                    onChange={(e) => setAdjAmount(e.target.value)}
-                    placeholder="e.g. 5000"
-                    style={{
-                      width: "100%",
-                      padding: "0.6rem 0.75rem",
-                      borderRadius: "8px",
-                      border: "1px solid var(--color-border, #e2e8f0)",
-                      fontSize: "0.9rem",
-                      boxSizing: "border-box",
-                    }}
-                  />
-                </div>
-                <div className="ctrl-field">
-                  <label
-                    style={{
-                      display: "block",
-                      fontSize: "0.85rem",
-                      fontWeight: 600,
-                      marginBottom: "4px",
-                    }}
-                  >
-                    Type
-                  </label>
-                  <select
-                    value={adjType}
-                    onChange={(e) =>
-                      setAdjType(e.target.value as "credit" | "debit")
-                    }
-                    style={{
-                      width: "100%",
-                      padding: "0.6rem 0.75rem",
-                      borderRadius: "8px",
-                      border: "1px solid var(--color-border, #e2e8f0)",
-                      fontSize: "0.9rem",
-                      background: "#fff",
-                      boxSizing: "border-box",
-                    }}
-                  >
-                    <option value="credit">✅ Credit (add funds)</option>
-                    <option value="debit">❌ Debit (remove funds)</option>
-                  </select>
-                </div>
-              </div>
-
-              {/* Reason */}
-              <div style={{ marginBottom: "1rem" }}>
-                <label
-                  style={{
-                    display: "block",
-                    fontSize: "0.85rem",
-                    fontWeight: 600,
-                    marginBottom: "4px",
-                  }}
-                >
-                  Reason Note <span style={{ color: "#ef4444" }}>*</span>
-                </label>
-                <textarea
-                  value={adjReason}
-                  onChange={(e) => setAdjReason(e.target.value)}
-                  rows={3}
-                  placeholder="e.g. MoMo transaction ref #ABC123 failed but user was charged. Refunding via wallet credit."
-                  style={{
-                    width: "100%",
-                    padding: "0.6rem 0.75rem",
-                    borderRadius: "8px",
-                    border: "1px solid var(--color-border, #e2e8f0)",
-                    fontSize: "0.875rem",
-                    resize: "vertical",
-                    boxSizing: "border-box",
-                  }}
-                />
-              </div>
-
-              {adjError && (
-                <p
-                  style={{
-                    fontSize: "0.85rem",
-                    color: "#ef4444",
-                    marginBottom: "0.75rem",
-                  }}
-                >
-                  {adjError}
-                </p>
-              )}
-              {adjSuccess && (
-                <p
-                  style={{
-                    fontSize: "0.85rem",
-                    color: "#22c55e",
-                    marginBottom: "0.75rem",
-                  }}
-                >
-                  ✓ {adjSuccess}
-                </p>
-              )}
-
-              <button
-                disabled={adjSubmitting}
-                onClick={submitAdjustment}
-                className="ctrl-submit-btn"
-                style={{
-                  background: adjType === "credit" ? "#22c55e" : "#ef4444",
-                  opacity: adjSubmitting ? 0.65 : 1,
-                  cursor: adjSubmitting ? "not-allowed" : "pointer",
-                }}
-              >
-                {adjSubmitting
-                  ? "Processing…"
-                  : adjType === "credit"
-                    ? "Apply Credit"
-                    : "Apply Debit"}
-              </button>
-            </div>
-
-            {/* ── Adjustment Audit Log ─── */}
-            <div className="ctrl-card">
-              <h2
-                style={{
-                  margin: "0 0 1rem",
-                  fontSize: "1.1rem",
-                  fontWeight: 700,
-                }}
-              >
-                📋 Adjustment Audit Log
-              </h2>
-              {adjustments.loading && !adjustments.loaded ? (
-                <p style={{ color: "var(--color-text-muted)" }}>Loading…</p>
-              ) : adjustments.data.length === 0 ? (
-                <p style={{ color: "var(--color-text-muted)" }}>
-                  No adjustments yet.
-                </p>
-              ) : (
-                <div style={{ overflowX: "auto" }}>
-                  <table
-                    style={{
-                      width: "100%",
-                      borderCollapse: "collapse",
-                      fontSize: "0.875rem",
-                    }}
-                  >
-                    <thead>
-                      <tr
-                        style={{
-                          borderBottom:
-                            "2px solid var(--color-border, #e2e8f0)",
-                        }}
-                      >
-                        {[
-                          "Date",
-                          "Admin",
-                          "User",
-                          "Type",
-                          "Amount (XAF)",
-                          "Reason",
-                        ].map((h) => (
-                          <th
-                            key={h}
+                        <thead>
+                          <tr
                             style={{
-                              padding: "0.5rem 0.75rem",
-                              textAlign: "left",
-                              whiteSpace: "nowrap",
+                              borderBottom:
+                                "2px solid var(--color-border, #e2e8f0)",
                             }}
                           >
-                            {h}
-                          </th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {adjustments.data.map((row) => (
-                        <tr
-                          key={String(row.id)}
+                            {[
+                              "Date",
+                              "Admin",
+                              "User",
+                              "Type",
+                              "Amount (XAF)",
+                              "Reason",
+                            ].map((h) => (
+                              <th
+                                key={h}
+                                style={{
+                                  padding: "0.5rem 0.75rem",
+                                  textAlign: "left",
+                                  whiteSpace: "nowrap",
+                                }}
+                              >
+                                {h}
+                              </th>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {adjustments.data.map((row) => (
+                            <tr
+                              key={String(row.id)}
+                              style={{
+                                borderBottom:
+                                  "1px solid var(--color-border, #e2e8f0)",
+                              }}
+                            >
+                              <td
+                                style={{
+                                  padding: "0.5rem 0.75rem",
+                                  whiteSpace: "nowrap",
+                                }}
+                              >
+                                {fmtDate(row.created_at)}
+                              </td>
+                              <td style={{ padding: "0.5rem 0.75rem" }}>
+                                {String(row.admin_email)}
+                              </td>
+                              <td style={{ padding: "0.5rem 0.75rem" }}>
+                                {String(row.user_name)}
+                                <br />
+                                <span
+                                  style={{
+                                    fontSize: "0.75rem",
+                                    color: "var(--color-text-muted)",
+                                  }}
+                                >
+                                  {String(row.user_email)}
+                                </span>
+                              </td>
+                              <td style={{ padding: "0.5rem 0.75rem" }}>
+                                <span
+                                  style={{
+                                    padding: "2px 8px",
+                                    borderRadius: "12px",
+                                    fontSize: "0.75rem",
+                                    fontWeight: 600,
+                                    background:
+                                      row.type === "credit"
+                                        ? "rgba(34,197,94,0.12)"
+                                        : "rgba(239,68,68,0.12)",
+                                    color:
+                                      row.type === "credit"
+                                        ? "#16a34a"
+                                        : "#dc2626",
+                                  }}
+                                >
+                                  {String(row.type).toUpperCase()}
+                                </span>
+                              </td>
+                              <td
+                                style={{
+                                  padding: "0.5rem 0.75rem",
+                                  fontWeight: 600,
+                                }}
+                              >
+                                {Number(row.amount).toLocaleString()}
+                              </td>
+                              <td
+                                style={{
+                                  padding: "0.5rem 0.75rem",
+                                  maxWidth: "260px",
+                                }}
+                              >
+                                {String(row.reason)}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                      {adjustments.hasMore && (
+                        <button
+                          onClick={() =>
+                            loadAdjustments(true, adjustments.page)
+                          }
+                          disabled={adjustments.loading}
                           style={{
-                            borderBottom:
-                              "1px solid var(--color-border, #e2e8f0)",
+                            marginTop: "1rem",
+                            padding: "0.5rem 1.25rem",
+                            borderRadius: "8px",
+                            background: "var(--color-primary, #0F1F3D)",
+                            color: "#fff",
+                            border: "none",
+                            cursor: "pointer",
+                            fontSize: "0.875rem",
                           }}
                         >
-                          <td
-                            style={{
-                              padding: "0.5rem 0.75rem",
-                              whiteSpace: "nowrap",
-                            }}
-                          >
-                            {fmtDate(row.created_at)}
-                          </td>
-                          <td style={{ padding: "0.5rem 0.75rem" }}>
-                            {String(row.admin_email)}
-                          </td>
-                          <td style={{ padding: "0.5rem 0.75rem" }}>
-                            {String(row.user_name)}
-                            <br />
-                            <span
-                              style={{
-                                fontSize: "0.75rem",
-                                color: "var(--color-text-muted)",
-                              }}
-                            >
-                              {String(row.user_email)}
-                            </span>
-                          </td>
-                          <td style={{ padding: "0.5rem 0.75rem" }}>
-                            <span
-                              style={{
-                                padding: "2px 8px",
-                                borderRadius: "12px",
-                                fontSize: "0.75rem",
-                                fontWeight: 600,
-                                background:
-                                  row.type === "credit"
-                                    ? "rgba(34,197,94,0.12)"
-                                    : "rgba(239,68,68,0.12)",
-                                color:
-                                  row.type === "credit" ? "#16a34a" : "#dc2626",
-                              }}
-                            >
-                              {String(row.type).toUpperCase()}
-                            </span>
-                          </td>
-                          <td
-                            style={{
-                              padding: "0.5rem 0.75rem",
-                              fontWeight: 600,
-                            }}
-                          >
-                            {Number(row.amount).toLocaleString()}
-                          </td>
-                          <td
-                            style={{
-                              padding: "0.5rem 0.75rem",
-                              maxWidth: "260px",
-                            }}
-                          >
-                            {String(row.reason)}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                  {adjustments.hasMore && (
-                    <button
-                      onClick={() => loadAdjustments(true, adjustments.page)}
-                      disabled={adjustments.loading}
+                          {adjustments.loading ? "Loading…" : "Load More"}
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                {/* ── Two-Factor Authentication ─── */}
+                <div className="ctrl-card">
+                  <h2
+                    style={{
+                      margin: "0 0 1.25rem",
+                      fontSize: "1.1rem",
+                      fontWeight: 700,
+                    }}
+                  >
+                    Two-Factor Authentication (2FA)
+                  </h2>
+                  {twoFaMsg && (
+                    <div
                       style={{
-                        marginTop: "1rem",
-                        padding: "0.5rem 1.25rem",
+                        background: "#f0fdf4",
+                        border: "1px solid #86efac",
+                        color: "#166534",
                         borderRadius: "8px",
-                        background: "var(--color-primary, #0F1F3D)",
-                        color: "#fff",
-                        border: "none",
-                        cursor: "pointer",
+                        padding: "0.625rem 0.875rem",
+                        marginBottom: "0.75rem",
                         fontSize: "0.875rem",
                       }}
                     >
-                      {adjustments.loading ? "Loading…" : "Load More"}
-                    </button>
+                      {twoFaMsg}
+                    </div>
+                  )}
+                  {twoFaErr && (
+                    <div
+                      style={{
+                        background: "#fef2f2",
+                        border: "1px solid #fca5a5",
+                        color: "#991b1b",
+                        borderRadius: "8px",
+                        padding: "0.625rem 0.875rem",
+                        marginBottom: "0.75rem",
+                        fontSize: "0.875rem",
+                      }}
+                    >
+                      {twoFaErr}
+                    </div>
+                  )}
+                  {twoFaEnabled === null ? (
+                    <p style={{ color: "var(--color-text-muted)" }}>
+                      Loading 2FA status…
+                    </p>
+                  ) : twoFaEnabled ? (
+                    <div>
+                      <p
+                        style={{
+                          color: "var(--color-text-body)",
+                          marginBottom: "1rem",
+                        }}
+                      >
+                        2FA is{" "}
+                        <strong style={{ color: "#16a34a" }}>enabled</strong>.
+                        Every login requires a valid TOTP code from your
+                        authenticator app.
+                      </p>
+                      <button
+                        onClick={handle2FaDisable}
+                        disabled={twoFaLoading}
+                        style={{
+                          padding: "0.5rem 1.25rem",
+                          borderRadius: "8px",
+                          background: "#991b1b",
+                          color: "#fff",
+                          border: "none",
+                          cursor: twoFaLoading ? "not-allowed" : "pointer",
+                          fontWeight: 700,
+                          opacity: twoFaLoading ? 0.6 : 1,
+                        }}
+                      >
+                        {twoFaLoading ? "…" : "Disable 2FA"}
+                      </button>
+                    </div>
+                  ) : twoFaSetupData ? (
+                    <div>
+                      <p
+                        style={{
+                          color: "var(--color-text-body)",
+                          marginBottom: "0.75rem",
+                          fontSize: "0.875rem",
+                        }}
+                      >
+                        Scan this QR code with your authenticator app (Google
+                        Authenticator, Authy, etc.), then enter the 6-digit code
+                        to confirm and enable 2FA.
+                      </p>
+                      <div style={{ marginBottom: "1rem" }}>
+                        <QRCodeSVG
+                          value={twoFaSetupData.otpauthUrl}
+                          size={180}
+                        />
+                      </div>
+                      <p
+                        style={{
+                          fontSize: "0.75rem",
+                          color: "var(--color-text-muted)",
+                          marginBottom: "0.75rem",
+                          fontFamily: "monospace",
+                          wordBreak: "break-all",
+                        }}
+                      >
+                        Manual key: {twoFaSetupData.base32}
+                      </p>
+                      <div
+                        style={{
+                          display: "flex",
+                          gap: "0.5rem",
+                          flexWrap: "wrap",
+                        }}
+                      >
+                        <input
+                          type="text"
+                          inputMode="numeric"
+                          value={twoFaOtp}
+                          onChange={(e) =>
+                            setTwoFaOtp(
+                              e.target.value.replace(/\D/g, "").slice(0, 6),
+                            )
+                          }
+                          placeholder="6-digit code"
+                          maxLength={6}
+                          style={{
+                            padding: "0.5rem 0.75rem",
+                            borderRadius: "8px",
+                            border: "1px solid var(--color-border)",
+                            fontSize: "1rem",
+                            width: "9rem",
+                            letterSpacing: "0.25em",
+                          }}
+                        />
+                        <button
+                          onClick={handle2FaVerify}
+                          disabled={twoFaLoading || twoFaOtp.length !== 6}
+                          style={{
+                            padding: "0.5rem 1.25rem",
+                            borderRadius: "8px",
+                            background: "#0F1F3D",
+                            color: "#fff",
+                            border: "none",
+                            cursor:
+                              twoFaOtp.length !== 6 || twoFaLoading
+                                ? "not-allowed"
+                                : "pointer",
+                            fontWeight: 700,
+                            opacity:
+                              twoFaOtp.length !== 6 || twoFaLoading ? 0.5 : 1,
+                          }}
+                        >
+                          {twoFaLoading ? "Verifying…" : "Enable 2FA"}
+                        </button>
+                        <button
+                          onClick={() => setTwoFaSetupData(null)}
+                          style={{
+                            padding: "0.5rem 0.875rem",
+                            borderRadius: "8px",
+                            background: "none",
+                            color: "var(--color-text-muted)",
+                            border: "1px solid var(--color-border)",
+                            cursor: "pointer",
+                          }}
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div>
+                      <p
+                        style={{
+                          color: "var(--color-text-body)",
+                          marginBottom: "1rem",
+                        }}
+                      >
+                        2FA is{" "}
+                        <strong style={{ color: "#dc2626" }}>disabled</strong>.
+                        Enable it to require a TOTP code at every login.
+                      </p>
+                      <button
+                        onClick={handle2FaSetup}
+                        disabled={twoFaLoading}
+                        style={{
+                          padding: "0.5rem 1.25rem",
+                          borderRadius: "8px",
+                          background: "#0F1F3D",
+                          color: "#fff",
+                          border: "none",
+                          cursor: twoFaLoading ? "not-allowed" : "pointer",
+                          fontWeight: 700,
+                          opacity: twoFaLoading ? 0.6 : 1,
+                        }}
+                      >
+                        {twoFaLoading ? "…" : "Set Up 2FA"}
+                      </button>
+                    </div>
                   )}
                 </div>
-              )}
-            </div>
+              </section>
+            )}
 
-            {/* ── Two-Factor Authentication ─── */}
-            <div className="ctrl-card">
-              <h2
-                style={{
-                  margin: "0 0 1.25rem",
-                  fontSize: "1.1rem",
-                  fontWeight: 700,
+            {/* ─────────────────────── AUDIT LOG TAB ──────────────────────────────── */}
+            {activeTab === "audit" && (
+              <AuditLogTab
+                data={auditLog.data}
+                loading={auditLog.loading}
+                error={auditLog.error}
+                hasMore={auditLog.hasMore}
+                onLoadMore={() => loadTab("audit", true, auditLog.page)}
+                onReload={() => loadTab("audit", false, 0)}
+              />
+            )}
+
+            {/* ─────────────────────── LIVE API KEYS TAB ──────────────────────── */}
+            {activeTab === "live-keys" && (
+              <LiveKeysAdminTab
+                data={liveKeys}
+                loading={liveKeysLoading}
+                loaded={liveKeysLoaded}
+                error={liveKeysError}
+                filter={liveKeysFilter}
+                setFilter={setLiveKeysFilter}
+                actionLoadingId={liveKeyActionLoadingId}
+                setActionLoadingId={setLiveKeyActionLoadingId}
+                actionMsg={liveKeyActionMsg}
+                setActionMsg={setLiveKeyActionMsg}
+                actionErr={liveKeyActionErr}
+                setActionErr={setLiveKeyActionErr}
+                onReload={() => loadLiveKeys(liveKeysFilter)}
+              />
+            )}
+
+            {/* ─────────────────────── INBOX TAB ─────────────────────────────────── */}
+            {activeTab === "inbox" && (
+              <SupportInboxTab
+                data={inboxData}
+                loading={inboxLoading}
+                loaded={inboxLoaded}
+                error={inboxError}
+                statusFilter={inboxStatusFilter}
+                setStatusFilter={setInboxStatusFilter}
+                updatingId={inboxUpdatingId}
+                onUpdateStatus={async (id, status) => {
+                  setInboxUpdatingId(id);
+                  try {
+                    await axios.patch(
+                      `${API_URL}/admin/feature-requests/${id}`,
+                      { status },
+                      { withCredentials: true },
+                    );
+                    loadInbox(inboxStatusFilter);
+                  } catch {
+                    /* silent */
+                  } finally {
+                    setInboxUpdatingId(null);
+                  }
                 }}
-              >
-                Two-Factor Authentication (2FA)
-              </h2>
-              {twoFaMsg && (
-                <div
-                  style={{
-                    background: "#f0fdf4",
-                    border: "1px solid #86efac",
-                    color: "#166534",
-                    borderRadius: "8px",
-                    padding: "0.625rem 0.875rem",
-                    marginBottom: "0.75rem",
-                    fontSize: "0.875rem",
-                  }}
-                >
-                  {twoFaMsg}
-                </div>
-              )}
-              {twoFaErr && (
-                <div
-                  style={{
-                    background: "#fef2f2",
-                    border: "1px solid #fca5a5",
-                    color: "#991b1b",
-                    borderRadius: "8px",
-                    padding: "0.625rem 0.875rem",
-                    marginBottom: "0.75rem",
-                    fontSize: "0.875rem",
-                  }}
-                >
-                  {twoFaErr}
-                </div>
-              )}
-              {twoFaEnabled === null ? (
-                <p style={{ color: "var(--color-text-muted)" }}>
-                  Loading 2FA status…
-                </p>
-              ) : twoFaEnabled ? (
-                <div>
-                  <p
-                    style={{
-                      color: "var(--color-text-body)",
-                      marginBottom: "1rem",
-                    }}
-                  >
-                    2FA is <strong style={{ color: "#16a34a" }}>enabled</strong>
-                    . Every login requires a valid TOTP code from your
-                    authenticator app.
-                  </p>
-                  <button
-                    onClick={handle2FaDisable}
-                    disabled={twoFaLoading}
-                    style={{
-                      padding: "0.5rem 1.25rem",
-                      borderRadius: "8px",
-                      background: "#991b1b",
-                      color: "#fff",
-                      border: "none",
-                      cursor: twoFaLoading ? "not-allowed" : "pointer",
-                      fontWeight: 700,
-                      opacity: twoFaLoading ? 0.6 : 1,
-                    }}
-                  >
-                    {twoFaLoading ? "…" : "Disable 2FA"}
-                  </button>
-                </div>
-              ) : twoFaSetupData ? (
-                <div>
-                  <p
-                    style={{
-                      color: "var(--color-text-body)",
-                      marginBottom: "0.75rem",
-                      fontSize: "0.875rem",
-                    }}
-                  >
-                    Scan this QR code with your authenticator app (Google
-                    Authenticator, Authy, etc.), then enter the 6-digit code to
-                    confirm and enable 2FA.
-                  </p>
-                  <div style={{ marginBottom: "1rem" }}>
-                    <QRCodeSVG value={twoFaSetupData.otpauthUrl} size={180} />
-                  </div>
-                  <p
-                    style={{
-                      fontSize: "0.75rem",
-                      color: "var(--color-text-muted)",
-                      marginBottom: "0.75rem",
-                      fontFamily: "monospace",
-                      wordBreak: "break-all",
-                    }}
-                  >
-                    Manual key: {twoFaSetupData.base32}
-                  </p>
-                  <div
-                    style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}
-                  >
-                    <input
-                      type="text"
-                      inputMode="numeric"
-                      value={twoFaOtp}
-                      onChange={(e) =>
-                        setTwoFaOtp(
-                          e.target.value.replace(/\D/g, "").slice(0, 6),
-                        )
-                      }
-                      placeholder="6-digit code"
-                      maxLength={6}
-                      style={{
-                        padding: "0.5rem 0.75rem",
-                        borderRadius: "8px",
-                        border: "1px solid var(--color-border)",
-                        fontSize: "1rem",
-                        width: "9rem",
-                        letterSpacing: "0.25em",
-                      }}
-                    />
-                    <button
-                      onClick={handle2FaVerify}
-                      disabled={twoFaLoading || twoFaOtp.length !== 6}
-                      style={{
-                        padding: "0.5rem 1.25rem",
-                        borderRadius: "8px",
-                        background: "#0F1F3D",
-                        color: "#fff",
-                        border: "none",
-                        cursor:
-                          twoFaOtp.length !== 6 || twoFaLoading
-                            ? "not-allowed"
-                            : "pointer",
-                        fontWeight: 700,
-                        opacity:
-                          twoFaOtp.length !== 6 || twoFaLoading ? 0.5 : 1,
-                      }}
-                    >
-                      {twoFaLoading ? "Verifying…" : "Enable 2FA"}
-                    </button>
-                    <button
-                      onClick={() => setTwoFaSetupData(null)}
-                      style={{
-                        padding: "0.5rem 0.875rem",
-                        borderRadius: "8px",
-                        background: "none",
-                        color: "var(--color-text-muted)",
-                        border: "1px solid var(--color-border)",
-                        cursor: "pointer",
-                      }}
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <div>
-                  <p
-                    style={{
-                      color: "var(--color-text-body)",
-                      marginBottom: "1rem",
-                    }}
-                  >
-                    2FA is{" "}
-                    <strong style={{ color: "#dc2626" }}>disabled</strong>.
-                    Enable it to require a TOTP code at every login.
-                  </p>
-                  <button
-                    onClick={handle2FaSetup}
-                    disabled={twoFaLoading}
-                    style={{
-                      padding: "0.5rem 1.25rem",
-                      borderRadius: "8px",
-                      background: "#0F1F3D",
-                      color: "#fff",
-                      border: "none",
-                      cursor: twoFaLoading ? "not-allowed" : "pointer",
-                      fontWeight: 700,
-                      opacity: twoFaLoading ? 0.6 : 1,
-                    }}
-                  >
-                    {twoFaLoading ? "…" : "Set Up 2FA"}
-                  </button>
-                </div>
-              )}
-            </div>
-          </section>
-        )}
+              />
+            )}
 
-        {/* ─────────────────────── AUDIT LOG TAB ──────────────────────────────── */}
-        {activeTab === "audit" && (
-          <AuditLogTab
-            data={auditLog.data}
-            loading={auditLog.loading}
-            error={auditLog.error}
-            hasMore={auditLog.hasMore}
-            onLoadMore={() => loadTab("audit", true, auditLog.page)}
-            onReload={() => loadTab("audit", false, 0)}
-          />
-        )}
-
-        {/* ─────────────────────── LIVE API KEYS TAB ──────────────────────── */}
-        {activeTab === "live-keys" && (
-          <LiveKeysAdminTab
-            data={liveKeys}
-            loading={liveKeysLoading}
-            loaded={liveKeysLoaded}
-            error={liveKeysError}
-            filter={liveKeysFilter}
-            setFilter={setLiveKeysFilter}
-            actionLoadingId={liveKeyActionLoadingId}
-            setActionLoadingId={setLiveKeyActionLoadingId}
-            actionMsg={liveKeyActionMsg}
-            setActionMsg={setLiveKeyActionMsg}
-            actionErr={liveKeyActionErr}
-            setActionErr={setLiveKeyActionErr}
-            onReload={() => loadLiveKeys(liveKeysFilter)}
-          />
-        )}
-
-        {/* ─────────────────────── INBOX TAB ─────────────────────────────────── */}
-        {activeTab === "inbox" && (
-          <SupportInboxTab
-            data={inboxData}
-            loading={inboxLoading}
-            loaded={inboxLoaded}
-            error={inboxError}
-            statusFilter={inboxStatusFilter}
-            setStatusFilter={setInboxStatusFilter}
-            updatingId={inboxUpdatingId}
-            onUpdateStatus={async (id, status) => {
-              setInboxUpdatingId(id);
-              try {
-                await axios.patch(
-                  `${API_URL}/admin/feature-requests/${id}`,
-                  { status },
-                  { withCredentials: true },
-                );
-                loadInbox(inboxStatusFilter);
-              } catch {
-                /* silent */
-              } finally {
-                setInboxUpdatingId(null);
-              }
-            }}
-          />
-        )}
-
-        {/* ─────────────────────── USER PROFILE MODAL ─────────────────────────── */}
-        {profileUserId !== null && (
-          <div
-            style={{
-              position: "fixed",
-              inset: 0,
-              background: "rgba(0,0,0,0.5)",
-              zIndex: 1000,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              padding: "1rem",
-            }}
-          >
+            {/* ─────────────────────── USER PROFILE MODAL ─────────────────────────── */}
+          </div>
+          {profileUserId !== null && (
             <div
-              style={{
-                background: "#fff",
-                borderRadius: "16px",
-                width: "100%",
-                maxWidth: "680px",
-                maxHeight: "90vh",
-                overflowY: "auto",
-                boxShadow: "0 20px 60px rgba(0,0,0,0.3)",
+              className="adm-modal-backdrop"
+              onClick={(e) => {
+                if (e.target === e.currentTarget) setProfileUserId(null);
               }}
             >
               <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  padding: "1.25rem 1.5rem",
-                  borderBottom: "1px solid var(--color-border)",
-                }}
+                className="adm-modal"
+                role="dialog"
+                aria-modal="true"
+                aria-label="User profile"
               >
-                <h2 style={{ margin: 0, fontSize: "1.1rem", fontWeight: 800 }}>
-                  User Profile
-                </h2>
-                <button
-                  onClick={() => setProfileUserId(null)}
-                  style={{
-                    background: "none",
-                    border: "none",
-                    fontSize: "1.25rem",
-                    cursor: "pointer",
-                    color: "var(--color-text-muted)",
-                  }}
-                >
-                  ×
-                </button>
-              </div>
-              <div style={{ padding: "1.5rem" }}>
-                {profileLoading && (
-                  <p style={{ color: "var(--color-text-muted)" }}>Loading…</p>
-                )}
-                {profileError && (
-                  <p style={{ color: "#dc2626" }}>{profileError}</p>
-                )}
-                {profileData && <UserProfileDrilldown data={profileData} />}
+                <div className="adm-modal-head">
+                  <h2>User Profile</h2>
+                  <button
+                    type="button"
+                    className="adm-modal-close"
+                    aria-label="Close user profile"
+                    onClick={() => setProfileUserId(null)}
+                  >
+                    ×
+                  </button>
+                </div>
+                <div className="adm-modal-body">
+                  {profileLoading && (
+                    <p style={{ color: "var(--color-text-muted)" }}>Loading…</p>
+                  )}
+                  {profileError && (
+                    <p style={{ color: "#dc2626" }}>{profileError}</p>
+                  )}
+                  {profileData && <UserProfileDrilldown data={profileData} />}
+                </div>
               </div>
             </div>
-          </div>
-        )}
-      </main>
+          )}
+        </main>
+      </div>
     </div>
   );
 }
@@ -5040,6 +5023,22 @@ function AdminVerifyTab() {
 // ─── Small reusable components ────────────────────────────────────────────────
 
 // Stat card for the overview tab
+// Emoji passed by callers are mapped to crisp vector icons; unknown values fall back to the emoji.
+const STAT_ICONS: Record<string, LucideIcon> = {
+  "👤": Users,
+  "🧾": FileText,
+  "💳": CreditCard,
+  "📤": Banknote,
+  "💰": Wallet,
+  "📈": TrendingUp,
+  "🔒": Lock,
+  "⏳": Hourglass,
+  "🤝": Handshake,
+  "⚠️": AlertTriangle,
+  "✅": CheckCircle2,
+  "🔗": Link2,
+};
+
 function StatCard({
   label,
   value,
@@ -5053,67 +5052,60 @@ function StatCard({
   icon: string;
   large?: boolean;
 }) {
-  const highlight = ["red", "danger"].includes(color);
-  const success = ["green", "emerald", "teal"].includes(color);
-  const bg = highlight
-    ? "var(--color-danger-bg)"
-    : success
-      ? "var(--color-success-bg)"
-      : "var(--color-mist)";
-  const border = highlight
-    ? "var(--color-danger-border)"
-    : success
-      ? "var(--color-success-border)"
-      : "var(--color-border)";
-  const valueColor = highlight
-    ? "var(--color-danger)"
-    : success
-      ? "var(--color-success)"
-      : "var(--color-text-heading)";
-
+  const Icon = STAT_ICONS[icon];
+  const isAlert = color === "red";
   return (
     <div
-      style={{
-        backgroundColor: bg,
-        border: `1px solid ${border}`,
-        borderRadius: "var(--radius-md)",
-        padding: "1rem",
-        boxShadow: "var(--shadow-card)",
-      }}
+      className={`adm-stat adm-tone-${color}${large ? " is-large" : ""}${isAlert ? " is-alert" : ""}`}
     >
-      <div
-        style={{
-          display: "flex",
-          alignItems: "flex-start",
-          justifyContent: "space-between",
-        }}
-      >
-        <div>
-          <p
-            style={{
-              fontSize: "0.6875rem",
-              fontWeight: 600,
-              color: "var(--color-text-muted)",
-              textTransform: "uppercase",
-              letterSpacing: "0.05em",
-              marginBottom: "0.375rem",
-            }}
-          >
-            {label}
-          </p>
-          <p
-            style={{
-              fontWeight: 800,
-              fontSize: large ? "1.5rem" : "1.25rem",
-              color: valueColor,
-              margin: 0,
-            }}
-          >
-            {value}
-          </p>
-        </div>
-        <span style={{ fontSize: "1.5rem" }}>{icon}</span>
+      <div className="adm-stat-top">
+        <p className="adm-stat-label">{label}</p>
+        <span className="adm-stat-icon" aria-hidden="true">
+          {Icon ? <Icon size={18} strokeWidth={2.1} /> : icon}
+        </span>
       </div>
+      <p className="adm-stat-value">{value}</p>
+    </div>
+  );
+}
+
+// Gives every table cell a data-label so the table can render as stacked cards on phones.
+function useResponsiveTable<T extends HTMLElement>(deps: unknown) {
+  const ref = useRef<T | null>(null);
+  useEffect(() => {
+    const root = ref.current;
+    if (!root) return;
+    root.querySelectorAll("table").forEach((table) => {
+      const labels = Array.from(table.querySelectorAll("thead th")).map((th) =>
+        (th.textContent || "").trim(),
+      );
+      table.querySelectorAll("tbody tr").forEach((row) => {
+        let col = 0;
+        Array.from(row.children).forEach((cell) => {
+          if (!(cell instanceof HTMLElement)) return;
+          const span = Number(cell.getAttribute("colspan") || 1);
+          if (span === 1 && labels[col]) {
+            cell.setAttribute("data-label", labels[col]);
+          }
+          col += span;
+        });
+      });
+    });
+  }, [deps]);
+  return ref;
+}
+
+function TableSkeleton() {
+  return (
+    <div className="adm-table-wrap" aria-busy="true" aria-live="polite">
+      {Array.from({ length: 6 }).map((_, i) => (
+        <div key={i} className="adm-skel-row">
+          <div className="adm-skel adm-skel-line" />
+          <div className="adm-skel adm-skel-line" />
+          <div className="adm-skel adm-skel-line" />
+          <div className="adm-skel adm-skel-line" />
+        </div>
+      ))}
     </div>
   );
 }
@@ -5133,44 +5125,20 @@ function TabSection({
   children: React.ReactNode;
 }) {
   const t = useTranslations("Admin");
+  const wrapRef = useResponsiveTable<HTMLDivElement>(children);
   return (
-    <section style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-        }}
-      >
-        <h2
-          style={{
-            fontSize: "1.25rem",
-            fontWeight: 800,
-            color: "var(--color-text-heading)",
-            margin: 0,
-          }}
-        >
-          {title}
-        </h2>
+    <section className="adm-stack">
+      <div className="adm-page-head">
+        <h2 className="adm-page-title">{title}</h2>
         {state.loaded && (
-          <p style={{ fontSize: "0.875rem", color: "var(--color-text-muted)" }}>
+          <span className="adm-count">
             {t("dashboard.recordsShowing", { count: state.data.length })}
-          </p>
+          </span>
         )}
       </div>
 
-      {/* First load spinner */}
-      {!state.loaded && state.loading && (
-        <p
-          style={{
-            color: "var(--color-text-muted)",
-            textAlign: "center",
-            padding: "2rem",
-          }}
-        >
-          {t("dashboard.tabLoading")}
-        </p>
-      )}
+      {/* First load skeleton */}
+      {!state.loaded && state.loading && <TableSkeleton />}
 
       {/* Error */}
       {state.error && (
@@ -5181,48 +5149,29 @@ function TabSection({
 
       {/* Empty state */}
       {state.loaded && state.data.length === 0 && !state.error && (
-        <div
-          style={{
-            backgroundColor: "var(--color-white)",
-            border: "1px solid var(--color-border)",
-            borderRadius: "var(--radius-md)",
-            padding: "3rem",
-            textAlign: "center",
-          }}
-        >
-          <p style={{ color: "var(--color-text-muted)" }}>{emptyMessage}</p>
+        <div className="adm-empty">
+          <span className="adm-empty-icon" aria-hidden="true">
+            <Inbox size={22} />
+          </span>
+          <p>{emptyMessage}</p>
         </div>
       )}
 
       {/* Table */}
       {state.data.length > 0 && (
-        <div
-          style={{
-            backgroundColor: "var(--color-white)",
-            border: "1px solid var(--color-border)",
-            borderRadius: "var(--radius-md)",
-            overflowX: "auto",
-            boxShadow: "var(--shadow-card)",
-          }}
-        >
-          <div style={{ minWidth: "max-content" }}>{children}</div>
+        <div ref={wrapRef} className="adm-table-wrap">
+          {children}
         </div>
       )}
 
       {/* Load more */}
       {state.hasMore && (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            paddingTop: "0.5rem",
-          }}
-        >
+        <div className="adm-more">
           <button
+            type="button"
             onClick={onLoadMore}
             disabled={state.loading}
-            className="btn-ghost"
-            style={{ fontSize: "0.875rem" }}
+            className="adm-btn"
           >
             {state.loading
               ? t("dashboard.tabLoading")
@@ -5236,23 +5185,7 @@ function TabSection({
 
 // Table header cell
 function Th({ children }: { children: React.ReactNode }) {
-  return (
-    <th
-      style={{
-        padding: "0.75rem 1rem",
-        fontSize: "0.6875rem",
-        fontWeight: 600,
-        color: "var(--color-text-muted)",
-        textTransform: "uppercase",
-        letterSpacing: "0.05em",
-        whiteSpace: "nowrap",
-        textAlign: "left",
-        borderBottom: "1px solid var(--color-border)",
-      }}
-    >
-      {children}
-    </th>
-  );
+  return <th className="adm-th">{children}</th>;
 }
 
 // Table data cell — supports bold, muted, and mono variants
@@ -5267,27 +5200,15 @@ function Td({
   muted?: boolean;
   mono?: boolean;
 }) {
-  return (
-    <td
-      style={{
-        padding: "0.75rem 1rem",
-        whiteSpace: "nowrap",
-        fontSize: muted || mono ? "0.8125rem" : "0.875rem",
-        fontWeight: bold ? 600 : 400,
-        color: bold
-          ? "var(--color-text-heading)"
-          : muted
-            ? "var(--color-text-muted)"
-            : mono
-              ? "var(--color-text-body)"
-              : "var(--color-text-body)",
-        fontFamily: mono ? "monospace" : "inherit",
-        borderBottom: "1px solid var(--color-border)",
-      }}
-    >
-      {children}
-    </td>
-  );
+  const cls = [
+    "adm-td",
+    bold ? "is-bold" : "",
+    muted ? "is-muted" : "",
+    mono ? "is-mono" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+  return <td className={cls}>{children}</td>;
 }
 
 // ─── Audit Log Tab Component ──────────────────────────────────────────────────
@@ -5341,7 +5262,7 @@ function AuditLogTab({
         <p style={{ color: "var(--color-text-muted)" }}>No audit events yet.</p>
       )}
       {data.length > 0 && (
-        <div style={{ overflowX: "auto" }}>
+        <div className="adm-table-wrap">
           <table
             style={{
               width: "100%",
@@ -5379,6 +5300,7 @@ function AuditLogTab({
                   }}
                 >
                   <td
+                    data-label="Date"
                     style={{
                       padding: "0.5rem 0.75rem",
                       whiteSpace: "nowrap",
@@ -5399,7 +5321,7 @@ function AuditLogTab({
                         )
                       : "—"}
                   </td>
-                  <td style={{ padding: "0.5rem 0.75rem" }}>
+                  <td data-label="Action" style={{ padding: "0.5rem 0.75rem" }}>
                     <span
                       style={{
                         padding: "2px 8px",
@@ -5414,6 +5336,7 @@ function AuditLogTab({
                     </span>
                   </td>
                   <td
+                    data-label="User ID"
                     style={{
                       padding: "0.5rem 0.75rem",
                       fontFamily: "monospace",
@@ -5422,6 +5345,7 @@ function AuditLogTab({
                     {row.target_id != null ? String(row.target_id) : "—"}
                   </td>
                   <td
+                    data-label="Detail"
                     style={{
                       padding: "0.5rem 0.75rem",
                       color: "var(--color-text-body)",

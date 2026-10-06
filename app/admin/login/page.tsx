@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
@@ -67,275 +67,134 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        backgroundColor: "#0a1628",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: "1.5rem",
-      }}
-    >
-      <div style={{ width: "100%", maxWidth: "22rem" }}>
-        {/* Brand mark */}
-        <div style={{ textAlign: "center", marginBottom: "2rem" }}>
-          <div
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              justifyContent: "center",
-              width: "3.25rem",
-              height: "3.25rem",
-              backgroundColor: "var(--color-accent)",
-              borderRadius: "0.875rem",
-              marginBottom: "1rem",
-            }}
+    <div className="adm adm-login">
+      <div className="adm-login-card">
+        <div className="adm-login-mark" aria-hidden="true">
+          <svg
+            width="24"
+            height="24"
+            fill="none"
+            stroke="#0F1F3D"
+            strokeWidth={2.5}
+            viewBox="0 0 24 24"
           >
-            <svg
-              width="24"
-              height="24"
-              fill="none"
-              stroke="#0F1F3D"
-              strokeWidth={2.5}
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-              />
-            </svg>
-          </div>
-          <h1
-            style={{
-              fontSize: "1.5rem",
-              fontWeight: 800,
-              color: "#ffffff",
-              margin: "0 0 0.25rem",
-            }}
-          >
-            {t("login.title")}
-          </h1>
-          <p style={{ fontSize: "0.875rem", color: "#94a3b8", margin: 0 }}>
-            {t("login.subtitle")}
-          </p>
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+            />
+          </svg>
         </div>
+        <h1 className="adm-login-title">{t("login.title")}</h1>
+        <p className="adm-login-sub">{t("login.subtitle")}</p>
 
-        {/* Card */}
-        <div
-          style={{
-            backgroundColor: "#111f38",
-            border: "1px solid rgba(255,255,255,0.08)",
-            borderRadius: "var(--radius-xl)",
-            padding: "1.75rem",
-            boxShadow: "0 8px 32px rgba(0,0,0,0.5)",
-          }}
+        <form
+          onSubmit={step === "credentials" ? handleCredentials : handleOtp}
         >
-          <form
-            onSubmit={step === "credentials" ? handleCredentials : handleOtp}
-          >
-            {step === "credentials" ? (
-              <>
-                <div style={{ marginBottom: "1rem" }}>
-                  <label
-                    htmlFor="admin-email"
-                    style={{
-                      display: "block",
-                      fontSize: "0.6875rem",
-                      fontWeight: 600,
-                      color: "#94a3b8",
-                      textTransform: "uppercase",
-                      letterSpacing: "0.05em",
-                      marginBottom: "0.375rem",
-                    }}
-                  >
-                    {t("login.emailLabel")}
-                  </label>
-                  <input
-                    id="admin-email"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="admin@fonlok.com"
-                    required
-                    style={{
-                      width: "100%",
-                      backgroundColor: "#0d1929",
-                      border: "1px solid rgba(255,255,255,0.12)",
-                      color: "#ffffff",
-                      borderRadius: "var(--radius-sm)",
-                      padding: "0.625rem 0.875rem",
-                      fontSize: "0.9375rem",
-                      outline: "none",
-                      boxSizing: "border-box",
-                    }}
-                  />
-                </div>
-                <div style={{ marginBottom: "1.25rem" }}>
-                  <label
-                    htmlFor="admin-password"
-                    style={{
-                      display: "block",
-                      fontSize: "0.6875rem",
-                      fontWeight: 600,
-                      color: "#94a3b8",
-                      textTransform: "uppercase",
-                      letterSpacing: "0.05em",
-                      marginBottom: "0.375rem",
-                    }}
-                  >
-                    {t("login.passwordLabel")}
-                  </label>
-                  <input
-                    id="admin-password"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="••••••••"
-                    required
-                    style={{
-                      width: "100%",
-                      backgroundColor: "#0d1929",
-                      border: "1px solid rgba(255,255,255,0.12)",
-                      color: "#ffffff",
-                      borderRadius: "var(--radius-sm)",
-                      padding: "0.625rem 0.875rem",
-                      fontSize: "0.9375rem",
-                      outline: "none",
-                      boxSizing: "border-box",
-                    }}
-                  />
-                </div>
-              </>
-            ) : (
-              <div style={{ marginBottom: "1.25rem" }}>
-                <p
-                  style={{
-                    color: "#94a3b8",
-                    fontSize: "0.875rem",
-                    marginBottom: "1rem",
-                    lineHeight: 1.6,
-                  }}
-                >
-                  Enter the 6-digit code from your authenticator app.
-                </p>
-                <label
-                  htmlFor="admin-otp"
-                  style={{
-                    display: "block",
-                    fontSize: "0.6875rem",
-                    fontWeight: 600,
-                    color: "#94a3b8",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.05em",
-                    marginBottom: "0.375rem",
-                  }}
-                >
-                  Authenticator Code
+          {step === "credentials" ? (
+            <>
+              <div className="adm-login-field">
+                <label htmlFor="admin-email" className="adm-login-label">
+                  {t("login.emailLabel")}
                 </label>
                 <input
-                  id="admin-otp"
-                  type="text"
-                  inputMode="numeric"
-                  value={otp}
-                  onChange={(e) =>
-                    setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))
-                  }
-                  placeholder="000000"
-                  maxLength={6}
+                  id="admin-email"
+                  className="adm-login-input"
+                  type="email"
+                  autoComplete="username"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="admin@fonlok.com"
                   required
-                  autoFocus
-                  style={{
-                    width: "100%",
-                    backgroundColor: "#0d1929",
-                    border: "1px solid rgba(255,255,255,0.12)",
-                    color: "#ffffff",
-                    borderRadius: "var(--radius-sm)",
-                    padding: "0.625rem 0.875rem",
-                    fontSize: "1.5rem",
-                    outline: "none",
-                    boxSizing: "border-box",
-                    letterSpacing: "0.35em",
-                    textAlign: "center",
-                  }}
                 />
-                <button
-                  type="button"
-                  onClick={() => {
-                    setStep("credentials");
-                    setError("");
-                    setOtp("");
-                  }}
-                  style={{
-                    marginTop: "0.625rem",
-                    background: "none",
-                    border: "none",
-                    color: "#94a3b8",
-                    fontSize: "0.8125rem",
-                    cursor: "pointer",
-                    textDecoration: "underline",
-                    padding: 0,
-                  }}
-                >
-                  Back
-                </button>
               </div>
-            )}
-
-            {error && (
-              <div
+              <div className="adm-login-field">
+                <label htmlFor="admin-password" className="adm-login-label">
+                  {t("login.passwordLabel")}
+                </label>
+                <input
+                  id="admin-password"
+                  className="adm-login-input"
+                  type="password"
+                  autoComplete="current-password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  required
+                />
+              </div>
+            </>
+          ) : (
+            <div className="adm-login-field">
+              <p className="adm-login-sub" style={{ margin: "0 0 1.1rem" }}>
+                Enter the 6-digit code from your authenticator app.
+              </p>
+              <label htmlFor="admin-otp" className="adm-login-label">
+                Authenticator Code
+              </label>
+              <input
+                id="admin-otp"
+                className="adm-login-input"
+                type="text"
+                inputMode="numeric"
+                autoComplete="one-time-code"
+                value={otp}
+                onChange={(e) =>
+                  setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))
+                }
+                placeholder="000000"
+                maxLength={6}
+                required
+                autoFocus
                 style={{
-                  backgroundColor: "rgba(239,68,68,0.15)",
-                  border: "1px solid rgba(239,68,68,0.35)",
-                  color: "#fca5a5",
-                  fontSize: "0.875rem",
-                  borderRadius: "var(--radius-sm)",
-                  padding: "0.625rem 0.875rem",
-                  marginBottom: "1rem",
+                  fontSize: "1.5rem",
+                  letterSpacing: "0.35em",
+                  textAlign: "center",
+                }}
+              />
+              <button
+                type="button"
+                onClick={() => {
+                  setStep("credentials");
+                  setError("");
+                  setOtp("");
+                }}
+                style={{
+                  marginTop: "0.7rem",
+                  background: "none",
+                  border: "none",
+                  padding: 0,
+                  color: "var(--adm-muted)",
+                  fontSize: "0.82rem",
+                  cursor: "pointer",
+                  textDecoration: "underline",
                 }}
               >
-                {error}
-              </div>
-            )}
+                Back
+              </button>
+            </div>
+          )}
 
-            <button
-              type="submit"
-              disabled={loading}
-              style={{
-                width: "100%",
-                backgroundColor: loading
-                  ? "rgba(245,158,11,0.5)"
-                  : "var(--color-accent)",
-                color: "#0F1F3D",
-                fontWeight: 700,
-                fontSize: "0.9375rem",
-                padding: "0.6875rem",
-                borderRadius: "var(--radius-sm)",
-                border: "none",
-                cursor: loading ? "not-allowed" : "pointer",
-                transition: "background 0.15s",
-              }}
-            >
-              {loading
-                ? t("login.submitting")
-                : step === "otp"
-                  ? "Verify Code"
-                  : t("login.submit")}
-            </button>
-          </form>
-        </div>
+          {error && (
+            <div className="adm-login-alert" role="alert">
+              {error}
+            </div>
+          )}
 
-        <p
-          style={{
-            textAlign: "center",
-            fontSize: "0.75rem",
-            color: "#475569",
-            marginTop: "1.25rem",
-          }}
-        >
-          {t("login.restricted")}
-        </p>
+          <button
+            type="submit"
+            disabled={loading}
+            className="adm-login-submit"
+          >
+            {loading
+              ? t("login.submitting")
+              : step === "otp"
+                ? "Verify Code"
+                : t("login.submit")}
+          </button>
+        </form>
+
+        <p className="adm-login-foot">{t("login.restricted")}</p>
       </div>
     </div>
   );

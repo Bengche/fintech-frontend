@@ -214,7 +214,7 @@ export default function AdminDisputePage() {
       <header
         style={{
           backgroundColor: "var(--color-primary)",
-          padding: "0.875rem 1.5rem",
+          padding: "0.875rem clamp(1rem, 4vw, 1.5rem)",
           display: "flex",
           alignItems: "center",
           gap: "0.75rem",
@@ -268,7 +268,7 @@ export default function AdminDisputePage() {
         style={{
           maxWidth: "56rem",
           margin: "0 auto",
-          padding: "1.5rem",
+          padding: "clamp(0.875rem, 4vw, 1.5rem)",
           display: "flex",
           flexDirection: "column",
           gap: "1.25rem",
