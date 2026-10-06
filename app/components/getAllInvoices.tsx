@@ -72,6 +72,12 @@ function getStatusConfig(status: string): {
       iconBg: "bg-blue-50",
       label: "Paid",
     },
+    partially_paid: {
+      pill: "bg-sky-50 text-sky-700 border border-sky-200",
+      dotBg: "bg-sky-500",
+      iconBg: "bg-sky-50",
+      label: "Partially paid",
+    },
     delivered: {
       pill: "bg-emerald-50 text-emerald-700 border border-emerald-200",
       dotBg: "bg-emerald-500",
@@ -111,14 +117,16 @@ export default function GetAllInvoices({
   const t = useTranslations("Invoice");
 
   function getDeleteBlockReason(invoice: Invoice): string | undefined {
-    if (invoice.status === "paid") return t("delete.reasonPaid");
+    if (invoice.status === "paid" || invoice.status === "partially_paid")
+      return t("delete.reasonPaid");
     if (invoice.status === "delivered") return t("delete.reasonDelivered");
     if (invoice.status === "completed") return t("delete.reasonCompleted");
     return undefined;
   }
 
   function getEditBlockReason(invoice: Invoice): string | undefined {
-    if (invoice.status === "paid") return t("edit.reasonPaid");
+    if (invoice.status === "paid" || invoice.status === "partially_paid")
+      return t("edit.reasonPaid");
     if (invoice.status === "delivered") return t("edit.reasonDelivered");
     if (invoice.status === "completed") return t("edit.reasonCompleted");
     return undefined;

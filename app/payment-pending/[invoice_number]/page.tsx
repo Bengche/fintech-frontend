@@ -41,12 +41,24 @@ function makeParticles(n: number): Particle[] {
 }
 
 // ── Main component ───────────────────────────────────────────────────────────
+// Progress of an invoice collected in parts (invoices above the mobile money limit).
+type PartProgress = {
+  total_amount: number;
+  part_count: number;
+  paid_parts: number;
+  paid_amount: number;
+  remaining_amount: number;
+  next_part_number: number | null;
+  next_part_amount: number;
+};
+
 export default function PaymentPendingPage() {
   const { invoice_number } = useParams<{ invoice_number: string }>();
   const searchParams = useSearchParams();
   const buyerEmail = searchParams.get("email") || "";
 
-  const [status, setStatus] = useState<"pending" | "paid">("pending");
+  const [status, setStatus] = useState<"pending" | "paid" | "part">("pending");
+  const [part, setPart] = useState<PartProgress | null>(null);
   const [particles] = useState<Particle[]>(() => makeParticles(40));
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const [dots, setDots] = useState(".");
@@ -72,7 +84,11 @@ export default function PaymentPendingPage() {
       try {
         const res = await Axios.get(`${API}/payment/poll/${invoice_number}`);
         const s = res.data?.status;
-        if (s === "paid" || s === "delivered" || s === "completed") {
+        if (s === "partially_paid" && res.data?.progress) {
+          setPart(res.data.progress as PartProgress);
+          setStatus("part");
+          if (intervalRef.current) clearInterval(intervalRef.current);
+        } else if (s === "paid" || s === "delivered" || s === "completed") {
           setStatus("paid");
           if (intervalRef.current) clearInterval(intervalRef.current);
         }
@@ -88,7 +104,8 @@ export default function PaymentPendingPage() {
     };
   }, [invoice_number]);
 
-  const isPaid = status === "paid";
+  const isPart = status === "part" && part !== null;
+  const isPaid = status === "paid" || isPart;
 
   return (
     <>
@@ -905,7 +922,10 @@ export default function PaymentPendingPage() {
                 marginBottom: "1rem",
               }}
             >
-              ✅ Payment Confirmed!
+              ✅{" "}
+              {isPart
+                ? `Part ${part.paid_parts} of ${part.part_count} received`
+                : "Payment Confirmed!"}
             </div>
           )}
 
@@ -919,9 +939,11 @@ export default function PaymentPendingPage() {
               lineHeight: 1.25,
             }}
           >
-            {isPaid
-              ? "🎉 Payment Successful!"
-              : "Approve the prompt on your phone"}
+            {isPart
+              ? `Part ${part.paid_parts} of ${part.part_count} paid`
+              : isPaid
+                ? "🎉 Payment Successful!"
+                : "Approve the prompt on your phone"}
           </h1>
 
           <p
@@ -932,9 +954,11 @@ export default function PaymentPendingPage() {
               margin: "0 0 1.5rem",
             }}
           >
-            {isPaid
-              ? "Your funds are safely held in escrow. The seller will be notified and will begin working on your order. Check your email for your receipt and chat link."
-              : `A Mobile Money payment prompt has been sent to your phone. Approve it to confirm your payment. This page will update automatically once confirmed.`}
+            {isPart
+              ? `Your payment of ${part.paid_amount.toLocaleString()} XAF so far is safely held in escrow. This invoice is above the mobile money limit, so it is collected in ${part.part_count} parts. Pay the remaining ${part.remaining_amount.toLocaleString()} XAF to complete your purchase. The seller is only asked to deliver once every part is paid.`
+              : isPaid
+                ? "Your funds are safely held in escrow. The seller will be notified and will begin working on your order. Check your email for your receipt and chat link."
+                : `A Mobile Money payment prompt has been sent to your phone. Approve it to confirm your payment. This page will update automatically once confirmed.`}
           </p>
 
           {/* Email chip */}
@@ -966,7 +990,11 @@ export default function PaymentPendingPage() {
                 <rect x="2" y="4" width="20" height="16" rx="2" />
                 <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
               </svg>
-              {isPaid ? "Receipt sent to" : "Confirmation will be sent to"}
+              {isPaid
+                ? isPart
+                  ? "Confirmation sent to"
+                  : "Receipt sent to"
+                : "Confirmation will be sent to"}
               &nbsp;
               <strong style={{ color: "#0F1F3D" }}>{buyerEmail}</strong>
             </div>
@@ -1022,7 +1050,9 @@ export default function PaymentPendingPage() {
                   transition: "opacity 0.15s",
                 }}
               >
-                View Invoice & Download Receipt
+                {isPart
+                  ? `Pay Part ${part.next_part_number} of ${part.part_count} — ${part.next_part_amount.toLocaleString()} XAF`
+                  : "View Invoice & Download Receipt"}
               </Link>
             )}
             <Link

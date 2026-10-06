@@ -389,9 +389,15 @@ export default function DevelopersPage() {
                   path: "/v1/payments/release",
                   desc: "When the buyer confirms receipt, call this. Fonlok disburses the net amount to the seller's MoMo number instantly.",
                 },
+                {
+                  label: "Split payouts",
+                  method: "POST",
+                  path: "/v1/invoices + split",
+                  desc: "Add a split to an invoice and Fonlok pays your commission to the MoMo number you provide, right after the seller is paid.",
+                },
               ].map((item) => (
                 <div
-                  key={item.path}
+                  key={item.label}
                   style={{
                     background: "var(--color-cloud)",
                     border: "1px solid var(--color-border)",
@@ -1130,6 +1136,14 @@ export default function DevelopersPage() {
                 {
                   q: "What is the platform fee and who pays it?",
                   a: "Fonlok deducts a 3% platform fee from the gross amount at the time of release. The seller receives the remainder directly to their Mobile Money number. There are no charges to create invoices or initiate payments — the fee is only deducted when funds are released.",
+                },
+                {
+                  q: "Is there a maximum amount per invoice, and what happens above 500,000 XAF?",
+                  a: "There is no maximum invoice amount, but mobile money payments above about 500,000 XAF are likely to fail on the network. So Fonlok automatically collects any invoice above 500,000 XAF in equal parts of at most 500,000 XAF (for example 650,000 XAF becomes 325,000 + 325,000). The invoice you create returns a payment_plan, and each call to POST /v1/payments/initiate charges the next part (the amount is always decided by Fonlok). After each confirmed part the invoice is 'partially_paid' and you receive a payment.part_confirmed webhook. When the last part is confirmed the invoice becomes 'paid' and payment.confirmed fires with the full amount; release, disputes and splits then work as usual. Only one prompt can be pending at a time (429 payment_in_progress).",
+                },
+                {
+                  q: "Can I earn a commission on the sales I send through Fonlok?",
+                  a: "Yes. Add a split object ({ phone, type: 'percentage' or 'fixed', value, name?, email? }) to POST /v1/invoices, or pass it to POST /v1/payments/release. When the funds are released, Fonlok pays the seller first, then sends your split to the MoMo number you provided and emails the recipient a branded payout receipt (to split.email, or to your account email if you omit it). The split is calculated on the invoice amount and taken from the seller's share, so a 10,000 XAF invoice with a 5% split pays you 500 XAF, Fonlok's 2% fee is 200 XAF, and the seller receives 9,300 XAF. Splits must be at least 100 XAF and at most 50% of the invoice. If a split payout is refused by the network you receive a payout.split_failed webhook and can retry it with POST /v1/payments/split/retry.",
                 },
                 {
                   q: "Can a buyer pay from a wallet instead of MoMo?",

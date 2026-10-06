@@ -17,6 +17,22 @@ import {
   LockKeyhole,
 } from "lucide-react";
 
+// Progress of an invoice collected in parts (invoices above the mobile money limit).
+type PaymentProgress = {
+  total_amount: number;
+  part_count: number;
+  parts: number[];
+  paid_parts: number;
+  paid_amount: number;
+  remaining_amount: number;
+  next_part_number: number | null;
+  next_part_amount: number;
+  complete: boolean;
+};
+
+const statusText = (status: string) =>
+  status.charAt(0).toUpperCase() + status.slice(1).replace(/_/g, " ");
+
 type InvoiceStats = {
   id: number;
   amount: number;
@@ -82,6 +98,9 @@ export default function InvoicePage() {
   const [payerEmail, setPayerEmail] = useState("");
   const [payLoading, setPayLoading] = useState(false);
   const [payError, setPayError] = useState("");
+  // Only set for invoices above the mobile money limit (collected in parts).
+  const [paymentProgress, setPaymentProgress] =
+    useState<PaymentProgress | null>(null);
   const [showEmailConfirm, setShowEmailConfirm] = useState(false);
   const [pdfLoading, setPdfLoading] = useState(false);
   const [receiptLanguage, setReceiptLanguage] = useState("en");
@@ -101,6 +120,7 @@ export default function InvoicePage() {
         );
         const details: InvoiceStats = response.data.invoice_details;
         setInvoiceStats(details);
+        setPaymentProgress(response.data.payment_progress ?? null);
 
         // Fetch milestones if this is an installment invoice
         if (details?.payment_type === "installment") {
@@ -240,6 +260,11 @@ export default function InvoicePage() {
   const displayAmount = invoiceStats.amount
     ? `${invoiceStats.amount.toLocaleString()} ${invoiceStats.currency}`
     : "-";
+  // What the buyer pays right now: the next part for invoices collected in parts.
+  const todayAmount =
+    paymentProgress && !paymentProgress.complete
+      ? `${paymentProgress.next_part_amount.toLocaleString()} ${invoiceStats.currency}`
+      : displayAmount;
 
   const statusBadgeClass =
     invoiceStats.status === "paid" ||
@@ -333,8 +358,7 @@ export default function InvoicePage() {
                   boxShadow: "0 8px 24px rgba(15,31,61,0.18)",
                 }}
               >
-                {invoiceStats.status.charAt(0).toUpperCase() +
-                  invoiceStats.status.slice(1)}
+                {statusText(invoiceStats.status)}
               </span>
             )}
           </div>
@@ -619,8 +643,7 @@ export default function InvoicePage() {
                 className={statusBadgeClass}
                 style={{ fontSize: "0.8125rem" }}
               >
-                {invoiceStats.status.charAt(0).toUpperCase() +
-                  invoiceStats.status.slice(1)}
+                {statusText(invoiceStats.status)}
               </span>
             )}
           </div>
@@ -764,7 +787,7 @@ export default function InvoicePage() {
               />
               <BreakdownRow
                 label={t("breakdownBuyerPays")}
-                value={displayAmount}
+                value={todayAmount}
                 strong
               />
             </div>
@@ -1360,6 +1383,92 @@ export default function InvoicePage() {
                 </div>
               )}
 
+              {/* Payment plan: invoices above the mobile money limit are paid in parts */}
+              {paymentProgress && !isPaid && (
+                <div
+                  style={{
+                    border: "1.5px solid #bfdbfe",
+                    background: "#eff6ff",
+                    borderRadius: "var(--radius-sm)",
+                    padding: "1rem 1.125rem",
+                  }}
+                >
+                  <p
+                    style={{
+                      margin: "0 0 0.25rem",
+                      fontWeight: 700,
+                      fontSize: "0.9375rem",
+                      color: "#1e3a8a",
+                    }}
+                  >
+                    {t("paymentPlanTitle", {
+                      count: paymentProgress.part_count,
+                    })}
+                  </p>
+                  <p
+                    style={{
+                      margin: "0 0 0.75rem",
+                      fontSize: "0.83rem",
+                      color: "#1e40af",
+                      lineHeight: 1.55,
+                    }}
+                  >
+                    {t("paymentPlanBody")}
+                  </p>
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: "0.375rem",
+                    }}
+                  >
+                    {paymentProgress.parts.map((amount, i) => {
+                      const done = i < paymentProgress.paid_parts;
+                      const next = i === paymentProgress.paid_parts;
+                      return (
+                        <div
+                          key={i}
+                          style={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                            flexWrap: "wrap",
+                            gap: "0.25rem 0.75rem",
+                            padding: "0.5rem 0.75rem",
+                            borderRadius: "8px",
+                            background: done
+                              ? "#f0fdf4"
+                              : next
+                                ? "#ffffff"
+                                : "rgba(255,255,255,0.6)",
+                            border: `1px solid ${done ? "#86efac" : next ? "#93c5fd" : "#dbeafe"}`,
+                            fontSize: "0.85rem",
+                          }}
+                        >
+                          <span style={{ fontWeight: next ? 700 : 500 }}>
+                            {t("partRow", { n: i + 1 })}
+                          </span>
+                          <span
+                            style={{
+                              fontWeight: 700,
+                              color: done ? "#15803d" : "#1e3a8a",
+                            }}
+                          >
+                            {amount.toLocaleString()} {invoiceStats.currency}
+                            {" · "}
+                            {done
+                              ? t("partPaid")
+                              : next
+                                ? t("partNext")
+                                : t("partUpcoming")}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
               {/* Payment method logos */}
               {!isPaid && (
                 <div style={{ marginBottom: "0.25rem" }}>
@@ -1563,6 +1672,12 @@ export default function InvoicePage() {
                   "Invoice Completed"
                 ) : isPaid ? (
                   "Payment Already Made"
+                ) : paymentProgress && !paymentProgress.complete ? (
+                  t("payPartNow", {
+                    n: paymentProgress.next_part_number ?? 1,
+                    count: paymentProgress.part_count,
+                    amount: paymentProgress.next_part_amount.toLocaleString(),
+                  })
                 ) : (
                   t("payNow")
                 )}

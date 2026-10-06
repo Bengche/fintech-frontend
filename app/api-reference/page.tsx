@@ -77,8 +77,10 @@ const NAV_SECTIONS = [
     label: "Payments",
     children: [
       { id: "initiate-payment", label: "Initiate payment" },
+      { id: "large-payments", label: "Large payments" },
       { id: "payment-status", label: "Payment status" },
       { id: "release-funds", label: "Release funds" },
+      { id: "split-payouts", label: "Split payouts" },
       { id: "open-dispute", label: "Open dispute" },
     ],
   },
@@ -149,6 +151,29 @@ const ERROR_CODES = [
     code: "invoice_not_found",
     status: 404,
     description: "No API-created invoice matched the given id.",
+  },
+  {
+    code: "payment_in_progress",
+    status: 429,
+    description:
+      "A payment prompt for this invoice was just sent and is still waiting for the buyer. Retry after about two minutes.",
+  },
+  {
+    code: "invalid_split",
+    status: 400,
+    description:
+      "The split is invalid: bad phone, same number as the seller, below 100 XAF, or above 50% of the invoice.",
+  },
+  {
+    code: "split_already_defined",
+    status: 409,
+    description:
+      "The invoice already has a different split. A split cannot be changed once defined.",
+  },
+  {
+    code: "split_not_retryable",
+    status: 409,
+    description: "Only a failed split on a completed invoice can be retried.",
   },
   {
     code: "payment_gateway_error",
@@ -1210,6 +1235,13 @@ curl https://api.fonlok.com/v1/ping \\
                 description:
                   "Date after which the invoice can no longer be paid.",
               },
+              {
+                name: "split",
+                type: "object",
+                required: false,
+                description:
+                  "Pay a commission to your own MoMo number when funds are released: { phone, type: 'percentage' | 'fixed', value, name?, email? }. See Split payouts.",
+              },
             ]}
           />
 
@@ -1245,7 +1277,9 @@ curl https://api.fonlok.com/v1/ping \\
   "payment_url":        "https://fonlok.com/pay/12-a1b2c3d4e5f6",
   "external_reference": "order_8821",
   "expires_at":         null,
-  "created_at":         "2026-07-17T10:00:00.000Z"
+  "created_at":         "2026-07-17T10:00:00.000Z",
+  "split":              null,
+  "payment_plan":       null
 }`}</Code>
 
           <Tip>
@@ -1282,7 +1316,9 @@ curl https://api.fonlok.com/v1/ping \\
   "expires_at":         null,
   "created_at":         "2026-07-17T10:00:00.000Z",
   "paid_at":            "2026-07-17T10:05:23.000Z",
-  "delivered_at":       null
+  "delivered_at":       null,
+  "split":              null,
+  "payment_progress":   null
 }`}</Code>
 
           <Divider />
@@ -1358,6 +1394,79 @@ curl https://api.fonlok.com/v1/ping \\
             <InlineCode>payment.confirmed</InlineCode> webhook event.
           </Note>
 
+          {/* Part payments for invoices above the mobile money limit */}
+          <SubTitle id="large-payments">
+            Large payments (above 500,000 XAF)
+          </SubTitle>
+          <Lead>
+            Mobile money payments above about 500,000 XAF are likely to fail on
+            the network. To prevent this, Fonlok automatically collects any
+            invoice above <strong>500,000 XAF</strong> in equal parts of at most
+            500,000 XAF. Nothing changes in how you create or release the
+            invoice: it is still one deal, held in escrow, and released once.
+          </Lead>
+          <Lead>
+            The invoice you create returns a{" "}
+            <InlineCode>payment_plan</InlineCode>. Each call to{" "}
+            <InlineCode>POST /v1/payments/initiate</InlineCode> charges the next
+            part and returns a <InlineCode>part</InlineCode> object. The amount
+            is always decided by Fonlok. After each confirmed part the invoice
+            status is <InlineCode>partially_paid</InlineCode>, and you receive a{" "}
+            <InlineCode>payment.part_confirmed</InlineCode> webhook. Only when
+            the last part is confirmed does the invoice become{" "}
+            <InlineCode>paid</InlineCode> and{" "}
+            <InlineCode>payment.confirmed</InlineCode> fire (with the full
+            invoice amount). Release, disputes and splits then work exactly as
+            for any other invoice.
+          </Lead>
+
+          <Code>{`# Invoice of 650,000 XAF: the create response includes
+"payment_plan": {
+  "part_count":      2,
+  "parts":           [325000, 325000],
+  "max_part_amount": 500000
+}
+
+# First POST /v1/payments/initiate
+{
+  "object":         "payment",
+  "reference":      "550e8400-e29b-41d4-a716-446655440000",
+  "invoice_id":     "12-a1b2c3d4e5f6",
+  "amount":         325000,
+  "invoice_amount": 650000,
+  "part": {
+    "number":          1,
+    "count":           2,
+    "amount":          325000,
+    "remaining_after": 325000
+  },
+  "status": "pending"
+}
+
+# GET /v1/invoices/:id and GET /v1/payments/:reference/status
+# include the running progress
+"payment_progress": {
+  "total_amount":      650000,
+  "part_count":        2,
+  "parts":             [325000, 325000],
+  "paid_parts":        1,
+  "paid_amount":       325000,
+  "remaining_amount":  325000,
+  "next_part_number":  2,
+  "next_part_amount":  325000,
+  "complete":          false
+}`}</Code>
+
+          <Note>
+            Call <InlineCode>POST /v1/payments/initiate</InlineCode> again for
+            each remaining part, with the same or another phone number. Only one
+            prompt can be waiting at a time: a second call within about two
+            minutes returns <InlineCode>429 payment_in_progress</InlineCode>.
+            The seller is only notified to deliver, and the invoice can only be
+            released, once every part is paid. The sandbox does not simulate
+            part payments.
+          </Note>
+
           {/* GET /v1/payments/:reference/status */}
           <SubTitle id="payment-status">Payment status</SubTitle>
           <Lead>
@@ -1411,6 +1520,13 @@ curl https://api.fonlok.com/v1/ping \\
                 description:
                   "The id of the invoice to release. Must be in paid status.",
               },
+              {
+                name: "split",
+                type: "object",
+                required: false,
+                description:
+                  "Attach a split at release time when the invoice was created without one. Same shape as on invoice creation. If the invoice already has a different split the call fails with 409 split_already_defined.",
+              },
             ]}
           />
 
@@ -1427,6 +1543,7 @@ curl https://api.fonlok.com/v1/ping \\
   "gross_amount":    35000,
   "platform_fee":    700,
   "seller_receives": 34300,
+  "split":           null,
   "currency":        "XAF",
   "seller_phone":    "237670123456",
   "message":         "34300 XAF dispatched to 237670123456 via Mobile Money.",
@@ -1478,6 +1595,186 @@ curl https://api.fonlok.com/v1/ping \\
               </span>
             </div>
           </div>
+
+          {/* Split payouts */}
+          <SubTitle id="split-payouts">Split payouts</SubTitle>
+          <Lead>
+            Earn a commission on every sale. Attach a{" "}
+            <InlineCode>split</InlineCode> to an invoice, at creation or at
+            release, and Fonlok sends your cut to the MoMo number you provide
+            right after the seller is paid. The split is calculated on the
+            invoice amount and taken from the seller&apos;s share. There is no
+            extra Fonlok fee.
+          </Lead>
+
+          <ParamTable
+            params={[
+              {
+                name: "split.phone",
+                type: "string",
+                required: true,
+                description:
+                  "MoMo number that receives the split, e.g. 237677777777. Must differ from seller_phone.",
+              },
+              {
+                name: "split.type",
+                type: "string",
+                required: true,
+                description:
+                  "percentage (of the invoice amount, up to 2 decimals) or fixed (whole XAF).",
+              },
+              {
+                name: "split.value",
+                type: "number",
+                required: true,
+                description:
+                  "The percentage (max 50) or the fixed XAF amount. The resulting split must be at least 100 XAF and at most 50% of the invoice.",
+              },
+              {
+                name: "split.name",
+                type: "string",
+                required: false,
+                description:
+                  "Label for the recipient, max 100 characters. Returned in responses and webhooks.",
+              },
+              {
+                name: "split.email",
+                type: "string",
+                required: false,
+                description:
+                  "Email that receives the branded split payout receipt. If omitted, the receipt is sent to your API key account email.",
+              },
+            ]}
+          />
+
+          <Code>{`curl -X POST https://api.fonlok.com/v1/invoices \\
+  -H "Authorization: Bearer sk_live_..." \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "title":        "Handmade leather bag",
+    "amount":       10000,
+    "seller_name":  "Amara Nkeng",
+    "seller_email": "amara@example.com",
+    "seller_phone": "237670123456",
+    "split": {
+      "phone": "237677777777",
+      "type":  "percentage",
+      "value": 5,
+      "name":  "Acme Marketplace",
+      "email": "payouts@acme.com"
+    }
+  }'
+
+# The invoice response includes
+"split": {
+  "recipient": { "phone": "237677777777", "name": "Acme Marketplace", "email": "payouts@acme.com" },
+  "type":      "percentage",
+  "value":     5,
+  "amount":    500,
+  "status":    "pending",
+  "paid_at":   null
+}`}</Code>
+
+          <div
+            style={{
+              background: "rgba(37,99,235,0.05)",
+              border: `1px solid rgba(37,99,235,0.15)`,
+              borderRadius: "8px",
+              padding: "1rem 1.25rem",
+              marginBottom: "1.25rem",
+              fontSize: "0.84rem",
+            }}
+          >
+            <strong style={{ color: C.navy }}>Split calculation</strong>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "auto 1fr",
+                gap: "0.25rem 1.5rem",
+                marginTop: "0.5rem",
+                color: C.muted,
+              }}
+            >
+              <span>Gross amount:</span> <span>10,000 XAF</span>
+              <span>Platform fee (2%):</span>{" "}
+              <span style={{ color: C.red }}>− 200 XAF</span>
+              <span>Your split (5%):</span>{" "}
+              <span style={{ color: C.red }}>− 500 XAF</span>
+              <span
+                style={{
+                  color: C.text,
+                  fontWeight: 700,
+                  borderTop: `1px solid ${C.border}`,
+                  paddingTop: "4px",
+                }}
+              >
+                Seller receives:
+              </span>
+              <span
+                style={{
+                  color: C.green,
+                  fontWeight: 700,
+                  borderTop: `1px solid ${C.border}`,
+                  paddingTop: "4px",
+                }}
+              >
+                9,300 XAF
+              </span>
+            </div>
+          </div>
+
+          <Lead>
+            The split is paid however the funds are released: through{" "}
+            <InlineCode>POST /v1/payments/release</InlineCode>, the buyer&apos;s
+            confirmation link or code, or a dispute decided in the seller&apos;s
+            favour. It is not paid when the buyer is refunded. Its status is
+            visible on the invoice and in the release response:{" "}
+            <InlineCode>pending</InlineCode>,{" "}
+            <InlineCode>processing</InlineCode>, <InlineCode>paid</InlineCode>{" "}
+            or <InlineCode>failed</InlineCode>.
+          </Lead>
+
+          <Lead>
+            If the mobile money network refuses a split, the seller is still
+            paid, the invoice is completed, and the split is marked{" "}
+            <InlineCode>failed</InlineCode> (you also receive a{" "}
+            <InlineCode>payout.split_failed</InlineCode> webhook). Retry it with
+            the endpoint below. A split is never sent twice; if the network does
+            not answer in time the status stays{" "}
+            <InlineCode>processing</InlineCode> and Fonlok support reviews it.
+          </Lead>
+          <Badge method="POST" path="/v1/payments/split/retry" />
+
+          <ParamTable
+            params={[
+              {
+                name: "invoice_id",
+                type: "string",
+                required: true,
+                description:
+                  "The id of the completed invoice whose split status is failed.",
+              },
+            ]}
+          />
+
+          <Code>{`curl -X POST https://api.fonlok.com/v1/payments/split/retry \\
+  -H "Authorization: Bearer sk_live_..." \\
+  -H "Content-Type: application/json" \\
+  -d '{ "invoice_id": "12-a1b2c3d4e5f6" }'
+
+# Response
+{
+  "object":     "split_retry",
+  "invoice_id": "12-a1b2c3d4e5f6",
+  "split": {
+    "recipient": { "phone": "237677777777", "name": "Acme Marketplace", "email": "payouts@acme.com" },
+    "type":      "percentage",
+    "value":     5,
+    "amount":    500,
+    "status":    "paid",
+    "paid_at":   "2026-07-17T10:41:00.000Z"
+  }
+}`}</Code>
 
           {/* POST /v1/payments/dispute */}
           <SubTitle id="open-dispute">Open dispute</SubTitle>
@@ -1668,7 +1965,7 @@ curl https://api.fonlok.com/v1/ping \\
             },
             {
               type: "payment.confirmed",
-              when: "Fired when the buyer approves the MoMo prompt and the payment is successfully collected by Campay. The invoice status is now paid.",
+              when: "Fired when the buyer approves the MoMo prompt and the payment is successfully collected by Campay. The invoice status is now paid. For invoices above 500,000 XAF this fires once, after the last part is confirmed, with the full invoice amount.",
               payload: `{
   "object":     "event",
   "type":       "payment.confirmed",
@@ -1679,6 +1976,24 @@ curl https://api.fonlok.com/v1/ping \\
   "provider":   "MTN",
   "status":     "paid",
   "timestamp":  "2026-07-17T10:05:23.000Z"
+}`,
+            },
+            {
+              type: "payment.part_confirmed",
+              when: "Invoices above 500,000 XAF only. Fired each time one part is confirmed. The invoice status is partially_paid until the last part, then payment.confirmed fires.",
+              payload: `{
+  "object":           "event",
+  "type":             "payment.part_confirmed",
+  "invoice_id":       "12-a1b2c3d4e5f6",
+  "reference":        "550e8400-e29b-41d4-a716-446655440000",
+  "part_number":      1,
+  "part_count":       2,
+  "amount":           325000,
+  "paid_amount":      325000,
+  "remaining_amount": 325000,
+  "total_amount":     650000,
+  "currency":         "XAF",
+  "timestamp":        "2026-07-17T10:05:23.000Z"
 }`,
             },
             {
@@ -1693,8 +2008,45 @@ curl https://api.fonlok.com/v1/ping \\
   "gross_amount":    35000,
   "platform_fee":    700,
   "seller_receives": 34300,
+  "split":           null,
   "currency":        "XAF",
   "timestamp":       "2026-07-17T10:30:00.000Z"
+}`,
+            },
+            {
+              type: "payout.split_completed",
+              when: "Fired when your split is sent after a buyer confirmation, a dispute decided for the seller, or a successful split retry. For POST /v1/payments/release, see the split field of payment.released.",
+              payload: `{
+  "object":     "event",
+  "type":       "payout.split_completed",
+  "invoice_id": "12-a1b2c3d4e5f6",
+  "split": {
+    "recipient": { "phone": "237677777777", "name": "Acme Marketplace", "email": "payouts@acme.com" },
+    "type":      "percentage",
+    "value":     5,
+    "amount":    500,
+    "status":    "paid",
+    "paid_at":   "2026-07-17T10:30:04.000Z"
+  },
+  "timestamp":  "2026-07-17T10:30:04.000Z"
+}`,
+            },
+            {
+              type: "payout.split_failed",
+              when: "Fired when the network refused your split. The seller was already paid. Call POST /v1/payments/split/retry to send it again.",
+              payload: `{
+  "object":     "event",
+  "type":       "payout.split_failed",
+  "invoice_id": "12-a1b2c3d4e5f6",
+  "split": {
+    "recipient": { "phone": "237677777777", "name": "Acme Marketplace", "email": "payouts@acme.com" },
+    "type":      "percentage",
+    "value":     5,
+    "amount":    500,
+    "status":    "failed",
+    "paid_at":   null
+  },
+  "timestamp":  "2026-07-17T10:30:04.000Z"
 }`,
             },
             {

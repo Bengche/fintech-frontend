@@ -11,6 +11,7 @@
  *  POST /v1/payments/initiate
  *  GET  /v1/payments/:reference/status
  *  POST /v1/payments/release
+ *  POST /v1/payments/split/retry
  *  POST /v1/payments/dispute
  *  POST /v1/wallet/pay
  *  POST /v1/webhooks/register
@@ -18,7 +19,8 @@
  *  DELETE /v1/webhooks/:id
  *
  * Webhook events:
- *  payment.initiated | payment.confirmed | payment.disputed | payment.released
+ *  payment.initiated | payment.confirmed | payment.part_confirmed | payment.disputed | payment.released
+ *  payout.split_completed | payout.split_failed
  */
 
 import type { ReactNode } from "react";
@@ -691,6 +693,13 @@ data = res.json()`}
               description:
                 'ISO 8601 expiry date, e.g. "2026-12-31". After this date the payment URL becomes inactive.',
             },
+            {
+              name: "split",
+              type: "object",
+              required: false,
+              description:
+                'Pay yourself (or anyone) a cut of this sale when funds are released: { "phone": "237677777777", "type": "percentage" | "fixed", "value": 5, "name": "Acme Marketplace", "email": "payouts@acme.com" }. The amount is calculated on the invoice amount, taken from the seller\'s share, and sent to phone by Mobile Money. The recipient gets a branded payout receipt at email (optional; defaults to your API key account email). Min 100 XAF, max 50% of the invoice, phone must differ from seller_phone. See Split payouts below.',
+            },
           ]}
           curlExample={`curl ${BASE}/v1/invoices \\
   -X POST \\
@@ -762,7 +771,13 @@ invoice = res.json()`}
   "payment_url": "https://fonlok.com/pay/42-a1b2c3d4e5f6",
   "external_reference": "order_789",
   "expires_at": "2026-12-31T00:00:00.000Z",
-  "created_at": "2025-01-15T10:30:00.000Z"
+  "created_at": "2025-01-15T10:30:00.000Z",
+  "split": null,   // or the split object when one was supplied
+  "payment_plan": {   // null for invoices up to 500,000 XAF
+    "part_count": 2,
+    "parts": [425000, 425000],
+    "max_part_amount": 500000
+  }
 }`}
           notes={
             <>
@@ -770,7 +785,9 @@ invoice = res.json()`}
               your API key, the request returns{" "}
               <code>409 duplicate_reference</code>. The <code>payment_url</code>{" "}
               is always present and active — share it with the buyer to let them
-              pay directly through the Fonlok payment page.
+              pay directly through the Fonlok payment page. To earn a commission
+              on the sale, add a <code>split</code> object — see{" "}
+              <strong>Split payouts</strong> below.
             </>
           }
         />
@@ -810,7 +827,9 @@ invoice = res.json()`}
   "expires_at": "2026-12-31T00:00:00.000Z",
   "created_at": "2025-01-15T10:30:00.000Z",
   "paid_at": "2025-01-15T10:33:00.000Z",
-  "delivered_at": null
+  "delivered_at": null,
+  "split": null,   // or { recipient, type, value, amount, status, paid_at }
+  "payment_progress": null   // or the progress object for invoices above 500,000 XAF
 
   // When status is "disputed", an extra field appears:
   // "chat_links": {
@@ -822,10 +841,12 @@ invoice = res.json()`}
             <>
               <strong>Status values:</strong> <code>pending</code> →{" "}
               <code>paid</code> → <code>completed</code> (or{" "}
-              <code>disputed</code>). Also possible: <code>delivered</code>,{" "}
-              <code>cancelled</code>, <code>refunded</code>. The{" "}
-              <code>payment_url</code> field is always returned regardless of
-              status.
+              <code>disputed</code>). Invoices above 500,000 XAF go{" "}
+              <code>pending</code> → <code>partially_paid</code> →{" "}
+              <code>paid</code> while their parts are collected. Also possible:{" "}
+              <code>delivered</code>, <code>cancelled</code>,{" "}
+              <code>refunded</code>. The <code>payment_url</code> field is
+              always returned regardless of status.
             </>
           }
         />
@@ -839,7 +860,7 @@ invoice = res.json()`}
         <Endpoint
           method="POST"
           path="/v1/payments/initiate"
-          description="Send a Mobile Money USSD push prompt to the buyer's phone via Campay. The buyer receives a pop-up on their handset and approves or declines the charge. Returns a reference UUID for polling status. Only invoices in 'pending' status can be initiated."
+          description="Send a Mobile Money USSD push prompt to the buyer's phone via Campay. The buyer receives a pop-up on their handset and approves or declines the charge. Returns a reference UUID for polling status. Only invoices in 'pending' status can be initiated. Invoices above 500,000 XAF are collected in equal parts of at most 500,000 XAF: each call charges the next part and the invoice stays payable while 'partially_paid'."
           params={[
             {
               name: "invoice_id",
@@ -900,7 +921,9 @@ payment = res.json()`}
   "object": "payment",
   "reference": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
   "invoice_id": "42-a1b2c3d4e5f6",
-  "amount": 850000,
+  "amount": 425000,
+  "invoice_amount": 850000,
+  "part": { "number": 1, "count": 2, "amount": 425000, "remaining_after": 425000 },
   "currency": "XAF",
   "provider": "mtn",
   "phone_number": "237670000000",
@@ -916,6 +939,17 @@ payment = res.json()`}
               response is used for polling status. Prefer webhooks over polling
               in production — the <code>payment.confirmed</code> event fires
               immediately when Campay confirms.
+              <br />
+              <strong>Large invoices:</strong> mobile money payments above about
+              500,000 XAF are likely to fail, so an invoice above 500,000 XAF
+              (such as this 850,000 XAF example) is collected in equal parts.
+              The amount charged is always decided by Fonlok: the{" "}
+              <code>part</code> object tells you which part this is. Call this
+              endpoint again for each remaining part; only one prompt can be
+              pending at a time (<code>429 payment_in_progress</code>). A{" "}
+              <code>payment.part_confirmed</code> event fires per part and{" "}
+              <code>payment.confirmed</code> fires once, when the last part is
+              confirmed.
             </>
           }
         />
@@ -940,11 +974,22 @@ status = res.json()`}
   "object": "payment_status",
   "reference": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
   "invoice_id": "42-a1b2c3d4e5f6",
-  "amount": 850000,
+  "amount": 425000,
   "currency": "XAF",
   "provider": "mtn",
   "status": "paid",
-  "invoice_status": "paid",
+  "invoice_status": "partially_paid",
+  "payment_progress": {   // null for invoices up to 500,000 XAF
+    "total_amount": 850000,
+    "part_count": 2,
+    "parts": [425000, 425000],
+    "paid_parts": 1,
+    "paid_amount": 425000,
+    "remaining_amount": 425000,
+    "next_part_number": 2,
+    "next_part_amount": 425000,
+    "complete": false
+  },
   "created_at": "2025-01-15T10:31:00.000Z"
 }`}
           notes={
@@ -953,8 +998,10 @@ status = res.json()`}
               buyer action), <code>paid</code> (confirmed, funds in escrow),{" "}
               <code>failed</code> (declined or timed out).{" "}
               <strong>Invoice status:</strong> mirrors the invoice lifecycle —{" "}
-              <code>pending</code>, <code>paid</code>, <code>completed</code>,{" "}
-              <code>disputed</code>, <code>cancelled</code>.
+              <code>pending</code>, <code>partially_paid</code> (some parts of
+              an invoice above 500,000 XAF are paid), <code>paid</code>,{" "}
+              <code>completed</code>, <code>disputed</code>,{" "}
+              <code>cancelled</code>.
             </>
           }
         />
@@ -970,6 +1017,13 @@ status = res.json()`}
               required: true,
               description:
                 "Invoice ID to release. Must be in 'paid' status and created via the API.",
+            },
+            {
+              name: "split",
+              type: "object",
+              required: false,
+              description:
+                "Same shape as the split on POST /v1/invoices. Use it to attach a split at release time when the invoice was created without one. If the invoice already has a split, it must match or the call returns 409 split_already_defined.",
             },
           ]}
           curlExample={`curl ${BASE}/v1/payments/release \\
@@ -999,6 +1053,7 @@ release = res.json()`}
   "gross_amount": 850000,
   "platform_fee": 17000,
   "seller_receives": 833000,
+  "split": null,
   "currency": "XAF",
   "seller_phone": "237670000001",
   "message": "833,000 XAF dispatched to 237670000001 via Mobile Money.",
@@ -1010,7 +1065,74 @@ release = res.json()`}
               invoice are safe — only one will succeed. If the Campay payout
               fails, the invoice status is restored to <code>paid</code> so you
               can retry safely. This endpoint fires a{" "}
-              <code>payment.released</code> webhook event.
+              <code>payment.released</code> webhook event. When the invoice has
+              a split, <code>seller_receives</code> already has the split
+              deducted and <code>split</code> reports its payout status.
+            </>
+          }
+        />
+
+        {/* ── SPLIT PAYOUTS ──────────────────────────────────────────── */}
+        <GroupHeader
+          title="Split payouts"
+          description="Earn a commission on every sale. Attach a split to an invoice (at creation, or when you release it) and Fonlok pays your cut to the MoMo number you provide, right after the seller is paid, and emails the recipient a branded payout receipt (to the optional split.email, or to your API key account email if you leave it out). The split is calculated on the invoice amount: with a 10,000 XAF invoice and a 5% split, you receive 500 XAF, Fonlok's 2% fee is 200 XAF, and the seller receives 9,300 XAF. There is no extra Fonlok fee for splits. The split applies however the funds are released: your API call, the buyer's confirmation link or code, or a dispute resolved in the seller's favour. It is not paid if the buyer is refunded."
+        />
+
+        <Endpoint
+          method="POST"
+          path="/v1/payments/split/retry"
+          description="Retry a split payout that failed. The seller has already been paid and the invoice is completed; only the split was refused by the mobile money network. Only a split with status 'failed' can be retried."
+          params={[
+            {
+              name: "invoice_id",
+              type: "string",
+              required: true,
+              description:
+                "Invoice ID whose split payout failed (split.status is 'failed').",
+            },
+          ]}
+          curlExample={`curl ${BASE}/v1/payments/split/retry \\
+  -X POST \\
+  -H "Authorization: Bearer sk_live_..." \\
+  -H "Content-Type: application/json" \\
+  -d '{"invoice_id": "42-a1b2c3d4e5f6"}'`}
+          jsExample={`const res = await fetch('${BASE}/v1/payments/split/retry', {
+  method: 'POST',
+  headers: {
+    Authorization: 'Bearer sk_live_...',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({ invoice_id: '42-a1b2c3d4e5f6' })
+});
+const result = await res.json();`}
+          pythonExample={`import requests
+
+res = requests.post('${BASE}/v1/payments/split/retry',
+    headers={'Authorization': 'Bearer sk_live_...'},
+    json={'invoice_id': '42-a1b2c3d4e5f6'})
+result = res.json()`}
+          responseExample={`{
+  "object": "split_retry",
+  "invoice_id": "42-a1b2c3d4e5f6",
+  "split": {
+    "recipient": { "phone": "237677777777", "name": "Acme Marketplace", "email": "payouts@acme.com" },
+    "type": "percentage",
+    "value": 5,
+    "amount": 42500,
+    "status": "paid",
+    "paid_at": "2025-01-15T10:41:00.000Z"
+  }
+}`}
+          notes={
+            <>
+              <strong>Split status:</strong> <code>pending</code> (not yet
+              released), <code>processing</code> (sent, awaiting network
+              confirmation — do not retry), <code>paid</code>, or{" "}
+              <code>failed</code> (refused, safe to retry). A split is never
+              sent twice. If the network does not answer in time the status
+              stays <code>processing</code> and Fonlok support reviews it. The
+              split payload on the invoice always shows the exact{" "}
+              <code>amount</code> in XAF.
             </>
           }
         />
@@ -1562,7 +1684,7 @@ result = res.json()`}
         {/* ── WEBHOOK EVENTS ────────────────────────────────────────────── */}
         <GroupHeader
           title="Webhook events"
-          description="Fonlok POSTs a signed JSON payload to your registered endpoint each time one of these events occurs. Always verify the X-Fonlok-Signature header before processing. Events: payment.initiated · payment.confirmed · payment.disputed · payment.dispute_resolved · payment.released · payout.completed"
+          description="Fonlok POSTs a signed JSON payload to your registered endpoint each time one of these events occurs. Always verify the X-Fonlok-Signature header before processing. Events: payment.initiated · payment.confirmed · payment.part_confirmed · payment.disputed · payment.dispute_resolved · payment.released · payout.completed · payout.split_completed · payout.split_failed"
         />
 
         {/* Signature verification */}
@@ -1633,10 +1755,13 @@ app.post(
     const event = JSON.parse(req.body.toString());
     switch (event.type) {
       case "payment.confirmed":         /* mark order as paid */        break;
+      case "payment.part_confirmed":    /* part of a large invoice */   break;
       case "payment.disputed":          /* flag order for review */     break;
       case "payment.dispute_resolved":  /* act on event.decision */     break;
       case "payment.released":          /* notify seller */             break;
       case "payout.completed":          /* alternate release path */    break;
+      case "payout.split_completed":    /* your commission was paid */  break;
+      case "payout.split_failed":       /* retry via split/retry */     break;
     }
     res.sendStatus(200);
   }
@@ -1664,7 +1789,7 @@ app.post(
             },
             {
               type: "payment.confirmed",
-              desc: "Fired when the buyer approves the MoMo prompt and Campay confirms the charge. Funds are now held in escrow and the invoice status is 'paid'.",
+              desc: "Fired when the buyer approves the MoMo prompt and Campay confirms the charge. Funds are now held in escrow and the invoice status is 'paid'. For invoices above 500,000 XAF it fires once, after the last part is confirmed, with the full invoice amount.",
               example: `{
   "object": "event",
   "type": "payment.confirmed",
@@ -1673,6 +1798,24 @@ app.post(
   "amount": 850000,
   "currency": "XAF",
   "provider": "mtn",
+  "timestamp": "2025-01-15T10:33:00.000Z"
+}`,
+            },
+            {
+              type: "payment.part_confirmed",
+              desc: "Invoices above 500,000 XAF only. Fired each time one part is confirmed; the invoice is 'partially_paid' until the last part, when payment.confirmed fires.",
+              example: `{
+  "object": "event",
+  "type": "payment.part_confirmed",
+  "invoice_id": "42-a1b2c3d4e5f6",
+  "reference": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "part_number": 1,
+  "part_count": 2,
+  "amount": 425000,
+  "paid_amount": 425000,
+  "remaining_amount": 425000,
+  "total_amount": 850000,
+  "currency": "XAF",
   "timestamp": "2025-01-15T10:33:00.000Z"
 }`,
             },
@@ -1737,6 +1880,7 @@ app.post(
   "gross_amount": 850000,
   "platform_fee": 17000,
   "seller_receives": 833000,
+  "split": null,   // or the split object (amount already deducted from seller_receives)
   "currency": "XAF",
   "timestamp": "2025-01-15T10:35:00.000Z"
 }`,
@@ -1757,6 +1901,42 @@ app.post(
   "seller_receives": 833000,
   "currency": "XAF",
   "released_at": "2025-01-15T10:35:00.000Z"
+}`,
+            },
+            {
+              type: "payout.split_completed",
+              desc: "Fired when your split payout is sent after the buyer's confirmation link or code, a dispute decided for the seller, or a successful POST /v1/payments/split/retry. For releases made through POST /v1/payments/release the result is in the split field of payment.released.",
+              example: `{
+  "object": "event",
+  "type": "payout.split_completed",
+  "invoice_id": "42-a1b2c3d4e5f6",
+  "split": {
+    "recipient": { "phone": "237677777777", "name": "Acme Marketplace", "email": "payouts@acme.com" },
+    "type": "percentage",
+    "value": 5,
+    "amount": 42500,
+    "status": "paid",
+    "paid_at": "2025-01-15T10:35:04.000Z"
+  },
+  "timestamp": "2025-01-15T10:35:04.000Z"
+}`,
+            },
+            {
+              type: "payout.split_failed",
+              desc: "Fired when the mobile money network refused your split payout. The seller has already been paid. Call POST /v1/payments/split/retry to send it again.",
+              example: `{
+  "object": "event",
+  "type": "payout.split_failed",
+  "invoice_id": "42-a1b2c3d4e5f6",
+  "split": {
+    "recipient": { "phone": "237677777777", "name": "Acme Marketplace", "email": "payouts@acme.com" },
+    "type": "percentage",
+    "value": 5,
+    "amount": 42500,
+    "status": "failed",
+    "paid_at": null
+  },
+  "timestamp": "2025-01-15T10:35:04.000Z"
 }`,
             },
           ] as { type: string; desc: string; example: string }[]
@@ -1882,6 +2062,18 @@ app.post(
 
 // 409  Duplicate external reference
 { "error": "duplicate_reference",     "message": "An invoice with reference 'order_789' already exists." }
+
+// 429  A payment prompt for this invoice is still waiting for the buyer
+{ "error": "payment_in_progress",     "message": "A payment prompt was just sent for this invoice. Wait for the buyer to approve it, or try again in about two minutes." }
+
+// 400  Invalid split (bad phone, same as seller, below 100 XAF or above 50%)
+{ "error": "invalid_split",           "message": "The split cannot exceed 50% of the invoice amount." }
+
+// 409  Invoice already has a different split
+{ "error": "split_already_defined",   "message": "This invoice already has a different split. A split cannot be changed once defined." }
+
+// 409  Split is not in a retryable state
+{ "error": "split_not_retryable",     "message": "Only a failed split on a completed invoice can be retried." }
 
 // 409  Insufficient wallet balance
 { "error": "insufficient_funds",      "message": "Wallet balance (200000 XAF) is less than invoice amount (850000 XAF).",

@@ -16,6 +16,7 @@ type Purchase = {
   currency: string;
   status:
     | "pending"
+    | "partially_paid"
     | "paid"
     | "delivered"
     | "expired"
@@ -35,6 +36,8 @@ type Purchase = {
 
 function statusPill(status: string) {
   const s = status.toLowerCase();
+  if (s === "partially_paid")
+    return { bg: "#e0f2fe", color: "#075985", border: "#bae6fd" };
   if (s === "paid" || s === "completed")
     return {
       bg: "var(--color-success-bg)",
@@ -63,7 +66,7 @@ function statusPill(status: string) {
 }
 
 function statusLabel(status: string) {
-  return status.charAt(0).toUpperCase() + status.slice(1);
+  return status.charAt(0).toUpperCase() + status.slice(1).replace(/_/g, " ");
 }
 
 function fmt(n: number) {

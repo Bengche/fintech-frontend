@@ -20,6 +20,7 @@ function getStatusPill(status: string) {
   const map: Record<string, string> = {
     pending: "bg-amber-50 text-amber-700 border border-amber-200",
     paid: "bg-blue-50 text-blue-700 border border-blue-200",
+    partially_paid: "bg-sky-50 text-sky-700 border border-sky-200",
     delivered: "bg-emerald-50 text-emerald-700 border border-emerald-200",
     completed: "bg-emerald-50 text-emerald-700 border border-emerald-200",
     expired: "bg-slate-100 text-slate-500 border border-slate-200",
@@ -135,7 +136,9 @@ export default function FilterInvoice() {
               </p>
               {invoices.map((inv) => (
                 <div
-                  key={String((inv as { id?: unknown }).id ?? inv.invoicenumber)}
+                  key={String(
+                    (inv as { id?: unknown }).id ?? inv.invoicenumber,
+                  )}
                   className="flex items-center justify-between gap-2 px-3 py-2.5 rounded-xl bg-slate-50 border border-slate-100 flex-wrap"
                 >
                   <div className="min-w-0">
@@ -159,7 +162,8 @@ export default function FilterInvoice() {
                         getStatusPill(inv.status),
                       ].join(" ")}
                     >
-                      {inv.status.charAt(0).toUpperCase() + inv.status.slice(1)}
+                      {inv.status.charAt(0).toUpperCase() +
+                        inv.status.slice(1).replace(/_/g, " ")}
                     </span>
                   </div>
                 </div>

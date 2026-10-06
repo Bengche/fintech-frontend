@@ -6,6 +6,9 @@ import { useTranslations } from "next-intl";
 import { haptic } from "@/hooks/useHaptic";
 
 const API = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
+// Must match the backend limit (MAX_PAYMENT_PART_XAF, default 500,000).
+const MAX_PAYMENT_PART =
+  Number(process.env.NEXT_PUBLIC_MAX_PAYMENT_PART_XAF) || 500000;
 
 export default function CreateInvoice({
   onCreated,
@@ -43,7 +46,6 @@ export default function CreateInvoice({
       if (sellerLogoPreview) URL.revokeObjectURL(sellerLogoPreview);
     };
   }, [sellerLogoPreview]);
-
 
   // --- Installment payment state ---
   const [paymentType, setPaymentType] = useState<"full" | "installment">(
@@ -428,6 +430,31 @@ export default function CreateInvoice({
                     />
                   </div>
                 </div>
+
+                {/* Invoices above the mobile money limit are paid in parts */}
+                {invoiceTotal > MAX_PAYMENT_PART && (
+                  <div
+                    style={{
+                      marginBottom: "1rem",
+                      padding: "0.75rem 1rem",
+                      borderRadius: "var(--radius-md)",
+                      background: "#eff6ff",
+                      border: "1px solid #bfdbfe",
+                      color: "#1e3a8a",
+                      fontSize: "0.8125rem",
+                      lineHeight: 1.55,
+                    }}
+                  >
+                    {t("create.partPaymentNotice", {
+                      limit: MAX_PAYMENT_PART.toLocaleString(),
+                      count: Math.ceil(invoiceTotal / MAX_PAYMENT_PART),
+                      part: Math.ceil(
+                        invoiceTotal /
+                          Math.ceil(invoiceTotal / MAX_PAYMENT_PART),
+                      ).toLocaleString(),
+                    })}
+                  </div>
+                )}
 
                 {/* Description */}
                 <div style={{ marginBottom: "1rem" }}>
