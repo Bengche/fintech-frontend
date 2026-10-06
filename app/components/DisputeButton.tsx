@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Axios from "axios";
-import { AlertTriangle, ChevronLeft } from "lucide-react";
+import { AlertTriangle, Check, ChevronLeft } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 const API = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
@@ -55,10 +55,10 @@ export default function DisputeButton({
       setLoadingMilestones(true);
       Axios.get(`${API}/invoice/milestones/${invoice_number}`)
         .then((res) => setMilestones(res.data.milestones || res.data || []))
-        .catch(() => setErrorMessage("Failed to load milestone data."))
+        .catch(() => setErrorMessage(t("errLoadMilestones")))
         .finally(() => setLoadingMilestones(false));
     }
-  }, [showModal, isMilestone, invoice_number, milestones.length]);
+  }, [showModal, isMilestone, invoice_number, milestones.length, t]);
 
   const unreleasedMilestones = milestones.filter(
     (m) => m.status !== "released",
@@ -79,17 +79,14 @@ export default function DisputeButton({
     if (disputeScope === "full") {
       if (releasedMilestones.length > 0) {
         setErrorMessage(
-          `${releasedMilestones.length} milestone(s) have already been paid out. ` +
-            "You cannot dispute the full invoice. Please select 'Specific Milestones' and choose only unpaid ones.",
+          t("errFullHasReleased", { count: releasedMilestones.length }),
         );
         return;
       }
       setModalStep("reason");
     } else {
       if (unreleasedMilestones.length === 0) {
-        setErrorMessage(
-          "All milestones have been paid out. Nothing left to dispute.",
-        );
+        setErrorMessage(t("errNothingLeft"));
         return;
       }
       setModalStep("milestones");
@@ -107,7 +104,7 @@ export default function DisputeButton({
 
   const handleMilestonesNext = () => {
     if (selectedMilestoneIds.size === 0) {
-      setErrorMessage("Please select at least one milestone to dispute.");
+      setErrorMessage(t("errSelectOne"));
       return;
     }
     setErrorMessage("");
@@ -173,7 +170,7 @@ export default function DisputeButton({
             display: "flex",
             alignItems: "center",
           }}
-          aria-label="Back"
+          aria-label={t("back")}
         >
           <ChevronLeft size={18} />
         </button>
@@ -201,7 +198,7 @@ export default function DisputeButton({
       {renderStepHeader()}
       {loadingMilestones ? (
         <p style={{ fontSize: "0.875rem", color: "var(--color-text-muted)" }}>
-          Loading milestone data…
+          {t("loadingMilestones")}
         </p>
       ) : (
         <>
@@ -250,14 +247,6 @@ export default function DisputeButton({
                 <div style={{ fontWeight: 600, fontSize: "0.875rem" }}>
                   {t("scopeFull", { defaultMessage: "Full Invoice" })}
                 </div>
-                <div
-                  style={{
-                    fontSize: "0.8125rem",
-                    color: "var(--color-text-muted)",
-                  }}
-                >
-                  Dispute all remaining unreleased milestones
-                </div>
                 {releasedMilestones.length > 0 && (
                   <div
                     style={{
@@ -269,8 +258,7 @@ export default function DisputeButton({
                       borderRadius: "4px",
                     }}
                   >
-                    ⚠ {releasedMilestones.length} milestone(s) already paid —
-                    cannot be included
+                    {t("releasedNotice", { count: releasedMilestones.length })}
                   </div>
                 )}
               </div>
@@ -305,14 +293,6 @@ export default function DisputeButton({
                     defaultMessage: "Specific Milestones",
                   })}
                 </div>
-                <div
-                  style={{
-                    fontSize: "0.8125rem",
-                    color: "var(--color-text-muted)",
-                  }}
-                >
-                  Choose only the milestones you want to dispute
-                </div>
               </div>
             </label>
           </div>
@@ -341,7 +321,7 @@ export default function DisputeButton({
                 cursor: "pointer",
               }}
             >
-              Next →
+              {t("next")}
             </button>
             <button onClick={close} className="btn-ghost" style={{ flex: 1 }}>
               {t("cancel")}
@@ -410,7 +390,8 @@ export default function DisputeButton({
               />
               <div style={{ flex: 1 }}>
                 <span style={{ fontSize: "0.875rem", fontWeight: 500 }}>
-                  {m.milestone_label || `Milestone ${m.milestone_number}`}
+                  {m.milestone_label ||
+                    t("milestoneN", { number: m.milestone_number })}
                 </span>
                 <span
                   style={{
@@ -425,12 +406,16 @@ export default function DisputeButton({
               {isReleased && (
                 <span
                   style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "0.25rem",
                     fontSize: "0.75rem",
                     color: "var(--color-success, #16a34a)",
                     fontWeight: 600,
                   }}
                 >
-                  ✓ Paid
+                  <Check size={12} strokeWidth={2.5} />
+                  {t("paid")}
                 </span>
               )}
             </label>
@@ -462,7 +447,7 @@ export default function DisputeButton({
             cursor: "pointer",
           }}
         >
-          Next →
+          {t("next")}
         </button>
         <button onClick={close} className="btn-ghost" style={{ flex: 1 }}>
           {t("cancel")}
@@ -505,10 +490,10 @@ export default function DisputeButton({
               border: "1px solid var(--color-border)",
             }}
           >
-            <strong>Scope:</strong>{" "}
+            <strong>{t("scopeSummary")}</strong>{" "}
             {disputeScope === "full"
-              ? "Full invoice (all unreleased milestones)"
-              : `${selectedMilestoneIds.size} specific milestone(s)`}
+              ? t("scopeSummaryFull")
+              : t("scopeSummaryCount", { count: selectedMilestoneIds.size })}
           </div>
         )}
 

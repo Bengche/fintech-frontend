@@ -289,7 +289,7 @@ export default function RevenueStats() {
                   margin: "1.25rem 0 0.75rem",
                 }}
               >
-                Analytics
+                {t("analytics")}
               </p>
               <div
                 style={{
@@ -314,7 +314,7 @@ export default function RevenueStats() {
                         margin: "0 0 0.375rem",
                       }}
                     >
-                      Conversion rate
+                      {t("conversionRate")}
                     </p>
                     <p
                       style={{
@@ -333,7 +333,7 @@ export default function RevenueStats() {
                         margin: "0.25rem 0 0",
                       }}
                     >
-                      of last {stats.last10Total ?? 10} invoices paid
+                      {t("conversionNote", { count: stats.last10Total ?? 10 })}
                     </p>
                   </div>
                 )}
@@ -354,7 +354,7 @@ export default function RevenueStats() {
                         margin: "0 0 0.375rem",
                       }}
                     >
-                      Avg. deal size
+                      {t("avgDealSize")}
                     </p>
                     <p
                       style={{
@@ -373,7 +373,7 @@ export default function RevenueStats() {
                         margin: "0.25rem 0 0",
                       }}
                     >
-                      Across completed invoices
+                      {t("avgDealNote")}
                     </p>
                   </div>
                 )}
@@ -394,7 +394,7 @@ export default function RevenueStats() {
                         margin: "0 0 0.375rem",
                       }}
                     >
-                      Top buyer
+                      {t("topBuyer")}
                     </p>
                     <p
                       style={{
@@ -418,7 +418,9 @@ export default function RevenueStats() {
                         margin: "0.25rem 0 0",
                       }}
                     >
-                      {stats.topBuyer.total_paid.toLocaleString()} XAF total
+                      {t("topBuyerTotal", {
+                        amount: stats.topBuyer.total_paid.toLocaleString(),
+                      })}
                     </p>
                   </div>
                 )}

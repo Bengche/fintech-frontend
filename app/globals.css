@@ -2159,7 +2159,9 @@ a:hover {
   background: var(--color-white);
   color: inherit;
   text-decoration: none;
-  transition: border-color 0.15s, background-color 0.15s;
+  transition:
+    border-color 0.15s,
+    background-color 0.15s;
 }
 .db-step:hover {
   border-color: var(--color-primary);

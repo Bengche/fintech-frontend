@@ -58,7 +58,14 @@ import axios from "axios";
 const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
 
 interface SidebarItem {
-  label: string;
+  labelKey:
+    | "dashboard"
+    | "createInvoice"
+    | "transactions"
+    | "myPurchases"
+    | "revenueStats"
+    | "referral"
+    | "verifyReceipt";
   href: string;
   icon: React.ReactNode;
   matchPaths?: string[];
@@ -67,33 +74,33 @@ interface SidebarItem {
 
 const PRIMARY_ITEMS: SidebarItem[] = [
   {
-    label: "Dashboard",
+    labelKey: "dashboard",
     href: "/dashboard",
     icon: <LayoutDashboard size={17} strokeWidth={1.8} />,
     matchPaths: ["/dashboard"],
     exact: true,
   },
   {
-    label: "Create Invoice",
+    labelKey: "createInvoice",
     href: "/dashboard?action=create",
     icon: <FilePlus size={17} strokeWidth={1.8} />,
     matchPaths: [],
     exact: false,
   },
   {
-    label: "Transactions",
+    labelKey: "transactions",
     href: "/transactions",
     icon: <ArrowLeftRight size={17} strokeWidth={1.8} />,
     matchPaths: ["/transactions"],
   },
   {
-    label: "My Purchases",
+    labelKey: "myPurchases",
     href: "/purchases",
     icon: <ShoppingBag size={17} strokeWidth={1.8} />,
     matchPaths: ["/purchases"],
   },
   {
-    label: "Revenue & Stats",
+    labelKey: "revenueStats",
     href: "/dashboard?tab=stats",
     icon: <BarChart2 size={17} strokeWidth={1.8} />,
     matchPaths: [],
@@ -102,13 +109,13 @@ const PRIMARY_ITEMS: SidebarItem[] = [
 
 const SECONDARY_ITEMS: SidebarItem[] = [
   {
-    label: "Referral",
+    labelKey: "referral",
     href: "/referral",
     icon: <Gift size={17} strokeWidth={1.8} />,
     matchPaths: ["/referral"],
   },
   {
-    label: "Verify Receipt",
+    labelKey: "verifyReceipt",
     href: "/verify",
     icon: <BadgeCheck size={17} strokeWidth={1.8} />,
     matchPaths: ["/verify"],
@@ -241,7 +248,7 @@ export default function DashboardSidebar() {
       {/* Sidebar panel — only visible on lg+ */}
       <aside
         className="hidden lg:flex"
-        aria-label="Dashboard navigation"
+        aria-label={t("sidebarLabel")}
         style={{
           position: "fixed",
           top: 0,
@@ -275,7 +282,7 @@ export default function DashboardSidebar() {
               display: "flex",
               alignItems: "center",
             }}
-            aria-label="Fonlok home"
+            aria-label={t("homeLabel")}
           >
             <FonlokLogo variant="light" iconSize={28} />
           </Link>
@@ -351,7 +358,7 @@ export default function DashboardSidebar() {
                     color: "rgba(255,255,255,0.35)",
                   }}
                 >
-                  View profile
+                  {t("viewProfile")}
                 </p>
               </div>
               <User
@@ -366,35 +373,35 @@ export default function DashboardSidebar() {
 
         {/* Primary navigation */}
         <nav style={{ flex: 1, padding: "0.5rem 0.75rem 0" }}>
-          <p className="sidebar-section-label">Navigation</p>
+          <p className="sidebar-section-label">{t("sectionNavigation")}</p>
 
           {PRIMARY_ITEMS.map((item) => {
             const active = isItemActive(item, pathname);
             return (
               <Link
-                key={item.label + item.href}
+                key={item.labelKey + item.href}
                 href={item.href}
                 className={`sidebar-item${active ? " sidebar-item--active" : ""}`}
               >
                 <span className="sidebar-icon">{item.icon}</span>
-                {item.label}
+                {t(item.labelKey)}
               </Link>
             );
           })}
 
           <div className="sidebar-divider" />
-          <p className="sidebar-section-label">Tools</p>
+          <p className="sidebar-section-label">{t("sectionTools")}</p>
 
           {SECONDARY_ITEMS.map((item) => {
             const active = isItemActive(item, pathname);
             return (
               <Link
-                key={item.label + item.href}
+                key={item.labelKey + item.href}
                 href={item.href}
                 className={`sidebar-item${active ? " sidebar-item--active" : ""}`}
               >
                 <span className="sidebar-icon">{item.icon}</span>
-                {item.label}
+                {t(item.labelKey)}
               </Link>
             );
           })}
@@ -412,7 +419,7 @@ export default function DashboardSidebar() {
           <RequestFeatureButton variant="sidebar" />
 
           <div className="sidebar-divider" />
-          <p className="sidebar-section-label">Account</p>
+          <p className="sidebar-section-label">{t("sectionAccount")}</p>
 
           <Link
             href="/settings"
@@ -437,7 +444,7 @@ export default function DashboardSidebar() {
           <button
             className="sidebar-item"
             onClick={switchLocale}
-            aria-label={`Switch language — currently ${locale.toUpperCase()}`}
+            aria-label={t("switchLanguage", { lang: locale.toUpperCase() })}
             style={{ marginBottom: "0.125rem" }}
           >
             <span className="sidebar-icon">

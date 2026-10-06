@@ -694,7 +694,20 @@
     "developers": "Développeurs",
     "logOut": "Se déconnecter",
     "signIn": "Se connecter",
-    "getStarted": "Commencer"
+    "getStarted": "Commencer",
+    "createInvoice": "Créer une facture",
+    "revenueStats": "Revenus & Stats",
+    "verifyReceipt": "Vérifier un reçu",
+    "sectionNavigation": "Navigation",
+    "sectionTools": "Outils",
+    "sectionAccount": "Compte",
+    "viewProfile": "Voir le profil",
+    "create": "Créer",
+    "sidebarLabel": "Navigation du tableau de bord",
+    "mobileNavLabel": "Navigation mobile rapide",
+    "switchLanguage": "Changer de langue — actuellement {lang}",
+    "homeLabel": "Accueil Fonlok",
+    "dashboardShort": "Accueil"
   },
   "CookieConsent": {
     "title": "Nous respectons votre vie privée",
@@ -738,7 +751,14 @@
     "totalEarned": "Total gagné (en tant que vendeur)",
     "fromPayouts": "Des versements effectués",
     "totalSpent": "Total dépensé (en tant qu'acheteur)",
-    "fromPurchases": "De vos achats"
+    "fromPurchases": "De vos achats",
+    "analytics": "Analyses",
+    "conversionRate": "Taux de conversion",
+    "conversionNote": "des {count} dernières factures payées",
+    "avgDealSize": "Montant moyen",
+    "avgDealNote": "Sur les factures terminées",
+    "topBuyer": "Meilleur acheteur",
+    "topBuyerTotal": "{amount} XAF au total"
   },
   "Invoice": {
     "create": {
@@ -830,7 +850,8 @@
       "resultsFound": "{count} facture trouvée",
       "resultsFoundPlural": "{count} factures trouvées",
       "noResults": "Aucune facture ne correspond à ce filtre.",
-      "errorDefault": "Échec du filtrage des factures."
+      "errorDefault": "Échec du filtrage des factures.",
+      "amountPlaceholder": "ex. 50000"
     },
     "list": {
       "title": "Vos factures",
@@ -854,7 +875,20 @@
       "fieldExpires": "Expire",
       "milestoneActionTitle": "Action requise — Facture par étapes",
       "milestoneActionBody": "L'acheteur a payé. Marquez chaque étape comme terminée lorsque vous avez accompli cette partie du travail. L'acheteur recevra un e-mail avec un lien sécurisé pour libérer le paiement.",
-      "manageMilestones": "Gérer les étapes →"
+      "manageMilestones": "Gérer les étapes →",
+      "searchPlaceholder": "Rechercher par nom ou numéro de facture...",
+      "emptyHint": "Créez votre première facture pour commencer à recevoir des paiements sécurisés.",
+      "hide": "Masquer",
+      "show": "Afficher",
+      "milestone": "Par étapes",
+      "expires": "Expire le {date}",
+      "paymentLink": "Lien de paiement",
+      "viewInvoice": "Voir la facture",
+      "chatBuyer": "Discuter avec l'acheteur",
+      "statusPartiallyPaid": "Partiellement payé",
+      "statusCompleted": "Terminé",
+      "statusDisputed": "Contesté",
+      "whatsappMessage": "Payez-moi pour « {name} » sur Fonlok : {url}"
     }
   },
   "Dispute": {
@@ -874,7 +908,20 @@
     "scopeLabel": "Sur quoi porte ce litige ?",
     "scopeFull": "Facture complète — tous les jalons non encore libérés",
     "scopeMilestone": "Jalons spécifiques — choisissez lesquels",
-    "milestonesLabel": "Sélectionnez les jalons à contester :"
+    "milestonesLabel": "Sélectionnez les jalons à contester :",
+    "back": "Retour",
+    "loadingMilestones": "Chargement des jalons…",
+    "next": "Suivant →",
+    "scopeSummary": "Portée :",
+    "scopeSummaryFull": "Facture complète (tous les jalons non libérés)",
+    "scopeSummaryCount": "{count, plural, one {# jalon spécifique} other {# jalons spécifiques}}",
+    "milestoneN": "Jalon {number}",
+    "paid": "Payé",
+    "releasedNotice": "{count, plural, one {# jalon déjà payé — ne peut pas être inclus} other {# jalons déjà payés — ne peuvent pas être inclus}}",
+    "errLoadMilestones": "Impossible de charger les jalons.",
+    "errFullHasReleased": "{count, plural, one {# jalon a déjà été versé} other {# jalons ont déjà été versés}}. Vous ne pouvez pas contester la facture complète. Sélectionnez « Jalons spécifiques » et choisissez uniquement les jalons non payés.",
+    "errNothingLeft": "Tous les jalons ont été versés. Il n'y a plus rien à contester.",
+    "errSelectOne": "Veuillez sélectionner au moins un jalon à contester."
   },
   "MarkDelivered": {
     "trigger": "Marquer comme livré",
@@ -961,7 +1008,9 @@
     "invoicesTab": {
       "title": "Vos factures",
       "subtitle": "Toutes les factures que vous avez créées",
-      "refresh": "Actualiser les factures"
+      "refresh": "Actualiser les factures",
+      "filterTitle": "Filtrer par montant",
+      "filterClose": "Fermer le filtre"
     },
     "onboarding": {
       "title": "Complétez votre profil",
@@ -1006,6 +1055,27 @@
       "processing": "Traitement…",
       "successDefault": "Fonds libérés avec succès !",
       "errorDefault": "Échec de la libération des fonds. Vérifiez votre code et numéro de facture."
+    },
+    "suspension": {
+      "title": "Votre compte a été suspendu",
+      "reason": "Motif : {reason}",
+      "until": "Suspendu jusqu'au : {date}",
+      "permanent": "Cette suspension est définitive.",
+      "appealNone": "Vous pouvez contester cette décision si vous pensez qu'elle est erronée.",
+      "appealPending": "Votre recours est en cours d'examen. Nous vous informerons par e-mail.",
+      "appealDeclined": "Votre recours a été refusé.",
+      "note": "Note : {note}",
+      "submit": "Soumettre un recours",
+      "modalTitle": "Contester la suspension",
+      "modalBody": "Expliquez pourquoi votre compte devrait être rétabli. Donnez autant de détails que possible. Notre équipe examinera votre recours sous 1 à 3 jours ouvrables.",
+      "placeholder": "Décrivez votre situation en détail...",
+      "counter": "{count} / 2000 caractères (minimum 20)",
+      "errMin": "Votre recours doit contenir au moins 20 caractères.",
+      "errFail": "Échec de l'envoi du recours. Veuillez réessayer.",
+      "successDefault": "Recours envoyé.",
+      "close": "Fermer",
+      "cancel": "Annuler",
+      "submitting": "Envoi..."
     }
   },
   "Transactions": {

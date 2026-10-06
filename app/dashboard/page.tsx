@@ -7,9 +7,15 @@ import EscrowBalance from "../components/EscrowBalance";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useSearchParams } from "next/navigation";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { haptic } from "@/hooks/useHaptic";
-import { Check, ChevronRight, RefreshCw, SlidersHorizontal, X } from "lucide-react";
+import {
+  Check,
+  ChevronRight,
+  RefreshCw,
+  SlidersHorizontal,
+  X,
+} from "lucide-react";
 import Link from "next/link";
 
 const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
@@ -34,6 +40,8 @@ function getTabFromSearchParams(
 export default function Dashboard() {
   const searchParams = useSearchParams();
   const t = useTranslations("Dashboard");
+  const ts = useTranslations("Dashboard.suspension");
+  const dateLocale = useLocale() === "fr" ? "fr-FR" : "en-GB";
 
   // When arriving via ?action=create (sidebar / bottom-nav shortcut),
   // the CreateInvoice modal opens automatically.
@@ -114,7 +122,7 @@ export default function Dashboard() {
 
   const submitAppeal = async () => {
     if (appealText.trim().length < 20) {
-      setAppealError("Your appeal must be at least 20 characters.");
+      setAppealError(ts("errMin"));
       return;
     }
     setAppealLoading(true);
@@ -126,7 +134,7 @@ export default function Dashboard() {
         { text: appealText.trim() },
         { withCredentials: true },
       );
-      setAppealSuccess(res.data.message || "Appeal submitted.");
+      setAppealSuccess(res.data.message || ts("successDefault"));
       setAppealText("");
       // Refresh suspension status
       const updated = await axios.get(`${API_URL}/user/suspension-status`, {
@@ -137,7 +145,7 @@ export default function Dashboard() {
       setAppealError(
         axios.isAxiosError(err) && err.response?.data?.message
           ? err.response.data.message
-          : "Failed to submit appeal. Please try again.",
+          : ts("errFail"),
       );
     } finally {
       setAppealLoading(false);
@@ -243,7 +251,7 @@ export default function Dashboard() {
                     fontSize: "1rem",
                   }}
                 >
-                  Your account has been suspended
+                  {ts("title")}
                 </p>
                 {suspension.suspension_reason && (
                   <p
@@ -255,7 +263,7 @@ export default function Dashboard() {
                       wordBreak: "break-word",
                     }}
                   >
-                    Reason: {suspension.suspension_reason}
+                    {ts("reason", { reason: suspension.suspension_reason })}
                   </p>
                 )}
                 {suspension.suspended_until ? (
@@ -266,11 +274,15 @@ export default function Dashboard() {
                       margin: "0 0 0.35rem",
                     }}
                   >
-                    Suspended until:{" "}
-                    {new Date(suspension.suspended_until).toLocaleDateString(
-                      "en-GB",
-                      { day: "2-digit", month: "short", year: "numeric" },
-                    )}
+                    {ts("until", {
+                      date: new Date(
+                        suspension.suspended_until,
+                      ).toLocaleDateString(dateLocale, {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                      }),
+                    })}
                   </p>
                 ) : (
                   <p
@@ -280,15 +292,14 @@ export default function Dashboard() {
                       margin: "0 0 0.35rem",
                     }}
                   >
-                    This suspension is permanent.
+                    {ts("permanent")}
                   </p>
                 )}
                 {suspension.appeal_status === "none" && (
                   <p
                     style={{ fontSize: "0.83rem", color: "#6b7280", margin: 0 }}
                   >
-                    You may appeal this decision if you believe it was made in
-                    error.
+                    {ts("appealNone")}
                   </p>
                 )}
                 {suspension.appeal_status === "pending" && (
@@ -300,16 +311,19 @@ export default function Dashboard() {
                       fontWeight: 700,
                     }}
                   >
-                    Your appeal is under review. We will notify you by email.
+                    {ts("appealPending")}
                   </p>
                 )}
                 {suspension.appeal_status === "declined" && (
                   <p
                     style={{ fontSize: "0.83rem", color: "#991b1b", margin: 0 }}
                   >
-                    Your appeal was declined.
+                    {ts("appealDeclined")}
                     {suspension.appeal_admin_note && (
-                      <span> Note: {suspension.appeal_admin_note}</span>
+                      <span>
+                        {" "}
+                        {ts("note", { note: suspension.appeal_admin_note })}
+                      </span>
                     )}
                   </p>
                 )}
@@ -335,7 +349,7 @@ export default function Dashboard() {
                     textAlign: "center",
                   }}
                 >
-                  Submit Appeal
+                  {ts("submit")}
                 </button>
               )}
             </div>
@@ -376,7 +390,7 @@ export default function Dashboard() {
                   color: "#0f172a",
                 }}
               >
-                Appeal Suspension
+                {ts("modalTitle")}
               </h3>
               <p
                 style={{
@@ -386,9 +400,7 @@ export default function Dashboard() {
                   lineHeight: 1.5,
                 }}
               >
-                Explain why you believe your account should be reinstated.
-                Provide as much detail as possible. Our team will review your
-                appeal within 1&ndash;3 business days.
+                {ts("modalBody")}
               </p>
               {appealSuccess ? (
                 <div style={{ textAlign: "center", padding: "1rem 0" }}>
@@ -415,7 +427,7 @@ export default function Dashboard() {
                       cursor: "pointer",
                     }}
                   >
-                    Close
+                    {ts("close")}
                   </button>
                 </div>
               ) : (
@@ -424,7 +436,7 @@ export default function Dashboard() {
                     value={appealText}
                     onChange={(e) => setAppealText(e.target.value)}
                     rows={5}
-                    placeholder="Describe your situation in detail..."
+                    placeholder={ts("placeholder")}
                     style={{
                       width: "100%",
                       padding: "0.65rem 0.8rem",
@@ -446,7 +458,7 @@ export default function Dashboard() {
                       margin: "0.35rem 0 0.75rem",
                     }}
                   >
-                    {appealText.trim().length} / 2000 characters (minimum 20)
+                    {ts("counter", { count: appealText.trim().length })}
                   </p>
                   {appealError && (
                     <p
@@ -479,7 +491,7 @@ export default function Dashboard() {
                         color: "#475569",
                       }}
                     >
-                      Cancel
+                      {ts("cancel")}
                     </button>
                     <button
                       onClick={submitAppeal}
@@ -502,7 +514,7 @@ export default function Dashboard() {
                             : 1,
                       }}
                     >
-                      {appealLoading ? "Submitting..." : "Submit Appeal"}
+                      {appealLoading ? ts("submitting") : ts("submit")}
                     </button>
                   </div>
                 </>
@@ -759,7 +771,9 @@ export default function Dashboard() {
                       setShowFilter((v) => !v);
                     }}
                     aria-label={
-                      showFilter ? "Close filter" : "Filter by amount"
+                      showFilter
+                        ? t("invoicesTab.filterClose")
+                        : t("invoicesTab.filterTitle")
                     }
                     aria-expanded={showFilter}
                     className={[
@@ -806,7 +820,7 @@ export default function Dashboard() {
                       className="text-slate-400"
                     />
                     <span className="text-xs font-bold text-slate-700 uppercase tracking-wide">
-                      Filter by Amount
+                      {t("invoicesTab.filterTitle")}
                     </span>
                   </div>
                   <div className="px-4">

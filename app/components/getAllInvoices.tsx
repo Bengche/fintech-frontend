@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 import Axios from "axios";
 import { useAuth } from "@/context/UserContext";
 import { QRCodeSVG } from "qrcode.react";
@@ -22,8 +22,9 @@ import {
   Search,
   ExternalLink,
 } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { haptic } from "@/hooks/useHaptic";
+import { STATUS_LABEL_KEY } from "./invoiceStatus";
 Axios.defaults.withCredentials = true;
 
 interface Invoice {
@@ -54,53 +55,42 @@ function getStatusConfig(status: string): {
   pill: string;
   dotBg: string;
   iconBg: string;
-  label: string;
 } {
-  const map: Record<
-    string,
-    { pill: string; dotBg: string; iconBg: string; label: string }
-  > = {
+  const map: Record<string, { pill: string; dotBg: string; iconBg: string }> = {
     pending: {
       pill: "bg-amber-50 text-amber-700 border border-amber-200",
       dotBg: "bg-amber-400",
       iconBg: "bg-amber-50",
-      label: "Pending",
     },
     paid: {
       pill: "bg-blue-50 text-blue-700 border border-blue-200",
       dotBg: "bg-blue-500",
       iconBg: "bg-blue-50",
-      label: "Paid",
     },
     partially_paid: {
       pill: "bg-sky-50 text-sky-700 border border-sky-200",
       dotBg: "bg-sky-500",
       iconBg: "bg-sky-50",
-      label: "Partially paid",
     },
     delivered: {
       pill: "bg-emerald-50 text-emerald-700 border border-emerald-200",
       dotBg: "bg-emerald-500",
       iconBg: "bg-emerald-50",
-      label: "Delivered",
     },
     completed: {
       pill: "bg-emerald-50 text-emerald-700 border border-emerald-200",
       dotBg: "bg-emerald-500",
       iconBg: "bg-emerald-50",
-      label: "Completed",
     },
     expired: {
       pill: "bg-slate-100 text-slate-500 border border-slate-200",
       dotBg: "bg-slate-400",
       iconBg: "bg-slate-100",
-      label: "Expired",
     },
     disputed: {
       pill: "bg-rose-50 text-rose-700 border border-rose-200",
       dotBg: "bg-rose-500",
       iconBg: "bg-rose-50",
-      label: "Disputed",
     },
   };
   return map[status] ?? map.expired;
@@ -115,6 +105,13 @@ export default function GetAllInvoices({
   onRegisterRefresh,
 }: GetAllProps) {
   const t = useTranslations("Invoice");
+  const dateLocale = useLocale() === "fr" ? "fr-FR" : "en-GB";
+  const statusLabel = (status: string) =>
+    t(
+      `list.${STATUS_LABEL_KEY[status] ?? "statusExpired"}` as Parameters<
+        typeof t
+      >[0],
+    );
 
   function getDeleteBlockReason(invoice: Invoice): string | undefined {
     if (invoice.status === "paid" || invoice.status === "partially_paid")
@@ -233,7 +230,7 @@ export default function GetAllInvoices({
                 className="btn-ghost text-sm"
                 onClick={() => setVisible((v) => !v)}
               >
-                {visible ? "Hide" : "Show"}
+                {visible ? t("list.hide") : t("list.show")}
               </button>
             )}
           </div>
@@ -249,7 +246,7 @@ export default function GetAllInvoices({
             />
             <input
               type="text"
-              placeholder="Search by name or invoice number..."
+              placeholder={t("list.searchPlaceholder")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-9 pr-4 py-2.5 text-sm rounded-xl border border-slate-200 bg-white text-slate-800 placeholder:text-slate-400 outline-none focus:border-[#0f1f3d] focus:ring-2 focus:ring-[#0f1f3d]/10 transition-all"
@@ -306,7 +303,7 @@ export default function GetAllInvoices({
             {t("list.empty")}
           </p>
           <p className="text-xs text-slate-400 text-center max-w-xs">
-            Create your first invoice to start receiving secure payments.
+            {t("list.emptyHint")}
           </p>
         </div>
       )}
@@ -325,11 +322,11 @@ export default function GetAllInvoices({
             const invoiceUrl = `${FRONTEND_URL}/pay/${invoice.invoicenumber}`;
             const sc = getStatusConfig(invoice.status);
             const createdStr = new Date(invoice.createdat).toLocaleDateString(
-              "en-GB",
+              dateLocale,
               { day: "2-digit", month: "short", year: "numeric" },
             );
             const expiresStr = invoice.expires_at
-              ? new Date(invoice.expires_at).toLocaleDateString("en-GB", {
+              ? new Date(invoice.expires_at).toLocaleDateString(dateLocale, {
                   day: "2-digit",
                   month: "short",
                   year: "numeric",
@@ -383,14 +380,14 @@ export default function GetAllInvoices({
                       {expiresStr && (
                         <>
                           <span className="text-slate-200">·</span>
-                          <span>Expires {expiresStr}</span>
+                          <span>{t("list.expires", { date: expiresStr })}</span>
                         </>
                       )}
                       {isMilestone && (
                         <>
                           <span className="text-slate-200">·</span>
                           <span className="text-[0.63rem] font-semibold px-1.5 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
-                            Milestone
+                            {t("list.milestone")}
                           </span>
                         </>
                       )}
@@ -412,7 +409,7 @@ export default function GetAllInvoices({
                           sc.pill,
                         ].join(" ")}
                       >
-                        {sc.label}
+                        {statusLabel(invoice.status)}
                       </span>
                     </div>
                     <span
@@ -432,7 +429,7 @@ export default function GetAllInvoices({
                     {/* Payment link */}
                     <div>
                       <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">
-                        Payment Link
+                        {t("list.paymentLink")}
                       </p>
                       <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 flex-wrap">
                         <span className="flex-1 text-[11px] text-slate-500 font-mono break-all min-w-0">
@@ -463,7 +460,7 @@ export default function GetAllInvoices({
                     {/* Share */}
                     <div className="flex gap-2 flex-wrap items-center">
                       <a
-                        href={`https://wa.me/?text=${encodeURIComponent(`Pay me for "${invoice.invoicename}" on Fonlok 👉 ${invoiceUrl}`)}`}
+                        href={`https://wa.me/?text=${encodeURIComponent(t("list.whatsappMessage", { name: invoice.invoicename, url: invoiceUrl }))}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold text-white no-underline hover:opacity-90 transition-opacity"
@@ -498,7 +495,7 @@ export default function GetAllInvoices({
                         className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-white text-slate-700 border border-slate-200 hover:border-slate-300 transition-colors no-underline"
                       >
                         <ExternalLink size={13} />
-                        View invoice
+                        {t("list.viewInvoice")}
                       </Link>
                     </div>
 
@@ -567,7 +564,7 @@ export default function GetAllInvoices({
                           style={{ color: "#ffffff" }}
                         >
                           <MessageSquare size={13} />
-                          Chat with Buyer
+                          {t("list.chatBuyer")}
                         </Link>
                         <DisputeButton
                           invoice_number={invoice.invoicenumber}

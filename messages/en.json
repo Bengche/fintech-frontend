@@ -694,7 +694,20 @@
     "developers": "Developers",
     "logOut": "Log out",
     "signIn": "Sign in",
-    "getStarted": "Get started"
+    "getStarted": "Get started",
+    "createInvoice": "Create Invoice",
+    "revenueStats": "Revenue & Stats",
+    "verifyReceipt": "Verify Receipt",
+    "sectionNavigation": "Navigation",
+    "sectionTools": "Tools",
+    "sectionAccount": "Account",
+    "viewProfile": "View profile",
+    "create": "Create",
+    "sidebarLabel": "Dashboard navigation",
+    "mobileNavLabel": "Mobile quick navigation",
+    "switchLanguage": "Switch language — currently {lang}",
+    "homeLabel": "Fonlok home",
+    "dashboardShort": "Dashboard"
   },
   "CookieConsent": {
     "title": "We value your privacy",
@@ -738,7 +751,14 @@
     "totalEarned": "Total Earned (as Seller)",
     "fromPayouts": "From completed payouts",
     "totalSpent": "Total Spent (as Buyer)",
-    "fromPurchases": "From your purchases"
+    "fromPurchases": "From your purchases",
+    "analytics": "Analytics",
+    "conversionRate": "Conversion rate",
+    "conversionNote": "of last {count} invoices paid",
+    "avgDealSize": "Avg. deal size",
+    "avgDealNote": "Across completed invoices",
+    "topBuyer": "Top buyer",
+    "topBuyerTotal": "{amount} XAF total"
   },
   "Invoice": {
     "create": {
@@ -830,7 +850,8 @@
       "resultsFound": "{count} invoice found",
       "resultsFoundPlural": "{count} invoices found",
       "noResults": "No invoices match that filter.",
-      "errorDefault": "Failed to filter invoices."
+      "errorDefault": "Failed to filter invoices.",
+      "amountPlaceholder": "e.g. 50000"
     },
     "list": {
       "title": "Your Invoices",
@@ -854,7 +875,20 @@
       "fieldExpires": "Expires",
       "milestoneActionTitle": "Action required — Milestone Invoice",
       "milestoneActionBody": "The buyer has paid. Mark each milestone as done when you complete that stage of the work. The buyer will receive an email with a secure payment release link for each milestone you complete.",
-      "manageMilestones": "Manage Milestones →"
+      "manageMilestones": "Manage Milestones →",
+      "searchPlaceholder": "Search by name or invoice number...",
+      "emptyHint": "Create your first invoice to start receiving secure payments.",
+      "hide": "Hide",
+      "show": "Show",
+      "milestone": "Milestone",
+      "expires": "Expires {date}",
+      "paymentLink": "Payment Link",
+      "viewInvoice": "View invoice",
+      "chatBuyer": "Chat with Buyer",
+      "statusPartiallyPaid": "Partially paid",
+      "statusCompleted": "Completed",
+      "statusDisputed": "Disputed",
+      "whatsappMessage": "Pay me for \"{name}\" on Fonlok: {url}"
     }
   },
   "Dispute": {
@@ -874,7 +908,20 @@
     "scopeLabel": "What is this dispute about?",
     "scopeFull": "Full Invoice — all remaining unreleased milestones",
     "scopeMilestone": "Specific Milestones — choose which ones",
-    "milestonesLabel": "Select the milestones you want to dispute:"
+    "milestonesLabel": "Select the milestones you want to dispute:",
+    "back": "Back",
+    "loadingMilestones": "Loading milestone data…",
+    "next": "Next →",
+    "scopeSummary": "Scope:",
+    "scopeSummaryFull": "Full invoice (all unreleased milestones)",
+    "scopeSummaryCount": "{count, plural, one {# specific milestone} other {# specific milestones}}",
+    "milestoneN": "Milestone {number}",
+    "paid": "Paid",
+    "releasedNotice": "{count, plural, one {# milestone already paid — cannot be included} other {# milestones already paid — cannot be included}}",
+    "errLoadMilestones": "Failed to load milestone data.",
+    "errFullHasReleased": "{count, plural, one {# milestone has} other {# milestones have}} already been paid out. You cannot dispute the full invoice. Please select 'Specific Milestones' and choose only unpaid ones.",
+    "errNothingLeft": "All milestones have been paid out. Nothing left to dispute.",
+    "errSelectOne": "Please select at least one milestone to dispute."
   },
   "MarkDelivered": {
     "trigger": "Mark as Delivered",
@@ -961,7 +1008,9 @@
     "invoicesTab": {
       "title": "Your Invoices",
       "subtitle": "All invoices you have created",
-      "refresh": "Refresh Invoices"
+      "refresh": "Refresh Invoices",
+      "filterTitle": "Filter by amount",
+      "filterClose": "Close filter"
     },
     "onboarding": {
       "title": "Complete your profile",
@@ -1006,6 +1055,27 @@
       "processing": "Processing…",
       "successDefault": "Funds released successfully!",
       "errorDefault": "Failed to release funds. Please check your code and invoice number."
+    },
+    "suspension": {
+      "title": "Your account has been suspended",
+      "reason": "Reason: {reason}",
+      "until": "Suspended until: {date}",
+      "permanent": "This suspension is permanent.",
+      "appealNone": "You may appeal this decision if you believe it was made in error.",
+      "appealPending": "Your appeal is under review. We will notify you by email.",
+      "appealDeclined": "Your appeal was declined.",
+      "note": "Note: {note}",
+      "submit": "Submit Appeal",
+      "modalTitle": "Appeal Suspension",
+      "modalBody": "Explain why you believe your account should be reinstated. Provide as much detail as possible. Our team will review your appeal within 1–3 business days.",
+      "placeholder": "Describe your situation in detail...",
+      "counter": "{count} / 2000 characters (minimum 20)",
+      "errMin": "Your appeal must be at least 20 characters.",
+      "errFail": "Failed to submit appeal. Please try again.",
+      "successDefault": "Appeal submitted.",
+      "close": "Close",
+      "cancel": "Cancel",
+      "submitting": "Submitting..."
     }
   },
   "Transactions": {

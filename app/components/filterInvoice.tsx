@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import Axios from "axios";
 import { useAuth } from "@/context/UserContext";
 import { useTranslations } from "next-intl";
+import { STATUS_LABEL_KEY } from "./invoiceStatus";
 
 const API = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
 
@@ -79,7 +80,7 @@ export default function FilterInvoice() {
                 inputMode="numeric"
                 min={0}
                 required
-                placeholder="e.g. 50000"
+                placeholder={t("filter.amountPlaceholder")}
                 onChange={handleChange}
                 value={formData.amount}
                 className="w-full px-3 py-2.5 text-sm rounded-xl border border-slate-200 bg-white text-slate-800 placeholder:text-slate-400 outline-none focus:border-[#0f1f3d] focus:ring-2 focus:ring-[#0f1f3d]/10 transition-all"
@@ -120,13 +121,16 @@ export default function FilterInvoice() {
         {invoices.length > 0 && (
           <div className="space-y-1.5">
             <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide">
-              {invoices.length} result{invoices.length !== 1 ? "s" : ""}
+              {t(
+                invoices.length === 1
+                  ? "filter.resultsFound"
+                  : "filter.resultsFoundPlural",
+                { count: invoices.length },
+              )}
             </p>
             {invoices.map((inv) => (
               <div
-                key={String(
-                  (inv as { id?: unknown }).id ?? inv.invoicenumber,
-                )}
+                key={String((inv as { id?: unknown }).id ?? inv.invoicenumber)}
                 className="flex items-center justify-between gap-2 px-3 py-2.5 rounded-xl bg-slate-50 border border-slate-100 flex-wrap"
               >
                 <div className="min-w-0">
@@ -150,8 +154,11 @@ export default function FilterInvoice() {
                       getStatusPill(inv.status),
                     ].join(" ")}
                   >
-                    {inv.status.charAt(0).toUpperCase() +
-                      inv.status.slice(1).replace(/_/g, " ")}
+                    {t(
+                      `list.${STATUS_LABEL_KEY[inv.status] ?? "statusExpired"}` as Parameters<
+                        typeof t
+                      >[0],
+                    )}
                   </span>
                 </div>
               </div>

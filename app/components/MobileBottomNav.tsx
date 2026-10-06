@@ -29,9 +29,10 @@ import {
   Settings,
 } from "lucide-react";
 import { haptic } from "@/hooks/useHaptic";
+import { useTranslations } from "next-intl";
 
 interface NavItem {
-  label: string;
+  labelKey: "create" | "dashboardShort" | "transactions" | "settings";
   href: string;
   icon: React.ReactNode;
   matchPaths?: string[];
@@ -39,25 +40,25 @@ interface NavItem {
 
 const NAV_ITEMS: NavItem[] = [
   {
-    label: "Create",
+    labelKey: "create",
     href: "/dashboard?action=create",
     icon: <FilePlus size={22} strokeWidth={1.8} />,
     matchPaths: [],
   },
   {
-    label: "Dashboard",
+    labelKey: "dashboardShort",
     href: "/dashboard",
     icon: <LayoutDashboard size={22} strokeWidth={1.8} />,
     matchPaths: [],
   },
   {
-    label: "Transactions",
+    labelKey: "transactions",
     href: "/transactions",
     icon: <ArrowLeftRight size={22} strokeWidth={1.8} />,
     matchPaths: ["/transactions"],
   },
   {
-    label: "Settings",
+    labelKey: "settings",
     href: "/settings",
     icon: <Settings size={22} strokeWidth={1.8} />,
     matchPaths: ["/settings"],
@@ -76,6 +77,7 @@ function isActive(item: NavItem, pathname: string): boolean {
 export default function MobileBottomNav() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const t = useTranslations("Navbar");
 
   return (
     <>
@@ -161,7 +163,7 @@ export default function MobileBottomNav() {
       {/* Bottom bar — hidden on lg+ via .mbn-nav CSS class */}
       <nav
         className="mbn-nav"
-        aria-label="Mobile quick navigation"
+        aria-label={t("mobileNavLabel")}
         style={{
           position: "fixed",
           bottom: 0,
@@ -190,7 +192,7 @@ export default function MobileBottomNav() {
             <Link
               key={item.href}
               href={item.href}
-              aria-label={item.label}
+              aria-label={t(item.labelKey)}
               aria-current={active ? "page" : undefined}
               className={`mbn-item${active ? " mbn-item-active" : ""}`}
               style={{
@@ -207,7 +209,7 @@ export default function MobileBottomNav() {
               <span className="mbn-icon">{item.icon}</span>
 
               {/* Label */}
-              <span className="mbn-label">{item.label}</span>
+              <span className="mbn-label">{t(item.labelKey)}</span>
             </Link>
           );
         })}
