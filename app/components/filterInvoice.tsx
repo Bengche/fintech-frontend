@@ -3,7 +3,6 @@ import React, { useState } from "react";
 import Axios from "axios";
 import { useAuth } from "@/context/UserContext";
 import { useTranslations } from "next-intl";
-import { SlidersHorizontal, ChevronDown, ChevronUp } from "lucide-react";
 
 const API = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
 
@@ -31,9 +30,9 @@ function getStatusPill(status: string) {
 export default function FilterInvoice() {
   const { user_id } = useAuth();
   const t = useTranslations("Invoice");
-  const [formData, setFormData] = useState({ amount: 0, currency: "XAF" });
+  const [formData, setFormData] = useState({ amount: "", currency: "XAF" });
   const [invoices, setInvoices] = useState<FilteredInvoice[]>([]);
-  const [showForm, setShowForm] = useState(false);
+  const [searched, setSearched] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -52,6 +51,7 @@ export default function FilterInvoice() {
         `${API}/invoice/filter/${user_id}?amount=${formData.amount}&currency=${formData.currency || "XAF"}`,
       );
       setInvoices(response.data.invoice || []);
+      setSearched(true);
     } catch (err: unknown) {
       const e = err as { response?: { data?: { message?: string } } };
       setError(e.response?.data?.message || t("filter.errorDefault"));
@@ -62,120 +62,107 @@ export default function FilterInvoice() {
 
   return (
     <div className="py-3">
-      {/* Toggle */}
-      <button
-        onClick={() => setShowForm(!showForm)}
-        className="flex items-center gap-2 text-sm font-semibold text-slate-700 hover:text-[#0f1f3d] transition-colors"
-      >
-        <SlidersHorizontal size={14} strokeWidth={2.2} />
-        {showForm ? t("filter.hide") : t("filter.show")}
-        {showForm ? (
-          <ChevronUp size={14} className="text-slate-400" />
-        ) : (
-          <ChevronDown size={14} className="text-slate-400" />
-        )}
-      </button>
-
-      {showForm && (
-        <div className="mt-3 space-y-4">
-          <form onSubmit={handleFilter} className="space-y-3">
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-[2fr_1fr]">
-              <div>
-                <label
-                  className="block text-xs font-semibold text-slate-500 mb-1.5"
-                  htmlFor="filter-amount"
-                >
-                  {t("filter.amountLabel")}
-                </label>
-                <input
-                  id="filter-amount"
-                  name="amount"
-                  type="number"
-                  placeholder="e.g. 50000"
-                  onChange={handleChange}
-                  value={formData.amount}
-                  className="w-full px-3 py-2.5 text-sm rounded-xl border border-slate-200 bg-white text-slate-800 placeholder:text-slate-400 outline-none focus:border-[#0f1f3d] focus:ring-2 focus:ring-[#0f1f3d]/10 transition-all"
-                />
-              </div>
-              <div>
-                <label
-                  className="block text-xs font-semibold text-slate-500 mb-1.5"
-                  htmlFor="filter-currency"
-                >
-                  {t("filter.currencyLabel")}
-                </label>
-                <select
-                  id="filter-currency"
-                  name="currency"
-                  onChange={handleChange}
-                  value={formData.currency}
-                  className="w-full px-3 py-2.5 text-sm rounded-xl border border-slate-200 bg-white text-slate-800 outline-none focus:border-[#0f1f3d] focus:ring-2 focus:ring-[#0f1f3d]/10 transition-all"
-                >
-                  <option value="XAF">XAF</option>
-                </select>
-              </div>
+      <div className="space-y-4">
+        <form onSubmit={handleFilter} className="space-y-3">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-[2fr_1fr]">
+            <div>
+              <label
+                className="block text-xs font-semibold text-slate-500 mb-1.5"
+                htmlFor="filter-amount"
+              >
+                {t("filter.amountLabel")}
+              </label>
+              <input
+                id="filter-amount"
+                name="amount"
+                type="number"
+                inputMode="numeric"
+                min={0}
+                required
+                placeholder="e.g. 50000"
+                onChange={handleChange}
+                value={formData.amount}
+                className="w-full px-3 py-2.5 text-sm rounded-xl border border-slate-200 bg-white text-slate-800 placeholder:text-slate-400 outline-none focus:border-[#0f1f3d] focus:ring-2 focus:ring-[#0f1f3d]/10 transition-all"
+              />
             </div>
+            <div>
+              <label
+                className="block text-xs font-semibold text-slate-500 mb-1.5"
+                htmlFor="filter-currency"
+              >
+                {t("filter.currencyLabel")}
+              </label>
+              <select
+                id="filter-currency"
+                name="currency"
+                onChange={handleChange}
+                value={formData.currency}
+                className="w-full px-3 py-2.5 text-sm rounded-xl border border-slate-200 bg-white text-slate-800 outline-none focus:border-[#0f1f3d] focus:ring-2 focus:ring-[#0f1f3d]/10 transition-all"
+              >
+                <option value="XAF">XAF</option>
+              </select>
+            </div>
+          </div>
 
-            {error && (
-              <p className="text-xs text-rose-600 font-medium">{error}</p>
-            )}
+          {error && (
+            <p className="text-xs text-rose-600 font-medium">{error}</p>
+          )}
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="px-4 py-2 rounded-xl bg-[#0f1f3d] text-white text-xs font-semibold hover:bg-[#162d5a] transition-colors disabled:opacity-60"
-            >
-              {loading ? t("filter.filtering") : t("filter.applyFilter")}
-            </button>
-          </form>
+          <button
+            type="submit"
+            disabled={loading}
+            className="px-4 py-2 rounded-xl bg-[#0f1f3d] text-white text-xs font-semibold hover:bg-[#162d5a] transition-colors disabled:opacity-60"
+          >
+            {loading ? t("filter.filtering") : t("filter.applyFilter")}
+          </button>
+        </form>
 
-          {invoices.length > 0 && (
-            <div className="space-y-1.5">
-              <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide">
-                {invoices.length} result{invoices.length !== 1 ? "s" : ""}
-              </p>
-              {invoices.map((inv) => (
-                <div
-                  key={String(
-                    (inv as { id?: unknown }).id ?? inv.invoicenumber,
-                  )}
-                  className="flex items-center justify-between gap-2 px-3 py-2.5 rounded-xl bg-slate-50 border border-slate-100 flex-wrap"
-                >
-                  <div className="min-w-0">
-                    <p className="text-sm font-semibold text-slate-800 truncate">
-                      {inv.invoicename}
-                    </p>
-                    <p className="text-[11px] font-mono text-slate-400 mt-0.5">
-                      #{inv.invoicenumber}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2 shrink-0">
-                    <span className="text-sm font-bold text-slate-900 tabular-nums">
-                      {Number(inv.amount).toLocaleString()}{" "}
-                      <span className="text-xs font-medium text-slate-500">
-                        {inv.currency}
-                      </span>
-                    </span>
-                    <span
-                      className={[
-                        "text-[0.63rem] font-semibold px-2 py-0.5 rounded-full",
-                        getStatusPill(inv.status),
-                      ].join(" ")}
-                    >
-                      {inv.status.charAt(0).toUpperCase() +
-                        inv.status.slice(1).replace(/_/g, " ")}
-                    </span>
-                  </div>
+        {invoices.length > 0 && (
+          <div className="space-y-1.5">
+            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide">
+              {invoices.length} result{invoices.length !== 1 ? "s" : ""}
+            </p>
+            {invoices.map((inv) => (
+              <div
+                key={String(
+                  (inv as { id?: unknown }).id ?? inv.invoicenumber,
+                )}
+                className="flex items-center justify-between gap-2 px-3 py-2.5 rounded-xl bg-slate-50 border border-slate-100 flex-wrap"
+              >
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold text-slate-800 truncate">
+                    {inv.invoicename}
+                  </p>
+                  <p className="text-[11px] font-mono text-slate-400 mt-0.5">
+                    #{inv.invoicenumber}
+                  </p>
                 </div>
-              ))}
-            </div>
-          )}
+                <div className="flex items-center gap-2 shrink-0">
+                  <span className="text-sm font-bold text-slate-900 tabular-nums">
+                    {Number(inv.amount).toLocaleString()}{" "}
+                    <span className="text-xs font-medium text-slate-500">
+                      {inv.currency}
+                    </span>
+                  </span>
+                  <span
+                    className={[
+                      "text-[0.63rem] font-semibold px-2 py-0.5 rounded-full",
+                      getStatusPill(inv.status),
+                    ].join(" ")}
+                  >
+                    {inv.status.charAt(0).toUpperCase() +
+                      inv.status.slice(1).replace(/_/g, " ")}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
 
-          {invoices.length === 0 && !loading && (
-            <p className="text-xs text-slate-400">{t("filter.noResults")}</p>
-          )}
-        </div>
-      )}
+        {searched && invoices.length === 0 && !loading && (
+          <p className="text-xs text-slate-400">{t("filter.noResults")}</p>
+        )}
+      </div>
     </div>
   );
 }

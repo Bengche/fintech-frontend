@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Axios from "axios";
 import { useAuth } from "@/context/UserContext";
 import { useTranslations } from "next-intl";
@@ -106,39 +106,21 @@ export default function RevenueStats() {
     }
   };
 
+  useEffect(() => {
+    if (user_id) loadStats();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user_id]);
+
   return (
     <div className="card">
       <div
         style={{
           display: "flex",
           alignItems: "center",
-          justifyContent: "space-between",
-          flexWrap: "wrap",
-          gap: "0.75rem",
+          justifyContent: "flex-end",
           marginBottom: stats ? "1.25rem" : 0,
         }}
       >
-        <div>
-          <h3
-            style={{
-              margin: 0,
-              fontSize: "1rem",
-              fontWeight: 700,
-              color: "var(--color-text-heading)",
-            }}
-          >
-            {t("title")}
-          </h3>
-          <p
-            style={{
-              margin: "0.2rem 0 0",
-              fontSize: "0.875rem",
-              color: "var(--color-text-muted)",
-            }}
-          >
-            {t("subtitle")}
-          </p>
-        </div>
         <button
           onClick={loadStats}
           className="btn-ghost"

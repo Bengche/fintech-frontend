@@ -136,6 +136,7 @@ export default function GetAllInvoices({
   const [invoices, setInvoices] = useState<Invoice[] | null>(null);
   const [statusFilter, setStatusFilter] = useState("all");
   const [loading, setLoading] = useState(false);
+  const [loaded, setLoaded] = useState(false);
   const [showQRId, setShowQRId] = useState<number | null>(null);
   const [expandedIds, setExpandedIds] = useState<Set<number>>(new Set());
   const [visible, setVisible] = useState(true);
@@ -162,12 +163,17 @@ export default function GetAllInvoices({
       setInvoices(null);
     } finally {
       setLoading(false);
+      setLoaded(true);
     }
   }, [user_id]);
 
   useEffect(() => {
     if (onRegisterRefresh) onRegisterRefresh(getAllInvoices);
   }, [onRegisterRefresh, getAllInvoices]);
+
+  useEffect(() => {
+    if (user_id) getAllInvoices();
+  }, [user_id, getAllInvoices]);
 
   const handleCopy = async (id: number, copyLink: string) => {
     haptic("soft");
@@ -280,7 +286,18 @@ export default function GetAllInvoices({
         </div>
       )}
 
-      {invoices === null && !loading && visible && (
+      {!loaded && (
+        <div className="space-y-2.5" aria-hidden="true">
+          {[0, 1, 2].map((i) => (
+            <div
+              key={i}
+              className="h-[68px] rounded-2xl border border-slate-100 bg-white shadow-sm animate-pulse"
+            />
+          ))}
+        </div>
+      )}
+
+      {invoices === null && loaded && !loading && visible && (
         <div className="flex flex-col items-center justify-center py-16 px-4">
           <div className="w-14 h-14 rounded-2xl bg-slate-100 flex items-center justify-center mb-4">
             <FileText size={24} className="text-slate-400" />
@@ -341,7 +358,7 @@ export default function GetAllInvoices({
                   {/* Status icon */}
                   <span
                     className={[
-                      "shrink-0 w-9 h-9 rounded-xl flex items-center justify-center",
+                      "shrink-0 w-9 h-9 rounded-xl hidden sm:flex items-center justify-center",
                       sc.iconBg,
                     ].join(" ")}
                   >
@@ -363,6 +380,12 @@ export default function GetAllInvoices({
                       </span>
                       <span className="text-slate-200">·</span>
                       <span>{createdStr}</span>
+                      {expiresStr && (
+                        <>
+                          <span className="text-slate-200">·</span>
+                          <span>Expires {expiresStr}</span>
+                        </>
+                      )}
                       {isMilestone && (
                         <>
                           <span className="text-slate-200">·</span>
@@ -403,31 +426,9 @@ export default function GetAllInvoices({
                   </div>
                 </button>
 
-                {/* Meta / quick-links bar */}
-                <div
-                  className={[
-                    "flex items-center gap-3 flex-wrap px-4 py-2 border-t border-slate-50 bg-slate-50/40",
-                    isExpanded ? "border-b border-slate-100" : "",
-                  ].join(" ")}
-                >
-                  {expiresStr && (
-                    <span className="text-[11px] text-slate-400">
-                      Expires {expiresStr}
-                    </span>
-                  )}
-                  <Link
-                    href={`/pay/${invoice.invoicenumber}`}
-                    onClick={(e) => e.stopPropagation()}
-                    className="ml-auto flex items-center gap-1 text-[11px] font-semibold text-[#0f1f3d] hover:text-[#f59e0b] transition-colors no-underline"
-                  >
-                    View Invoice
-                    <ExternalLink size={10} strokeWidth={2.5} />
-                  </Link>
-                </div>
-
                 {/* Expanded details panel */}
                 {isExpanded && (
-                  <div className="px-4 pt-4 pb-5 space-y-4">
+                  <div className="px-4 pt-4 pb-5 space-y-4 border-t border-slate-100">
                     {/* Payment link */}
                     <div>
                       <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">
@@ -492,6 +493,13 @@ export default function GetAllInvoices({
                           ? t("list.hideQR")
                           : t("list.showQR")}
                       </button>
+                      <Link
+                        href={`/pay/${invoice.invoicenumber}`}
+                        className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-white text-slate-700 border border-slate-200 hover:border-slate-300 transition-colors no-underline"
+                      >
+                        <ExternalLink size={13} />
+                        View invoice
+                      </Link>
                     </div>
 
                     {/* QR Code */}

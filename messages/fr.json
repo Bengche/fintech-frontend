@@ -836,7 +836,7 @@
       "title": "Vos factures",
       "refresh": "Actualiser les factures",
       "loading": "Chargement…",
-      "empty": "Aucune facture. Cliquez sur « Actualiser les factures » pour charger ou créer votre première facture.",
+      "empty": "Aucune facture pour le moment.",
       "noMatch": "Aucune facture ne correspond à ce filtre.",
       "statusAll": "Toutes",
       "statusPending": "En attente",

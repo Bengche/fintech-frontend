@@ -51,15 +51,14 @@ export default function EscrowBalance() {
     <div
       className="db-escrow"
       style={{
-        background: hasBalance
-          ? "linear-gradient(135deg, #0f1f3d 0%, #1e3a5f 100%)"
-          : "var(--color-white)",
+        background: hasBalance ? "#0f1f3d" : "var(--color-white)",
         border: hasBalance ? "none" : "1px solid var(--color-border)",
         borderRadius: "var(--radius-md)",
         padding: "1.25rem 1.5rem",
         boxShadow: hasBalance
-          ? "0 4px 24px rgba(15,31,61,0.18)"
+          ? "0 2px 12px rgba(15,31,61,0.16)"
           : "var(--shadow-card)",
+        position: "relative",
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
@@ -209,9 +208,11 @@ export default function EscrowBalance() {
         )}
 
         <button
+          className="db-escrow-refresh"
           onClick={() => load(true)}
           disabled={refreshing}
           title={t("refresh")}
+          aria-label={t("refresh")}
           style={{
             background: "none",
             border: hasBalance

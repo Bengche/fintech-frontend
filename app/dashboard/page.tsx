@@ -7,10 +7,10 @@ import EscrowBalance from "../components/EscrowBalance";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useSearchParams } from "next/navigation";
-import { InlineSpinner } from "@/app/components/Spinner";
 import { useTranslations } from "next-intl";
 import { haptic } from "@/hooks/useHaptic";
-import { Search, X } from "lucide-react";
+import { Check, ChevronRight, RefreshCw, SlidersHorizontal, X } from "lucide-react";
+import Link from "next/link";
 
 const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
 
@@ -214,7 +214,7 @@ export default function Dashboard() {
           padding: "2rem 1.25rem calc(4rem + env(safe-area-inset-bottom, 0px))",
         }}
       >
-        {/* â”€â”€ Escrow balance â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+        {/* Escrow balance */}
         {/* ── Suspension banner ──────────────────────────────────────────── */}
         {suspension?.isActive && (
           <div
@@ -612,16 +612,6 @@ export default function Dashboard() {
                   >
                     {t("onboarding.subtitle")}
                   </p>
-                  <p
-                    style={{
-                      margin: "0.45rem 0 0",
-                      fontSize: "0.75rem",
-                      color: "var(--color-text-muted)",
-                      lineHeight: 1.5,
-                    }}
-                  >
-                    {t("onboarding.helper")}
-                  </p>
                 </div>
                 <span className="badge badge-info">
                   {t("onboarding.progress", {
@@ -634,7 +624,7 @@ export default function Dashboard() {
               <div
                 style={{
                   marginTop: "0.85rem",
-                  height: "8px",
+                  height: "6px",
                   borderRadius: "999px",
                   background: "var(--color-mist)",
                   overflow: "hidden",
@@ -644,8 +634,9 @@ export default function Dashboard() {
                   style={{
                     width: `${(onboardingData.completedCount / onboardingData.totalCount) * 100}%`,
                     height: "100%",
-                    background:
-                      "linear-gradient(90deg, var(--color-primary), var(--color-accent))",
+                    borderRadius: "999px",
+                    background: "var(--color-primary)",
+                    transition: "width 0.4s ease",
                   }}
                 />
               </div>
@@ -654,75 +645,36 @@ export default function Dashboard() {
                 style={{
                   marginTop: "1rem",
                   display: "grid",
-                  gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-                  gap: "0.625rem",
+                  gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+                  gap: "0.5rem",
                 }}
               >
                 {onboardingData.steps.map((step) => (
-                  <a
+                  <Link
                     key={step.key}
                     href={step.href}
-                    style={{
-                      textDecoration: "none",
-                      border: "1px solid var(--color-border)",
-                      borderRadius: "0.75rem",
-                      padding: "0.7rem 0.8rem",
-                      background: step.completed
-                        ? "rgba(22,163,74,0.08)"
-                        : "var(--color-white)",
-                      color: "inherit",
-                      display: "block",
-                    }}
+                    className={`db-step${step.completed ? " is-done" : ""}`}
                   >
-                    <p
-                      style={{
-                        margin: "0 0 0.15rem",
-                        fontWeight: 700,
-                        fontSize: "0.84rem",
-                        color: "var(--color-text-heading)",
-                      }}
-                    >
-                      {t(`onboarding.steps.${step.key}.title`)}
-                    </p>
-                    <p
-                      style={{
-                        margin: 0,
-                        fontSize: "0.78rem",
-                        color: "var(--color-text-muted)",
-                        lineHeight: 1.45,
-                      }}
-                    >
-                      {t(`onboarding.steps.${step.key}.hint`)}
-                    </p>
-                    <p
-                      style={{
-                        margin: "0.4rem 0 0",
-                        fontSize: "0.76rem",
-                        fontWeight: 700,
-                        color: step.completed
-                          ? "var(--color-success)"
-                          : "var(--color-primary)",
-                      }}
-                    >
-                      {step.completed
-                        ? t("onboarding.done")
-                        : t("onboarding.start")}
-                    </p>
-                  </a>
+                    <span className="db-step-mark" aria-hidden="true">
+                      {step.completed && <Check size={12} strokeWidth={3} />}
+                    </span>
+                    <span className="db-step-text">
+                      <span className="db-step-title">
+                        {t(`onboarding.steps.${step.key}.title`)}
+                      </span>
+                      <span className="db-step-hint">
+                        {t(`onboarding.steps.${step.key}.hint`)}
+                      </span>
+                    </span>
+                    {!step.completed && (
+                      <ChevronRight
+                        size={16}
+                        className="db-step-go"
+                        aria-label={t("onboarding.start")}
+                      />
+                    )}
+                  </Link>
                 ))}
-              </div>
-
-              <div style={{ marginTop: "0.85rem", textAlign: "right" }}>
-                <button
-                  className="btn-ghost"
-                  disabled={onboardingDismissLoading}
-                  onClick={dismissOnboarding}
-                  style={{ fontSize: "0.85rem" }}
-                >
-                  {onboardingDismissLoading
-                    ? t("onboarding.dismissing")
-                    : t("onboarding.dismiss")}
-                </button>
               </div>
             </div>
           )}
@@ -739,7 +691,7 @@ export default function Dashboard() {
           }}
         />
 
-        {/* â”€â”€ Tab bar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+        {/* Tab bar */}
         <div
           className="db-tabs"
           style={{
@@ -782,7 +734,7 @@ export default function Dashboard() {
           ))}
         </div>
 
-        {/* â”€â”€ Tab content â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+        {/* Tab content */}
         <div style={{ marginTop: "1.5rem" }}>
           {/* My Invoices */}
           {activeTab === "invoices" && (
@@ -817,27 +769,29 @@ export default function Dashboard() {
                         : "bg-white border-slate-200 text-slate-500 hover:border-slate-300 hover:text-slate-700",
                     ].join(" ")}
                   >
-                    <Search size={15} strokeWidth={2.1} />
+                    <SlidersHorizontal size={15} strokeWidth={2.1} />
                   </button>
 
                   {/* Refresh */}
                   <button
-                    className="btn-primary"
                     disabled={refreshLoading}
+                    aria-label={t("invoicesTab.refresh")}
+                    title={t("invoicesTab.refresh")}
                     onClick={() => {
                       if (triggerRefresh) {
+                        haptic("soft");
                         setRefreshLoading(true);
                         triggerRefresh();
                         setTimeout(() => setRefreshLoading(false), 1200);
                       }
                     }}
-                    style={{ fontSize: "0.875rem", padding: "0.45rem 1.1rem" }}
+                    className="flex items-center justify-center w-9 h-9 rounded-xl border bg-white border-slate-200 text-slate-500 hover:border-slate-300 hover:text-slate-700 transition-all duration-150 disabled:opacity-60"
                   >
-                    {refreshLoading ? (
-                      <InlineSpinner size="xs" />
-                    ) : (
-                      t("invoicesTab.refresh")
-                    )}
+                    <RefreshCw
+                      size={15}
+                      strokeWidth={2.1}
+                      className={refreshLoading ? "animate-spin" : undefined}
+                    />
                   </button>
                 </div>
               </div>
@@ -846,7 +800,7 @@ export default function Dashboard() {
               {showFilter && (
                 <div className="bg-white rounded-2xl border border-slate-200 shadow-sm mb-4 overflow-hidden">
                   <div className="flex items-center gap-2 px-4 py-3 border-b border-slate-100">
-                    <Search
+                    <SlidersHorizontal
                       size={13}
                       strokeWidth={2}
                       className="text-slate-400"
