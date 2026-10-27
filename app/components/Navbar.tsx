@@ -156,7 +156,7 @@ export default function Navbar() {
       <nav
         style={{
           position: "fixed",
-          top: 0,
+          top: "env(safe-area-inset-top, 0px)",
           left: 0,
           right: 0,
           zIndex: 50,
@@ -177,7 +177,8 @@ export default function Navbar() {
           style={{
             maxWidth: "1200px",
             margin: "0 auto",
-            padding: "0 1.25rem",
+            padding:
+              "0 max(1.25rem, env(safe-area-inset-right, 0px)) 0 max(1.25rem, env(safe-area-inset-left, 0px))",
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
@@ -391,7 +392,7 @@ export default function Navbar() {
           {/* ── Mobile right controls ──────────────────────── */}
           <div
             className="flex md:hidden"
-            style={{ alignItems: "center", gap: "0.375rem" }}
+            style={{ alignItems: "center", gap: "0.375rem", flexShrink: 0 }}
           >
             {/* Ask Kila mobile button */}
             <button
@@ -543,7 +544,8 @@ export default function Navbar() {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
-                padding: "1rem 1.125rem",
+                padding:
+                  "calc(1rem + env(safe-area-inset-top, 0px)) 1.125rem 1rem",
                 borderBottom: "1px solid rgba(255,255,255,0.09)",
                 flexShrink: 0,
               }}

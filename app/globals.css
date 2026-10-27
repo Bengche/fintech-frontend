@@ -111,6 +111,23 @@ body {
   line-height: 1.6;
   margin: 0;
   overflow-x: hidden;
+  /* iOS standalone PWA (black-translucent status bar): keep content out of the
+     notch / status-bar area. env() resolves to 0 everywhere else. */
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+/* Solid band behind the iOS status bar so scrolling content never shows
+   through the clock / battery icons. Zero height outside the PWA. */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: env(safe-area-inset-top, 0px);
+  background-color: var(--color-primary);
+  z-index: 1000;
+  pointer-events: none;
 }
 
 h1,

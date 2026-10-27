@@ -64,6 +64,9 @@ const STYLES = `
       height: 100dvh !important;
       border-radius: 0 !important;
     }
+    .kila-panel > div:first-child {
+      padding-top: calc(14px + env(safe-area-inset-top, 0px)) !important;
+    }
   }
 
   .kila-msg-text a { color: #F59E0B; text-decoration: underline; }

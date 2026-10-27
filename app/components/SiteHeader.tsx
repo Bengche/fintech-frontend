@@ -62,7 +62,7 @@ export default function SiteHeader() {
         backgroundColor: "var(--color-white)",
         borderBottom: "1px solid var(--color-border)",
         position: "sticky",
-        top: 0,
+        top: "env(safe-area-inset-top, 0px)",
         zIndex: 100,
       }}
     >
@@ -262,8 +262,8 @@ export default function SiteHeader() {
 
         {/* Mobile right controls: Ask Kila + hamburger */}
         <div
-          className="md:hidden"
-          style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}
+          className="flex md:hidden"
+          style={{ alignItems: "center", gap: "0.5rem", flexShrink: 0 }}
         >
           <button
             onClick={openKila}
@@ -314,50 +314,45 @@ export default function SiteHeader() {
             }
             aria-expanded={mobileOpen}
             style={{
-              background: "none",
-              border: "none",
+              background: "rgba(15,31,61,0.06)",
+              border: "1.5px solid var(--color-border)",
+              borderRadius: "9px",
               cursor: "pointer",
-              padding: "0.25rem",
+              padding: 0,
               display: "flex",
-              flexDirection: "column",
-              gap: "5px",
-              width: "28px",
+              alignItems: "center",
+              justifyContent: "center",
+              width: "38px",
+              height: "38px",
+              flexShrink: 0,
+              WebkitAppearance: "none",
+              appearance: "none",
+              color: "var(--color-primary)",
             }}
           >
-            <span
-              style={{
-                height: "2px",
-                backgroundColor: "var(--color-text-heading)",
-                borderRadius: "2px",
-                display: "block",
-                transition: "transform 0.2s",
-                transform: mobileOpen
-                  ? "translateY(7px) rotate(45deg)"
-                  : "none",
-              }}
-            />
-            <span
-              style={{
-                height: "2px",
-                backgroundColor: "var(--color-text-heading)",
-                borderRadius: "2px",
-                display: "block",
-                opacity: mobileOpen ? 0 : 1,
-                transition: "opacity 0.2s",
-              }}
-            />
-            <span
-              style={{
-                height: "2px",
-                backgroundColor: "var(--color-text-heading)",
-                borderRadius: "2px",
-                display: "block",
-                transition: "transform 0.2s",
-                transform: mobileOpen
-                  ? "translateY(-7px) rotate(-45deg)"
-                  : "none",
-              }}
-            />
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.4"
+              strokeLinecap="round"
+              aria-hidden="true"
+            >
+              {mobileOpen ? (
+                <>
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                </>
+              ) : (
+                <>
+                  <line x1="3" y1="6" x2="21" y2="6" />
+                  <line x1="3" y1="12" x2="21" y2="12" />
+                  <line x1="3" y1="18" x2="21" y2="18" />
+                </>
+              )}
+            </svg>
           </button>
         </div>
       </div>
@@ -369,6 +364,9 @@ export default function SiteHeader() {
             backgroundColor: "var(--color-white)",
             borderTop: "1px solid var(--color-border)",
             padding: "1rem 1.5rem 1.5rem",
+            maxHeight:
+              "calc(100dvh - 64px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px))",
+            overflowY: "auto",
           }}
         >
           {/* Marketing nav links — only shown to logged-out visitors */}

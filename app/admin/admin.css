@@ -51,7 +51,7 @@
 
 .adm-header {
   position: sticky;
-  top: 0;
+  top: env(safe-area-inset-top, 0px);
   z-index: 50;
   height: var(--adm-header-h);
   padding: 0 1.25rem;
@@ -154,7 +154,7 @@
 
 .adm-nav {
   position: sticky;
-  top: var(--adm-header-h);
+  top: calc(var(--adm-header-h) + env(safe-area-inset-top, 0px));
   z-index: 40;
   background: var(--adm-surface);
   border-bottom: 1px solid var(--adm-line);

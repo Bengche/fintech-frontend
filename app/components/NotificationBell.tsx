@@ -200,7 +200,7 @@ export default function NotificationBell({
               display: "flex",
               alignItems: "flex-start",
               justifyContent: "center",
-              paddingTop: "72px",
+              paddingTop: "calc(72px + env(safe-area-inset-top, 0px))",
               paddingLeft: "12px",
               paddingRight: "12px",
               paddingBottom: "12px",
