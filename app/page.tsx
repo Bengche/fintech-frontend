@@ -48,7 +48,7 @@ export async function generateMetadata(): Promise<Metadata> {
       "Orange Money escrow",
       "safe online payment Cameroon",
       "Fonlok",
-      "paiement sÃ©curisÃ© Cameroun",
+      "paiement sécurisé Cameroun",
     ],
     openGraph: {
       title: t("title"),
@@ -354,6 +354,7 @@ export default async function LandingPage() {
           style={{
             backgroundColor: "var(--color-primary-light)",
             padding: "3rem 1.5rem 3.5rem",
+            overflow: "hidden",
             justifyContent: "center",
             alignItems: "center",
           }}
@@ -890,7 +891,7 @@ export default async function LandingPage() {
                     maxWidth: "480px",
                   }}
                 >
-                  A flat 2% platform fee is deducted at payout. Buyers pay
+                  A flat 3% platform fee is deducted at payout. Buyers pay
                   nothing extra. Full integration takes less than a day with our
                   documented REST API.
                 </p>

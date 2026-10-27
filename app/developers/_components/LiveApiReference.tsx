@@ -1051,12 +1051,12 @@ release = res.json()`}
   "invoice_id": "42-a1b2c3d4e5f6",
   "status": "completed",
   "gross_amount": 850000,
-  "platform_fee": 17000,
-  "seller_receives": 833000,
+  "platform_fee": 25500,
+  "seller_receives": 824500,
   "split": null,
   "currency": "XAF",
   "seller_phone": "237670000001",
-  "message": "833,000 XAF dispatched to 237670000001 via Mobile Money.",
+  "message": "824,500 XAF dispatched to 237670000001 via Mobile Money.",
   "released_at": "2025-01-15T10:35:00.000Z"
 }`}
           notes={
@@ -1075,7 +1075,7 @@ release = res.json()`}
         {/* ── SPLIT PAYOUTS ──────────────────────────────────────────── */}
         <GroupHeader
           title="Split payouts"
-          description="Earn a commission on every sale. Attach a split to an invoice (at creation, or when you release it) and Fonlok pays your cut to the MoMo number you provide, right after the seller is paid, and emails the recipient a branded payout receipt (to the optional split.email, or to your API key account email if you leave it out). The split is calculated on the invoice amount: with a 10,000 XAF invoice and a 5% split, you receive 500 XAF, Fonlok's 2% fee is 200 XAF, and the seller receives 9,300 XAF. There is no extra Fonlok fee for splits. The split applies however the funds are released: your API call, the buyer's confirmation link or code, or a dispute resolved in the seller's favour. It is not paid if the buyer is refunded."
+          description="Earn a commission on every sale. Attach a split to an invoice (at creation, or when you release it) and Fonlok pays your cut to the MoMo number you provide, right after the seller is paid, and emails the recipient a branded payout receipt (to the optional split.email, or to your API key account email if you leave it out). The split is calculated on the invoice amount: with a 10,000 XAF invoice and a 5% split, you receive 500 XAF, Fonlok's 3% fee is 300 XAF, and the seller receives 9,200 XAF. There is no extra Fonlok fee for splits. The split applies however the funds are released: your API call, the buyer's confirmation link or code, or a dispute resolved in the seller's favour. It is not paid if the buyer is refunded."
         />
 
         <Endpoint
@@ -1847,7 +1847,7 @@ app.post(
   "invoice_id": "42-a1b2c3d4e5f6",
   "decision": "seller",
   "amount": 850000,
-  "amount_disbursed": 833000,
+  "amount_disbursed": 824500,
   "currency": "XAF",
   "status": "completed",
   "timestamp": "2025-01-17T09:00:00.000Z"
@@ -1860,7 +1860,7 @@ app.post(
   "invoice_id": "42-a1b2c3d4e5f6",
   "decision": "buyer",
   "amount": 850000,
-  "amount_disbursed": 833000,
+  "amount_disbursed": 824500,
   "currency": "XAF",
   "status": "refunded",
   "timestamp": "2025-01-17T09:00:00.000Z"
@@ -1878,8 +1878,8 @@ app.post(
   "seller_phone": "237670000001",
   "seller_email": "jean@example.com",
   "gross_amount": 850000,
-  "platform_fee": 17000,
-  "seller_receives": 833000,
+  "platform_fee": 25500,
+  "seller_receives": 824500,
   "split": null,   // or the split object (amount already deducted from seller_receives)
   "currency": "XAF",
   "timestamp": "2025-01-15T10:35:00.000Z"
@@ -1897,8 +1897,8 @@ app.post(
   "seller_phone": "237670000001",
   "seller_email": "jean@example.com",
   "gross_amount": 850000,
-  "platform_fee": 17000,
-  "seller_receives": 833000,
+  "platform_fee": 25500,
+  "seller_receives": 824500,
   "currency": "XAF",
   "released_at": "2025-01-15T10:35:00.000Z"
 }`,

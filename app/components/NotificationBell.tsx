@@ -228,10 +228,10 @@ export default function NotificationBell({
               className="notif-panel-anim"
               style={{
                 position: "relative",
-                width: "calc(100vw - 24px)",
+                width: "100%",
                 maxWidth: "480px",
                 height: "auto",
-                maxHeight: "calc(100vh - 96px)",
+                maxHeight: "calc(100dvh - 96px)",
                 minHeight: "200px",
                 background: "#ffffff",
                 borderRadius: "20px",

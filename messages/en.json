@@ -417,7 +417,7 @@
     },
     "networkNote": {
       "heading": "About Mobile Money network charges",
-      "body": "MTN and Orange apply their own transaction fees on Mobile Money payments (typically around 1–2%). These charges are collected by the mobile network operator at the moment of payment and are completely separate from Fonlok's 3% fee. Fonlok does not receive or control these charges."
+      "body": "MTN and Orange apply their own transaction fees on Mobile Money payments (typically around 1–2%). These charges are collected by the mobile network operator at the moment of payment and are completely separate from Fonlok's 3% fee. Fonlok does not receive or control these charges. Fonlok's 3% fee is all-inclusive: it already covers payout processing,       so sellers pay nothing more on top."
     },
     "referral": {
       "heading": "Earn back your fee — and more",
@@ -789,7 +789,7 @@
       "milestoneMustAddUp": "Amounts must add up to {total} XAF. Difference: {diff} XAF.",
       "milestoneLabel": "Milestone {n} label",
       "escrowFeeTitle": "Escrow fee:",
-      "escrowFeeDesc": "Fonlok charges a flat 2% fee per transaction. This is deducted from your payout after the buyer confirms delivery. Buyers are never charged a Fonlok fee.",
+      "escrowFeeDesc": "Fonlok charges a flat 3% fee per transaction. This is deducted from your payout after the buyer confirms delivery. Buyers are never charged a Fonlok fee.",
       "partPaymentNotice": "This amount is above the mobile money limit ({limit} XAF), so your buyer will pay it in {count} equal parts of about {part} XAF each. The funds stay in escrow and you are only asked to deliver once every part is paid.",
       "saveAsTemplate": "Save this invoice as a template",
       "cancelTemplate": "Cancel",

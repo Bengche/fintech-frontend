@@ -1505,7 +1505,7 @@ curl https://api.fonlok.com/v1/ping \\
           <Lead>
             Release held funds to the seller after the buyer confirms receipt of
             the goods or service. Fonlok deducts a{" "}
-            <strong>2% platform fee</strong>, then disburses the net amount
+            <strong>3% platform fee</strong>, then disburses the net amount
             directly to the seller&apos;s MoMo number via Campay. Both parties
             receive an email confirmation.
           </Lead>
@@ -1541,12 +1541,12 @@ curl https://api.fonlok.com/v1/ping \\
   "invoice_id":      "12-a1b2c3d4e5f6",
   "status":          "completed",
   "gross_amount":    35000,
-  "platform_fee":    700,
-  "seller_receives": 34300,
+  "platform_fee":    1050,
+  "seller_receives": 33950,
   "split":           null,
   "currency":        "XAF",
   "seller_phone":    "237670123456",
-  "message":         "34300 XAF dispatched to 237670123456 via Mobile Money.",
+  "message":         "33950 XAF dispatched to 237670123456 via Mobile Money.",
   "released_at":     "2026-07-17T10:30:00.000Z"
 }`}</Code>
 
@@ -1571,8 +1571,8 @@ curl https://api.fonlok.com/v1/ping \\
               }}
             >
               <span>Gross amount:</span> <span>35,000 XAF</span>
-              <span>Platform fee (2%):</span>{" "}
-              <span style={{ color: C.red }}>− 700 XAF</span>
+              <span>Platform fee (3%):</span>{" "}
+              <span style={{ color: C.red }}>− 1,050 XAF</span>
               <span
                 style={{
                   color: C.text,
@@ -1591,7 +1591,7 @@ curl https://api.fonlok.com/v1/ping \\
                   paddingTop: "4px",
                 }}
               >
-                34,300 XAF
+                33,950 XAF
               </span>
             </div>
           </div>
@@ -1696,8 +1696,8 @@ curl https://api.fonlok.com/v1/ping \\
               }}
             >
               <span>Gross amount:</span> <span>10,000 XAF</span>
-              <span>Platform fee (2%):</span>{" "}
-              <span style={{ color: C.red }}>− 200 XAF</span>
+              <span>Platform fee (3%):</span>{" "}
+              <span style={{ color: C.red }}>− 300 XAF</span>
               <span>Your split (5%):</span>{" "}
               <span style={{ color: C.red }}>− 500 XAF</span>
               <span
@@ -1718,7 +1718,7 @@ curl https://api.fonlok.com/v1/ping \\
                   paddingTop: "4px",
                 }}
               >
-                9,300 XAF
+                9,200 XAF
               </span>
             </div>
           </div>
@@ -2006,8 +2006,8 @@ curl https://api.fonlok.com/v1/ping \\
   "seller_phone":    "237670123456",
   "seller_email":    "amara@example.com",
   "gross_amount":    35000,
-  "platform_fee":    700,
-  "seller_receives": 34300,
+  "platform_fee":    1050,
+  "seller_receives": 33950,
   "split":           null,
   "currency":        "XAF",
   "timestamp":       "2026-07-17T10:30:00.000Z"

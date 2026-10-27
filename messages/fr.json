@@ -417,7 +417,7 @@
     },
     "networkNote": {
       "heading": "À propos des frais de réseau Mobile Money",
-      "body": "MTN et Orange appliquent leurs propres frais de transaction sur les paiements Mobile Money (généralement entre 1 et 2%). Ces frais sont perçus par l'opérateur de réseau mobile au moment du paiement et sont totalement indépendants des 3% de Fonlok. Fonlok ne reçoit pas et ne contrôle pas ces frais."
+      "body": "MTN et Orange appliquent leurs propres frais de transaction sur les paiements Mobile Money (généralement entre 1 et 2%). Ces frais sont perçus par l'opérateur de réseau mobile au moment du paiement et sont totalement indépendants des 3% de Fonlok. Fonlok ne reçoit pas et ne contrôle pas ces frais. Les 3% de Fonlok sont tout compris : ils couvrent déjà le traitement du versement, les vendeurs ne paient donc rien de plus."
     },
     "referral": {
       "heading": "Récupérez vos frais — et plus encore",
@@ -789,7 +789,7 @@
       "milestoneMustAddUp": "Les montants doivent totaliser {total} XAF. Différence : {diff} XAF.",
       "milestoneLabel": "Libellé du jalon {n}",
       "escrowFeeTitle": "Frais de séquestre :",
-      "escrowFeeDesc": "Fonlok prélève des frais fixes de 2% par transaction. Ceux-ci sont déduits de votre versement après confirmation de livraison par l'acheteur. Les acheteurs ne sont jamais facturés de frais Fonlok.",
+      "escrowFeeDesc": "Fonlok prélève des frais fixes de 3% par transaction. Ceux-ci sont déduits de votre versement après confirmation de livraison par l'acheteur. Les acheteurs ne sont jamais facturés de frais Fonlok.",
       "partPaymentNotice": "Ce montant dépasse la limite du mobile money ({limit} XAF) : votre acheteur le paiera donc en {count} parties égales d'environ {part} XAF chacune. Les fonds restent en séquestre et vous n'êtes invité à livrer qu'une fois toutes les parties payées.",
       "saveAsTemplate": "Enregistrer comme modèle",
       "cancelTemplate": "Annuler",

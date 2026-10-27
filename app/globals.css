@@ -99,6 +99,8 @@
 html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
   scroll-behavior: smooth;
   overflow-x: hidden;
 }
@@ -110,7 +112,10 @@ body {
   font-size: 1rem;
   line-height: 1.6;
   margin: 0;
-  overflow-x: hidden;
+  /* "clip" avoids turning <body> into its own scroll container, which breaks
+     position: fixed/sticky and 100dvh on iOS Safari (html already hides overflow). */
+  overflow-x: clip;
+  max-width: 100%;
   /* iOS standalone PWA (black-translucent status bar): keep content out of the
      notch / status-bar area. env() resolves to 0 everywhere else. */
   padding-top: env(safe-area-inset-top, 0px);
@@ -128,6 +133,19 @@ body::before {
   background-color: var(--color-primary);
   z-index: 1000;
   pointer-events: none;
+}
+
+/* iOS Safari zooms the whole page when a focused field has a font size under
+   16px, which leaves the site wider than the screen. Keep fields at 16px on
+   touch devices; desktop is unaffected. */
+@media (hover: none) and (pointer: coarse) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not(
+      [type="file"]
+    ):not([type="color"]):not([type="submit"]):not([type="button"]),
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
 }
 
 h1,

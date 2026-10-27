@@ -51,22 +51,38 @@ const STYLES = `
     30%      { transform: scale(1.4); }
   }
 
-  /* Mobile: full-screen chat panel */
+  /* Mobile: full-screen chat panel, sized to the visual viewport so the
+     iOS keyboard and browser bars never push content off-screen */
   @media (max-width: 640px) {
     .kila-panel {
       position: fixed !important;
-      top: 0 !important;
+      top: var(--kila-top, 0px) !important;
       left: 0 !important;
       right: 0 !important;
-      bottom: 0 !important;
-      width: 100vw !important;
-      max-height: 100dvh !important;
-      height: 100dvh !important;
+      bottom: auto !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      height: var(--kila-vh, 100dvh) !important;
+      max-height: var(--kila-vh, 100dvh) !important;
       border-radius: 0 !important;
     }
     .kila-panel > div:first-child {
       padding-top: calc(14px + env(safe-area-inset-top, 0px)) !important;
+      padding-left: max(16px, env(safe-area-inset-left, 0px)) !important;
+      padding-right: max(16px, env(safe-area-inset-right, 0px)) !important;
     }
+    .kila-footer {
+      padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px)) !important;
+    }
+  }
+
+  /* Tablet / small desktop: never wider than the screen */
+  .kila-panel { max-width: calc(100vw - 40px); box-sizing: border-box; }
+  @media (max-width: 640px) { .kila-panel { max-width: 100% !important; } }
+
+  /* iOS zooms the page when a focused input is under 16px */
+  @media (hover: none) and (pointer: coarse) {
+    .kila-input { font-size: 16px !important; }
   }
 
   .kila-msg-text a { color: #F59E0B; text-decoration: underline; }
@@ -127,11 +143,40 @@ export default function AiChatWidget() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, loading]);
 
-  // Focus input when panel opens
+  // Focus input when panel opens (skipped on touch devices, where it would
+  // instantly raise the keyboard and cover the conversation)
   useEffect(() => {
-    if (kilaOpen) {
+    if (kilaOpen && !window.matchMedia("(pointer: coarse)").matches) {
       setTimeout(() => inputRef.current?.focus(), 150);
     }
+  }, [kilaOpen]);
+
+  // Keep the panel inside the visible area (iOS keyboard / browser bars) and
+  // stop the page behind it from scrolling while it is open on phones.
+  useEffect(() => {
+    if (!kilaOpen) return;
+    const root = document.documentElement;
+    const vv = window.visualViewport;
+    const update = () => {
+      if (!vv) return;
+      root.style.setProperty("--kila-vh", `${vv.height}px`);
+      root.style.setProperty("--kila-top", `${vv.offsetTop}px`);
+    };
+    update();
+    vv?.addEventListener("resize", update);
+    vv?.addEventListener("scroll", update);
+
+    const isPhone = window.matchMedia("(max-width: 640px)").matches;
+    const prevOverflow = document.body.style.overflow;
+    if (isPhone) document.body.style.overflow = "hidden";
+
+    return () => {
+      vv?.removeEventListener("resize", update);
+      vv?.removeEventListener("scroll", update);
+      root.style.removeProperty("--kila-vh");
+      root.style.removeProperty("--kila-top");
+      document.body.style.overflow = prevOverflow;
+    };
   }, [kilaOpen]);
 
   // Close with animation
@@ -338,6 +383,9 @@ export default function AiChatWidget() {
             style={{
               flex: 1,
               overflowY: "auto",
+              overflowX: "hidden",
+              overscrollBehavior: "contain",
+              WebkitOverflowScrolling: "touch",
               padding: "16px 14px 8px",
               display: "flex",
               flexDirection: "column",
@@ -354,6 +402,7 @@ export default function AiChatWidget() {
                   flexDirection: msg.role === "user" ? "row-reverse" : "row",
                   alignItems: "flex-end",
                   gap: 8,
+                  minWidth: 0,
                 }}
               >
                 {/* AI avatar chip */}
@@ -397,6 +446,8 @@ export default function AiChatWidget() {
                         ? "0 2px 8px rgba(245,158,11,0.3)"
                         : "0 2px 8px rgba(0,0,0,0.07)",
                     wordBreak: "break-word",
+                    overflowWrap: "anywhere",
+                    minWidth: 0,
                   }}
                   dangerouslySetInnerHTML={{
                     __html: renderMarkdown(msg.content),
@@ -563,6 +614,7 @@ export default function AiChatWidget() {
 
           {/* Powered-by footer */}
           <div
+            className="kila-footer"
             style={{
               textAlign: "center",
               padding: "5px 0 8px",

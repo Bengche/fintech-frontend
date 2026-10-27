@@ -48,7 +48,7 @@ const faqSchema = {
     },
     {
       "@type": "Question",
-      name: "Who pays the Fonlok fee â€” buyer or seller?",
+      name: "Who pays the Fonlok fee - buyer or seller?",
       acceptedAnswer: {
         "@type": "Answer",
         text: "The seller pays a 3% fee on each transaction. Buyers pay the exact invoice amount with no additional charges from Fonlok.",

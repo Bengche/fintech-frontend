@@ -50,13 +50,13 @@ const howToSchema = {
       "@type": "HowToStep",
       position: 3,
       name: "Buyer pays with Mobile Money",
-      text: "The buyer opens the link and pays using MTN Mobile Money or Orange Money. The money goes into Fonlok&#39;s secure escrow account â€” not directly to the seller yet.",
+      text: "The buyer opens the link and pays using MTN Mobile Money or Orange Money. The money goes into Fonlok&#39;s secure escrow account - not directly to the seller yet.",
     },
     {
       "@type": "HowToStep",
       position: 4,
       name: "Deliver the goods or service",
-      text: "Once Fonlok confirms the payment, the seller is notified and delivers whatever was agreed â€” physical goods, a service, digital files, or anything else.",
+      text: "Once Fonlok confirms the payment, the seller is notified and delivers whatever was agreed - physical goods, a service, digital files, or anything else.",
     },
     {
       "@type": "HowToStep",

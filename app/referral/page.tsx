@@ -850,7 +850,7 @@ export default function ReferralPage() {
                         }}
                       >
                         @{u.username}
-                        {u.created_at ? ` Â· ${fmtDate(u.created_at)}` : ""}
+                        {u.created_at ? ` · ${fmtDate(u.created_at)}` : ""}
                       </p>
                     </div>
                   </div>

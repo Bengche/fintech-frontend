@@ -5,9 +5,9 @@ import { getTranslations } from "next-intl/server";
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
-    title: "Referral Programme â€” Earn 0.5% on every deal | Fonlok",
+    title: "Referral Programme - Earn 0.5% on every deal | Fonlok",
     description:
-      "Share your unique referral link and earn 0.5% commission on every transaction your referrals complete â€” automatically, forever, with no expiry.",
+      "Share your unique referral link and earn 0.5% commission on every transaction your referrals complete - automatically, forever, with no expiry.",
     alternates: { canonical: "https://fonlok.com/referral-programme" },
   };
 }
